@@ -6,7 +6,7 @@ import { userService } from '../../services/userService';
 import { notificationService } from '../../services/notificationService';
 import { getCurrentLevelInfo } from '../../utils/otakuLevels';
 import NotificationDropdown from './NotificationDropdown';
-import { API_BASE_URL } from '../../config/api';
+import { API_BASE_URL, IMAGE_BASE_URL } from '../../config/api';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -124,8 +124,14 @@ export default function Navbar() {
 
   const getAvatarUrl = (avatarUrl) => {
     if (!avatarUrl) return null;
+    // 외부 URL은 그대로 사용
     if (avatarUrl.startsWith('http')) return avatarUrl;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${avatarUrl}`;
+    // /uploads로 시작하면 API 서버 (파일 업로드)
+    if (avatarUrl.startsWith('/uploads')) {
+      return `${import.meta.env.VITE_API_URL || API_BASE_URL}${avatarUrl}`;
+    }
+    // 그 외는 IMAGE_BASE_URL (R2, 캐릭터 이미지)
+    return `${IMAGE_BASE_URL}${avatarUrl}`;
   };
 
   const menuItems = [
