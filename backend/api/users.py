@@ -440,3 +440,17 @@ def get_my_genre_radar(
     주요 장르별 평균 평점과 개수 (레이더 차트용)
     """
     return get_genre_radar_data(current_user.id)
+
+
+@router.get("/{user_id}/character-ratings", response_model=List[Dict])
+def get_user_character_ratings(
+    user_id: int,
+    limit: int = Query(500, ge=1, le=1000)
+):
+    """
+    다른 사용자가 평가한 캐릭터 목록 (공개)
+
+    rating, status와 함께 반환
+    """
+    from services.profile_service import get_character_ratings
+    return get_character_ratings(user_id, limit)

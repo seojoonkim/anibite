@@ -109,6 +109,12 @@ export const userService = {
     return response.data;
   },
 
+  // Get other user's character ratings (public)
+  async getUserCharacterRatings(userId, params = {}) {
+    const response = await api.get(`/api/users/${userId}/character-ratings`, { params });
+    return response.data;
+  },
+
   // Upload profile picture
   async uploadAvatar(file) {
     const formData = new FormData();
