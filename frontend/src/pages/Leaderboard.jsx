@@ -4,7 +4,7 @@ import { userService } from '../services/userService';
 import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/common/Navbar';
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
-import { API_BASE_URL } from '../config/api';
+import { getAvatarUrl as getAvatarUrlHelper } from '../utils/imageHelpers';
 
 export default function Leaderboard() {
   const { language } = useLanguage();
@@ -28,9 +28,7 @@ export default function Leaderboard() {
   };
 
   const getAvatarUrl = (avatarUrl) => {
-    if (!avatarUrl) return null;
-    if (avatarUrl.startsWith('http')) return avatarUrl;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${avatarUrl}`;
+    return getAvatarUrlHelper(avatarUrl) || '/placeholder-avatar.png';
   };
 
   const toRoman = (num) => {
