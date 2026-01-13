@@ -15,7 +15,7 @@ cmds = [
 ]
 
 [start]
-cmd = "cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT"
+cmd = "cd backend && python3 scripts/create_feed_activities_table.py && python3 scripts/create_feed_triggers.py && uvicorn main:app --host 0.0.0.0 --port $PORT"
 
 [variables]
 PYTHONUNBUFFERED = "1"
