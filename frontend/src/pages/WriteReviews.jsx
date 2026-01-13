@@ -66,43 +66,8 @@ export default function WriteReviews() {
       // Sort by the mixed score
       itemsWithScore.sort((a, b) => b.sortScore - a.sortScore);
 
-      // Load reviews first before showing content
-      const CHUNK_SIZE = 15; // 청크 크기
-      const reviewsMap = {};
-
-      // Split items into chunks for progressive loading
-      const chunks = [];
-      for (let i = 0; i < itemsWithScore.length; i += CHUNK_SIZE) {
-        chunks.push(itemsWithScore.slice(i, i + CHUNK_SIZE));
-      }
-
-      // Load all reviews before displaying content
-      for (let i = 0; i < chunks.length; i++) {
-        const chunkPromises = chunks[i].map(item => {
-          if (item.type === 'anime') {
-            return reviewService.getMyReview(item.itemId)
-              .then(myReview => {
-                if (myReview && myReview.content && myReview.content.trim()) {
-                  reviewsMap[item.id] = myReview;
-                }
-              })
-              .catch(() => {});
-          } else {
-            return characterReviewService.getMyReview(item.itemId)
-              .then(myReview => {
-                if (myReview && myReview.content && myReview.content.trim()) {
-                  reviewsMap[item.id] = myReview;
-                }
-              })
-              .catch(() => {});
-          }
-        });
-
-        await Promise.all(chunkPromises);
-      }
-
-      // 모든 리뷰 로드 완료 후 한 번에 표시
-      setReviews({ ...reviewsMap });
+      // Don't pre-load reviews - load them only when user clicks "작성하기" or "수정"
+      // This dramatically improves initial page load speed (50+ API calls -> 0)
       setAllItems(itemsWithScore);
       setReviewsLoading(false);
       setLoading(false);
@@ -113,10 +78,36 @@ export default function WriteReviews() {
     }
   };
 
-  const handleStartEdit = (id, existingContent = '', currentRating = 0) => {
-    setEditingId(id);
-    setEditContent(existingContent);
+  const handleStartEdit = async (item, existingContent = '', currentRating = 0) => {
+    setEditingId(item.id);
     setEditRating(currentRating);
+
+    // Load existing review if not already loaded and no content provided
+    if (!existingContent && !reviews[item.id]) {
+      try {
+        let myReview;
+        if (item.type === 'anime') {
+          myReview = await reviewService.getMyReview(item.itemId);
+        } else {
+          myReview = await characterReviewService.getMyReview(item.itemId);
+        }
+
+        if (myReview && myReview.content && myReview.content.trim()) {
+          setReviews(prev => ({
+            ...prev,
+            [item.id]: myReview
+          }));
+          setEditContent(myReview.content);
+        } else {
+          setEditContent('');
+        }
+      } catch (err) {
+        // No review exists, start with empty content
+        setEditContent('');
+      }
+    } else {
+      setEditContent(existingContent);
+    }
   };
 
   const handleSaveAnimeReview = async (animeId) => {
@@ -519,7 +510,7 @@ export default function WriteReviews() {
                               {hasReview.content}
                             </p>
                             <button
-                              onClick={() => handleStartEdit(item.id, hasReview.content, item.rating)}
+                              onClick={() => handleStartEdit(item, hasReview.content, item.rating)}
                               className="text-sm text-[#3797F0] hover:text-[#2C7CB8]"
                             >
                               수정
@@ -527,7 +518,7 @@ export default function WriteReviews() {
                           </>
                         ) : (
                           <button
-                            onClick={() => handleStartEdit(item.id, '', item.rating)}
+                            onClick={() => handleStartEdit(item, '', item.rating)}
                             className="text-sm text-gray-500 hover:text-gray-700 border border-gray-300 px-4 py-2 rounded hover:border-gray-400 transition-colors"
                           >
                             리뷰 작성하기
