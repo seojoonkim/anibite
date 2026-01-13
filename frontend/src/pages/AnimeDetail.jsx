@@ -424,10 +424,12 @@ export default function AnimeDetail() {
     }
 
     try {
-      // 별점이 기존과 다르면 먼저 별점 저장
+      // 별점을 항상 먼저 저장 (리뷰 작성 시 필수)
       if (!myRating || myRating.rating !== reviewData.rating) {
         const ratingResult = await ratingService.rateAnime(parseInt(id), { rating: reviewData.rating, status: 'RATED' });
         setMyRating(ratingResult);
+        // 별점 저장 후 약간의 딜레이를 주어 DB 반영 보장
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
 
       if (isEditingReview && myReview) {

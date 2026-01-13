@@ -215,10 +215,12 @@ export default function CharacterDetail() {
     }
 
     try {
-      // 별점이 기존과 다르면 먼저 별점 저장
+      // 별점을 항상 먼저 저장 (리뷰 작성 시 필수)
       if (!character.my_rating || character.my_rating !== reviewData.rating) {
         await characterService.rateCharacter(parseInt(id), reviewData.rating);
         setCharacter({ ...character, my_rating: reviewData.rating });
+        // 별점 저장 후 약간의 딜레이를 주어 DB 반영 보장
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
 
       if (isEditingReview && myReview && myReview.review_id) {
