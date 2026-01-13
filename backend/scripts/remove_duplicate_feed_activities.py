@@ -58,28 +58,32 @@ def remove_duplicates():
 
 
 def add_unique_constraint():
-    """Add unique constraint to prevent future duplicates"""
+    """Add unique constraint to prevent future duplicates (recreate if exists)"""
     db = get_db()
 
     print("\nAdding unique constraint to feed_activities...")
 
     try:
-        # SQLite doesn't support ADD CONSTRAINT, so we need to check if index exists
+        # Check if index exists
         existing_index = db.execute_query("""
             SELECT name FROM sqlite_master
             WHERE type='index' AND name='idx_feed_unique_activity'
         """, fetch_one=True)
 
         if existing_index:
-            print("✓ Unique constraint already exists")
-        else:
-            db.execute_query("""
-                CREATE UNIQUE INDEX idx_feed_unique_activity
-                ON feed_activities(activity_type, user_id, item_id)
-            """)
-            print("✓ Added unique constraint to prevent duplicates")
+            print("  Dropping existing unique constraint...")
+            db.execute_query("DROP INDEX idx_feed_unique_activity")
+
+        # Create unique index
+        db.execute_query("""
+            CREATE UNIQUE INDEX idx_feed_unique_activity
+            ON feed_activities(activity_type, user_id, item_id)
+        """)
+        print("✓ Created unique constraint to prevent duplicates")
     except Exception as e:
         print(f"⚠ Failed to add unique constraint: {e}")
+        # Don't fail the whole script if this doesn't work
+        pass
 
 
 if __name__ == "__main__":
