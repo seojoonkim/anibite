@@ -7,6 +7,12 @@ export const userService = {
     return response.data;
   },
 
+  // Get other user's profile
+  async getUserProfile(userId) {
+    const response = await api.get(`/api/users/${userId}/profile`);
+    return response.data;
+  },
+
   // Get user statistics
   async getStats() {
     const response = await api.get('/api/users/me/stats');
@@ -16,6 +22,12 @@ export const userService = {
   // Get genre preferences
   async getGenrePreferences() {
     const response = await api.get('/api/users/me/genre-preferences');
+    return response.data;
+  },
+
+  // Get other user's genre preferences
+  async getUserGenrePreferences(userId) {
+    const response = await api.get(`/api/users/${userId}/genre-preferences`);
     return response.data;
   },
 
