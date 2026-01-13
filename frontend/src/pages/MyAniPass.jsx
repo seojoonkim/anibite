@@ -390,6 +390,8 @@ export default function MyAniPass() {
         // Initialize likes and comments state
         const likesState = {};
         const commentsState = {};
+        const newExpandedComments = new Set();
+        const commentsToLoad = [];
         feedData.forEach(activity => {
           const key = `${activity.activity_type}_${activity.user_id}_${activity.item_id}`;
           likesState[key] = {
@@ -397,13 +399,31 @@ export default function MyAniPass() {
             liked: Boolean(activity.user_has_liked)
           };
           commentsState[key] = [];
+          // 댓글이 있으면 자동으로 펼치기
+          if (activity.comments_count > 0) {
+            newExpandedComments.add(key);
+            commentsToLoad.push(activity);
+          }
         });
         setActivityLikes(likesState);
         setComments(commentsState);
-        // 프로필 페이지에서는 댓글 자동 펼침 안함 (성능 최적화)
-        setExpandedComments(new Set());
+        setExpandedComments(newExpandedComments);
 
         setLoadedTabs(prev => ({ ...prev, feed: true }));
+
+        // 로딩 완료 (댓글은 백그라운드에서 순차 로드)
+        setLoading(false);
+        setTabLoading(false);
+
+        // 댓글이 있는 활동의 댓글을 순차적으로 로드
+        if (commentsToLoad.length > 0) {
+          (async () => {
+            for (const activity of commentsToLoad) {
+              await loadComments(activity);
+            }
+          })();
+        }
+        return;
       }
 
       setLoading(false);
