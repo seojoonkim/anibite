@@ -2,9 +2,9 @@
 # AniPass 애니메이션 평가 플랫폼
 
 # Web Framework
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-python-multipart==0.0.6
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
 
 # Authentication & Security
 python-jose[cryptography]==3.3.0
@@ -12,9 +12,9 @@ passlib[bcrypt]==1.7.4
 python-dateutil==2.8.2
 
 # Data Validation
-pydantic==2.5.3
-pydantic-settings==2.1.0
-email-validator==2.1.0
+pydantic==2.10.6
+pydantic-settings==2.7.1
+email-validator==2.2.0
 
 # Database (SQLite)
 # No additional package needed - using built-in sqlite3
