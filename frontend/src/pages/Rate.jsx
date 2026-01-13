@@ -381,7 +381,7 @@ export default function Rate() {
 
   const loadStats = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/users/me/stats', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || API_BASE_URL}/api/users/me/stats`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
