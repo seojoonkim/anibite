@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { userService } from '../services/userService';
 import { authService } from '../services/authService';
 import Navbar from '../components/common/Navbar';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 export default function Settings() {
   const { user, updateUser } = useAuth();
@@ -152,23 +152,21 @@ export default function Settings() {
     setIsChangingAvatar(true);
     setAvatarError('');
     setAvatarSuccess('');
-    setAvatarMode('upload');
+    setAvatarMode('character');
     setSelectedFile(null);
     setPreviewUrl(null);
     setSelectedCharacterId(null);
 
     // Load 5-star characters
-    if (avatarMode === 'character' || fiveStarCharacters.length === 0) {
-      try {
-        setLoadingCharacters(true);
-        const characters = await userService.getFiveStarCharacters();
-        setFiveStarCharacters(characters);
-      } catch (err) {
-        console.error('Failed to load characters:', err);
-        setAvatarError(language === 'ko' ? '캐릭터 목록을 불러오지 못했습니다.' : 'Failed to load characters.');
-      } finally {
-        setLoadingCharacters(false);
-      }
+    try {
+      setLoadingCharacters(true);
+      const characters = await userService.getFiveStarCharacters();
+      setFiveStarCharacters(characters);
+    } catch (err) {
+      console.error('Failed to load characters:', err);
+      setAvatarError(language === 'ko' ? '캐릭터 목록을 불러오지 못했습니다.' : 'Failed to load characters.');
+    } finally {
+      setLoadingCharacters(false);
     }
   };
 
@@ -253,7 +251,8 @@ export default function Settings() {
   const getAvatarUrl = (url) => {
     if (!url) return '/placeholder-avatar.png';
     if (url.startsWith('http')) return url;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${url}`;
+    // Use IMAGE_BASE_URL for character images stored in R2
+    return `${IMAGE_BASE_URL}${url}`;
   };
 
   return (
