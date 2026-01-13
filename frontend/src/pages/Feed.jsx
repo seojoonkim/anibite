@@ -18,6 +18,7 @@ import Navbar from '../components/common/Navbar';
 import StarRating from '../components/common/StarRating';
 import NotificationCard from '../components/feed/NotificationCard';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
+import { getAvatarUrl as getAvatarUrlHelper, getAvatarFallback } from '../utils/imageHelpers';
 
 export default function Feed() {
   const { user } = useAuth();
@@ -476,18 +477,26 @@ export default function Feed() {
     return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
+  // Use helper function for avatar URLs (R2-first with fallback)
   const getAvatarUrl = (avatarUrl) => {
-    if (!avatarUrl) return '/placeholder-avatar.png';
-    if (avatarUrl.startsWith('http')) return avatarUrl;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${avatarUrl}`;
+    return getAvatarUrlHelper(avatarUrl) || '/placeholder-avatar.png';
   };
 
-  const handleAvatarError = (e, userId) => {
-    // 이미 실패한 이미지는 다시 시도하지 않음 (무한 루프 방지)
-    if (failedImages.has(`avatar-${userId}`)) return;
-
-    setFailedImages(prev => new Set(prev).add(`avatar-${userId}`));
-    e.target.src = '/placeholder-avatar.png';
+  const handleAvatarError = (e, userId, avatarUrl) => {
+    // R2 실패 시 외부 URL로 fallback
+    if (!e.target.dataset.fallbackAttempted && avatarUrl) {
+      e.target.dataset.fallbackAttempted = 'true';
+      const fallbackUrl = getAvatarFallback(avatarUrl);
+      if (fallbackUrl) {
+        e.target.src = fallbackUrl;
+        return;
+      }
+    }
+    // Fallback도 실패하면 hidden
+    if (!failedImages.has(`avatar-${userId}`)) {
+      setFailedImages(prev => new Set(prev).add(`avatar-${userId}`));
+      e.target.src = '/placeholder-avatar.png';
+    }
   };
 
   const handleImageError = (e, itemId) => {
