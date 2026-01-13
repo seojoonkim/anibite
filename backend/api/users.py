@@ -353,12 +353,8 @@ def set_avatar_from_character(
             detail="Character not found"
         )
 
-    avatar_url = char.get('image_url') or char.get('image_local')
-    if not avatar_url:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Character has no image"
-        )
+    # R2 우선: character ID 기반 경로를 우선 사용
+    avatar_url = f"/images/characters/{character_id}.jpg"
 
     # avatar_url 업데이트
     update_user_avatar(current_user.id, avatar_url)
