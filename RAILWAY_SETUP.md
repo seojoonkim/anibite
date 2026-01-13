@@ -19,15 +19,17 @@ Railway 프로젝트 Settings → Variables에서 다음 환경 변수를 추가
 # 로컬에서: openssl rand -hex 32
 SECRET_KEY=your-generated-secret-key-here
 
-# Vercel 프론트엔드 URL (CORS 설정)
-PRODUCTION_ORIGIN=https://your-frontend.vercel.app
+# 프론트엔드 URL (CORS 설정)
+PRODUCTION_ORIGIN=https://anipass.io
 ```
 
 ### 선택 환경 변수
 
 ```bash
-# Cloudflare R2 또는 CDN 사용 시
-IMAGE_BASE_URL=https://your-cdn-url.com
+# Cloudflare R2 이미지 URL
+# R2 버킷을 anipass.io 도메인에 연결한 경우:
+IMAGE_BASE_URL=https://images.anipass.io
+# 또는 R2 public URL: https://pub-xxxxx.r2.dev
 
 # 커스텀 데이터베이스 경로 (기본값: /app/data/anime.db)
 DATABASE_PATH=/data/anime.db

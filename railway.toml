@@ -1,0 +1,6 @@
+[build]
+builder = "nixpacks"
+nixpacksConfigPath = "nixpacks.toml"
+
+[build.nixpacks]
+pythonVersion = "3.11"
