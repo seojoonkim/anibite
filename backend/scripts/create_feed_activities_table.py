@@ -71,8 +71,17 @@ def create_feed_activities_table():
 
 
 def migrate_existing_data():
-    """Migrate existing activities to feed_activities table"""
+    """Migrate existing activities to feed_activities table (idempotent)"""
     db = get_db()
+
+    # Check if data already exists
+    result = db.execute_query("SELECT COUNT(*) FROM feed_activities", fetch_one=True)
+    existing_count = result[0] if result else 0
+
+    if existing_count > 0:
+        print(f"⚠ feed_activities table already has {existing_count} entries")
+        print("  Skipping migration to avoid duplicates...")
+        return
 
     print("Migrating existing data...")
 
