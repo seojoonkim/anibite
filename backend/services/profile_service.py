@@ -374,9 +374,10 @@ def get_five_star_characters(user_id: int) -> List[Dict]:
 
 
 def get_character_ratings(user_id: int, limit: int = 500) -> List[Dict]:
-    """사용자가 평가한 캐릭터 목록 (feed_activities 테이블 사용으로 극도로 빠름)"""
+    """사용자가 평가한 캐릭터 목록 (feed_activities + character_ratings 결합)"""
 
-    rows = db.execute_query(
+    # Part 1: 평점이 있는 캐릭터들 (feed_activities에서 빠르게 조회)
+    rated_rows = db.execute_query(
         """
         SELECT
             item_id as character_id,
@@ -384,7 +385,7 @@ def get_character_ratings(user_id: int, limit: int = 500) -> List[Dict]:
             item_title_korean as character_name_native,
             item_image as image_url,
             rating,
-            NULL as status,
+            'RATED' as status,
             activity_time as updated_at,
             anime_id,
             anime_title,
@@ -397,7 +398,45 @@ def get_character_ratings(user_id: int, limit: int = 500) -> List[Dict]:
         (user_id, limit)
     )
 
-    return [dict_from_row(row) for row in rows]
+    # Part 2: 평점 없이 상태만 있는 캐릭터들 (WANT_TO_KNOW, NOT_INTERESTED)
+    status_rows = db.execute_query(
+        """
+        SELECT
+            cr.character_id,
+            c.name_full as character_name,
+            c.name_native as character_name_native,
+            c.image_url,
+            cr.rating,
+            CASE
+                WHEN cr.status = 'NOT_INTERESTED' THEN 'PASS'
+                ELSE cr.status
+            END as status,
+            cr.updated_at,
+            (SELECT a.id FROM anime a
+             JOIN anime_character ac ON a.id = ac.anime_id
+             WHERE ac.character_id = cr.character_id
+             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END LIMIT 1) as anime_id,
+            (SELECT a.title_romaji FROM anime a
+             JOIN anime_character ac ON a.id = ac.anime_id
+             WHERE ac.character_id = cr.character_id
+             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END LIMIT 1) as anime_title,
+            (SELECT a.title_korean FROM anime a
+             JOIN anime_character ac ON a.id = ac.anime_id
+             WHERE ac.character_id = cr.character_id
+             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END LIMIT 1) as anime_title_korean
+        FROM character_ratings cr
+        JOIN character c ON cr.character_id = c.id
+        WHERE cr.user_id = ? AND cr.rating IS NULL
+        ORDER BY cr.updated_at DESC
+        """,
+        (user_id,)
+    )
+
+    # 두 결과를 합치고 updated_at 기준으로 정렬
+    all_results = [dict_from_row(row) for row in rated_rows] + [dict_from_row(row) for row in status_rows]
+    all_results.sort(key=lambda x: x['updated_at'], reverse=True)
+
+    return all_results[:limit]
 
 
 def get_leaderboard(limit: int = 50) -> List[Dict]:
