@@ -224,7 +224,7 @@ export default function Navbar() {
                       strokeWidth="5"
                       strokeLinecap="round"
                       fill="none"
-                      className="drop-shadow-lg"
+                      className=""
                     />
                     {/* Right side - very rounded */}
                     <path
@@ -233,14 +233,14 @@ export default function Navbar() {
                       strokeWidth="5"
                       strokeLinecap="round"
                       fill="none"
-                      className="drop-shadow-lg"
+                      className=""
                     />
                     {/* Cross bar - bubble style */}
                     <ellipse
                       cx="22" cy="26"
                       rx="8" ry="3"
                       fill="white"
-                      className="drop-shadow-lg"
+                      className=""
                     />
 
                     {/* Star Icon - Simple & Cute */}
@@ -251,12 +251,12 @@ export default function Navbar() {
                         stroke="white"
                         strokeWidth="1.2"
                         strokeLinejoin="round"
-                        className="drop-shadow-lg"
+                        className=""
                       />
                     </g>
                   </svg>
                 </div>
-                <span className="drop-shadow-lg">AniPass</span>
+                <span className="">AniPass</span>
               </Link>
             </div>
 
@@ -283,7 +283,7 @@ export default function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setShowLangMenu(!showLangMenu)}
-                  className="text-[#262626] hover:text-black px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1"
+                  className="text-[#262626] hover:text-black px-3 py-2 rounded-md text-xs font-medium transition-colors flex items-center gap-1"
                   style={{ minWidth: '70px' }}
                 >
                   <span>{language === 'ko' ? 'KO' : 'EN'}</span>
@@ -296,13 +296,13 @@ export default function Navbar() {
                   <div className="absolute right-0 mt-2 w-24 bg-white rounded-md shadow-[0_4px_16px_rgba(0,0,0,0.12)] z-50">
                     <button
                       onClick={() => handleLanguageChange('ko')}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-md"
+                      className="block w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 rounded-t-md"
                     >
                       KO
                     </button>
                     <button
                       onClick={() => handleLanguageChange('en')}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-md"
+                      className="block w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 rounded-b-md"
                     >
                       EN
                     </button>
@@ -401,7 +401,7 @@ export default function Navbar() {
                       </button>
                       <button
                         onClick={handleSettings}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        className="block w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 transition-colors"
                       >
                         <div className="flex items-center gap-2">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

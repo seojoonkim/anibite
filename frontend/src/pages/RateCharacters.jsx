@@ -37,7 +37,7 @@ export default function RateCharacters() {
           const cardWidth = cardElement.offsetWidth;
           // 별 5개가 카드에 꽉 차도록 계산 (패딩 고려)
           const availableWidth = cardWidth - 12; // 좌우 패딩 px-2 (8px * 2) 줄임
-          const starSize = Math.floor(availableWidth / 5.5); // 더 크게: 6 → 5.5
+          const starSize = Math.floor(availableWidth / 5.29); // 더 크게 (4% increase): 5.5 → 5.29
           newSizes[charId] = `${starSize}px`;
         }
       });
