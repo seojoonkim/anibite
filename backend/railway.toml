@@ -2,6 +2,6 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "python init_db.py; if [ ! -f /app/data/anime.db ] || [ $(stat -c%s /app/data/anime.db 2>/dev/null || echo 0) -lt 1000000 ]; then python download_db.py || echo 'Download failed, continuing with existing database'; fi; python scripts/create_feed_activities_table.py || true; python scripts/create_feed_triggers.py || true; python scripts/remove_duplicate_feed_activities.py || true; uvicorn main:app --host 0.0.0.0 --port $PORT"
+startCommand = "python init_db.py; if [ ! -f /app/data/anime.db ] || [ $(stat -c%s /app/data/anime.db 2>/dev/null || echo 0) -lt 1000000 ]; then python download_db.py || echo 'Download failed, continuing with existing database'; fi; python scripts/create_unified_activities.py || true; python scripts/update_activity_triggers.py || true; uvicorn main:app --host 0.0.0.0 --port $PORT"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
