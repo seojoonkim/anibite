@@ -43,13 +43,32 @@ def create_review(user_id: int, review_data: ReviewCreate) -> ReviewResponse:
             )
         )
 
-    # 평점 ID 가져오기 (있으면)
-    rating_row = db.execute_query(
-        "SELECT id FROM user_ratings WHERE user_id = ? AND anime_id = ?",
-        (user_id, review_data.anime_id),
-        fetch_one=True
-    )
-    rating_id = rating_row['id'] if rating_row else None
+    # 별점이 함께 제공된 경우 먼저 저장
+    rating_id = None
+    if review_data.rating is not None:
+        try:
+            from services.rating_service import rate_anime
+            from models.rating import RatingCreate, RatingStatus
+
+            # 별점 저장
+            rating_result = rate_anime(
+                user_id,
+                review_data.anime_id,
+                RatingCreate(rating=review_data.rating, status=RatingStatus.RATED)
+            )
+            rating_id = rating_result.id
+        except Exception as e:
+            # 별점 저장 실패해도 리뷰는 계속 진행 (rating_id 없이)
+            print(f"Warning: Failed to save rating: {e}")
+
+    # 기존 평점 ID 가져오기 (rating이 제공되지 않았거나 저장 실패한 경우)
+    if rating_id is None:
+        rating_row = db.execute_query(
+            "SELECT id FROM user_ratings WHERE user_id = ? AND anime_id = ?",
+            (user_id, review_data.anime_id),
+            fetch_one=True
+        )
+        rating_id = rating_row['id'] if rating_row else None
 
     # 리뷰 생성
     review_id = db.execute_insert(

@@ -48,6 +48,16 @@ def create_character_review(user_id: int, review_data: CharacterReviewCreate) ->
             )
         )
 
+    # 별점이 함께 제공된 경우 먼저 저장
+    if review_data.rating is not None:
+        try:
+            from services.character_service import rate_character
+            # 별점 저장
+            rate_character(user_id, review_data.character_id, review_data.rating)
+        except Exception as e:
+            # 별점 저장 실패해도 리뷰는 계속 진행
+            print(f"Warning: Failed to save character rating: {e}")
+
     # 리뷰 생성
     review_id = db.execute_insert(
         """
