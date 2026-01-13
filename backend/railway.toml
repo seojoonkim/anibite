@@ -1,0 +1,7 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "python init_db.py && uvicorn main:app --host 0.0.0.0 --port $PORT"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
