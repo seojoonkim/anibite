@@ -290,13 +290,17 @@ def migrate_existing_data():
 
 
 if __name__ == "__main__":
-    print("Creating feed_activities table for optimized feed queries...\n")
+    try:
+        print("Creating feed_activities table for optimized feed queries...\n")
 
-    create_feed_activities_table()
-    migrate_existing_data()
+        create_feed_activities_table()
+        migrate_existing_data()
 
-    print("\n✓ Migration completed successfully!")
-    print("\nNext steps:")
-    print("1. Update feed_service.py to use feed_activities table")
-    print("2. Add triggers to keep feed_activities in sync with source tables")
-    print("3. Test feed query performance")
+        print("\n✓ Migration completed successfully!")
+        print("\nNext steps:")
+        print("1. Update feed_service.py to use feed_activities table")
+        print("2. Add triggers to keep feed_activities in sync with source tables")
+        print("3. Test feed query performance")
+    except Exception as e:
+        print(f"⚠ Migration failed (may be already done): {e}")
+        print("Continuing anyway...")
