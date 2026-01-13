@@ -39,18 +39,8 @@ export default function Register() {
     const result = await register(registerData);
 
     if (result.success) {
-      if (result.emailVerificationRequired) {
-        // Redirect to email sent page
-        navigate('/email-sent', {
-          state: {
-            email: formData.email,
-            username: formData.username || formData.display_name
-          }
-        });
-      } else {
-        // User is already verified (shouldn't happen with new flow)
-        navigate('/');
-      }
+      // Registration successful - redirect to home
+      navigate('/');
     } else {
       setError(result.error);
     }
