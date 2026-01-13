@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import StarRating from '../common/StarRating';
-import { API_BASE_URL } from '../../config/api';
+import { API_BASE_URL, IMAGE_BASE_URL } from '../../config/api';
 
 export default function RatingHistory({ ratings }) {
   if (!ratings || ratings.length === 0) {
@@ -13,9 +13,13 @@ export default function RatingHistory({ ratings }) {
   }
 
   const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/placeholder-anime.png';
+    if (!imageUrl) return '/placeholder-anime.svg';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
+    // Use covers_large for better quality
+    const processedUrl = imageUrl.includes('/covers/')
+      ? imageUrl.replace('/covers/', '/covers_large/')
+      : imageUrl;
+    return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
   return (
@@ -37,7 +41,7 @@ export default function RatingHistory({ ratings }) {
                 alt={rating.title}
                 className="w-12 h-16 object-cover rounded flex-shrink-0 border-2 border-transparent group-hover:border-[#3498DB] transition-all"
                 onError={(e) => {
-                  e.target.src = '/placeholder-anime.png';
+                  e.target.src = '/placeholder-anime.svg';
                 }}
               />
 

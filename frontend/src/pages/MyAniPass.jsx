@@ -25,7 +25,7 @@ import SeasonStats from '../components/profile/SeasonStats';
 import GenreCombinationChart from '../components/profile/GenreCombinationChart';
 import api from '../services/api';
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 export default function MyAniPass() {
   const { user } = useAuth();
@@ -377,9 +377,13 @@ export default function MyAniPass() {
   };
 
   const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/placeholder-anime.png';
+    if (!imageUrl) return '/placeholder-anime.svg';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
+    // Use covers_large for better quality
+    const processedUrl = imageUrl.includes('/covers/')
+      ? imageUrl.replace('/covers/', '/covers_large/')
+      : imageUrl;
+    return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
   const getAvatarUrl = (avatarUrl) => {
@@ -649,7 +653,7 @@ export default function MyAniPass() {
   const handleImageError = (e, itemId) => {
     if (failedImages.has(`image-${itemId}`)) return;
     setFailedImages(prev => new Set(prev).add(`image-${itemId}`));
-    e.target.src = '/placeholder-anime.png';
+    e.target.src = '/placeholder-anime.svg';
   };
 
   const handleCreatePost = async () => {
@@ -699,7 +703,7 @@ export default function MyAniPass() {
               alt={title}
               className="w-full h-full object-cover"
               onError={(e) => {
-                e.target.src = '/placeholder-anime.png';
+                e.target.src = '/placeholder-anime.svg';
               }}
             />
           </div>

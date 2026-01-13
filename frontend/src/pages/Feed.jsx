@@ -17,7 +17,7 @@ import { getCurrentLevelInfo } from '../utils/otakuLevels';
 import Navbar from '../components/common/Navbar';
 import StarRating from '../components/common/StarRating';
 import NotificationCard from '../components/feed/NotificationCard';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 export default function Feed() {
   const { user } = useAuth();
@@ -467,9 +467,13 @@ export default function Feed() {
   }, []);
 
   const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/placeholder-anime.png';
+    if (!imageUrl) return '/placeholder-anime.svg';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
+    // Use covers_large for better quality
+    const processedUrl = imageUrl.includes('/covers/')
+      ? imageUrl.replace('/covers/', '/covers_large/')
+      : imageUrl;
+    return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
   const getAvatarUrl = (avatarUrl) => {
@@ -491,7 +495,7 @@ export default function Feed() {
     if (failedImages.has(`image-${itemId}`)) return;
 
     setFailedImages(prev => new Set(prev).add(`image-${itemId}`));
-    e.target.src = '/placeholder-anime.png';
+    e.target.src = '/placeholder-anime.svg';
   };
 
   const getActivityText = (activity) => {

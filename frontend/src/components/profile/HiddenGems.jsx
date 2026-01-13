@@ -1,14 +1,18 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
-import { API_BASE_URL } from '../../config/api';
+import { API_BASE_URL, IMAGE_BASE_URL } from '../../config/api';
 
 export default function HiddenGems({ gems }) {
   const { language } = useLanguage();
 
   const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/placeholder-anime.png';
+    if (!imageUrl) return '/placeholder-anime.svg';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
+    // Use covers_large for better quality
+    const processedUrl = imageUrl.includes('/covers/')
+      ? imageUrl.replace('/covers/', '/covers_large/')
+      : imageUrl;
+    return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
   return (
@@ -38,7 +42,7 @@ export default function HiddenGems({ gems }) {
                 alt={anime.title}
                 className="w-12 h-16 object-cover rounded"
                 onError={(e) => {
-                  e.target.src = '/placeholder-anime.png';
+                  e.target.src = '/placeholder-anime.svg';
                 }}
               />
 
