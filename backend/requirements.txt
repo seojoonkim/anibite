@@ -26,8 +26,3 @@ email-validator==2.2.0
 
 # CORS
 # No additional package needed - using FastAPI's built-in CORSMiddleware
-
-# Development
-pytest==7.4.4
-pytest-asyncio==0.23.3
-httpx==0.26.0  # For testing FastAPI
