@@ -1788,7 +1788,7 @@ export default function MyAniPass() {
 
                                 {/* Review Content */}
                                 {activity.review_content && (
-                                  <p className="text-sm text-gray-700 line-clamp-2">
+                                  <p className="text-sm text-gray-700 whitespace-pre-wrap">
                                     {activity.review_content}
                                   </p>
                                 )}
