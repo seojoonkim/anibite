@@ -26,6 +26,12 @@ def create_feed_triggers():
         AFTER INSERT ON user_ratings
         WHEN NEW.status = 'RATED' AND NEW.rating IS NOT NULL
         BEGIN
+            -- Delete existing entry first to avoid duplicates
+            DELETE FROM feed_activities
+            WHERE activity_type = 'anime_rating'
+              AND user_id = NEW.user_id
+              AND item_id = NEW.anime_id;
+
             INSERT INTO feed_activities (
                 activity_type, user_id, item_id, activity_time,
                 username, display_name, avatar_url, otaku_score,
@@ -172,6 +178,12 @@ def create_feed_triggers():
         AFTER INSERT ON character_ratings
         WHEN NEW.rating IS NOT NULL
         BEGIN
+            -- Delete existing entry first to avoid duplicates
+            DELETE FROM feed_activities
+            WHERE activity_type = 'character_rating'
+              AND user_id = NEW.user_id
+              AND item_id = NEW.character_id;
+
             INSERT INTO feed_activities (
                 activity_type, user_id, item_id, activity_time,
                 username, display_name, avatar_url, otaku_score,
@@ -349,6 +361,12 @@ def create_feed_triggers():
         CREATE TRIGGER IF NOT EXISTS trg_user_post_insert
         AFTER INSERT ON user_posts
         BEGIN
+            -- Delete existing entry first to avoid duplicates (should not happen but just in case)
+            DELETE FROM feed_activities
+            WHERE activity_type = 'user_post'
+              AND user_id = NEW.user_id
+              AND item_id = NEW.id;
+
             INSERT INTO feed_activities (
                 activity_type, user_id, item_id, activity_time,
                 username, display_name, avatar_url, otaku_score,
