@@ -1184,13 +1184,8 @@ export default function AnimeDetail() {
                     const isExpanded = expandedComments.has(review.id);
                     const levelInfo = getCurrentLevelInfo(review.otaku_score || 0);
 
-                    // 내 리뷰일 경우 현재 user 정보 사용
+                    // Use review data directly from backend (includes avatar_url, username, display_name)
                     const isMyReview = review.user_id === user?.id;
-                    const reviewUser = {
-                      avatar_url: review.avatar_url || (isMyReview ? user?.avatar_url : null),
-                      display_name: review.display_name || (isMyReview ? user?.display_name : null),
-                      username: review.username || (isMyReview ? user?.username : null)
-                    };
 
                     return (
                       <div key={review.id} className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-all">
@@ -1217,17 +1212,17 @@ export default function AnimeDetail() {
                               <div className="flex items-center gap-2">
                                 {/* User Avatar */}
                                 <Link to={`/user/${review.user_id}`} className="flex-shrink-0">
-                                  {reviewUser.avatar_url ? (
+                                  {review.avatar_url ? (
                                     <img
-                                      src={getAvatarUrl(reviewUser.avatar_url)}
-                                      alt={reviewUser.display_name || reviewUser.username}
+                                      src={getAvatarUrl(review.avatar_url)}
+                                      alt={review.display_name || review.username}
                                       className="w-8 h-8 rounded-full object-cover border border-gray-200"
                                       onError={(e) => handleAvatarError(e, review.user_id)}
                                     />
                                   ) : (
                                     <div className="w-8 h-8 rounded-full flex items-center justify-center border border-gray-200" style={{ background: 'linear-gradient(to bottom right, #90B2E4, #638CCC)' }}>
                                       <span className="text-white text-xs font-bold">
-                                        {(reviewUser.display_name || reviewUser.username || '?').charAt(0).toUpperCase()}
+                                        {(review.display_name || review.username || '?').charAt(0).toUpperCase()}
                                       </span>
                                     </div>
                                   )}
@@ -1236,7 +1231,7 @@ export default function AnimeDetail() {
                                   to={`/user/${review.user_id}`}
                                   className="text-sm font-medium text-gray-700 hover:text-[#A8E6CF] transition-colors"
                                 >
-                                  {reviewUser.display_name || reviewUser.username}
+                                  {review.display_name || review.username}
                                 </Link>
                                 {(() => {
                                   return (
