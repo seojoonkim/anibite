@@ -5,7 +5,7 @@ import { ratingService } from '../services/ratingService';
 import { seriesService } from '../services/seriesService';
 import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/common/Navbar';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 function RatingCard({ anime, onRate }) {
   const { getAnimeTitle, t, language } = useLanguage();
@@ -20,9 +20,13 @@ function RatingCard({ anime, onRate }) {
   const [starSize, setStarSize] = useState('3rem');
 
   const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/placeholder-anime.png';
+    if (!imageUrl) return '/placeholder-anime.svg';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
+    // Use covers_large for better quality
+    const processedUrl = imageUrl.includes('/covers/')
+      ? imageUrl.replace('/covers/', '/covers_large/')
+      : imageUrl;
+    return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
   useEffect(() => {
@@ -170,7 +174,7 @@ function RatingCard({ anime, onRate }) {
             alt={getAnimeTitle(anime)}
             className="w-full h-full object-cover group-hover/image:scale-110 transition-transform duration-300"
             onError={(e) => {
-              e.target.src = '/placeholder-anime.png';
+              e.target.src = '/placeholder-anime.svg';
             }}
           />
 

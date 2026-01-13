@@ -11,7 +11,7 @@ import Navbar from '../components/common/Navbar';
 import StarRating from '../components/common/StarRating';
 import RatingWidget from '../components/anime/RatingWidget';
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 export default function AnimeDetail() {
   const { id } = useParams();
@@ -509,9 +509,13 @@ export default function AnimeDetail() {
   };
 
   const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/placeholder-anime.png';
+    if (!imageUrl) return '/placeholder-anime.svg';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
+    // Use covers_large for better quality
+    const processedUrl = imageUrl.includes('/covers/')
+      ? imageUrl.replace('/covers/', '/covers_large/')
+      : imageUrl;
+    return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
   if (loading) {
@@ -603,7 +607,7 @@ export default function AnimeDetail() {
                 alt={getAnimeTitle(anime)}
                 className="w-full"
                 onError={(e) => {
-                  e.target.src = '/placeholder-anime.png';
+                  e.target.src = '/placeholder-anime.svg';
                 }}
               />
             </div>
@@ -941,7 +945,7 @@ export default function AnimeDetail() {
                             alt={char.character_name}
                             className="w-16 h-16 rounded-full object-cover"
                             onError={(e) => {
-                              e.target.src = '/placeholder-anime.png';
+                              e.target.src = '/placeholder-anime.svg';
                             }}
                           />
                           {/* Role Badge */}
@@ -970,7 +974,7 @@ export default function AnimeDetail() {
                             alt={char.voice_actor_name}
                             className="w-16 h-16 rounded-full object-cover"
                             onError={(e) => {
-                              e.target.src = '/placeholder-anime.png';
+                              e.target.src = '/placeholder-anime.svg';
                             }}
                           />
                           <div className="flex-1 min-w-0">
@@ -997,7 +1001,7 @@ export default function AnimeDetail() {
                         alt={staff.name_full}
                         className="w-20 h-20 rounded-full object-cover mb-2"
                         onError={(e) => {
-                          e.target.src = '/placeholder-anime.png';
+                          e.target.src = '/placeholder-anime.svg';
                         }}
                       />
                       <h4 className="font-medium text-sm truncate w-full">{staff.name_full}</h4>
@@ -1025,7 +1029,7 @@ export default function AnimeDetail() {
                           alt={getAnimeTitle(rec)}
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            e.target.src = '/placeholder-anime.png';
+                            e.target.src = '/placeholder-anime.svg';
                           }}
                         />
                       </div>
@@ -1194,7 +1198,7 @@ export default function AnimeDetail() {
                               alt={getAnimeTitle(anime)}
                               className="w-16 h-24 object-cover rounded border-2 border-transparent hover:border-[#A8E6CF] transition-all"
                               onError={(e) => {
-                                e.target.src = '/placeholder-anime.png';
+                                e.target.src = '/placeholder-anime.svg';
                               }}
                             />
                           </Link>

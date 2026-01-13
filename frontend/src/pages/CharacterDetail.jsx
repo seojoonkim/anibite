@@ -10,7 +10,7 @@ import * as ActivityUtils from '../utils/activityUtils';
 import Navbar from '../components/common/Navbar';
 import StarRating from '../components/common/StarRating';
 import CharacterRatingWidget from '../components/character/CharacterRatingWidget';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 export default function CharacterDetail() {
   const { id } = useParams();
@@ -655,13 +655,17 @@ export default function CharacterDetail() {
   };
 
   const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/placeholder-anime.png';
+    if (!imageUrl) return '/placeholder-anime.svg';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
+    // Use covers_large for better quality
+    const processedUrl = imageUrl.includes('/covers/')
+      ? imageUrl.replace('/covers/', '/covers_large/')
+      : imageUrl;
+    return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
   const getCoverUrl = (coverUrl) => {
-    if (!coverUrl) return '/placeholder-anime.png';
+    if (!coverUrl) return '/placeholder-anime.svg';
     if (coverUrl.startsWith('http')) return coverUrl;
     return `${import.meta.env.VITE_API_URL || API_BASE_URL}${coverUrl}`;
   };
@@ -767,7 +771,7 @@ export default function CharacterDetail() {
                 alt={character.name_full}
                 className="w-full"
                 onError={(e) => {
-                  e.target.src = '/placeholder-anime.png';
+                  e.target.src = '/placeholder-anime.svg';
                 }}
               />
             </div>
@@ -997,7 +1001,7 @@ export default function CharacterDetail() {
                             alt={getAnimeTitle(anime)}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             onError={(e) => {
-                              e.target.src = '/placeholder-anime.png';
+                              e.target.src = '/placeholder-anime.svg';
                             }}
                           />
                           {/* Role Badge */}
@@ -1160,7 +1164,7 @@ export default function CharacterDetail() {
                           alt={character?.name_full}
                           className="w-16 h-24 object-cover rounded border-2 border-transparent hover:border-[#A8E6CF] transition-all"
                           onError={(e) => {
-                            e.target.src = '/placeholder-anime.png';
+                            e.target.src = '/placeholder-anime.svg';
                           }}
                         />
                       </Link>
@@ -1605,7 +1609,7 @@ export default function CharacterDetail() {
                               alt={character?.name_full}
                               className="w-16 h-24 object-cover rounded border-2 border-transparent hover:border-[#A8E6CF] transition-all"
                               onError={(e) => {
-                                e.target.src = '/placeholder-anime.png';
+                                e.target.src = '/placeholder-anime.svg';
                               }}
                             />
                           </Link>

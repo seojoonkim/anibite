@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import StarRating from '../common/StarRating';
-import { API_BASE_URL } from '../../config/api';
+import { IMAGE_BASE_URL } from '../../config/api';
 
 export default function AnimeCard({ anime }) {
   const getStatusColor = (status) => {
@@ -13,9 +13,13 @@ export default function AnimeCard({ anime }) {
   };
 
   const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/placeholder-anime.png';
+    if (!imageUrl) return '/placeholder-anime.svg';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
+    // Use covers_large for better quality
+    const processedUrl = imageUrl.includes('/covers/')
+      ? imageUrl.replace('/covers/', '/covers_large/')
+      : imageUrl;
+    return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
   return (

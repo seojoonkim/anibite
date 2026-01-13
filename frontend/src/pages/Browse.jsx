@@ -4,7 +4,7 @@ import { animeService } from '../services/animeService';
 import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/common/Navbar';
 import StarRating from '../components/common/StarRating';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 export default function Browse() {
   const { t, getAnimeTitle, language } = useLanguage();
@@ -76,9 +76,13 @@ export default function Browse() {
   };
 
   const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/placeholder-anime.png';
+    if (!imageUrl) return '/placeholder-anime.svg';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
+    // Use covers_large for better quality
+    const processedUrl = imageUrl.includes('/covers/')
+      ? imageUrl.replace('/covers/', '/covers_large/')
+      : imageUrl;
+    return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
   const getStatusBadge = (status) => {
@@ -246,7 +250,7 @@ export default function Browse() {
                                   alt={getAnimeTitle(anime)}
                                   className="w-full h-full object-cover hover:scale-110 transition-transform duration-200"
                                   onError={(e) => {
-                                    e.target.src = '/placeholder-anime.png';
+                                    e.target.src = '/placeholder-anime.svg';
                                   }}
                                 />
                               </div>
