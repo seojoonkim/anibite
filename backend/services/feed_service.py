@@ -425,6 +425,10 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
         SELECT
             'anime_rating' as activity_type,
             ur.user_id,
+            u.username,
+            u.display_name,
+            u.avatar_url,
+            COALESCE(us.otaku_score, 0) as otaku_score,
             ur.anime_id as item_id,
             a.title_romaji as item_title,
             a.title_korean as item_title_korean,
@@ -435,6 +439,7 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
             NULL as anime_title,
             NULL as anime_title_korean,
             r.content as review_content,
+            NULL as post_content,
             COALESCE(r.id, (SELECT id FROM user_reviews WHERE user_id = ur.user_id AND anime_id = ur.anime_id LIMIT 1)) as review_id,
             COALESCE((SELECT COUNT(*) FROM review_comments rc
              JOIN user_reviews ur2 ON rc.review_id = ur2.id
@@ -458,7 +463,9 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
                 END
             ELSE 0 END as user_has_liked
         FROM user_ratings ur
+        JOIN users u ON ur.user_id = u.id
         JOIN anime a ON ur.anime_id = a.id
+        LEFT JOIN user_stats us ON u.id = us.user_id
         LEFT JOIN user_reviews r ON ur.user_id = r.user_id AND ur.anime_id = r.anime_id
         WHERE ur.user_id = ? AND ur.status = 'RATED' AND ur.rating IS NOT NULL
         ORDER BY COALESCE(r.created_at, ur.updated_at) DESC
@@ -472,6 +479,10 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
         SELECT
             'character_rating' as activity_type,
             cr.user_id,
+            u.username,
+            u.display_name,
+            u.avatar_url,
+            COALESCE(us.otaku_score, 0) as otaku_score,
             cr.character_id as item_id,
             c.name_full as item_title,
             c.name_native as item_title_korean,
@@ -488,6 +499,7 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
              WHERE ac.character_id = c.id
              ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC, a.popularity DESC LIMIT 1) as anime_title_korean,
             rev.content as review_content,
+            NULL as post_content,
             COALESCE(rev.id, (SELECT id FROM character_reviews WHERE user_id = cr.user_id AND character_id = cr.character_id LIMIT 1)) as review_id,
             COALESCE((SELECT COUNT(*) FROM review_comments rc
              JOIN character_reviews chr ON rc.review_id = chr.id
@@ -511,7 +523,9 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
                 END
             ELSE 0 END as user_has_liked
         FROM character_ratings cr
+        JOIN users u ON cr.user_id = u.id
         JOIN character c ON cr.character_id = c.id
+        LEFT JOIN user_stats us ON u.id = us.user_id
         LEFT JOIN character_reviews rev ON cr.user_id = rev.user_id AND cr.character_id = rev.character_id
         WHERE cr.user_id = ? AND cr.rating IS NOT NULL
         ORDER BY COALESCE(rev.created_at, cr.updated_at) DESC
@@ -525,6 +539,10 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
         SELECT
             'character_review' as activity_type,
             cr.user_id,
+            u.username,
+            u.display_name,
+            u.avatar_url,
+            COALESCE(us.otaku_score, 0) as otaku_score,
             cr.character_id as item_id,
             c.name_full as item_title,
             c.name_native as item_title_korean,
@@ -534,6 +552,7 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
             cr.created_at as activity_time,
             cr.id as review_id,
             cr.content as review_content,
+            NULL as post_content,
             (SELECT COUNT(*) FROM review_comments
              WHERE review_id = cr.id AND review_type = 'character') as comments_count,
             (SELECT a.title_romaji FROM anime a
@@ -556,7 +575,9 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
                  AND item_id = cr.character_id) > 0
             ELSE 0 END as user_has_liked
         FROM character_reviews cr
+        JOIN users u ON cr.user_id = u.id
         JOIN character c ON cr.character_id = c.id
+        LEFT JOIN user_stats us ON u.id = us.user_id
         WHERE cr.user_id = ?
         AND NOT EXISTS (
             SELECT 1 FROM character_ratings cr2
@@ -575,6 +596,10 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
         SELECT
             'anime_review' as activity_type,
             r.user_id,
+            u.username,
+            u.display_name,
+            u.avatar_url,
+            COALESCE(us.otaku_score, 0) as otaku_score,
             r.anime_id as item_id,
             a.title_romaji as item_title,
             a.title_korean as item_title_korean,
@@ -584,6 +609,7 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
             r.created_at as activity_time,
             r.id as review_id,
             r.content as review_content,
+            NULL as post_content,
             NULL as anime_title,
             NULL as anime_title_korean,
             (SELECT COUNT(*) FROM review_comments
@@ -600,7 +626,9 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
                  AND item_id = r.anime_id) > 0
             ELSE 0 END as user_has_liked
         FROM user_reviews r
+        JOIN users u ON r.user_id = u.id
         JOIN anime a ON r.anime_id = a.id
+        LEFT JOIN user_stats us ON u.id = us.user_id
         WHERE r.user_id = ?
         AND NOT EXISTS (
             SELECT 1 FROM user_ratings ur
@@ -620,6 +648,10 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
         SELECT
             'user_post' as activity_type,
             up.user_id,
+            u.username,
+            u.display_name,
+            u.avatar_url,
+            COALESCE(us.otaku_score, 0) as otaku_score,
             up.id as item_id,
             NULL as item_title,
             NULL as item_title_korean,
@@ -628,6 +660,8 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
             NULL as status,
             up.created_at as activity_time,
             up.content as post_content,
+            NULL as review_content,
+            NULL as review_id,
             NULL as anime_title,
             NULL as anime_title_korean,
             (SELECT COUNT(*) FROM activity_comments
@@ -646,6 +680,8 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
                  AND item_id = up.id) > 0
             ELSE 0 END as user_has_liked
         FROM user_posts up
+        JOIN users u ON up.user_id = u.id
+        LEFT JOIN user_stats us ON u.id = us.user_id
         WHERE up.user_id = ?
         ORDER BY up.created_at DESC
         """,
