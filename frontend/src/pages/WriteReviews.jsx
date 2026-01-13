@@ -7,6 +7,7 @@ import { characterReviewService } from '../services/characterReviewService';
 import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/common/Navbar';
 import StarRating from '../components/common/StarRating';
+import { API_BASE_URL } from '../config/api';
 
 export default function WriteReviews() {
   const { getAnimeTitle, language } = useLanguage();
@@ -278,7 +279,7 @@ export default function WriteReviews() {
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.png';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `http://localhost:8000${imageUrl}`;
+    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
   };
 
   const getFilteredItems = () => {

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
+import { API_BASE_URL } from '../config/api';
 
 export default function HiddenGems({ gems }) {
   const { language } = useLanguage();
@@ -7,7 +8,7 @@ export default function HiddenGems({ gems }) {
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.png';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `http://localhost:8000${imageUrl}`;
+    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
   };
 
   return (

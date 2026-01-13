@@ -25,6 +25,7 @@ import SeasonStats from '../components/profile/SeasonStats';
 import GenreCombinationChart from '../components/profile/GenreCombinationChart';
 import api from '../services/api';
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
+import { API_BASE_URL } from '../config/api';
 
 export default function MyAniPass() {
   const { user } = useAuth();
@@ -378,13 +379,13 @@ export default function MyAniPass() {
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.png';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `http://localhost:8000${imageUrl}`;
+    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
   };
 
   const getAvatarUrl = (avatarUrl) => {
     if (!avatarUrl) return null;
     if (avatarUrl.startsWith('http')) return avatarUrl;
-    return `http://localhost:8000${avatarUrl}`;
+    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${avatarUrl}`;
   };
 
   const getActivityText = (activity) => {

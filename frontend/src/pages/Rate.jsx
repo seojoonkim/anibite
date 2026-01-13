@@ -5,6 +5,7 @@ import { ratingService } from '../services/ratingService';
 import { seriesService } from '../services/seriesService';
 import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/common/Navbar';
+import { API_BASE_URL } from '../config/api';
 
 function RatingCard({ anime, onRate }) {
   const { getAnimeTitle, t, language } = useLanguage();
@@ -21,7 +22,7 @@ function RatingCard({ anime, onRate }) {
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.png';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `http://localhost:8000${imageUrl}`;
+    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
   };
 
   useEffect(() => {

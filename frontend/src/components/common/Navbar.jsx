@@ -6,6 +6,7 @@ import { userService } from '../../services/userService';
 import { notificationService } from '../../services/notificationService';
 import { getCurrentLevelInfo } from '../../utils/otakuLevels';
 import NotificationDropdown from './NotificationDropdown';
+import { API_BASE_URL } from '../config/api';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -124,7 +125,7 @@ export default function Navbar() {
   const getAvatarUrl = (avatarUrl) => {
     if (!avatarUrl) return null;
     if (avatarUrl.startsWith('http')) return avatarUrl;
-    return `http://localhost:8000${avatarUrl}`;
+    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${avatarUrl}`;
   };
 
   const menuItems = [

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { notificationService } from '../../services/notificationService';
 import { useLanguage } from '../../context/LanguageContext';
+import { API_BASE_URL } from '../config/api';
 
 export default function NotificationDropdown({
   isOpen,
@@ -144,13 +145,13 @@ export default function NotificationDropdown({
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.png';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `http://localhost:8000${imageUrl}`;
+    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
   };
 
   const getAvatarUrl = (avatarUrl) => {
     if (!avatarUrl) return '/placeholder-avatar.png';
     if (avatarUrl.startsWith('http')) return avatarUrl;
-    return `http://localhost:8000${avatarUrl}`;
+    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${avatarUrl}`;
   };
 
   // 알림 클릭 (피드 알림 페이지의 해당 활동으로 이동)
