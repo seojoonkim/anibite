@@ -454,12 +454,3 @@ def get_user_character_ratings(
     """
     from services.profile_service import get_character_ratings
     return get_character_ratings(user_id, limit)
-
-
-@router.post("/fix-character-images-198-202")
-def fix_character_images():
-    """임시: 텐마와 야쿠모 이미지 경로 수정"""
-    from database import db
-    db.execute_update("UPDATE character SET image_url = ? WHERE id = ?", ("/images/characters/198.jpg", 198))
-    db.execute_update("UPDATE character SET image_url = ? WHERE id = ?", ("/images/characters/202.jpg", 202))
-    return {"status": "ok", "message": "Updated character 198 and 202 image paths"}
