@@ -583,24 +583,14 @@ export default function CharacterDetail() {
       const currentLike = reviewLikes[reviewId] || { liked: false, count: 0 };
       const newLiked = !currentLike.liked;
 
-      // Check if this is a ratings-only review
-      if (ActivityUtils.isRatingsOnly(review)) {
-        // Use activity like service for ratings-only
-        const activityType = ActivityUtils.getActivityType(review);
-        const userId = ActivityUtils.getUserId(review);
-        const itemId = ActivityUtils.getItemId(review);
+      // Always use activityLikeService for consistency
+      const activityType = 'character_rating';
+      const userId = review.user_id;
+      const itemId = review.character_id;
 
-        await import('../services/activityLikeService').then(module =>
-          module.activityLikeService.toggleLike(activityType, userId, itemId)
-        );
-      } else {
-        // Use character review service for full reviews
-        if (newLiked) {
-          await characterReviewService.likeReview(reviewId);
-        } else {
-          await characterReviewService.unlikeReview(reviewId);
-        }
-      }
+      await import('../services/activityLikeService').then(module =>
+        module.activityLikeService.toggleLike(activityType, userId, itemId)
+      );
 
       setReviewLikes(prev => ({
         ...prev,

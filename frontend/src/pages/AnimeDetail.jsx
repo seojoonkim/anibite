@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { animeService } from '../services/animeService';
 import { ratingService } from '../services/ratingService';
 import { reviewService } from '../services/reviewService';
-import { reviewLikeService } from '../services/reviewLikeService';
+import { activityLikeService } from '../services/activityLikeService';
 import * as ActivityUtils from '../utils/activityUtils';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -223,14 +223,14 @@ export default function AnimeDetail() {
     }
 
     try {
+      const review = getReviewById(reviewId);
+      if (!review) return;
+
       const currentLike = reviewLikes[reviewId];
       const newLiked = !currentLike.liked;
 
-      if (newLiked) {
-        await reviewLikeService.likeReview(reviewId);
-      } else {
-        await reviewLikeService.unlikeReview(reviewId);
-      }
+      // Use activityLikeService with activity_type, activity_user_id, item_id
+      await activityLikeService.toggleLike('anime_rating', review.user_id, review.anime_id);
 
       setReviewLikes(prev => ({
         ...prev,
