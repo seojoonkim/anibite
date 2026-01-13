@@ -358,7 +358,7 @@ def get_five_star_characters(user_id: int) -> List[Dict]:
             c.id as character_id,
             c.name_full,
             c.name_native,
-            COALESCE('/' || c.image_local, c.image_url) as image_url,
+            c.image_url as image_url,
             c.image_local,
             cr.rating
         FROM character_ratings cr
@@ -374,7 +374,7 @@ def get_five_star_characters(user_id: int) -> List[Dict]:
 
 
 def get_character_ratings(user_id: int, limit: int = 500) -> List[Dict]:
-    """사용자가 평가한 캐릭터 목록 (평가, 알고싶어요, 관심없어요 포함)"""
+    """사용자가 평가한 캐릭터 목록 (최적화 버전 - LEFT JOIN 사용)"""
 
     rows = db.execute_query(
         """
@@ -382,24 +382,23 @@ def get_character_ratings(user_id: int, limit: int = 500) -> List[Dict]:
             cr.character_id,
             c.name_full as character_name,
             c.name_native as character_name_native,
-            COALESCE('/' || c.image_local, c.image_url) as image_url,
+            c.image_url as image_url,
             cr.rating,
             cr.status,
             cr.updated_at,
-            (SELECT a.id FROM anime a
-             JOIN anime_character ac ON a.id = ac.anime_id
-             WHERE ac.character_id = c.id
-             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC, a.popularity DESC LIMIT 1) as anime_id,
-            (SELECT a.title_romaji FROM anime a
-             JOIN anime_character ac ON a.id = ac.anime_id
-             WHERE ac.character_id = c.id
-             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC, a.popularity DESC LIMIT 1) as anime_title,
-            (SELECT a.title_korean FROM anime a
-             JOIN anime_character ac ON a.id = ac.anime_id
-             WHERE ac.character_id = c.id
-             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC, a.popularity DESC LIMIT 1) as anime_title_korean
+            a.id as anime_id,
+            a.title_romaji as anime_title,
+            a.title_korean as anime_title_korean
         FROM character_ratings cr
         JOIN character c ON cr.character_id = c.id
+        LEFT JOIN (
+            SELECT DISTINCT ac.character_id, a.id, a.title_romaji, a.title_korean,
+                   ROW_NUMBER() OVER (PARTITION BY ac.character_id
+                                      ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END,
+                                               a.start_date ASC, a.popularity DESC) as rn
+            FROM anime_character ac
+            JOIN anime a ON ac.anime_id = a.id
+        ) a ON c.id = a.character_id AND a.rn = 1
         WHERE cr.user_id = ?
         ORDER BY cr.updated_at DESC
         LIMIT ?
