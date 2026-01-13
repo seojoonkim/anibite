@@ -274,12 +274,14 @@ export default function MyAniPass() {
       // 다른 사용자 프로필 정보 로드
       if (!isOwnProfile && !profileUser) {
         const targetUserId = parseInt(userId);
-        const [profile, genrePrefs] = await Promise.all([
+        const [profileData, genrePrefs] = await Promise.all([
           userService.getUserProfile(targetUserId).catch(() => null),
           userService.getUserGenrePreferences(targetUserId).catch(() => [])
         ]);
-        setProfileUser(profile);
-        setStats(profile); // 다른 사용자의 stats는 profile에 포함됨
+        if (profileData) {
+          setProfileUser(profileData.user); // user 객체 설정
+          setStats(profileData.stats); // stats 객체 설정
+        }
         setGenrePreferences(genrePrefs);
       }
 
