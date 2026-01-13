@@ -221,22 +221,41 @@ export default function MyAniPass() {
 
   const loadData = async () => {
     try {
+      // 다른 사용자의 프로필을 볼 때는 anipass 탭은 표시 안함
+      if (!isOwnProfile && activeTab === 'anipass') {
+        return;
+      }
+
       // 이미 로드한 탭이면 스킵 (anipass와 feed는 항상 새로 로드)
       if (loadedTabs[activeTab] && activeTab !== 'anipass' && activeTab !== 'feed') {
         return;
       }
 
       // Only show full loading screen on initial load
-      if (!stats) {
+      if (!stats && isOwnProfile) {
+        setLoading(true);
+      } else if (!profileUser && !isOwnProfile) {
         setLoading(true);
       } else {
         setTabLoading(true);
       }
 
-      // 항상 stats 로드 (탭에 숫자 표시용)
-      if (!stats) {
+      // 내 프로필일 때는 stats 로드
+      if (!stats && isOwnProfile) {
         const statsData = await userService.getStats();
         setStats(statsData);
+      }
+
+      // 다른 사용자 프로필 정보 로드
+      if (!isOwnProfile && !profileUser) {
+        const targetUserId = parseInt(userId);
+        const [profile, genrePrefs] = await Promise.all([
+          userService.getUserProfile(targetUserId).catch(() => null),
+          userService.getUserGenrePreferences(targetUserId).catch(() => [])
+        ]);
+        setProfileUser(profile);
+        setStats(profile); // 다른 사용자의 stats는 profile에 포함됨
+        setGenrePreferences(genrePrefs);
       }
 
       if (activeTab === 'anipass') {
@@ -278,10 +297,17 @@ export default function MyAniPass() {
         setGenreCombinations(genreCombo);
       } else if (activeTab === 'anime') {
         // Load all anime (rated, watchlist, pass)
+        const targetUserId = isOwnProfile ? null : parseInt(userId);
         const [ratedData, watchlistData, passData] = await Promise.all([
-          ratingService.getMyRatings({ limit: 500, status: 'RATED' }),
-          ratingService.getMyRatings({ limit: 100, status: 'WANT_TO_WATCH' }),
-          ratingService.getMyRatings({ limit: 100, status: 'PASS' })
+          isOwnProfile
+            ? ratingService.getMyRatings({ limit: 500, status: 'RATED' })
+            : ratingService.getUserRatings(targetUserId, { limit: 500, status: 'RATED' }),
+          isOwnProfile
+            ? ratingService.getMyRatings({ limit: 100, status: 'WANT_TO_WATCH' })
+            : ratingService.getUserRatings(targetUserId, { limit: 100, status: 'WANT_TO_WATCH' }),
+          isOwnProfile
+            ? ratingService.getMyRatings({ limit: 100, status: 'PASS' })
+            : ratingService.getUserRatings(targetUserId, { limit: 100, status: 'PASS' })
         ]);
 
         const allAnimeData = [
@@ -300,7 +326,10 @@ export default function MyAniPass() {
         setLoadedTabs(prev => ({ ...prev, anime: true }));
       } else if (activeTab === 'character') {
         // Load initial character ratings quickly (50 first)
-        const initialCharactersData = await userService.getCharacterRatings({ limit: 50 });
+        const targetUserId = isOwnProfile ? null : parseInt(userId);
+        const initialCharactersData = isOwnProfile
+          ? await userService.getCharacterRatings({ limit: 50 })
+          : await userService.getUserCharacterRatings(targetUserId, { limit: 50 });
         setAllCharacters(initialCharactersData || []);
 
         // Apply initial filter immediately
@@ -309,7 +338,11 @@ export default function MyAniPass() {
         setTabLoading(false);
 
         // Load remaining characters in background
-        userService.getCharacterRatings({ limit: 500, offset: 50 }).then(remainingData => {
+        const loadRemainingChars = isOwnProfile
+          ? userService.getCharacterRatings({ limit: 500, offset: 50 })
+          : userService.getUserCharacterRatings(targetUserId, { limit: 500, offset: 50 });
+
+        loadRemainingChars.then(remainingData => {
           if (remainingData && remainingData.length > 0) {
             const allData = [...(initialCharactersData || []), ...remainingData];
             setAllCharacters(allData);
@@ -811,17 +844,19 @@ export default function MyAniPass() {
               >
                 {language === 'ko' ? '피드' : 'Feed'}
               </button>
-              <button
-                onClick={() => setActiveTab('anipass')}
-                className={`px-6 py-3 font-medium transition-colors ${
-                  activeTab === 'anipass'
-                    ? 'border-b-2'
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-                style={activeTab === 'anipass' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
-              >
-                {language === 'ko' ? '애니패스' : 'AniPass'}
-              </button>
+              {isOwnProfile && (
+                <button
+                  onClick={() => setActiveTab('anipass')}
+                  className={`px-6 py-3 font-medium transition-colors ${
+                    activeTab === 'anipass'
+                      ? 'border-b-2'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                  style={activeTab === 'anipass' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
+                >
+                  {language === 'ko' ? '애니패스' : 'AniPass'}
+                </button>
+              )}
               <button
                 onClick={() => setActiveTab('anime')}
                 className={`px-6 py-3 font-medium transition-colors ${
@@ -944,17 +979,19 @@ export default function MyAniPass() {
             >
               {language === 'ko' ? '피드' : 'Feed'}
             </button>
-            <button
-              onClick={() => setActiveTab('anipass')}
-              className={`px-6 py-3 font-medium transition-colors ${
-                activeTab === 'anipass'
-                  ? 'border-b-2'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-              style={activeTab === 'anipass' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
-            >
-              {language === 'ko' ? '애니패스' : 'AniPass'}
-            </button>
+            {isOwnProfile && (
+              <button
+                onClick={() => setActiveTab('anipass')}
+                className={`px-6 py-3 font-medium transition-colors ${
+                  activeTab === 'anipass'
+                    ? 'border-b-2'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+                style={activeTab === 'anipass' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
+              >
+                {language === 'ko' ? '애니패스' : 'AniPass'}
+              </button>
+            )}
             <button
               onClick={() => setActiveTab('anime')}
               className={`px-6 py-3 font-medium transition-colors ${

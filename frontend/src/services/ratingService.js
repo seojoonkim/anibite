@@ -29,6 +29,12 @@ export const ratingService = {
     return response.data;
   },
 
+  // Get other user's ratings (public)
+  async getUserRatings(userId, params = {}) {
+    const response = await api.get(`/api/ratings/user/${userId}`, { params });
+    return response.data;
+  },
+
   // Delete rating
   async deleteRating(animeId) {
     const response = await api.delete(`/api/ratings/anime/${animeId}`);

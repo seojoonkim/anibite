@@ -85,3 +85,18 @@ def delete_my_rating(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Rating not found"
         )
+
+
+@router.get("/user/{user_id}", response_model=UserRatingListResponse)
+def get_user_ratings_by_id(
+    user_id: int,
+    status: Optional[RatingStatus] = Query(None, description="상태 필터"),
+    limit: Optional[int] = Query(None, ge=1, le=1000, description="최대 개수")
+):
+    """
+    다른 사용자의 평점 목록 조회 (공개)
+
+    - status: RATED, WANT_TO_WATCH, PASS
+    - limit: 최대 개수
+    """
+    return get_user_ratings(user_id, status, limit)
