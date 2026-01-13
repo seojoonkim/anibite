@@ -381,16 +381,15 @@ export default function MyAniPass() {
         });
       } else if (activeTab === 'feed') {
         const targetUserId = userId || user?.id;
-        const feedData = await feedService.getUserFeed(targetUserId, 30, 0);
+        // 빠른 로딩: 초기 10개만 로드
+        const feedData = await feedService.getUserFeed(targetUserId, 10, 0);
         setUserActivities(feedData || []);
-        setFeedOffset(30);
-        setHasMoreFeed(feedData && feedData.length === 30);
+        setFeedOffset(10);
+        setHasMoreFeed(feedData && feedData.length === 10);
 
         // Initialize likes and comments state
         const likesState = {};
         const commentsState = {};
-        const newExpandedComments = new Set();
-        const commentsToLoad = [];
         feedData.forEach(activity => {
           const key = `${activity.activity_type}_${activity.user_id}_${activity.item_id}`;
           likesState[key] = {
@@ -398,23 +397,11 @@ export default function MyAniPass() {
             liked: Boolean(activity.user_has_liked)
           };
           commentsState[key] = [];
-          // Auto-expand comments for activities that have comments
-          if (activity.comments_count > 0) {
-            newExpandedComments.add(key);
-            commentsToLoad.push(activity);
-          }
         });
         setActivityLikes(likesState);
         setComments(commentsState);
-        setExpandedComments(newExpandedComments);
-
-        // Load comments for activities with comments (limit to first 5 to avoid too many requests)
-        if (commentsToLoad.length > 0) {
-          const limitedCommentsToLoad = commentsToLoad.slice(0, 5);
-          for (const activity of limitedCommentsToLoad) {
-            await loadComments(activity);
-          }
-        }
+        // 프로필 페이지에서는 댓글 자동 펼침 안함 (성능 최적화)
+        setExpandedComments(new Set());
 
         setLoadedTabs(prev => ({ ...prev, feed: true }));
       }
@@ -722,10 +709,12 @@ export default function MyAniPass() {
     try {
       await userPostService.createPost(newPostContent);
       setNewPostContent('');
-      // Reload feed data
+      // Reload feed data (최신 10개만)
       const targetUserId = userId || user?.id;
-      const feedData = await feedService.getUserFeed(targetUserId, 50, 0);
+      const feedData = await feedService.getUserFeed(targetUserId, 10, 0);
       setUserActivities(feedData || []);
+      setFeedOffset(10);
+      setHasMoreFeed(feedData && feedData.length === 10);
 
       // Reinitialize likes and comments state
       const likesState = {};
@@ -736,10 +725,11 @@ export default function MyAniPass() {
           count: activity.likes_count || 0,
           liked: Boolean(activity.user_has_liked)
         };
-        commentsState[key] = activity.comments || [];
+        commentsState[key] = [];
       });
       setActivityLikes(likesState);
-      setActivityComments(commentsState);
+      setComments(commentsState);
+      setExpandedComments(new Set());
     } catch (err) {
       console.error('Failed to create post:', err);
       alert(language === 'ko' ? '게시물 작성에 실패했습니다.' : 'Failed to create post.');
