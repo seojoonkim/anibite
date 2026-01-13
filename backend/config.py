@@ -56,3 +56,7 @@ TOP_K_SIMILAR_USERS = 20
 
 # Images
 COVER_IMAGES_DIR = BASE_DIR / "data" / "images" / "covers"
+IMAGE_BASE_URL = os.getenv("IMAGE_BASE_URL", "http://localhost:8000/static/images")
+
+# Cloudflare R2 Settings (Production)
+# Set IMAGE_BASE_URL=https://images.anipass.io in production environment
