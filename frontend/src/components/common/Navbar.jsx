@@ -204,7 +204,7 @@ export default function Navbar() {
           <div className="flex items-center h-16 relative">
             {/* Logo */}
             <div className="flex items-center" style={{ width: '200px' }}>
-              <Link to="/feed" className="flex items-center gap-3 text-2xl font-bold text-black hover:opacity-60 transition-opacity group">
+              <Link to="/feed" className="flex items-center gap-2 text-2xl font-bold text-black hover:opacity-60 transition-opacity group">
                 {/* AniPass Logo Icon */}
                 <div className="relative">
                   <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -370,7 +370,7 @@ export default function Navbar() {
                         </span>
                       </div>
                     )}
-                    <span className="text-base font-medium">{user.display_name || user.username}</span>
+                    <span className="text-sm font-medium">{user.display_name || user.username}</span>
                     {(() => {
                       const levelInfo = getCurrentLevelInfo(otakuScore);
                       return (
