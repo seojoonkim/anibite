@@ -205,13 +205,17 @@ export default function Feed() {
         setComments(newComments);
         setExpandedComments(newExpandedComments);
 
-        // 댓글이 있는 활동의 댓글 로드 (빠른 로딩: 처음 3개만)
-        if (commentsToLoad.length > 0) {
-          commentsToLoad.slice(0, 3).forEach(activity => loadComments(activity));
-        }
-
-        // 저장함 로딩 완료
+        // 저장함 로딩 완료 (댓글은 백그라운드에서 순차 로드)
         setLoading(false);
+
+        // 댓글이 있는 활동의 댓글을 순차적으로 로드
+        if (commentsToLoad.length > 0) {
+          (async () => {
+            for (const activity of commentsToLoad) {
+              await loadComments(activity);
+            }
+          })();
+        }
       } else if (feedFilter === 'notifications') {
         // 알림 데이터 로드 (최적화: 10개만)
         const notificationData = await notificationService.getNotifications(initialLimit, 0);
@@ -306,13 +310,17 @@ export default function Feed() {
         setComments(newComments);
         setExpandedComments(newExpandedComments);
 
-        // 댓글이 있는 활동의 댓글 로드 (빠른 로딩: 처음 3개만)
-        if (commentsToLoad.length > 0) {
-          commentsToLoad.slice(0, 3).forEach(activity => loadComments(activity));
-        }
-
-        // 알림 로딩 완료
+        // 알림 로딩 완료 (댓글은 백그라운드에서 순차 로드)
         setLoading(false);
+
+        // 댓글이 있는 활동의 댓글을 순차적으로 로드
+        if (commentsToLoad.length > 0) {
+          (async () => {
+            for (const activity of commentsToLoad) {
+              await loadComments(activity);
+            }
+          })();
+        }
       } else {
         // 전체 또는 팔로잉 - 점진적 로딩
         const showFollowing = feedFilter === 'following';
@@ -353,13 +361,17 @@ export default function Feed() {
         setComments(newComments);
         setExpandedComments(newExpandedComments);
 
-        // 댓글이 있는 활동의 댓글 로드 (빠른 로딩: 처음 3개만)
-        if (commentsToLoad.length > 0) {
-          commentsToLoad.slice(0, 3).forEach(activity => loadComments(activity));
-        }
-
-        // 로딩 완료 (무한 스크롤로 추가 로드)
+        // 로딩 완료 (무한 스크롤로 추가 로드, 댓글은 백그라운드에서 순차 로드)
         setLoading(false);
+
+        // 댓글이 있는 활동의 댓글을 순차적으로 로드
+        if (commentsToLoad.length > 0) {
+          (async () => {
+            for (const activity of commentsToLoad) {
+              await loadComments(activity);
+            }
+          })();
+        }
 
         return; // Early return to skip the setLoading(false) below
       }
