@@ -47,16 +47,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await authService.register(userData);
 
-      // If no access_token, email verification is required
-      if (!data.access_token) {
-        return {
-          success: true,
-          emailVerificationRequired: true,
-          user: data.user
-        };
-      }
-
-      // If access_token exists, user is already verified (shouldn't happen with new flow)
+      // User is automatically verified and logged in
       setUser(data.user);
       return { success: true, user: data.user };
     } catch (error) {
