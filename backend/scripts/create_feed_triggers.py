@@ -423,6 +423,10 @@ def create_feed_triggers():
 
 
 if __name__ == "__main__":
-    print("Creating triggers for feed_activities synchronization...\n")
-    create_feed_triggers()
-    print("\n✓ Setup completed! Feed activities will now be synchronized automatically.")
+    try:
+        print("Creating triggers for feed_activities synchronization...\n")
+        create_feed_triggers()
+        print("\n✓ Setup completed! Feed activities will now be synchronized automatically.")
+    except Exception as e:
+        print(f"⚠ Trigger creation failed (may be already done): {e}")
+        print("Continuing anyway...")
