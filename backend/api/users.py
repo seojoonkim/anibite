@@ -353,13 +353,23 @@ def set_avatar_from_character(
             detail="Character not found"
         )
 
-    # R2 우선: character ID 기반 경로를 우선 사용
-    avatar_url = f"/images/characters/{character_id}.jpg"
+    # 캐릭터의 원래 image_url 가져오기 (외부 URL)
+    # 프론트엔드에서 R2 우선 시도하고 실패하면 이 URL로 fallback
+    avatar_url = char.get('image_url') or char.get('image_local')
+    if not avatar_url:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Character has no image"
+        )
 
     # avatar_url 업데이트
     update_user_avatar(current_user.id, avatar_url)
 
-    return {"avatar_url": avatar_url}
+    # character_id도 함께 반환 (프론트엔드에서 R2 우선 시도용)
+    return {
+        "avatar_url": avatar_url,
+        "character_id": character_id
+    }
 
 
 @router.get("/leaderboard", response_model=List[Dict])
