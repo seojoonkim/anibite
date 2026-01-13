@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+backend/__pycache__/
+backend/**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+data/backend.log
+
+# Build outputs
+frontend/dist/
+frontend/build/
+*.egg-info/
+dist/
+build/
+
+# Database temporary files
+*.db-shm
+*.db-wal
+
+# Images (3.1GB - too large for GitHub)
+data/images/characters/
+data/images/banners/
+data/images/staff/
+data/images/covers/
+data/images/covers_large/
+
+# But keep the directory structure
+!data/images/.gitkeep
+!data/images/characters/.gitkeep
+!data/images/banners/.gitkeep
+!data/images/staff/.gitkeep
+!data/images/covers/.gitkeep
+!data/images/covers_large/.gitkeep
+
+# Testing
+.pytest_cache/
+coverage/
+.coverage
+htmlcov/
+
+# OS
+Thumbs.db
+Desktop.ini

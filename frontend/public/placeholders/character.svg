@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 230 323" width="230" height="323">
+  <defs>
+    <linearGradient id="char-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f5576c;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="230" height="323" fill="url(#char-gradient)"/>
+
+  <!-- Character icon -->
+  <g transform="translate(65, 106)">
+    <!-- Head -->
+    <circle cx="50" cy="40" r="28" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+    <!-- Body -->
+    <ellipse cx="50" cy="95" rx="35" ry="45" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+    <!-- Face details -->
+    <circle cx="42" cy="36" r="3" fill="rgba(255,255,255,0.6)"/>
+    <circle cx="58" cy="36" r="3" fill="rgba(255,255,255,0.6)"/>
+    <path d="M 42 48 Q 50 52 58 48" stroke="rgba(255,255,255,0.6)" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- Text -->
+  <text x="115" y="240" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="rgba(255,255,255,0.9)" text-anchor="middle">
+    No Image
+  </text>
+  <text x="115" y="260" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="rgba(255,255,255,0.7)" text-anchor="middle">
+    Available
+  </text>
+</svg>
