@@ -33,7 +33,7 @@ export default function Settings() {
 
   // Avatar changing state
   const [isChangingAvatar, setIsChangingAvatar] = useState(false);
-  const [avatarMode, setAvatarMode] = useState('upload'); // 'upload' or 'character'
+  const [avatarMode, setAvatarMode] = useState('character'); // only 'character' mode
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [fiveStarCharacters, setFiveStarCharacters] = useState([]);
@@ -319,59 +319,8 @@ export default function Settings() {
               </div>
             ) : (
               <div className="space-y-4">
-                {/* Mode selector */}
-                <div className="flex gap-2 border-b border-gray-200">
-                  <button
-                    onClick={() => setAvatarMode('upload')}
-                    className={`px-4 py-2 font-medium transition-colors ${
-                      avatarMode === 'upload'
-                        ? 'text-[#3498DB] border-b-2 border-blue-600'
-                        : 'text-gray-600 hover:text-gray-800'
-                    }`}
-                  >
-                    {language === 'ko' ? '파일 업로드' : 'Upload File'}
-                  </button>
-                  <button
-                    onClick={() => setAvatarMode('character')}
-                    className={`px-4 py-2 font-medium transition-colors ${
-                      avatarMode === 'character'
-                        ? 'text-[#3498DB] border-b-2 border-blue-600'
-                        : 'text-gray-600 hover:text-gray-800'
-                    }`}
-                  >
-                    {language === 'ko' ? '5점 캐릭터 선택' : 'Select 5-Star Character'}
-                  </button>
-                </div>
-
-                {/* Upload mode */}
-                {avatarMode === 'upload' && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {language === 'ko' ? '이미지 파일 선택 (JPG, PNG, GIF, WebP)' : 'Select Image File (JPG, PNG, GIF, WebP)'}
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                      onChange={handleFileSelect}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    />
-                    {previewUrl && (
-                      <div className="mt-4">
-                        <p className="text-sm font-medium text-gray-700 mb-2">
-                          {language === 'ko' ? '미리보기' : 'Preview'}
-                        </p>
-                        <img
-                          src={previewUrl}
-                          alt="Preview"
-                          className="w-32 h-32 rounded-full object-cover border-2 border-gray-200"
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Character selection mode */}
-                {avatarMode === 'character' && (
+                {/* Character selection mode - always shown */}
+                {(
                   <div>
                     {loadingCharacters ? (
                       <p className="text-sm text-gray-600">
