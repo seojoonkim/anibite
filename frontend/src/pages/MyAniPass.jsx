@@ -33,6 +33,7 @@ export default function MyAniPass() {
   const { userId } = useParams();
   const isOwnProfile = !userId || parseInt(userId) === user?.id;
   const [profileUser, setProfileUser] = useState(null);
+  const displayUser = isOwnProfile ? user : profileUser;
   const [activeTab, setActiveTab] = useState('feed');
   const [animeSubMenu, setAnimeSubMenu] = useState('all'); // 애니 서브메뉴: all, 5, 4, 3, 2, 1, 0, watchlist, pass
   const [characterSubMenu, setCharacterSubMenu] = useState('all'); // 캐릭터 서브메뉴: all, 5, 4, 3, 2, 1, 0, want, pass
@@ -40,6 +41,30 @@ export default function MyAniPass() {
   const toRoman = (num) => {
     const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
     return romanNumerals[num - 1] || num;
+  };
+
+  // Generate consistent avatar gradient based on username
+  const getAvatarGradient = (username) => {
+    if (!username) return 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)';
+
+    // Hash username to get consistent colors
+    let hash = 0;
+    for (let i = 0; i < username.length; i++) {
+      hash = username.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    const gradients = [
+      'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)', // Instagram
+      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // Purple
+      'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', // Pink
+      'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', // Blue
+      'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', // Green
+      'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', // Orange
+      'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', // Teal
+      'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', // Pastel
+    ];
+
+    return gradients[Math.abs(hash) % gradients.length];
   };
   const [stats, setStats] = useState(null);
   const [genrePreferences, setGenrePreferences] = useState([]);
@@ -792,25 +817,25 @@ export default function MyAniPass() {
           <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 mb-8">
             <div className="flex items-center gap-4 mb-6">
               {/* Real Avatar */}
-              {user?.avatar_url ? (
+              {displayUser?.avatar_url ? (
                 <img
-                  src={getAvatarUrl(user.avatar_url)}
-                  alt={user.display_name || user.username}
+                  src={getAvatarUrl(displayUser.avatar_url)}
+                  alt={displayUser.display_name || displayUser.username}
                   className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
                   onError={(e) => {
                     e.target.style.display = 'none';
                   }}
                 />
               ) : (
-                <div className="w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold border-2 border-gray-200" style={{ background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)' }}>
-                  {(user?.display_name || user?.username || 'U')[0].toUpperCase()}
+                <div className="w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold border-2 border-gray-200" style={{ background: getAvatarGradient(displayUser?.username) }}>
+                  {(displayUser?.display_name || displayUser?.username || 'U')[0].toUpperCase()}
                 </div>
               )}
               <div className="flex-1">
                 {/* Real Name */}
                 <div className="flex items-center gap-2 mb-1">
                   <h1 className="text-2xl font-bold">
-                    {user?.display_name || user?.username}
+                    {displayUser?.display_name || displayUser?.username}
                   </h1>
                 </div>
                 {/* Real Follow Counts */}
@@ -904,24 +929,24 @@ export default function MyAniPass() {
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 mb-8">
           <div className="flex items-center gap-4 mb-6">
-            {user?.avatar_url ? (
+            {displayUser?.avatar_url ? (
               <img
-                src={getAvatarUrl(user.avatar_url)}
-                alt={user.display_name || user.username}
+                src={getAvatarUrl(displayUser.avatar_url)}
+                alt={displayUser.display_name || displayUser.username}
                 className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
                 onError={(e) => {
                   e.target.style.display = 'none';
                 }}
               />
             ) : (
-              <div className="w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold border-2 border-gray-200" style={{ background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)' }}>
-                {(user?.display_name || user?.username || 'U')[0].toUpperCase()}
+              <div className="w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold border-2 border-gray-200" style={{ background: getAvatarGradient(displayUser?.username) }}>
+                {(displayUser?.display_name || displayUser?.username || 'U')[0].toUpperCase()}
               </div>
             )}
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold">
-                  {user?.display_name || user?.username}
+                  {displayUser?.display_name || displayUser?.username}
                 </h1>
                 {stats && (
                   (() => {
@@ -1564,11 +1589,11 @@ export default function MyAniPass() {
                           <span className="text-sm text-gray-600">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</span>
                           <span className="text-sm font-bold text-gray-900">{stats.average_rating?.toFixed(1) || 'N/A'}</span>
                         </div>
-                        {user?.created_at && (
+                        {displayUser?.created_at && (
                           <div className="flex justify-between items-center">
                             <span className="text-sm text-gray-600">{language === 'ko' ? '가입일' : 'Joined'}</span>
                             <span className="text-sm font-bold text-gray-900">
-                              {new Date(user.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                              {new Date(displayUser.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                             </span>
                           </div>
                         )}
@@ -1602,16 +1627,16 @@ export default function MyAniPass() {
                   {isOwnProfile && (
                     <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 mb-6">
                       <div className="flex gap-3">
-                        {user?.avatar_url ? (
+                        {displayUser?.avatar_url ? (
                           <img
-                            src={getAvatarUrl(user.avatar_url)}
-                            alt={user.display_name || user.username}
+                            src={getAvatarUrl(displayUser.avatar_url)}
+                            alt={displayUser.display_name || displayUser.username}
                             className="w-10 h-10 rounded-full object-cover border border-gray-200"
                           />
                         ) : (
-                          <div className="w-10 h-10 rounded-full flex items-center justify-center border border-gray-200" style={{ background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)' }}>
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center border border-gray-200" style={{ background: getAvatarGradient(displayUser?.username) }}>
                             <span className="text-white text-sm font-bold">
-                              {(user?.display_name || user?.username || '?').charAt(0).toUpperCase()}
+                              {(displayUser?.display_name || displayUser?.username || '?').charAt(0).toUpperCase()}
                             </span>
                           </div>
                         )}
@@ -1843,7 +1868,7 @@ export default function MyAniPass() {
                                           className="w-6 h-6 rounded-full object-cover"
                                         />
                                       ) : (
-                                        <div className="w-6 h-6 rounded-full gradient-custom-profile flex items-center justify-center">
+                                        <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: getAvatarGradient(comment.username) }}>
                                           <span className="text-white text-[10px] font-bold">
                                             {(comment.display_name || comment.username || '?')[0].toUpperCase()}
                                           </span>
@@ -2103,7 +2128,7 @@ export default function MyAniPass() {
                           className="w-12 h-12 rounded-full object-cover border border-gray-200"
                         />
                       ) : (
-                        <div className="w-12 h-12 rounded-full gradient-custom-profile flex items-center justify-center border border-gray-200">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center border border-gray-200" style={{ background: getAvatarGradient(follower.username) }}>
                           <span className="text-white text-lg font-bold">
                             {(follower.display_name || follower.username || '?')[0].toUpperCase()}
                           </span>
