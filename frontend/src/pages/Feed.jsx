@@ -186,8 +186,6 @@ export default function Feed() {
         // 좋아요/댓글 정보 초기화
         const newActivityLikes = {};
         const newComments = {};
-        const newExpandedComments = new Set();
-        const commentsToLoad = [];
         savedData.forEach(activity => {
           const key = getActivityKey(activity);
           newActivityLikes[key] = {
@@ -195,27 +193,13 @@ export default function Feed() {
             count: activity.likes_count || 0
           };
           newComments[key] = [];
-          // 댓글이 있으면 자동으로 펼치기
-          if (activity.comments_count > 0) {
-            newExpandedComments.add(key);
-            commentsToLoad.push(activity);
-          }
         });
         setActivityLikes(newActivityLikes);
         setComments(newComments);
-        setExpandedComments(newExpandedComments);
+        setExpandedComments(new Set());
 
-        // 저장함 로딩 완료 (댓글은 백그라운드에서 순차 로드)
+        // 저장함 로딩 완료 (댓글은 사용자가 클릭할 때만 로드)
         setLoading(false);
-
-        // 댓글이 있는 활동의 댓글을 순차적으로 로드
-        if (commentsToLoad.length > 0) {
-          (async () => {
-            for (const activity of commentsToLoad) {
-              await loadComments(activity);
-            }
-          })();
-        }
       } else if (feedFilter === 'notifications') {
         // 알림 데이터 로드 (최적화: 10개만)
         const notificationData = await notificationService.getNotifications(initialLimit, 0);
@@ -288,9 +272,6 @@ export default function Feed() {
         // State 초기화 (백엔드 데이터 직접 사용, 별도 API 호출 제거)
         const newActivityLikes = {};
         const newComments = {};
-        const newExpandedComments = new Set();
-
-        const commentsToLoad = [];
         transformedActivities.forEach(activity => {
           const key = getActivityKey(activity);
 
@@ -299,28 +280,14 @@ export default function Feed() {
             count: activity.likes_count || 0
           };
           newComments[key] = [];
-          // 댓글이 있으면 자동으로 펼치기
-          if (activity.comments_count > 0) {
-            newExpandedComments.add(key);
-            commentsToLoad.push(activity);
-          }
         });
 
         setActivityLikes(newActivityLikes);
         setComments(newComments);
-        setExpandedComments(newExpandedComments);
+        setExpandedComments(new Set());
 
-        // 알림 로딩 완료 (댓글은 백그라운드에서 순차 로드)
+        // 알림 로딩 완료 (댓글은 사용자가 클릭할 때만 로드)
         setLoading(false);
-
-        // 댓글이 있는 활동의 댓글을 순차적으로 로드
-        if (commentsToLoad.length > 0) {
-          (async () => {
-            for (const activity of commentsToLoad) {
-              await loadComments(activity);
-            }
-          })();
-        }
       } else {
         // 전체 또는 팔로잉 - 점진적 로딩
         const showFollowing = feedFilter === 'following';
@@ -342,8 +309,6 @@ export default function Feed() {
         // 좋아요/댓글 정보 초기화
         const newActivityLikes = {};
         const newComments = {};
-        const newExpandedComments = new Set();
-        const commentsToLoad = [];
         (initialData || []).forEach(activity => {
           const key = getActivityKey(activity);
           newActivityLikes[key] = {
@@ -351,27 +316,13 @@ export default function Feed() {
             count: activity.likes_count || 0
           };
           newComments[key] = [];
-          // 댓글이 있으면 자동으로 펼치기
-          if (activity.comments_count > 0) {
-            newExpandedComments.add(key);
-            commentsToLoad.push(activity);
-          }
         });
         setActivityLikes(newActivityLikes);
         setComments(newComments);
-        setExpandedComments(newExpandedComments);
+        setExpandedComments(new Set());
 
-        // 로딩 완료 (무한 스크롤로 추가 로드, 댓글은 백그라운드에서 순차 로드)
+        // 로딩 완료 (무한 스크롤로 추가 로드, 댓글은 사용자가 클릭할 때만 로드)
         setLoading(false);
-
-        // 댓글이 있는 활동의 댓글을 순차적으로 로드
-        if (commentsToLoad.length > 0) {
-          (async () => {
-            for (const activity of commentsToLoad) {
-              await loadComments(activity);
-            }
-          })();
-        }
 
         return; // Early return to skip the setLoading(false) below
       }
