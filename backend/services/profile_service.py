@@ -374,33 +374,24 @@ def get_five_star_characters(user_id: int) -> List[Dict]:
 
 
 def get_character_ratings(user_id: int, limit: int = 500) -> List[Dict]:
-    """사용자가 평가한 캐릭터 목록 (최적화 버전 - LEFT JOIN 사용)"""
+    """사용자가 평가한 캐릭터 목록 (feed_activities 테이블 사용으로 극도로 빠름)"""
 
     rows = db.execute_query(
         """
         SELECT
-            cr.character_id,
-            c.name_full as character_name,
-            c.name_native as character_name_native,
-            c.image_url as image_url,
-            cr.rating,
-            cr.status,
-            cr.updated_at,
-            a.id as anime_id,
-            a.title_romaji as anime_title,
-            a.title_korean as anime_title_korean
-        FROM character_ratings cr
-        JOIN character c ON cr.character_id = c.id
-        LEFT JOIN (
-            SELECT DISTINCT ac.character_id, a.id, a.title_romaji, a.title_korean,
-                   ROW_NUMBER() OVER (PARTITION BY ac.character_id
-                                      ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END,
-                                               a.start_date ASC, a.popularity DESC) as rn
-            FROM anime_character ac
-            JOIN anime a ON ac.anime_id = a.id
-        ) a ON c.id = a.character_id AND a.rn = 1
-        WHERE cr.user_id = ?
-        ORDER BY cr.updated_at DESC
+            item_id as character_id,
+            item_title as character_name,
+            item_title_korean as character_name_native,
+            item_image as image_url,
+            rating,
+            NULL as status,
+            activity_time as updated_at,
+            anime_id,
+            anime_title,
+            anime_title_korean
+        FROM feed_activities
+        WHERE user_id = ? AND activity_type = 'character_rating'
+        ORDER BY activity_time DESC
         LIMIT ?
         """,
         (user_id, limit)

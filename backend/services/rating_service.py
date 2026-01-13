@@ -109,53 +109,94 @@ def get_user_ratings(
     status_filter: Optional[RatingStatus] = None,
     limit: Optional[int] = None
 ) -> UserRatingListResponse:
-    """사용자의 모든 평점 조회"""
+    """사용자의 모든 평점 조회 (feed_activities 테이블 사용으로 최적화)"""
 
-    where_clause = "ur.user_id = ?"
-    params = [user_id]
+    # feed_activities는 RATED 상태만 저장하므로, 다른 status는 원본 테이블 사용
+    if status_filter and status_filter != RatingStatus.RATED:
+        # WANT_TO_WATCH, PASS 등은 user_ratings 테이블에서 직접 조회
+        where_clause = "ur.user_id = ? AND ur.status = ?"
+        params = [user_id, status_filter.value]
 
-    if status_filter:
-        where_clause += " AND ur.status = ?"
-        params.append(status_filter.value)
+        total = db.execute_query(
+            f"SELECT COUNT(*) as total FROM user_ratings ur WHERE {where_clause}",
+            tuple(params),
+            fetch_one=True
+        )['total']
 
+        limit_clause = f"LIMIT {limit}" if limit else ""
+        rows = db.execute_query(
+            f"""
+            SELECT
+                ur.*,
+                a.title_romaji,
+                a.title_english,
+                a.title_korean,
+                a.cover_image_url as image_url,
+                a.season_year,
+                a.episodes
+            FROM user_ratings ur
+            JOIN anime a ON ur.anime_id = a.id
+            WHERE {where_clause}
+            ORDER BY ur.updated_at DESC
+            {limit_clause}
+            """,
+            tuple(params)
+        )
+
+        items = [RatingResponse(**dict_from_row(row)) for row in rows]
+
+        # WANT_TO_WATCH, PASS는 평균 평점이 없음
+        return UserRatingListResponse(
+            items=items,
+            total=total,
+            average_rating=None
+        )
+
+    # RATED 또는 필터 없음: feed_activities에서 빠르게 조회
     # 전체 개수
     total = db.execute_query(
-        f"SELECT COUNT(*) as total FROM user_ratings ur WHERE {where_clause}",
-        tuple(params),
+        """SELECT COUNT(*) as total FROM feed_activities
+           WHERE user_id = ? AND activity_type = 'anime_rating'""",
+        (user_id,),
         fetch_one=True
     )['total']
 
-    # 평균 평점 (RATED 상태만)
+    # 평균 평점
     avg_row = db.execute_query(
         """
         SELECT AVG(rating) as avg_rating
-        FROM user_ratings
-        WHERE user_id = ? AND status = 'RATED' AND rating IS NOT NULL
+        FROM feed_activities
+        WHERE user_id = ? AND activity_type = 'anime_rating' AND rating IS NOT NULL
         """,
         (user_id,),
         fetch_one=True
     )
-    average_rating = avg_row['avg_rating'] if avg_row['avg_rating'] else None
+    average_rating = avg_row['avg_rating'] if avg_row and avg_row['avg_rating'] else None
 
-    # 평점 목록
+    # 평점 목록 - feed_activities에서 조회
     limit_clause = f"LIMIT {limit}" if limit else ""
     rows = db.execute_query(
         f"""
         SELECT
-            ur.*,
-            a.title_romaji,
-            a.title_english,
-            a.title_korean,
-            a.cover_image_url as image_url,
-            a.season_year,
-            a.episodes
-        FROM user_ratings ur
-        JOIN anime a ON ur.anime_id = a.id
-        WHERE {where_clause}
-        ORDER BY ur.updated_at DESC
+            id,
+            item_id as anime_id,
+            user_id,
+            rating,
+            'RATED' as status,
+            activity_time as updated_at,
+            created_at,
+            item_title as title_romaji,
+            item_title as title_english,
+            item_title_korean as title_korean,
+            item_image as image_url,
+            NULL as season_year,
+            NULL as episodes
+        FROM feed_activities
+        WHERE user_id = ? AND activity_type = 'anime_rating'
+        ORDER BY activity_time DESC
         {limit_clause}
         """,
-        tuple(params)
+        (user_id,)
     )
 
     items = [RatingResponse(**dict_from_row(row)) for row in rows]
