@@ -442,6 +442,16 @@ export default function MyAniPass() {
     return getAvatarUrlHelper(avatarUrl) || '/placeholder-avatar.png';
   };
 
+  // Helper for anime cover images
+  const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return '/placeholder-anime.svg';
+    if (imageUrl.startsWith('http')) return imageUrl;
+    const processedUrl = imageUrl.includes('/covers/')
+      ? imageUrl.replace('/covers/', '/covers_large/')
+      : imageUrl;
+    return `${IMAGE_BASE_URL}${processedUrl}`;
+  };
+
   const getActivityText = (activity) => {
     const displayName = activity.display_name || activity.username;
 
