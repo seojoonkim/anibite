@@ -424,24 +424,31 @@ export default function AnimeDetail() {
     }
 
     try {
-      // 별점을 항상 먼저 저장 (리뷰 작성 시 필수)
-      const ratingResult = await ratingService.rateAnime(parseInt(id), { rating: reviewData.rating, status: 'RATED' });
-      setMyRating(ratingResult);
-      // 별점 저장 후 충분한 딜레이를 주어 DB 반영 보장
-      await new Promise(resolve => setTimeout(resolve, 300));
-
       if (isEditingReview && myReview) {
+        // 수정 시: 별점은 별도로 저장하고 리뷰만 수정
+        if (reviewData.rating && (!myRating || myRating.rating !== reviewData.rating)) {
+          const ratingResult = await ratingService.rateAnime(parseInt(id), { rating: reviewData.rating, status: 'RATED' });
+          setMyRating(ratingResult);
+        }
+
         await reviewService.updateReview(myReview.id, {
           content: reviewData.content,
           is_spoiler: reviewData.is_spoiler
         });
         setReviewSuccess(language === 'ko' ? '리뷰가 수정되었습니다.' : 'Review updated successfully.');
       } else {
+        // 새로 작성: 별점과 리뷰를 한 번에 전송
         await reviewService.createReview({
           anime_id: parseInt(id),
           content: reviewData.content,
-          is_spoiler: reviewData.is_spoiler
+          is_spoiler: reviewData.is_spoiler,
+          rating: reviewData.rating  // 별점을 리뷰 API에 함께 전송
         });
+
+        // 리뷰 생성 후 별점 상태 업데이트
+        const ratingResult = await ratingService.getMyRating(parseInt(id));
+        if (ratingResult) setMyRating(ratingResult);
+
         setReviewSuccess(language === 'ko' ? '리뷰가 작성되었습니다.' : 'Review submitted successfully.');
       }
 
