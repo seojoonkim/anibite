@@ -215,26 +215,30 @@ export default function CharacterDetail() {
     }
 
     try {
-      // 별점을 항상 먼저 저장 (리뷰 작성 시 필수)
-      if (!character.my_rating || character.my_rating !== reviewData.rating) {
-        await characterService.rateCharacter(parseInt(id), reviewData.rating);
-        setCharacter({ ...character, my_rating: reviewData.rating });
-        // 별점 저장 후 약간의 딜레이를 주어 DB 반영 보장
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-
       if (isEditingReview && myReview && myReview.review_id) {
+        // 수정 시: 별점은 별도로 저장하고 리뷰만 수정
+        if (!character.my_rating || character.my_rating !== reviewData.rating) {
+          await characterService.rateCharacter(parseInt(id), reviewData.rating);
+          setCharacter({ ...character, my_rating: reviewData.rating });
+        }
+
         await characterReviewService.updateReview(myReview.review_id, {
           content: reviewData.content,
           is_spoiler: reviewData.is_spoiler
         });
         setReviewSuccess(language === 'ko' ? '리뷰가 수정되었습니다.' : 'Review updated successfully.');
       } else {
+        // 새로 작성: 별점과 리뷰를 한 번에 전송
         await characterReviewService.createReview({
           character_id: parseInt(id),
           content: reviewData.content,
-          is_spoiler: reviewData.is_spoiler
+          is_spoiler: reviewData.is_spoiler,
+          rating: reviewData.rating  // 별점을 리뷰 API에 함께 전송
         });
+
+        // 리뷰 생성 후 캐릭터 데이터 새로고침하여 별점 상태 반영
+        setCharacter({ ...character, my_rating: reviewData.rating });
+
         setReviewSuccess(language === 'ko' ? '리뷰가 작성되었습니다.' : 'Review submitted successfully.');
       }
 
