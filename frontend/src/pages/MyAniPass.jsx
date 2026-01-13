@@ -26,6 +26,7 @@ import GenreCombinationChart from '../components/profile/GenreCombinationChart';
 import api from '../services/api';
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
+import { getCharacterImageUrl, getCharacterImageFallback, getCharacterDisplayName, getAvatarUrl as getAvatarUrlHelper, getAvatarFallback } from '../utils/imageHelpers';
 
 export default function MyAniPass() {
   const { user } = useAuth();
@@ -436,21 +437,8 @@ export default function MyAniPass() {
     return `${hours}시간 ${mins}분`;
   };
 
-  const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/placeholder-anime.svg';
-    if (imageUrl.startsWith('http')) return imageUrl;
-    // Use covers_large for better quality
-    const processedUrl = imageUrl.includes('/covers/')
-      ? imageUrl.replace('/covers/', '/covers_large/')
-      : imageUrl;
-    return `${IMAGE_BASE_URL}${processedUrl}`;
-  };
-
-  const getAvatarUrl = (avatarUrl) => {
-    if (!avatarUrl) return null;
-    if (avatarUrl.startsWith('http')) return avatarUrl;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${avatarUrl}`;
-  };
+  // Note: Using helper functions from imageHelpers.js
+  // getCharacterImageUrl, getAvatarUrlHelper
 
   const getActivityText = (activity) => {
     const displayName = activity.display_name || activity.username;
@@ -1429,9 +1417,8 @@ export default function MyAniPass() {
                               </h3>
                               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
                                 {groups[category].map((character) => {
-                                  const name = language === 'ko' && character.character_name_native
-                                    ? character.character_name_native
-                                    : character.character_name;
+                                  // 영어 이름 우선
+                                  const name = character.character_name || character.character_name_native || '';
 
                                   return (
                                     <Link
@@ -1442,11 +1429,18 @@ export default function MyAniPass() {
                                       <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300">
                                         <div className="relative aspect-[3/4] bg-gray-200">
                                           <img
-                                            src={getImageUrl(character.image_url)}
+                                            src={getCharacterImageUrl(character.character_id, character.image_url)}
                                             alt={name}
                                             className="w-full h-full object-cover"
                                             onError={(e) => {
-                                              e.target.src = '/placeholder-character.png';
+                                              // R2 실패 시 외부 URL로 fallback
+                                              if (!e.target.dataset.fallbackAttempted) {
+                                                e.target.dataset.fallbackAttempted = 'true';
+                                                const fallbackUrl = getCharacterImageFallback(character.image_url);
+                                                e.target.src = fallbackUrl;
+                                              } else {
+                                                e.target.src = '/placeholder-character.png';
+                                              }
                                             }}
                                           />
                                         </div>
@@ -1481,9 +1475,8 @@ export default function MyAniPass() {
                     // 특정 필터 선택 시
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
                       {displayedCharacters.map((character) => {
-                        const name = language === 'ko' && character.character_name_native
-                          ? character.character_name_native
-                          : character.character_name;
+                        // 영어 이름 우선
+                        const name = character.character_name || character.character_name_native || '';
 
                         return (
                           <Link
@@ -1494,11 +1487,18 @@ export default function MyAniPass() {
                             <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300">
                               <div className="relative aspect-[3/4] bg-gray-200">
                                 <img
-                                  src={getImageUrl(character.image_url)}
+                                  src={getCharacterImageUrl(character.character_id, character.image_url)}
                                   alt={name}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
-                                    e.target.src = '/placeholder-character.png';
+                                    // R2 실패 시 외부 URL로 fallback
+                                    if (!e.target.dataset.fallbackAttempted) {
+                                      e.target.dataset.fallbackAttempted = 'true';
+                                      const fallbackUrl = getCharacterImageFallback(character.image_url);
+                                      e.target.src = fallbackUrl;
+                                    } else {
+                                      e.target.src = '/placeholder-character.png';
+                                    }
                                   }}
                                 />
                               </div>
