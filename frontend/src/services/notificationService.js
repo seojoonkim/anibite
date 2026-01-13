@@ -36,7 +36,7 @@ export const notificationService = {
    */
   async getUnreadCount() {
     try {
-      const response = await api.get('/api/notifications/unread-count/');
+      const response = await api.get('/api/notifications/unread-count');
       return response.data.count || 0;
     } catch (error) {
       console.error('Failed to get unread count:', error);
@@ -49,7 +49,7 @@ export const notificationService = {
    */
   async markAsRead() {
     try {
-      await api.post('/api/notifications/mark-read/');
+      await api.post('/api/notifications/mark-read');
     } catch (error) {
       console.error('Failed to mark notifications as read:', error);
     }
