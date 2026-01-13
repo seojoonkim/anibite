@@ -661,17 +661,17 @@ export default function CharacterDetail() {
   };
 
   const getImageUrl = (imageUrl, fallbackUrl = null) => {
-    if (!imageUrl) return '/placeholder-anime.svg';
-
-    // 외부 URL이 있으면 우선 사용 (대부분의 캐릭터는 외부 URL 사용)
-    if (imageUrl.startsWith('http')) return imageUrl;
-
-    // R2 경로 처리 (/ 로 시작하는 경로)
-    if (imageUrl.startsWith('/')) {
-      return `${IMAGE_BASE_URL}${imageUrl}`;
+    // 일반론적 해결: R2를 먼저 시도, 실패하면 외부 URL로 fallback
+    // character ID가 있으면 R2에서 먼저 찾기 (onError에서 fallback 처리)
+    if (character?.id) {
+      return `${IMAGE_BASE_URL}/images/characters/${character.id}.jpg`;
     }
 
-    // Use covers_large for better quality
+    // character 객체가 없는 경우 (로딩 중) image_url 그대로 사용
+    if (!imageUrl) return '/placeholder-anime.svg';
+    if (imageUrl.startsWith('http')) return imageUrl;
+    if (imageUrl.startsWith('/')) return `${IMAGE_BASE_URL}${imageUrl}`;
+
     const processedUrl = imageUrl.includes('/covers/')
       ? imageUrl.replace('/covers/', '/covers_large/')
       : imageUrl;
@@ -789,7 +789,13 @@ export default function CharacterDetail() {
                 alt={character.name_full}
                 className="w-full"
                 onError={(e) => {
-                  e.target.src = '/placeholder-anime.svg';
+                  // R2 실패 시 외부 URL로 fallback
+                  if (character.image_url && character.image_url.startsWith('http') && !e.target.dataset.fallbackAttempted) {
+                    e.target.dataset.fallbackAttempted = 'true';
+                    e.target.src = character.image_url;
+                  } else {
+                    e.target.src = '/placeholder-anime.svg';
+                  }
                 }}
               />
             </div>
