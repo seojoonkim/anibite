@@ -2,6 +2,12 @@
 
 AniPass 백엔드를 Railway에 배포하는 방법입니다.
 
+## ⚠️ 현재 상태
+
+- **Python 3.13** 사용 (Railway 기본값)
+- **numpy/scipy 비활성화**: Railway가 Python 3.13을 강제하는데, scipy의 미리 빌드된 wheel이 없어서 임시로 비활성화
+- **추천 알고리즘**: 나중에 Python 3.11 지원 시 재활성화 예정
+
 ## 1. 프로젝트 연결
 
 1. [Railway Dashboard](https://railway.app/dashboard)에 로그인
