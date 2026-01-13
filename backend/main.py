@@ -15,6 +15,7 @@ app = FastAPI(
     title="AniPass API",
     description="애니메이션 평가 및 추천 플랫폼 API",
     version="1.0.0",
+    redirect_slashes=False,  # Prevent HTTPS->HTTP redirect on Railway
 )
 
 # CORS middleware
