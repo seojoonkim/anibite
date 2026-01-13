@@ -663,13 +663,14 @@ export default function CharacterDetail() {
   const getImageUrl = (imageUrl, fallbackUrl = null) => {
     if (!imageUrl) return '/placeholder-anime.svg';
 
-    // R2 우선: character ID 기반 이미지를 먼저 사용
-    if (character?.id) {
-      const r2Path = `/images/characters/${character.id}.jpg`;
-      return `${IMAGE_BASE_URL}${r2Path}`;
+    // 외부 URL이 있으면 우선 사용 (대부분의 캐릭터는 외부 URL 사용)
+    if (imageUrl.startsWith('http')) return imageUrl;
+
+    // R2 경로 처리 (/ 로 시작하는 경로)
+    if (imageUrl.startsWith('/')) {
+      return `${IMAGE_BASE_URL}${imageUrl}`;
     }
 
-    if (imageUrl.startsWith('http')) return imageUrl;
     // Use covers_large for better quality
     const processedUrl = imageUrl.includes('/covers/')
       ? imageUrl.replace('/covers/', '/covers_large/')
@@ -788,13 +789,7 @@ export default function CharacterDetail() {
                 alt={character.name_full}
                 className="w-full"
                 onError={(e) => {
-                  // R2에 없으면 외부 URL로 fallback
-                  if (character.image_url && character.image_url.startsWith('http') && !e.target.dataset.fallbackAttempted) {
-                    e.target.dataset.fallbackAttempted = 'true';
-                    e.target.src = character.image_url;
-                  } else {
-                    e.target.src = '/placeholder-anime.svg';
-                  }
+                  e.target.src = '/placeholder-anime.svg';
                 }}
               />
             </div>
