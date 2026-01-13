@@ -174,21 +174,18 @@ export default function Feed() {
     try {
       setLoading(true);
 
-      // 점진적 로딩: 먼저 10개만 빠르게 로드
+      // 빠른 로딩: 초기 10개만 로드
       const initialLimit = 10;
-      const totalLimit = 30;
 
       if (feedFilter === 'saved') {
-        // 저장된 피드만 필터링 (최적화: 30개만 가져오기)
-        const allData = await feedService.getFeed(totalLimit, 0, false);
+        // 저장된 피드만 필터링 (최적화: 10개만 가져오기)
+        const allData = await feedService.getFeed(initialLimit, 0, false);
         const savedData = (allData || []).filter(activity => savedActivities.has(getActivityKey(activity)));
         updateActivitiesForFilter('saved', savedData);
 
-        // 좋아요/댓글 정보 초기화
+        // 좋아요/댓글 정보 초기화 (댓글은 클릭할 때만 로드)
         const newActivityLikes = {};
         const newComments = {};
-        const newExpandedComments = new Set();
-        const commentsToLoad = [];
         savedData.forEach(activity => {
           const key = getActivityKey(activity);
           newActivityLikes[key] = {
@@ -196,26 +193,15 @@ export default function Feed() {
             count: activity.likes_count || 0
           };
           newComments[key] = [];
-          // Auto-expand comments for activities that have comments
-          if (activity.comments_count > 0) {
-            newExpandedComments.add(key);
-            commentsToLoad.push(activity);
-          }
         });
         setActivityLikes(newActivityLikes);
         setComments(newComments);
-        setExpandedComments(newExpandedComments);
-
-        // Load comments for activities with comments
-        if (commentsToLoad.length > 0) {
-          commentsToLoad.forEach(activity => loadComments(activity));
-        }
 
         // 저장함 로딩 완료
         setLoading(false);
       } else if (feedFilter === 'notifications') {
-        // 알림 데이터 로드 (최적화: 30개만)
-        const notificationData = await notificationService.getNotifications(30, 0);
+        // 알림 데이터 로드 (최적화: 10개만)
+        const notificationData = await notificationService.getNotifications(initialLimit, 0);
         setNotifications(notificationData.items || []);
 
         // 처음 로드할 때만 읽음 처리
@@ -287,7 +273,6 @@ export default function Feed() {
         const newComments = {};
         const newExpandedComments = new Set();
 
-        const commentsToLoad = [];
         transformedActivities.forEach(activity => {
           const key = getActivityKey(activity);
 
@@ -296,21 +281,10 @@ export default function Feed() {
             count: activity.likes_count || 0
           };
           newComments[key] = [];
-          // Auto-expand comments for activities that have comments
-          if (activity.comments_count > 0) {
-            newExpandedComments.add(key);
-            commentsToLoad.push(activity);
-          }
         });
 
         setActivityLikes(newActivityLikes);
         setComments(newComments);
-        setExpandedComments(newExpandedComments);
-
-        // Load comments for activities with comments
-        if (commentsToLoad.length > 0) {
-          commentsToLoad.forEach(activity => loadComments(activity));
-        }
 
         // 알림 로딩 완료
         setLoading(false);
@@ -332,11 +306,9 @@ export default function Feed() {
         })));
         updateActivitiesForFilter(currentFilter, initialData || []);
 
-        // 좋아요/댓글 정보 초기화 (첫 10개)
+        // 좋아요/댓글 정보 초기화 (댓글은 클릭할 때만 로드)
         const newActivityLikes = {};
         const newComments = {};
-        const newExpandedComments = new Set();
-        const commentsToLoad = [];
         (initialData || []).forEach(activity => {
           const key = getActivityKey(activity);
           newActivityLikes[key] = {
@@ -344,65 +316,12 @@ export default function Feed() {
             count: activity.likes_count || 0
           };
           newComments[key] = [];
-          // Auto-expand comments for activities that have comments
-          if (activity.comments_count > 0) {
-            newExpandedComments.add(key);
-            commentsToLoad.push(activity);
-          }
         });
         setActivityLikes(newActivityLikes);
         setComments(newComments);
-        setExpandedComments(newExpandedComments);
 
-        // Load comments for activities with comments
-        if (commentsToLoad.length > 0) {
-          commentsToLoad.forEach(activity => loadComments(activity));
-        }
-
-        // 즉시 로딩 완료 처리 (UI 표시)
+        // 로딩 완료 (무한 스크롤로 추가 로드)
         setLoading(false);
-
-        // 2단계: 백그라운드에서 나머지 20개 로드
-        if (initialData && initialData.length === initialLimit) {
-          feedService.getFeed(totalLimit - initialLimit, initialLimit, showFollowing).then(additionalData => {
-            if (!additionalData || additionalData.length === 0) return;
-
-            // Update only the specific filter that started this load
-            updateActivitiesForFilter(currentFilter, prev => [...prev, ...additionalData]);
-
-            // 추가 데이터의 좋아요/댓글 정보 초기화
-            const additionalLikes = {};
-            const additionalComments = {};
-            const additionalCommentsToLoad = [];
-            additionalData.forEach(activity => {
-              const key = getActivityKey(activity);
-              additionalLikes[key] = {
-                liked: Boolean(activity.user_liked),
-                count: activity.likes_count || 0
-              };
-              additionalComments[key] = [];
-              // Auto-expand comments for activities that have comments
-              if (activity.comments_count > 0) {
-                additionalCommentsToLoad.push({ key, activity });
-              }
-            });
-
-            setActivityLikes(prevLikes => ({ ...prevLikes, ...additionalLikes }));
-            setComments(prevComments => ({ ...prevComments, ...additionalComments }));
-
-            // Load comments and expand for activities with comments
-            if (additionalCommentsToLoad.length > 0) {
-              setExpandedComments(prevExpanded => {
-                const newSet = new Set(prevExpanded);
-                additionalCommentsToLoad.forEach(({ key }) => newSet.add(key));
-                return newSet;
-              });
-              additionalCommentsToLoad.forEach(({ activity }) => loadComments(activity));
-            }
-          }).catch(err => {
-            console.error('Failed to load additional feed items:', err);
-          });
-        }
 
         return; // Early return to skip the setLoading(false) below
       }
