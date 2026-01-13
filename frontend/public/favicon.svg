@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Card Background -->
+  <rect x="4" y="8" width="56" height="48" rx="6" fill="#3FC1C9" />
+
+  <!-- Border -->
+  <rect x="4" y="8" width="56" height="48" rx="6" stroke="white" stroke-width="2" opacity="0.4" fill="none" />
+
+  <!-- Letter A - Bubble/Rounded Style -->
+  <!-- Left side - very rounded -->
+  <path
+    d="M 16 51 Q 18 49 21 44 Q 23 39 24 34 Q 26 29 27 24 Q 29 19 32 14"
+    stroke="white"
+    stroke-width="8"
+    stroke-linecap="round"
+    fill="none"
+  />
+  <!-- Right side - very rounded -->
+  <path
+    d="M 32 14 Q 35 19 37 24 Q 38 29 40 34 Q 41 39 43 44 Q 46 49 48 51"
+    stroke="white"
+    stroke-width="8"
+    stroke-linecap="round"
+    fill="none"
+  />
+  <!-- Cross bar - bubble style -->
+  <ellipse
+    cx="32" cy="36"
+    rx="12" ry="5"
+    fill="white"
+  />
+
+  <!-- Star Icon - Simple & Cute (slightly bigger) -->
+  <path
+    d="M 32 6 L 35.5 14 L 44 15.5 L 38 22 L 39.5 30.5 L 32 26 L 24.5 30.5 L 26 22 L 20 15.5 L 28.5 14 Z"
+    fill="#FC5185"
+    stroke="white"
+    stroke-width="2"
+    stroke-linejoin="round"
+  />
+</svg>

@@ -1,0 +1,256 @@
+/**
+ * Activity Utils - 통합 평점/리뷰 시스템 유틸리티
+ * 애니, 캐릭터, 피드 모든 페이지에서 동일하게 작동
+ */
+
+import { activityCommentService } from '../services/activityCommentService';
+import { activityLikeService } from '../services/activityLikeService';
+import { reviewCommentService } from '../services/reviewCommentService';
+import { reviewService } from '../services/reviewService';
+import { characterReviewService } from '../services/characterReviewService';
+import { commentLikeService } from '../services/commentLikeService';
+
+/**
+ * Activity 타입 결정
+ * @param {Object} item - 평점/리뷰 아이템
+ * @returns {string} - 'anime_rating' | 'anime_review' | 'character_rating' | 'character_review'
+ */
+export function getActivityType(item) {
+  // Feed에서 이미 activity_type이 있으면 그대로 사용
+  if (item.activity_type) {
+    return item.activity_type;
+  }
+
+  // 캐릭터인지 애니인지 확인
+  const isCharacter = item.character_id !== undefined || item.characterId !== undefined;
+
+  // Feed에서는 review_content, CharacterDetail에서는 content
+  const content = item.review_content || item.content;
+  const reviewId = item.review_id;
+
+  // 리뷰가 있는지 확인 (content가 있거나 review_id가 있으면 리뷰)
+  const hasReview = (content && content.length > 0) || (reviewId && reviewId > 0);
+
+  const activityType = isCharacter
+    ? (hasReview ? 'character_review' : 'character_rating')
+    : (hasReview ? 'anime_review' : 'anime_rating');
+
+  return activityType;
+}
+
+/**
+ * Activity Key 생성
+ * @param {Object} item - 평점/리뷰 아이템
+ * @returns {string} - 'activity_type_userId_itemId'
+ */
+export function getActivityKey(item) {
+  const activityType = getActivityType(item);
+  const userId = item.user_id || item.userId;
+  const itemId = item.character_id || item.characterId || item.anime_id || item.animeId;
+
+  return `${activityType}_${userId}_${itemId}`;
+}
+
+/**
+ * 평점만 있는지 확인 (리뷰 없음)
+ * @param {Object} item - 평점/리뷰 아이템
+ * @returns {boolean}
+ */
+export function isRatingsOnly(item) {
+  if (!item) {
+    return false;
+  }
+
+  // Feed에서는 review_content, CharacterDetail에서는 content
+  const content = item.review_content || item.content;
+  const reviewId = item.review_id;
+
+  const noContent = !content || content.length === 0;
+  const noReviewId = !reviewId || reviewId <= 0;
+
+  return noContent && noReviewId;
+}
+
+/**
+ * 댓글 로드
+ * @param {Object} item - 평점/리뷰 아이템
+ * @returns {Promise<Object>} - { items: [], total: 0 }
+ */
+export async function loadComments(item) {
+  const activityType = getActivityType(item);
+  const userId = item.user_id || item.userId;
+  // Feed에서는 item_id, CharacterDetail에서는 character_id/anime_id
+  const itemId = item.item_id || item.character_id || item.characterId || item.anime_id || item.animeId;
+  // review_id 필드가 있으면 사용, 없으면 id 사용
+  const reviewId = item.review_id || item.id;
+
+  // 평점만 있는 경우 - activity_comments 사용
+  if (isRatingsOnly(item)) {
+    return await activityCommentService.getActivityComments(activityType, userId, itemId);
+  }
+
+  // 리뷰가 있는 경우 - review_comments 사용
+  const reviewType = activityType === 'character_review' ? 'character' : 'anime';
+  return await reviewCommentService.getReviewComments(reviewId, reviewType);
+}
+
+/**
+ * 댓글 작성
+ * @param {Object} item - 평점/리뷰 아이템
+ * @param {string} content - 댓글 내용
+ * @returns {Promise<Object>}
+ */
+export async function createComment(item, content) {
+  const activityType = getActivityType(item);
+  const userId = item.user_id || item.userId;
+  // Feed에서는 item_id, CharacterDetail에서는 character_id/anime_id
+  const itemId = item.item_id || item.character_id || item.characterId || item.anime_id || item.animeId;
+  // review_id 필드가 있으면 사용, 없으면 id 사용
+  const reviewId = item.review_id || item.id;
+
+  // 평점만 있는 경우 - activity_comments 사용
+  if (isRatingsOnly(item)) {
+    return await activityCommentService.createComment(activityType, userId, itemId, content);
+  }
+
+  // 리뷰가 있는 경우 - review_comments 사용
+  const reviewType = activityType === 'character_review' ? 'character' : 'anime';
+  return await reviewCommentService.createComment({
+    review_id: reviewId,
+    review_type: reviewType,
+    content: content
+  });
+}
+
+/**
+ * 답글 작성
+ * @param {Object} item - 평점/리뷰 아이템
+ * @param {number} parentCommentId - 부모 댓글 ID
+ * @param {string} content - 답글 내용
+ * @returns {Promise<Object>}
+ */
+export async function createReply(item, parentCommentId, content) {
+  const activityType = getActivityType(item);
+  const userId = item.user_id || item.userId;
+  // Feed에서는 item_id, CharacterDetail에서는 character_id/anime_id
+  const itemId = item.item_id || item.character_id || item.characterId || item.anime_id || item.animeId;
+  // review_id 필드가 있으면 사용, 없으면 id 사용
+  const reviewId = item.review_id || item.id;
+
+  console.log('[activityUtils] createReply:', {
+    activityType,
+    userId,
+    itemId,
+    reviewId,
+    parentCommentId,
+    content,
+    item_id: item.id,
+    item_review_id: item.review_id,
+    item
+  });
+
+  // 평점만 있는 경우 - activity_comments 사용
+  if (isRatingsOnly(item)) {
+    console.log('[activityUtils] createReply - Ratings only, calling activityCommentService.createComment with parentCommentId');
+    const result = await activityCommentService.createComment(activityType, userId, itemId, content, parentCommentId);
+    console.log('[activityUtils] createReply - Result:', result);
+    return result;
+  }
+
+  // 리뷰가 있는 경우 - review_comments 사용
+  console.log('[activityUtils] createReply - Has review, calling reviewCommentService.createReply');
+  const reviewType = activityType === 'character_review' ? 'character' : 'anime';
+  const result = await reviewCommentService.createReply(parentCommentId, {
+    review_id: reviewId,
+    review_type: reviewType,
+    content: content
+  });
+  console.log('[activityUtils] createReply - Result:', result);
+  return result;
+}
+
+/**
+ * 댓글 삭제
+ * @param {Object} item - 평점/리뷰 아이템
+ * @param {number} commentId - 댓글 ID
+ * @returns {Promise<void>}
+ */
+export async function deleteComment(item, commentId) {
+  const activityType = getActivityType(item);
+
+  console.log('[activityUtils] deleteComment:', { activityType, commentId, item });
+
+  // 평점만 있는 경우 - activity_comments 사용
+  if (isRatingsOnly(item)) {
+    console.log('[activityUtils] deleteComment - Ratings only, calling activityCommentService.deleteComment');
+    const result = await activityCommentService.deleteComment(commentId);
+    console.log('[activityUtils] deleteComment - Result:', result);
+    return result;
+  }
+
+  // 리뷰가 있는 경우 - review_comments 사용
+  console.log('[activityUtils] deleteComment - Has review, calling reviewCommentService.deleteReviewComment');
+  const result = await reviewCommentService.deleteReviewComment(commentId);
+  console.log('[activityUtils] deleteComment - Result:', result);
+  return result;
+}
+
+/**
+ * 좋아요 토글 (평점/리뷰에 대한 좋아요)
+ * @param {Object} item - 평점/리뷰 아이템
+ * @returns {Promise<void>}
+ */
+export async function toggleLike(item) {
+  const activityType = getActivityType(item);
+  const userId = item.user_id || item.userId;
+  const itemId = item.character_id || item.characterId || item.anime_id || item.animeId;
+  const reviewId = item.id;
+
+  console.log('[activityUtils] toggleLike:', { activityType, userId, itemId, reviewId });
+
+  // 평점만 있는 경우 - activity_likes 사용
+  if (isRatingsOnly(item)) {
+    return await activityLikeService.toggleLike(activityType, userId, itemId);
+  }
+
+  // 리뷰가 있는 경우 - review_likes 또는 character_review_likes 사용
+  if (activityType === 'character_review') {
+    // 현재 좋아요 상태에 따라 like/unlike 호출
+    // 이건 호출하는 쪽에서 처리해야 할 수도 있음
+    // 여기서는 characterReviewService를 직접 사용하지 않고 반환
+    throw new Error('Character review like should be handled by calling component');
+  } else {
+    // 애니 리뷰
+    throw new Error('Anime review like should be handled by calling component');
+  }
+}
+
+/**
+ * 댓글 좋아요 토글
+ * @param {number} commentId - 댓글 ID
+ * @returns {Promise<void>}
+ */
+export async function toggleCommentLike(commentId) {
+  console.log('[activityUtils] toggleCommentLike:', { commentId });
+
+  // 댓글 좋아요는 모든 경우에 동일하게 commentLikeService 사용
+  return await commentLikeService.toggleLike(commentId);
+}
+
+/**
+ * 아이템 ID 추출
+ * @param {Object} item - 평점/리뷰 아이템
+ * @returns {number}
+ */
+export function getItemId(item) {
+  return item.character_id || item.characterId || item.anime_id || item.animeId;
+}
+
+/**
+ * 사용자 ID 추출
+ * @param {Object} item - 평점/리뷰 아이템
+ * @returns {number}
+ */
+export function getUserId(item) {
+  return item.user_id || item.userId;
+}

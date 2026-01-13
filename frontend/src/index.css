@@ -1,0 +1,82 @@
+/* 모던하고 세련된 폰트 */
+@import url('https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: 'SUIT Variable', 'Pretendard Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #F5F5F7 0%, #EEEEF0 100%);
+  color: #2D3748;
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* English text - 세련되고 모던한 Inter */
+:lang(en) {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: -0.01em;
+  font-feature-settings: 'cv05' 1, 'cv08' 1, 'cv11' 1;
+}
+
+/* Korean text - 더 모던한 SUIT Variable */
+:lang(ko) {
+  font-family: 'SUIT Variable', 'Pretendard Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* 부드러운 그라디언트 배경 */
+.gradient-bg {
+  background: linear-gradient(135deg, #8EC5FC 0%, #E0C3FC 100%);
+}
+
+/* 파스텔 그림자 */
+.pastel-shadow {
+  box-shadow: 0 4px 20px rgba(142, 197, 252, 0.15);
+}
+
+.pastel-shadow-hover:hover {
+  box-shadow: 0 8px 30px rgba(142, 197, 252, 0.25);
+}
+
+/* 부드러운 페이드인 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
