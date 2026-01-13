@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import StarRating from '../common/StarRating';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL } from '../../config/api';
 
 export default function AnimeCard({ anime }) {
   const getStatusColor = (status) => {
