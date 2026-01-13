@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { notificationService } from '../../services/notificationService';
 import { useLanguage } from '../../context/LanguageContext';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL } from '../../config/api';
 
 export default function NotificationDropdown({
   isOpen,

@@ -6,7 +6,7 @@ import { userService } from '../../services/userService';
 import { notificationService } from '../../services/notificationService';
 import { getCurrentLevelInfo } from '../../utils/otakuLevels';
 import NotificationDropdown from './NotificationDropdown';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL } from '../../config/api';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
