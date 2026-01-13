@@ -332,297 +332,45 @@ def _enrich_comments_count(activities: List[Dict]):
 
 def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, offset: int = 0) -> List[Dict]:
     """
-    특정 사용자의 활동 피드
+    특정 사용자의 활동 피드 (feed_activities 테이블 사용)
+    - 단일 테이블 조회로 극도로 빠른 성능
     """
 
-    # 애니메이션 평가 활동 (리뷰와 함께)
-    anime_ratings = db.execute_query(
+    # feed_activities 테이블에서 user_id로 필터링
+    rows = db.execute_query(
         """
         SELECT
-            'anime_rating' as activity_type,
-            ur.user_id,
-            u.username,
-            u.display_name,
-            u.avatar_url,
-            COALESCE(us.otaku_score, 0) as otaku_score,
-            ur.anime_id as item_id,
-            a.title_romaji as item_title,
-            a.title_korean as item_title_korean,
-            COALESCE('/' || a.cover_image_local, a.cover_image_url) as item_image,
-            ur.rating,
-            ur.status,
-            COALESCE(r.created_at, ur.updated_at) as activity_time,
-            NULL as anime_title,
-            NULL as anime_title_korean,
-            r.content as review_content,
-            NULL as post_content,
-            COALESCE(r.id, (SELECT id FROM user_reviews WHERE user_id = ur.user_id AND anime_id = ur.anime_id LIMIT 1)) as review_id,
-            COALESCE((SELECT COUNT(*) FROM review_comments rc
-             JOIN user_reviews ur2 ON rc.review_id = ur2.id
-             WHERE ur2.user_id = ur.user_id AND ur2.anime_id = ur.anime_id AND rc.review_type = 'anime'), 0) as comments_count,
-            CASE
-                WHEN r.id IS NOT NULL THEN (SELECT COALESCE(likes_count, 0) FROM user_reviews WHERE id = r.id)
-                ELSE (SELECT COUNT(*) FROM activity_likes
-                      WHERE activity_type = 'anime_rating'
-                      AND activity_user_id = ur.user_id
-                      AND item_id = ur.anime_id)
-            END as likes_count,
-            CASE WHEN ? IS NOT NULL THEN
-                CASE
-                    WHEN r.id IS NOT NULL THEN (SELECT COUNT(*) FROM review_likes
-                                                 WHERE user_id = ? AND review_id = r.id) > 0
-                    ELSE (SELECT COUNT(*) FROM activity_likes
-                          WHERE user_id = ?
-                          AND activity_type = 'anime_rating'
-                          AND activity_user_id = ur.user_id
-                          AND item_id = ur.anime_id) > 0
-                END
-            ELSE 0 END as user_has_liked
-        FROM user_ratings ur
-        JOIN users u ON ur.user_id = u.id
-        JOIN anime a ON ur.anime_id = a.id
-        LEFT JOIN user_stats us ON u.id = us.user_id
-        LEFT JOIN user_reviews r ON ur.user_id = r.user_id AND ur.anime_id = r.anime_id
-        WHERE ur.user_id = ? AND ur.status = 'RATED' AND ur.rating IS NOT NULL
-        ORDER BY COALESCE(r.created_at, ur.updated_at) DESC
-        """,
-        (current_user_id, current_user_id, current_user_id, user_id)
-    )
-
-    # 캐릭터 평가 활동 (리뷰와 함께)
-    character_ratings = db.execute_query(
-        """
-        SELECT
-            'character_rating' as activity_type,
-            cr.user_id,
-            u.username,
-            u.display_name,
-            u.avatar_url,
-            COALESCE(us.otaku_score, 0) as otaku_score,
-            cr.character_id as item_id,
-            c.name_full as item_title,
-            c.name_native as item_title_korean,
-            COALESCE('/' || c.image_local, c.image_url) as item_image,
-            cr.rating,
+            activity_type,
+            user_id,
+            username,
+            display_name,
+            avatar_url,
+            otaku_score,
+            item_id,
+            item_title,
+            item_title_korean,
+            item_image,
+            rating,
             NULL as status,
-            COALESCE(rev.created_at, cr.updated_at) as activity_time,
-            (SELECT a.title_romaji FROM anime a
-             JOIN anime_character ac ON a.id = ac.anime_id
-             WHERE ac.character_id = c.id
-             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC, a.popularity DESC LIMIT 1) as anime_title,
-            (SELECT a.title_korean FROM anime a
-             JOIN anime_character ac ON a.id = ac.anime_id
-             WHERE ac.character_id = c.id
-             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC, a.popularity DESC LIMIT 1) as anime_title_korean,
-            rev.content as review_content,
-            NULL as post_content,
-            COALESCE(rev.id, (SELECT id FROM character_reviews WHERE user_id = cr.user_id AND character_id = cr.character_id LIMIT 1)) as review_id,
-            COALESCE((SELECT COUNT(*) FROM review_comments rc
-             JOIN character_reviews chr ON rc.review_id = chr.id
-             WHERE chr.user_id = cr.user_id AND chr.character_id = cr.character_id AND rc.review_type = 'character'), 0) as comments_count,
-            CASE
-                WHEN rev.id IS NOT NULL THEN (SELECT COALESCE(likes_count, 0) FROM character_reviews WHERE id = rev.id)
-                ELSE (SELECT COUNT(*) FROM activity_likes
-                      WHERE activity_type = 'character_rating'
-                      AND activity_user_id = cr.user_id
-                      AND item_id = cr.character_id)
-            END as likes_count,
-            CASE WHEN ? IS NOT NULL THEN
-                CASE
-                    WHEN rev.id IS NOT NULL THEN (SELECT COUNT(*) FROM character_review_likes
-                                                    WHERE user_id = ? AND review_id = rev.id) > 0
-                    ELSE (SELECT COUNT(*) FROM activity_likes
-                          WHERE user_id = ?
-                          AND activity_type = 'character_rating'
-                          AND activity_user_id = cr.user_id
-                          AND item_id = cr.character_id) > 0
-                END
-            ELSE 0 END as user_has_liked
-        FROM character_ratings cr
-        JOIN users u ON cr.user_id = u.id
-        JOIN character c ON cr.character_id = c.id
-        LEFT JOIN user_stats us ON u.id = us.user_id
-        LEFT JOIN character_reviews rev ON cr.user_id = rev.user_id AND cr.character_id = rev.character_id
-        WHERE cr.user_id = ? AND cr.rating IS NOT NULL
-        ORDER BY COALESCE(rev.created_at, cr.updated_at) DESC
+            activity_time,
+            anime_title,
+            anime_title_korean,
+            anime_id,
+            review_id,
+            review_content,
+            post_content,
+            0 as comments_count
+        FROM feed_activities
+        WHERE user_id = ?
+        ORDER BY activity_time DESC
+        LIMIT ? OFFSET ?
         """,
-        (current_user_id, current_user_id, current_user_id, user_id)
+        (user_id, limit, offset)
     )
 
-    # 캐릭터 리뷰 활동 (평점 없이 리뷰만 작성한 경우)
-    character_reviews = db.execute_query(
-        """
-        SELECT
-            'character_review' as activity_type,
-            cr.user_id,
-            u.username,
-            u.display_name,
-            u.avatar_url,
-            COALESCE(us.otaku_score, 0) as otaku_score,
-            cr.character_id as item_id,
-            c.name_full as item_title,
-            c.name_native as item_title_korean,
-            COALESCE('/' || c.image_local, c.image_url) as item_image,
-            NULL as rating,
-            NULL as status,
-            cr.created_at as activity_time,
-            cr.id as review_id,
-            cr.content as review_content,
-            NULL as post_content,
-            (SELECT COUNT(*) FROM review_comments
-             WHERE review_id = cr.id AND review_type = 'character') as comments_count,
-            (SELECT a.title_romaji FROM anime a
-             JOIN anime_character ac ON a.id = ac.anime_id
-             WHERE ac.character_id = c.id
-             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC, a.popularity DESC LIMIT 1) as anime_title,
-            (SELECT a.title_korean FROM anime a
-             JOIN anime_character ac ON a.id = ac.anime_id
-             WHERE ac.character_id = c.id
-             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC, a.popularity DESC LIMIT 1) as anime_title_korean,
-            (SELECT COUNT(*) FROM activity_likes
-             WHERE activity_type = 'character_review'
-             AND activity_user_id = cr.user_id
-             AND item_id = cr.character_id) as likes_count,
-            CASE WHEN ? IS NOT NULL THEN
-                (SELECT COUNT(*) FROM activity_likes
-                 WHERE user_id = ?
-                 AND activity_type = 'character_review'
-                 AND activity_user_id = cr.user_id
-                 AND item_id = cr.character_id) > 0
-            ELSE 0 END as user_has_liked
-        FROM character_reviews cr
-        JOIN users u ON cr.user_id = u.id
-        JOIN character c ON cr.character_id = c.id
-        LEFT JOIN user_stats us ON u.id = us.user_id
-        WHERE cr.user_id = ?
-        AND NOT EXISTS (
-            SELECT 1 FROM character_ratings cr2
-            WHERE cr2.user_id = cr.user_id
-            AND cr2.character_id = cr.character_id
-            AND cr2.rating IS NOT NULL
-        )
-        ORDER BY cr.created_at DESC
-        """,
-        (current_user_id, current_user_id, user_id)
-    )
+    results = [dict_from_row(row) for row in rows]
 
-    # 리뷰만 있는 활동 (평점 없이 리뷰만 작성한 경우)
-    reviews = db.execute_query(
-        """
-        SELECT
-            'anime_review' as activity_type,
-            r.user_id,
-            u.username,
-            u.display_name,
-            u.avatar_url,
-            COALESCE(us.otaku_score, 0) as otaku_score,
-            r.anime_id as item_id,
-            a.title_romaji as item_title,
-            a.title_korean as item_title_korean,
-            COALESCE('/' || a.cover_image_local, a.cover_image_url) as item_image,
-            NULL as rating,
-            NULL as status,
-            r.created_at as activity_time,
-            r.id as review_id,
-            r.content as review_content,
-            NULL as post_content,
-            NULL as anime_title,
-            NULL as anime_title_korean,
-            (SELECT COUNT(*) FROM review_comments
-             WHERE review_id = r.id AND review_type = 'anime') as comments_count,
-            (SELECT COUNT(*) FROM activity_likes
-             WHERE activity_type = 'anime_review'
-             AND activity_user_id = r.user_id
-             AND item_id = r.anime_id) as likes_count,
-            CASE WHEN ? IS NOT NULL THEN
-                (SELECT COUNT(*) FROM activity_likes
-                 WHERE user_id = ?
-                 AND activity_type = 'anime_review'
-                 AND activity_user_id = r.user_id
-                 AND item_id = r.anime_id) > 0
-            ELSE 0 END as user_has_liked
-        FROM user_reviews r
-        JOIN users u ON r.user_id = u.id
-        JOIN anime a ON r.anime_id = a.id
-        LEFT JOIN user_stats us ON u.id = us.user_id
-        WHERE r.user_id = ?
-        AND NOT EXISTS (
-            SELECT 1 FROM user_ratings ur
-            WHERE ur.user_id = r.user_id
-            AND ur.anime_id = r.anime_id
-            AND ur.status = 'RATED'
-            AND ur.rating IS NOT NULL
-        )
-        ORDER BY r.created_at DESC
-        """,
-        (current_user_id, current_user_id, user_id)
-    )
+    # Batch load comments_count for performance
+    _enrich_comments_count(results)
 
-    # 일반 포스트 활동
-    posts = db.execute_query(
-        """
-        SELECT
-            'user_post' as activity_type,
-            up.user_id,
-            u.username,
-            u.display_name,
-            u.avatar_url,
-            COALESCE(us.otaku_score, 0) as otaku_score,
-            up.id as item_id,
-            NULL as item_title,
-            NULL as item_title_korean,
-            NULL as item_image,
-            NULL as rating,
-            NULL as status,
-            up.created_at as activity_time,
-            up.content as post_content,
-            NULL as review_content,
-            NULL as review_id,
-            NULL as anime_title,
-            NULL as anime_title_korean,
-            (SELECT COUNT(*) FROM activity_comments
-             WHERE activity_type = 'post'
-             AND activity_user_id = up.user_id
-             AND item_id = up.id) as comments_count,
-            (SELECT COUNT(*) FROM activity_likes
-             WHERE activity_type = 'post'
-             AND activity_user_id = up.user_id
-             AND item_id = up.id) as likes_count,
-            CASE WHEN ? IS NOT NULL THEN
-                (SELECT COUNT(*) FROM activity_likes
-                 WHERE user_id = ?
-                 AND activity_type = 'post'
-                 AND activity_user_id = up.user_id
-                 AND item_id = up.id) > 0
-            ELSE 0 END as user_has_liked
-        FROM user_posts up
-        JOIN users u ON up.user_id = u.id
-        LEFT JOIN user_stats us ON u.id = us.user_id
-        WHERE up.user_id = ?
-        ORDER BY up.created_at DESC
-        """,
-        (current_user_id, current_user_id, user_id)
-    )
-
-    # 모든 활동 합치고 시간순 정렬
-    all_activities = []
-    # 애니 평점
-    anime_rating_dicts = [dict_from_row(row) for row in anime_ratings]
-    all_activities.extend(anime_rating_dicts)
-    # 캐릭터 평점
-    character_rating_dicts = [dict_from_row(row) for row in character_ratings]
-    all_activities.extend(character_rating_dicts)
-    # 애니 리뷰
-    review_dicts = [dict_from_row(row) for row in reviews]
-    all_activities.extend(review_dicts)
-    # 캐릭터 리뷰
-    character_review_dicts = [dict_from_row(row) for row in character_reviews]
-    all_activities.extend(character_review_dicts)
-    # 사용자 게시글
-    all_activities.extend([dict_from_row(row) for row in posts])
-
-    # 시간순 정렬
-    all_activities.sort(key=lambda x: x['activity_time'], reverse=True)
-
-    # offset과 limit 적용
-    return all_activities[offset:offset + limit]
+    return results
