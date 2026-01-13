@@ -667,7 +667,11 @@ export default function CharacterDetail() {
   const getCoverUrl = (coverUrl) => {
     if (!coverUrl) return '/placeholder-anime.svg';
     if (coverUrl.startsWith('http')) return coverUrl;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${coverUrl}`;
+    // Use covers_large for better quality
+    const processedUrl = coverUrl.includes('/covers/')
+      ? coverUrl.replace('/covers/', '/covers_large/')
+      : coverUrl;
+    return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
   const getBirthday = () => {
