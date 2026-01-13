@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import StarRating from '../common/StarRating';
+import { API_BASE_URL } from '../config/api';
 
 export default function AnimeCard({ anime }) {
   const getStatusColor = (status) => {
@@ -14,7 +15,7 @@ export default function AnimeCard({ anime }) {
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.png';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `http://localhost:8000${imageUrl}`;
+    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
   };
 
   return (

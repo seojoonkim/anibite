@@ -11,6 +11,7 @@ import Navbar from '../components/common/Navbar';
 import StarRating from '../components/common/StarRating';
 import RatingWidget from '../components/anime/RatingWidget';
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
+import { API_BASE_URL } from '../config/api';
 
 export default function AnimeDetail() {
   const { id } = useParams();
@@ -357,7 +358,7 @@ export default function AnimeDetail() {
   const getAvatarUrl = (url) => {
     if (!url) return null;
     if (url.startsWith('http')) return url;
-    return `http://localhost:8000${url}`;
+    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${url}`;
   };
 
   const handleAvatarError = (e, userId) => {
@@ -510,7 +511,7 @@ export default function AnimeDetail() {
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.png';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `http://localhost:8000${imageUrl}`;
+    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
   };
 
   if (loading) {

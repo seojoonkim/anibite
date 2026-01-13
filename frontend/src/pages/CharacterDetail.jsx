@@ -10,6 +10,7 @@ import * as ActivityUtils from '../utils/activityUtils';
 import Navbar from '../components/common/Navbar';
 import StarRating from '../components/common/StarRating';
 import CharacterRatingWidget from '../components/character/CharacterRatingWidget';
+import { API_BASE_URL } from '../config/api';
 
 export default function CharacterDetail() {
   const { id } = useParams();
@@ -633,7 +634,7 @@ export default function CharacterDetail() {
   const getAvatarUrl = (url) => {
     if (!url) return null;
     if (url.startsWith('http')) return url;
-    return `http://localhost:8000${url}`;
+    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${url}`;
   };
 
   const toRoman = (num) => {
@@ -656,13 +657,13 @@ export default function CharacterDetail() {
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.png';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `http://localhost:8000${imageUrl}`;
+    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${imageUrl}`;
   };
 
   const getCoverUrl = (coverUrl) => {
     if (!coverUrl) return '/placeholder-anime.png';
     if (coverUrl.startsWith('http')) return coverUrl;
-    return `http://localhost:8000${coverUrl}`;
+    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${coverUrl}`;
   };
 
   const getBirthday = () => {

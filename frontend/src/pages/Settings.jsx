@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { userService } from '../services/userService';
 import { authService } from '../services/authService';
 import Navbar from '../components/common/Navbar';
+import { API_BASE_URL } from '../config/api';
 
 export default function Settings() {
   const { user, updateUser } = useAuth();
@@ -252,7 +253,7 @@ export default function Settings() {
   const getAvatarUrl = (url) => {
     if (!url) return '/placeholder-avatar.png';
     if (url.startsWith('http')) return url;
-    return `http://localhost:8000${url}`;
+    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${url}`;
   };
 
   return (
