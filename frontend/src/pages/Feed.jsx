@@ -205,9 +205,9 @@ export default function Feed() {
         setComments(newComments);
         setExpandedComments(newExpandedComments);
 
-        // 댓글이 있는 활동의 댓글 로드
+        // 댓글이 있는 활동의 댓글 로드 (빠른 로딩: 처음 3개만)
         if (commentsToLoad.length > 0) {
-          commentsToLoad.forEach(activity => loadComments(activity));
+          commentsToLoad.slice(0, 3).forEach(activity => loadComments(activity));
         }
 
         // 저장함 로딩 완료
@@ -306,9 +306,9 @@ export default function Feed() {
         setComments(newComments);
         setExpandedComments(newExpandedComments);
 
-        // 댓글이 있는 활동의 댓글 로드
+        // 댓글이 있는 활동의 댓글 로드 (빠른 로딩: 처음 3개만)
         if (commentsToLoad.length > 0) {
-          commentsToLoad.forEach(activity => loadComments(activity));
+          commentsToLoad.slice(0, 3).forEach(activity => loadComments(activity));
         }
 
         // 알림 로딩 완료
@@ -353,9 +353,9 @@ export default function Feed() {
         setComments(newComments);
         setExpandedComments(newExpandedComments);
 
-        // 댓글이 있는 활동의 댓글 로드
+        // 댓글이 있는 활동의 댓글 로드 (빠른 로딩: 처음 3개만)
         if (commentsToLoad.length > 0) {
-          commentsToLoad.forEach(activity => loadComments(activity));
+          commentsToLoad.slice(0, 3).forEach(activity => loadComments(activity));
         }
 
         // 로딩 완료 (무한 스크롤로 추가 로드)
