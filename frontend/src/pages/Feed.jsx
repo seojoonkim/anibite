@@ -183,9 +183,11 @@ export default function Feed() {
         const savedData = (allData || []).filter(activity => savedActivities.has(getActivityKey(activity)));
         updateActivitiesForFilter('saved', savedData);
 
-        // 좋아요/댓글 정보 초기화 (댓글은 클릭할 때만 로드)
+        // 좋아요/댓글 정보 초기화
         const newActivityLikes = {};
         const newComments = {};
+        const newExpandedComments = new Set();
+        const commentsToLoad = [];
         savedData.forEach(activity => {
           const key = getActivityKey(activity);
           newActivityLikes[key] = {
@@ -193,9 +195,20 @@ export default function Feed() {
             count: activity.likes_count || 0
           };
           newComments[key] = [];
+          // 댓글이 있으면 자동으로 펼치기
+          if (activity.comments_count > 0) {
+            newExpandedComments.add(key);
+            commentsToLoad.push(activity);
+          }
         });
         setActivityLikes(newActivityLikes);
         setComments(newComments);
+        setExpandedComments(newExpandedComments);
+
+        // 댓글이 있는 활동의 댓글 로드
+        if (commentsToLoad.length > 0) {
+          commentsToLoad.forEach(activity => loadComments(activity));
+        }
 
         // 저장함 로딩 완료
         setLoading(false);
@@ -273,6 +286,7 @@ export default function Feed() {
         const newComments = {};
         const newExpandedComments = new Set();
 
+        const commentsToLoad = [];
         transformedActivities.forEach(activity => {
           const key = getActivityKey(activity);
 
@@ -281,10 +295,21 @@ export default function Feed() {
             count: activity.likes_count || 0
           };
           newComments[key] = [];
+          // 댓글이 있으면 자동으로 펼치기
+          if (activity.comments_count > 0) {
+            newExpandedComments.add(key);
+            commentsToLoad.push(activity);
+          }
         });
 
         setActivityLikes(newActivityLikes);
         setComments(newComments);
+        setExpandedComments(newExpandedComments);
+
+        // 댓글이 있는 활동의 댓글 로드
+        if (commentsToLoad.length > 0) {
+          commentsToLoad.forEach(activity => loadComments(activity));
+        }
 
         // 알림 로딩 완료
         setLoading(false);
@@ -306,9 +331,11 @@ export default function Feed() {
         })));
         updateActivitiesForFilter(currentFilter, initialData || []);
 
-        // 좋아요/댓글 정보 초기화 (댓글은 클릭할 때만 로드)
+        // 좋아요/댓글 정보 초기화
         const newActivityLikes = {};
         const newComments = {};
+        const newExpandedComments = new Set();
+        const commentsToLoad = [];
         (initialData || []).forEach(activity => {
           const key = getActivityKey(activity);
           newActivityLikes[key] = {
@@ -316,9 +343,20 @@ export default function Feed() {
             count: activity.likes_count || 0
           };
           newComments[key] = [];
+          // 댓글이 있으면 자동으로 펼치기
+          if (activity.comments_count > 0) {
+            newExpandedComments.add(key);
+            commentsToLoad.push(activity);
+          }
         });
         setActivityLikes(newActivityLikes);
         setComments(newComments);
+        setExpandedComments(newExpandedComments);
+
+        // 댓글이 있는 활동의 댓글 로드
+        if (commentsToLoad.length > 0) {
+          commentsToLoad.forEach(activity => loadComments(activity));
+        }
 
         // 로딩 완료 (무한 스크롤로 추가 로드)
         setLoading(false);
