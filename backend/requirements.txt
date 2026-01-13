@@ -25,7 +25,7 @@ email-validator==2.1.0
 # scipy==1.12.0
 
 # CORS
-python-cors==1.0.0
+# No additional package needed - using FastAPI's built-in CORSMiddleware
 
 # Development
 pytest==7.4.4
