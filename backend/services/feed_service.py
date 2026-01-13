@@ -462,9 +462,8 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
         LEFT JOIN user_reviews r ON ur.user_id = r.user_id AND ur.anime_id = r.anime_id
         WHERE ur.user_id = ? AND ur.status = 'RATED' AND ur.rating IS NOT NULL
         ORDER BY COALESCE(r.created_at, ur.updated_at) DESC
-        LIMIT ?
         """,
-        (current_user_id, current_user_id, current_user_id, user_id, limit)
+        (current_user_id, current_user_id, current_user_id, user_id)
     )
 
     # 캐릭터 평가 활동 (리뷰와 함께)
@@ -516,9 +515,8 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
         LEFT JOIN character_reviews rev ON cr.user_id = rev.user_id AND cr.character_id = rev.character_id
         WHERE cr.user_id = ? AND cr.rating IS NOT NULL
         ORDER BY COALESCE(rev.created_at, cr.updated_at) DESC
-        LIMIT ?
         """,
-        (current_user_id, current_user_id, current_user_id, user_id, limit)
+        (current_user_id, current_user_id, current_user_id, user_id)
     )
 
     # 캐릭터 리뷰 활동 (평점 없이 리뷰만 작성한 경우)
@@ -567,9 +565,8 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
             AND cr2.rating IS NOT NULL
         )
         ORDER BY cr.created_at DESC
-        LIMIT ?
         """,
-        (current_user_id, current_user_id, user_id, limit)
+        (current_user_id, current_user_id, user_id)
     )
 
     # 리뷰만 있는 활동 (평점 없이 리뷰만 작성한 경우)
@@ -613,9 +610,8 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
             AND ur.rating IS NOT NULL
         )
         ORDER BY r.created_at DESC
-        LIMIT ?
         """,
-        (current_user_id, current_user_id, user_id, limit)
+        (current_user_id, current_user_id, user_id)
     )
 
     # 일반 포스트 활동
@@ -652,9 +648,8 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
         FROM user_posts up
         WHERE up.user_id = ?
         ORDER BY up.created_at DESC
-        LIMIT ?
         """,
-        (current_user_id, current_user_id, user_id, limit)
+        (current_user_id, current_user_id, user_id)
     )
 
     # 모든 활동 합치고 시간순 정렬
