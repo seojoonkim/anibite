@@ -20,8 +20,8 @@ email-validator==2.1.0
 # No additional package needed - using built-in sqlite3
 
 # Recommendation Algorithm
-numpy==1.26.3
-scipy==1.11.4
+numpy==1.26.4
+scipy==1.12.0
 
 # CORS
 python-cors==1.0.0
