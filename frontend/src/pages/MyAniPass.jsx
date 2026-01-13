@@ -437,8 +437,10 @@ export default function MyAniPass() {
     return `${hours}시간 ${mins}분`;
   };
 
-  // Note: Using helper functions from imageHelpers.js
-  // getCharacterImageUrl, getAvatarUrlHelper
+  // Wrapper for avatar URL helper
+  const getAvatarUrl = (avatarUrl) => {
+    return getAvatarUrlHelper(avatarUrl) || '/placeholder-avatar.png';
+  };
 
   const getActivityText = (activity) => {
     const displayName = activity.display_name || activity.username;
