@@ -248,18 +248,28 @@ export default function ActivityComments({
 
                                 <p className="text-xs text-gray-700 whitespace-pre-wrap">{reply.content}</p>
 
-                                {currentUser && currentUser.id === reply.user_id && (
-                                  <button
-                                    onClick={() => {
-                                      if (window.confirm(language === 'ko' ? '답글을 삭제하시겠습니까?' : 'Delete this reply?')) {
-                                        onDeleteComment(reply.id, comment.id);
-                                      }
-                                    }}
-                                    className="mt-0.5 text-[10px] text-red-500 hover:text-red-700"
-                                  >
-                                    {language === 'ko' ? '삭제' : 'Delete'}
-                                  </button>
-                                )}
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  {currentUser && (
+                                    <button
+                                      onClick={() => setReplyingTo(comment.id)}
+                                      className="text-[10px] text-gray-500 hover:text-[#3797F0]"
+                                    >
+                                      {language === 'ko' ? '답글' : 'Reply'}
+                                    </button>
+                                  )}
+                                  {currentUser && currentUser.id === reply.user_id && (
+                                    <button
+                                      onClick={() => {
+                                        if (window.confirm(language === 'ko' ? '답글을 삭제하시겠습니까?' : 'Delete this reply?')) {
+                                          onDeleteComment(reply.id, comment.id);
+                                        }
+                                      }}
+                                      className="text-[10px] text-red-500 hover:text-red-700"
+                                    >
+                                      {language === 'ko' ? '삭제' : 'Delete'}
+                                    </button>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           );
