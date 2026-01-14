@@ -284,6 +284,13 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
   useEffect(() => {
     if (page === 0) {
       loadMore();
+    } else if (page === 1) {
+      // Auto-load second batch immediately after first batch
+      setTimeout(() => {
+        if (hasMore && !loading) {
+          loadMore();
+        }
+      }, 100);
     }
   }, [page]);
 

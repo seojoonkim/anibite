@@ -482,6 +482,23 @@ export default function Rate() {
       setHasMore(data.has_more !== false);
       setPage(1);
       setLoading(false);
+
+      // Auto-load second batch immediately after first batch
+      if (data.has_more !== false) {
+        setTimeout(async () => {
+          try {
+            const data2 = await animeService.getAnimeForRating({
+              limit: 20,
+              offset: 20
+            });
+            setAnimeList(prev => [...prev, ...(data2.items || [])]);
+            setHasMore(data2.has_more !== false);
+            setPage(2);
+          } catch (err) {
+            console.error('Failed to auto-load more:', err);
+          }
+        }, 100);
+      }
     } catch (err) {
       console.error('Failed to load anime:', err);
       setLoading(false);

@@ -120,6 +120,32 @@ export default function RateCharacters() {
       setHasMore(receivedItems === pageSize);
       setLoading(false);
       setLoadingMore(false);
+
+      // Auto-load second batch immediately after first batch
+      if (pageNum === 1 && receivedItems === pageSize) {
+        setTimeout(async () => {
+          try {
+            const data2 = await characterService.getCharactersForRating({
+              limit: pageSize,
+              offset: pageSize
+            });
+            const items2 = data2.items || [];
+            setCharacters(prev => [...prev, ...items2]);
+            // Add new character statuses
+            const newStatuses = {};
+            items2.forEach(char => {
+              if (char.my_status) {
+                newStatuses[char.id] = char.my_status;
+              }
+            });
+            setCharacterStatuses(prev => ({ ...prev, ...newStatuses }));
+            setHasMore(items2.length === pageSize);
+            setPage(2);
+          } catch (err) {
+            console.error('Failed to auto-load more:', err);
+          }
+        }, 100);
+      }
     } catch (err) {
       console.error('Failed to load characters:', err);
       setLoading(false);
