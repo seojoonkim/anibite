@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from typing import Optional, List
 from pydantic import BaseModel, Field
 from models.user import UserResponse
-from api.deps import get_current_user, get_optional_user
+from api.deps import get_current_user, get_current_user_optional
 from services.activity_service import (
     get_activities,
     get_activity_by_id,
@@ -117,7 +117,7 @@ def get_activities_endpoint(
     following_only: bool = Query(False, description="Show only activities from followed users"),
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
-    current_user: Optional[UserResponse] = Depends(get_optional_user)
+    current_user: Optional[UserResponse] = Depends(get_current_user_optional)
 ):
     """
     Get activities with optional filtering
@@ -148,7 +148,7 @@ def get_activities_endpoint(
 @router.get("/{activity_id}", response_model=ActivityResponse)
 def get_activity_endpoint(
     activity_id: int,
-    current_user: Optional[UserResponse] = Depends(get_optional_user)
+    current_user: Optional[UserResponse] = Depends(get_current_user_optional)
 ):
     """Get a single activity by ID"""
 
