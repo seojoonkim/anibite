@@ -34,6 +34,10 @@ export default function CharacterDetail() {
   const [comments, setComments] = useState({});
   const [expandedComments, setExpandedComments] = useState(new Set());
   const [savedActivities, setSavedActivities] = useState(new Set());
+  const [newComment, setNewComment] = useState({});
+  const [commentLikes, setCommentLikes] = useState({});
+  const [replyingTo, setReplyingTo] = useState({});
+  const [myReviewComments, setMyReviewComments] = useState([]);
 
   // Use unified activities hook
   const {
