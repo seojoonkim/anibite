@@ -385,8 +385,6 @@ export default function Rate() {
     averageRating: 0
   });
   const observerRef = useRef(null);
-  // Session seed for consistent ordering within session, but different on refresh
-  const sessionSeedRef = useRef(Math.floor(Math.random() * 1000000));
 
   useEffect(() => {
     loadAnime();
@@ -477,8 +475,7 @@ export default function Rate() {
       // Use ULTRA FAST optimized endpoint (0.1s target)
       const data = await animeService.getAnimeForRating({
         limit: 20,
-        offset: 0,
-        seed: sessionSeedRef.current
+        offset: 0
       });
 
       setAnimeList(data.items || []);
@@ -492,8 +489,7 @@ export default function Rate() {
           try {
             const data2 = await animeService.getAnimeForRating({
               limit: 20,
-              offset: 20,
-              seed: sessionSeedRef.current
+              offset: 20
             });
             // Remove duplicates by ID
             setAnimeList(prev => {
@@ -529,8 +525,7 @@ export default function Rate() {
       // Use ULTRA FAST optimized endpoint (0.1s target)
       const data = await animeService.getAnimeForRating({
         limit: 20,
-        offset: offset,
-        seed: sessionSeedRef.current
+        offset: offset
       });
 
       console.log('Loaded data:', data);
