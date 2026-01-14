@@ -20,6 +20,7 @@ import { getCurrentLevelInfo } from '../../utils/otakuLevels';
 import ActivityComments from './ActivityComments';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL || API_BASE_URL;
 
 /**
  * Context presets for common page layouts
@@ -95,13 +96,13 @@ export default function ActivityCard({
   const getImageUrl = (url) => {
     if (!url) return null;
     if (url.startsWith('http')) return url;
-    return `${API_BASE_URL}${url}`;
+    return `${IMAGE_BASE_URL}${url}`;
   };
 
   const getAvatarUrl = (url) => {
     if (!url) return null;
     if (url.startsWith('http')) return url;
-    return `${API_BASE_URL}${url}`;
+    return `${IMAGE_BASE_URL}${url}`;
   };
 
   const getActivityLink = () => {
