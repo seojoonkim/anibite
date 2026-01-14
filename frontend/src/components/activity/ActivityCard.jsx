@@ -264,7 +264,7 @@ export default function ActivityCard({
     try {
       await createComment(newCommentText.trim());
       setNewCommentText('');
-      if (onUpdate) onUpdate();
+      // Don't call onUpdate() - useActivityComments already handles optimistic updates
     } catch (err) {
       console.error('Failed to create comment:', err);
       alert(language === 'ko' ? '댓글 작성에 실패했습니다.' : 'Failed to create comment.');
@@ -278,7 +278,7 @@ export default function ActivityCard({
       await createComment(replyText.trim(), parentCommentId);
       setReplyText('');
       setReplyingTo(null);
-      if (onUpdate) onUpdate();
+      // Don't call onUpdate() - useActivityComments already handles optimistic updates
     } catch (err) {
       console.error('Failed to create reply:', err);
       alert(language === 'ko' ? '답글 작성에 실패했습니다.' : 'Failed to create reply.');
