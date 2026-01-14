@@ -367,19 +367,21 @@ def create_activity_comment(
     """Create a comment on an activity"""
     db = default_db
 
-    # Verify activity exists
+    # Verify activity exists and get activity info for legacy columns
     activity = get_activity_by_id(activity_id)
     if not activity:
         raise ValueError(f"Activity {activity_id} not found")
 
-    # Insert comment
+    # Insert comment with legacy columns (activity_type, activity_user_id, item_id)
     comment_id = db.execute_insert(
         """
         INSERT INTO activity_comments (
-            activity_id, user_id, parent_comment_id, content, created_at
-        ) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+            activity_id, user_id, parent_comment_id, content,
+            activity_type, activity_user_id, item_id, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
         """,
-        (activity_id, user_id, parent_comment_id, content)
+        (activity_id, user_id, parent_comment_id, content,
+         activity['activity_type'], activity['user_id'], activity.get('item_id'))
     )
 
     # Get created comment
