@@ -185,7 +185,8 @@ export default function Feed() {
 
   const getTimeAgo = (timestamp) => {
     const now = new Date();
-    const activityTime = new Date(timestamp.endsWith('Z') ? timestamp : timestamp + 'Z');
+    // Backend sends UTC time without timezone info, so append 'Z' to parse as UTC
+    const activityTime = new Date(timestamp.endsWith('Z') ? timestamp : timestamp.replace(' ', 'T') + 'Z');
     const diff = now - activityTime;
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
