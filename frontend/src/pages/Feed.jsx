@@ -38,6 +38,7 @@ export default function Feed() {
   const {
     activities,
     loading,
+    loadingMore,
     hasMore,
     loadMore,
     reset: resetActivities
@@ -64,7 +65,7 @@ export default function Feed() {
     };
 
     const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && hasMore && !loading) {
+      if (entries[0].isIntersecting && hasMore && !loading && !loadingMore) {
         loadMore();
       }
     }, options);
@@ -80,7 +81,7 @@ export default function Feed() {
         observerRef.current.disconnect();
       }
     };
-  }, [hasMore, loading, loadMore, feedFilter]);
+  }, [hasMore, loading, loadingMore, loadMore, feedFilter]);
 
   // Update feedFilter when URL changes
   useEffect(() => {
@@ -555,12 +556,12 @@ export default function Feed() {
                 {/* Infinite scroll trigger */}
                 {feedFilter !== 'notifications' && (
                   <div ref={loadMoreTriggerRef} className="h-20 flex items-center justify-center">
-                    {loading && (
+                    {loadingMore && (
                       <div className="text-gray-500 text-sm">
                         {language === 'ko' ? '로딩 중...' : 'Loading...'}
                       </div>
                     )}
-                    {!loading && !hasMore && activities.length > 0 && (
+                    {!loading && !loadingMore && !hasMore && activities.length > 0 && (
                       <div className="text-gray-400 text-sm">
                         {language === 'ko' ? '모든 활동을 불러왔습니다' : 'All activities loaded'}
                       </div>

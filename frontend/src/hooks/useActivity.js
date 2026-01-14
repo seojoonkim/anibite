@@ -247,12 +247,18 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
   const [page, setPage] = useState(0);
   const [allActivities, setAllActivities] = useState([]);
   const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
-  const loadMore = useCallback(async () => {
-    if (loading || !hasMore) return;
+  const loadMore = useCallback(async (silent = false) => {
+    if (initialLoading || loadingMore || !hasMore) return;
 
-    setLoading(true);
+    // Only show loading indicator for initial load
+    if (page === 0) {
+      setInitialLoading(true);
+    } else if (!silent) {
+      setLoadingMore(true);
+    }
 
     try {
       const data = await activityService.getActivities({
@@ -267,9 +273,10 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
     } catch (err) {
       console.error('Failed to load more activities:', err);
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
+      setLoadingMore(false);
     }
-  }, [filters, page, pageSize, loading, hasMore]);
+  }, [filters, page, pageSize, initialLoading, loadingMore, hasMore]);
 
   const reset = useCallback(() => {
     setPage(0);
@@ -283,12 +290,12 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
 
   useEffect(() => {
     if (page === 0) {
-      loadMore();
+      loadMore(false);
     } else if (page === 1) {
-      // Auto-load second batch immediately after first batch
+      // Auto-load second batch silently immediately after first batch
       setTimeout(() => {
-        if (hasMore && !loading) {
-          loadMore();
+        if (hasMore && !initialLoading && !loadingMore) {
+          loadMore(true); // Silent load
         }
       }, 100);
     }
@@ -296,7 +303,8 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
 
   return {
     activities: allActivities,
-    loading,
+    loading: initialLoading, // Only true during initial load
+    loadingMore,
     hasMore,
     loadMore,
     reset
