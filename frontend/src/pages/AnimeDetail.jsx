@@ -55,6 +55,11 @@ export default function AnimeDetail() {
     }
   );
 
+  // Debug: Log activities when they change
+  useEffect(() => {
+    console.log('[AnimeDetail] activities loaded:', activities.length, activities);
+  }, [activities]);
+
 
   // 로마 숫자 변환 함수
   const toRoman = (num) => {
@@ -84,10 +89,9 @@ export default function AnimeDetail() {
       setAnime(animeData);
 
       // 나머지 데이터는 병렬로 로드 (실패해도 괜찮음)
-      const [myRatingData, myReviewData, reviewsData] = await Promise.all([
+      const [myRatingData, myReviewData] = await Promise.all([
         user ? ratingService.getUserRating(id).catch(() => null) : Promise.resolve(null),
-        user ? reviewService.getMyReview(id).catch(() => null) : Promise.resolve(null),
-        reviewService.getAnimeReviews(id, { page: 1, page_size: 10 }).catch(() => ({ items: [] }))
+        user ? reviewService.getMyReview(id).catch(() => null) : Promise.resolve(null)
       ]);
 
       // 내 평점
@@ -100,10 +104,7 @@ export default function AnimeDetail() {
         processMyReview(myReviewData);
       }
 
-      // 리뷰 목록
-      if (reviewsData) {
-        processReviews(reviewsData);
-      }
+      // 다른 사람들의 활동은 useActivities hook에서 자동으로 로드됨
     } catch (err) {
       console.error('Failed to load anime data:', err);
       setError(`데이터를 불러오는데 실패했습니다: ${err.message || '알 수 없는 오류'}`);
@@ -1087,7 +1088,7 @@ export default function AnimeDetail() {
             <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold">
-                  {language === 'ko' ? '리뷰' : 'Reviews'} ({(myReview ? 1 : 0) + reviews.length})
+                  {language === 'ko' ? '리뷰' : 'Reviews'} ({activities.length})
                 </h3>
                 {!myReview && (
                   <button
