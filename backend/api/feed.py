@@ -12,7 +12,7 @@ from database import get_db, Database
 router = APIRouter()
 
 
-def enrich_activities_with_engagement(activities: List[Dict], current_user_id: int, db: Database) -> List[Dict]:
+def enrich_activities_with_engagement(activities: List[Dict], current_user_id: Optional[int], db: Database) -> List[Dict]:
     """
     각 활동에 좋아요 수, 댓글 수, 현재 사용자의 좋아요 여부를 추가
     주의: feed_service에서 이미 comments_count, user_has_liked를 계산했으므로 덮어쓰지 않음
@@ -28,6 +28,12 @@ def enrich_activities_with_engagement(activities: List[Dict], current_user_id: i
         item_id = activity['item_id']
         user_id = activity['user_id']
 
+        # 로그인하지 않은 경우 user_liked는 항상 False
+        if current_user_id is None:
+            activity['user_liked'] = False
+            activity['user_has_liked'] = False
+            # likes_count는 계속 계산 (공개 정보)
+
         # 애니메이션 평가/리뷰는 review_likes/review_comments 사용
         if activity_type in ['anime_rating', 'anime_review']:
             # 리뷰 ID 조회
@@ -42,14 +48,15 @@ def enrich_activities_with_engagement(activities: List[Dict], current_user_id: i
                 # 리뷰 테이블의 likes_count 사용
                 activity['likes_count'] = review['likes_count'] or 0
 
-                # 현재 사용자가 좋아요를 눌렀는지
-                user_liked_result = db.execute_query(
-                    "SELECT COUNT(*) FROM review_likes WHERE review_id = ? AND user_id = ?",
-                    (review_id, current_user_id),
-                    fetch_one=True
-                )
-                activity['user_liked'] = (user_liked_result[0] > 0) if user_liked_result else False
-                activity['user_has_liked'] = activity['user_liked']
+                # 현재 사용자가 좋아요를 눌렀는지 (로그인한 경우만)
+                if current_user_id is not None:
+                    user_liked_result = db.execute_query(
+                        "SELECT COUNT(*) FROM review_likes WHERE review_id = ? AND user_id = ?",
+                        (review_id, current_user_id),
+                        fetch_one=True
+                    )
+                    activity['user_liked'] = (user_liked_result[0] > 0) if user_liked_result else False
+                    activity['user_has_liked'] = activity['user_liked']
 
                 # comments_count는 feed_service에서 이미 계산했으므로 덮어쓰지 않음
                 # (feed_service가 review_id 유무에 따라 올바른 테이블에서 조회)
@@ -62,13 +69,14 @@ def enrich_activities_with_engagement(activities: List[Dict], current_user_id: i
                 )
                 activity['likes_count'] = likes_count_result[0] if likes_count_result else 0
 
-                user_liked_result = db.execute_query(
-                    "SELECT COUNT(*) FROM activity_likes WHERE activity_type = ? AND activity_user_id = ? AND item_id = ? AND user_id = ?",
-                    (activity_type, user_id, item_id, current_user_id),
-                    fetch_one=True
-                )
-                activity['user_liked'] = (user_liked_result[0] > 0) if user_liked_result else False
-                activity['user_has_liked'] = activity['user_liked']
+                if current_user_id is not None:
+                    user_liked_result = db.execute_query(
+                        "SELECT COUNT(*) FROM activity_likes WHERE activity_type = ? AND activity_user_id = ? AND item_id = ? AND user_id = ?",
+                        (activity_type, user_id, item_id, current_user_id),
+                        fetch_one=True
+                    )
+                    activity['user_liked'] = (user_liked_result[0] > 0) if user_liked_result else False
+                    activity['user_has_liked'] = activity['user_liked']
                 # comments_count는 feed_service에서 이미 계산했으므로 덮어쓰지 않음
 
         # 캐릭터 평가/리뷰는 character_reviews/character_review_likes 사용
@@ -85,14 +93,15 @@ def enrich_activities_with_engagement(activities: List[Dict], current_user_id: i
                 # 캐릭터 리뷰 테이블의 likes_count 사용
                 activity['likes_count'] = character_review['likes_count'] or 0
 
-                # 현재 사용자가 좋아요를 눌렀는지
-                user_liked_result = db.execute_query(
-                    "SELECT COUNT(*) FROM character_review_likes WHERE review_id = ? AND user_id = ?",
-                    (review_id, current_user_id),
-                    fetch_one=True
-                )
-                activity['user_liked'] = (user_liked_result[0] > 0) if user_liked_result else False
-                activity['user_has_liked'] = activity['user_liked']
+                # 현재 사용자가 좋아요를 눌렀는지 (로그인한 경우만)
+                if current_user_id is not None:
+                    user_liked_result = db.execute_query(
+                        "SELECT COUNT(*) FROM character_review_likes WHERE review_id = ? AND user_id = ?",
+                        (review_id, current_user_id),
+                        fetch_one=True
+                    )
+                    activity['user_liked'] = (user_liked_result[0] > 0) if user_liked_result else False
+                    activity['user_has_liked'] = activity['user_liked']
 
                 # comments_count는 feed_service에서 이미 계산했으므로 덮어쓰지 않음
                 # (feed_service가 review_id 유무에 따라 올바른 테이블에서 조회)
@@ -105,13 +114,14 @@ def enrich_activities_with_engagement(activities: List[Dict], current_user_id: i
                 )
                 activity['likes_count'] = likes_count_result[0] if likes_count_result else 0
 
-                user_liked_result = db.execute_query(
-                    "SELECT COUNT(*) FROM activity_likes WHERE activity_type = ? AND activity_user_id = ? AND item_id = ? AND user_id = ?",
-                    (activity_type, user_id, item_id, current_user_id),
-                    fetch_one=True
-                )
-                activity['user_liked'] = (user_liked_result[0] > 0) if user_liked_result else False
-                activity['user_has_liked'] = activity['user_liked']
+                if current_user_id is not None:
+                    user_liked_result = db.execute_query(
+                        "SELECT COUNT(*) FROM activity_likes WHERE activity_type = ? AND activity_user_id = ? AND item_id = ? AND user_id = ?",
+                        (activity_type, user_id, item_id, current_user_id),
+                        fetch_one=True
+                    )
+                    activity['user_liked'] = (user_liked_result[0] > 0) if user_liked_result else False
+                    activity['user_has_liked'] = activity['user_liked']
                 # comments_count는 feed_service에서 이미 계산했으므로 덮어쓰지 않음
 
         else:
@@ -123,13 +133,14 @@ def enrich_activities_with_engagement(activities: List[Dict], current_user_id: i
             )
             activity['likes_count'] = likes_count_result[0] if likes_count_result else 0
 
-            user_liked_result = db.execute_query(
-                "SELECT COUNT(*) FROM activity_likes WHERE activity_type = ? AND activity_user_id = ? AND item_id = ? AND user_id = ?",
-                (activity_type, user_id, item_id, current_user_id),
-                fetch_one=True
-            )
-            activity['user_liked'] = (user_liked_result[0] > 0) if user_liked_result else False
-            activity['user_has_liked'] = activity['user_liked']
+            if current_user_id is not None:
+                user_liked_result = db.execute_query(
+                    "SELECT COUNT(*) FROM activity_likes WHERE activity_type = ? AND activity_user_id = ? AND item_id = ? AND user_id = ?",
+                    (activity_type, user_id, item_id, current_user_id),
+                    fetch_one=True
+                )
+                activity['user_liked'] = (user_liked_result[0] > 0) if user_liked_result else False
+                activity['user_has_liked'] = activity['user_liked']
 
             # comments_count는 feed_service에서 이미 계산했으므로 덮어쓰지 않음
 
