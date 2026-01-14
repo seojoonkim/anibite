@@ -46,14 +46,14 @@ def root():
     return {
         "message": "Welcome to AniPass API",
         "docs": "/docs",
-        "version": "1.0.0"
+        "version": "1.0.1"
     }
 
 
 # Health check
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    return {"status": "ok", "timestamp": "2026-01-13"}
 
 
 # Include API routers
