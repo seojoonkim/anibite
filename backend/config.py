@@ -23,7 +23,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-this-in-production"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 
-# CORS Settings
+# CORS Settings - Allow frontend domains
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS",
     "http://localhost:3000,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://127.0.0.1:3000,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175,http://127.0.0.1:5176,https://anipass.io,https://www.anipass.io"
 ).split(",")
