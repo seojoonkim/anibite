@@ -221,7 +221,7 @@ export default function ActivityCard({
       return;
     }
     await toggleLike();
-    if (onUpdate) onUpdate();
+    // Don't call onUpdate() - let the hook handle optimistic updates
   };
 
   const handleBookmarkClick = () => {
