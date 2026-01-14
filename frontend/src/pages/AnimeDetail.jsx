@@ -84,9 +84,10 @@ export default function AnimeDetail() {
       setAnime(animeData);
 
       // 나머지 데이터는 병렬로 로드 (실패해도 괜찮음)
-      const [myRatingData, myReviewData] = await Promise.all([
+      const [myRatingData, myReviewData, reviewsData] = await Promise.all([
         user ? ratingService.getUserRating(id).catch(() => null) : Promise.resolve(null),
-        user ? reviewService.getMyReview(id).catch(() => null) : Promise.resolve(null)
+        user ? reviewService.getMyReview(id).catch(() => null) : Promise.resolve(null),
+        reviewService.getAnimeReviews(id, { page: 1, page_size: 10 }).catch(() => ({ items: [] }))
       ]);
 
       // 내 평점
@@ -96,7 +97,12 @@ export default function AnimeDetail() {
 
       // 내 리뷰
       if (myReviewData) {
-        setMyReview(myReviewData);
+        processMyReview(myReviewData);
+      }
+
+      // 리뷰 목록
+      if (reviewsData) {
+        processReviews(reviewsData);
       }
     } catch (err) {
       console.error('Failed to load anime data:', err);
