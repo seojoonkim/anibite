@@ -36,9 +36,10 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  zoom: 0.9; /* 전체 UI 10% 축소 */
-  width: 111.11%; /* 0.9로 축소되므로 100%를 유지하려면 111.11% 필요 */
-  transform-origin: top left;
+  transform: scale(0.9);
+  transform-origin: top center;
+  width: 111.11%;
+  margin-left: -5.555%; /* (111.11% - 100%) / 2 = 5.555% */
 }
 
 /* English text - 세련되고 모던한 Inter */
