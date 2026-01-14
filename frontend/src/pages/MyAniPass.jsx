@@ -1164,6 +1164,30 @@ export default function MyAniPass() {
 
             {activeTab === 'anime' && (
               <div>
+                {/* Quick Stats Summary */}
+                {stats && (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                    <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-4">
+                      <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '평가한애니' : 'Rated'}</div>
+                      <div className="text-2xl font-bold text-gray-900">{stats.total_rated || 0}</div>
+                    </div>
+                    <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-4">
+                      <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '보고싶어요' : 'Watchlist'}</div>
+                      <div className="text-2xl font-bold text-gray-900">{stats.total_want_to_watch || 0}</div>
+                    </div>
+                    <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-4">
+                      <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '관심없어요' : 'Pass'}</div>
+                      <div className="text-2xl font-bold text-gray-900">{stats.total_pass || 0}</div>
+                    </div>
+                    <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-4">
+                      <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</div>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {stats.average_rating ? `★ ${stats.average_rating.toFixed(1)}` : '-'}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Sub-menu */}
                 <div className="mb-6">
                   <div className="flex flex-wrap gap-2">
