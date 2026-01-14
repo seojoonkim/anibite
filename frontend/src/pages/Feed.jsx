@@ -238,7 +238,6 @@ export default function Feed() {
 
   // Edit modal handlers
   const handleEditContent = (activity, mode = 'edit') => {
-    console.log('[Feed] handleEditContent called:', { activity, mode });
     setEditingActivity(activity);
     setEditMode(mode);
     setEditModalOpen(true);
