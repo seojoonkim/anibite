@@ -32,7 +32,6 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
   };
 
   useEffect(() => {
-    console.log('[EditReviewModal] useEffect:', { isOpen, activity, mode });
     if (isOpen && activity) {
       setFormData({
         rating: activity.rating || 0,
@@ -78,12 +77,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
     }
   };
 
-  if (!isOpen) {
-    console.log('[EditReviewModal] Not rendering - isOpen is false');
-    return null;
-  }
-
-  console.log('[EditReviewModal] Rendering modal:', { isOpen, activity, mode });
+  if (!isOpen) return null;
 
   const getTitle = () => {
     if (mode === 'edit_rating') {
@@ -96,8 +90,8 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black bg-opacity-50">
+      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative z-[10000]">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-900">{getTitle()}</h2>
