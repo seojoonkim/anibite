@@ -383,30 +383,9 @@ def get_all_user_ratings(user_id: int) -> Dict:
 
 
 def delete_rating(user_id: int, anime_id: int) -> bool:
-    """평점 삭제 (관련 댓글과 좋아요, activities도 함께 삭제)"""
+    """평점 삭제 (activities 삭제 시 CASCADE로 댓글/좋아요도 자동 삭제)"""
 
-    # 먼저 관련 activity 댓글과 좋아요 삭제
-    db.execute_update(
-        """
-        DELETE FROM activity_comments
-        WHERE activity_type = 'anime_rating'
-        AND activity_user_id = ?
-        AND item_id = ?
-        """,
-        (user_id, anime_id)
-    )
-
-    db.execute_update(
-        """
-        DELETE FROM activity_likes
-        WHERE activity_type = 'anime_rating'
-        AND activity_user_id = ?
-        AND item_id = ?
-        """,
-        (user_id, anime_id)
-    )
-
-    # activities 테이블에서 삭제
+    # activities 테이블에서 삭제 (CASCADE로 comments/likes 자동 삭제)
     db.execute_update(
         """
         DELETE FROM activities
