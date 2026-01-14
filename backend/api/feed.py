@@ -32,7 +32,8 @@ def enrich_activities_with_engagement(activities: List[Dict], current_user_id: O
         if current_user_id is None:
             activity['user_liked'] = False
             activity['user_has_liked'] = False
-            # likes_count는 계속 계산 (공개 정보)
+            activity['likes_count'] = 0  # 로그인 없으면 간단하게 0으로
+            continue
 
         # 애니메이션 평가/리뷰는 review_likes/review_comments 사용
         if activity_type in ['anime_rating', 'anime_review']:
