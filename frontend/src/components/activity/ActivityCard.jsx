@@ -79,6 +79,13 @@ export default function ActivityCard({
   const [replyText, setReplyText] = useState('');
   const [avatarError, setAvatarError] = useState(false);
   const [itemImageError, setItemImageError] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
+
+  // Initialize bookmark state from localStorage
+  useEffect(() => {
+    const bookmarks = JSON.parse(localStorage.getItem('anipass_bookmarks') || '[]');
+    setBookmarked(bookmarks.includes(activity.id));
+  }, [activity.id]);
 
   // Hooks
   const { liked, likesCount, toggleLike } = useActivityLike(
@@ -196,6 +203,27 @@ export default function ActivityCard({
     }
     await toggleLike();
     if (onUpdate) onUpdate();
+  };
+
+  const handleBookmarkClick = () => {
+    if (!user) {
+      alert(language === 'ko' ? '로그인이 필요합니다.' : 'Please login first.');
+      return;
+    }
+
+    const bookmarks = JSON.parse(localStorage.getItem('anipass_bookmarks') || '[]');
+
+    if (bookmarked) {
+      // Remove bookmark
+      const newBookmarks = bookmarks.filter(id => id !== activity.id);
+      localStorage.setItem('anipass_bookmarks', JSON.stringify(newBookmarks));
+      setBookmarked(false);
+    } else {
+      // Add bookmark
+      const newBookmarks = [...bookmarks, activity.id];
+      localStorage.setItem('anipass_bookmarks', JSON.stringify(newBookmarks));
+      setBookmarked(true);
+    }
   };
 
   const handleCommentSubmit = async () => {
@@ -426,12 +454,22 @@ export default function ActivityCard({
 
             {/* Bookmark Button */}
             <button
-              className="flex items-center gap-2 transition-all hover:scale-110 text-gray-600 hover:text-[#FFD700]"
+              onClick={handleBookmarkClick}
+              className="flex items-center gap-2 transition-all hover:scale-110"
+              style={{
+                color: bookmarked ? '#FFD700' : '#6B7280'
+              }}
               title={language === 'ko' ? '저장하기' : 'Bookmark'}
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-              </svg>
+              {bookmarked ? (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                </svg>
+              ) : (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                </svg>
+              )}
             </button>
           </div>
 
