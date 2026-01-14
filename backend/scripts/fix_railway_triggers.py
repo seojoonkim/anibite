@@ -141,6 +141,7 @@ def fix_triggers():
                 username, display_name, avatar_url, otaku_score,
                 item_title, item_title_korean, item_image,
                 rating, review_title, review_content, is_spoiler,
+                anime_id, anime_title, anime_title_korean,
                 created_at, updated_at
             )
             SELECT
@@ -159,6 +160,18 @@ def fix_triggers():
                 r.title,
                 r.content,
                 COALESCE(r.is_spoiler, 0),
+                (SELECT a.id FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = NEW.character_id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END LIMIT 1),
+                (SELECT a.title_romaji FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = NEW.character_id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END LIMIT 1),
+                (SELECT a.title_korean FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = NEW.character_id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END LIMIT 1),
                 NEW.created_at,
                 NEW.updated_at
             FROM users u
@@ -181,6 +194,7 @@ def fix_triggers():
                 username, display_name, avatar_url, otaku_score,
                 item_title, item_title_korean, item_image,
                 rating, review_title, review_content, is_spoiler,
+                anime_id, anime_title, anime_title_korean,
                 created_at, updated_at
             )
             SELECT
@@ -199,6 +213,18 @@ def fix_triggers():
                 r.title,
                 r.content,
                 COALESCE(r.is_spoiler, 0),
+                (SELECT a.id FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = NEW.character_id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END LIMIT 1),
+                (SELECT a.title_romaji FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = NEW.character_id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END LIMIT 1),
+                (SELECT a.title_korean FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = NEW.character_id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END LIMIT 1),
                 OLD.created_at,
                 NEW.updated_at
             FROM users u
