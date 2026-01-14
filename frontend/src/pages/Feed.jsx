@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { useActivities } from '../hooks/useActivity';
+import { useActivityPagination } from '../hooks/useActivity';
 import { activityService } from '../services/activityService';
 import { notificationService } from '../services/notificationService';
 import { ratingService } from '../services/ratingService';
@@ -30,22 +30,57 @@ export default function Feed() {
   const [editingActivity, setEditingActivity] = useState(null);
   const [editMode, setEditMode] = useState('edit'); // 'edit' | 'add_review' | 'edit_rating'
 
-  // Use unified activities hook for all/following filters
+  // Scroll observer ref
+  const observerRef = useRef(null);
+  const loadMoreTriggerRef = useRef(null);
+
+  // Use pagination hook for infinite scroll
   const {
     activities,
     loading,
-    error,
-    refetch
-  } = useActivities(
+    hasMore,
+    loadMore,
+    reset: resetActivities
+  } = useActivityPagination(
     {
-      followingOnly: feedFilter === 'following',
-      limit: 50,
-      offset: 0
+      followingOnly: feedFilter === 'following'
     },
-    {
-      autoFetch: feedFilter === 'all' || feedFilter === 'following'
-    }
+    50
   );
+
+  // Reset activities when filter changes
+  useEffect(() => {
+    resetActivities();
+  }, [feedFilter, resetActivities]);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    if (feedFilter === 'notifications') return; // Skip for notifications
+
+    const options = {
+      root: null,
+      rootMargin: '200px',
+      threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasMore && !loading) {
+        loadMore();
+      }
+    }, options);
+
+    if (loadMoreTriggerRef.current) {
+      observer.observe(loadMoreTriggerRef.current);
+    }
+
+    observerRef.current = observer;
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [hasMore, loading, loadMore, feedFilter]);
 
   // Update feedFilter when URL changes
   useEffect(() => {
@@ -152,7 +187,7 @@ export default function Feed() {
         content: newPostContent.trim()
       });
       setNewPostContent('');
-      refetch();
+      resetActivities();
     } catch (err) {
       console.error('Failed to create post:', err);
       alert(language === 'ko' ? '게시 실패' : 'Failed to post');
@@ -456,10 +491,6 @@ export default function Feed() {
                   </div>
                 ))}
               </div>
-            ) : error ? (
-              <div className="text-center py-12">
-                <p className="text-red-600">{language === 'ko' ? '피드를 불러오는데 실패했습니다.' : 'Failed to load feed.'}</p>
-              </div>
             ) : filteredActivities.length === 0 ? (
               <div className="text-center py-12">
                 {feedFilter === 'notifications' ? (
@@ -497,7 +528,7 @@ export default function Feed() {
                         <ActivityCard
                           activity={activity}
                           context="notification"
-                          onUpdate={refetch}
+                          onUpdate={resetActivities}
                           onEditContent={handleEditContent}
                           onDeleteContent={handleDeleteContent}
                         />
@@ -511,13 +542,29 @@ export default function Feed() {
                       <ActivityCard
                         activity={activity}
                         context="feed"
-                        onUpdate={refetch}
+                        onUpdate={resetActivities}
                         onEditContent={handleEditContent}
                         onDeleteContent={handleDeleteContent}
                       />
                     </div>
                   );
                 })}
+
+                {/* Infinite scroll trigger */}
+                {feedFilter !== 'notifications' && (
+                  <div ref={loadMoreTriggerRef} className="h-20 flex items-center justify-center">
+                    {loading && (
+                      <div className="text-gray-500 text-sm">
+                        {language === 'ko' ? '로딩 중...' : 'Loading...'}
+                      </div>
+                    )}
+                    {!loading && !hasMore && activities.length > 0 && (
+                      <div className="text-gray-400 text-sm">
+                        {language === 'ko' ? '모든 활동을 불러왔습니다' : 'All activities loaded'}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
