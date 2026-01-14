@@ -493,16 +493,9 @@ export default function AnimeDetail() {
       setShowReviewForm(false);
       setIsEditingReview(false);
 
-      // 병렬로 데이터 새로고침
-      const [animeData, reviewData, myReviewData] = await Promise.all([
-        animeService.getAnimeById(id),
-        reviewService.getAnimeReviews(id, { page: 1, page_size: 10 }),
-        reviewService.getMyReview(id).catch(() => null)
-      ]);
-
-      if (animeData) setAnime(animeData);
-      if (reviewData) processReviews(reviewData);
-      if (myReviewData) processMyReview(myReviewData);
+      // 전체 데이터 다시 로드
+      await loadAllData();
+      await refetchActivities();
 
       setTimeout(() => setReviewSuccess(''), 3000);
     } catch (err) {
