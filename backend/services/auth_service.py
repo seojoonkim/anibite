@@ -52,9 +52,14 @@ def register_user(user_data: UserRegister) -> TokenResponse:
         (user_id,)
     )
 
-    # 생성된 사용자 조회
+    # 생성된 사용자 조회 (with otaku_score)
     user_row = db.execute_query(
-        "SELECT * FROM users WHERE id = ?",
+        """
+        SELECT u.*, COALESCE(us.otaku_score, 0.0) as otaku_score
+        FROM users u
+        LEFT JOIN user_stats us ON u.id = us.user_id
+        WHERE u.id = ?
+        """,
         (user_id,),
         fetch_one=True
     )
@@ -189,9 +194,14 @@ def update_user_profile(user_id: int, display_name: Optional[str] = None, email:
         tuple(params)
     )
 
-    # 업데이트된 사용자 정보 반환
+    # 업데이트된 사용자 정보 반환 (with otaku_score)
     user_row = db.execute_query(
-        "SELECT * FROM users WHERE id = ?",
+        """
+        SELECT u.*, COALESCE(us.otaku_score, 0.0) as otaku_score
+        FROM users u
+        LEFT JOIN user_stats us ON u.id = us.user_id
+        WHERE u.id = ?
+        """,
         (user_id,),
         fetch_one=True
     )
@@ -252,9 +262,14 @@ def update_user_avatar(user_id: int, avatar_url: str) -> UserResponse:
         (avatar_url, user_id)
     )
 
-    # 업데이트된 사용자 정보 반환
+    # 업데이트된 사용자 정보 반환 (with otaku_score)
     user_row = db.execute_query(
-        "SELECT * FROM users WHERE id = ?",
+        """
+        SELECT u.*, COALESCE(us.otaku_score, 0.0) as otaku_score
+        FROM users u
+        LEFT JOIN user_stats us ON u.id = us.user_id
+        WHERE u.id = ?
+        """,
         (user_id,),
         fetch_one=True
     )
@@ -323,13 +338,18 @@ def verify_email(token: str) -> TokenResponse:
         fetch_one=False
     )
     
-    # 인증된 사용자 정보 다시 조회
+    # 인증된 사용자 정보 다시 조회 (with otaku_score)
     user_row = db.execute_query(
-        "SELECT * FROM users WHERE id = ?",
+        """
+        SELECT u.*, COALESCE(us.otaku_score, 0.0) as otaku_score
+        FROM users u
+        LEFT JOIN user_stats us ON u.id = us.user_id
+        WHERE u.id = ?
+        """,
         (user_dict['id'],),
         fetch_one=True
     )
-    
+
     user_dict = dict_from_row(user_row)
     user = UserResponse(**user_dict)
     
