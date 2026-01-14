@@ -117,6 +117,32 @@ export default function ActivityCard({
     return romanNumerals[num - 1] || num;
   };
 
+  const getRelativeTime = (dateString) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now - date;
+    const diffSecs = Math.floor(diffMs / 1000);
+    const diffMins = Math.floor(diffSecs / 60);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffSecs < 60) {
+      return language === 'ko' ? '방금 전' : 'Just now';
+    } else if (diffMins < 60) {
+      return language === 'ko' ? `${diffMins}분 전` : `${diffMins}m ago`;
+    } else if (diffHours < 24) {
+      return language === 'ko' ? `${diffHours}시간 전` : `${diffHours}h ago`;
+    } else if (diffDays < 7) {
+      return language === 'ko' ? `${diffDays}일 전` : `${diffDays}d ago`;
+    } else {
+      return date.toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+  };
+
   const levelInfo = getCurrentLevelInfo(activity.otaku_score || 0);
 
   // Handlers
@@ -230,7 +256,7 @@ export default function ActivityCard({
 
               {/* Timestamp */}
               <span className="text-xs text-gray-400 ml-2">
-                {new Date(activity.activity_time).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US')}
+                {getRelativeTime(activity.activity_time)}
               </span>
             </div>
           )}
