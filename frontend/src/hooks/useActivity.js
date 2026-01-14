@@ -199,6 +199,33 @@ export function useActivityComments(activityId) {
     }
   };
 
+  const deleteComment = async (commentId, parentCommentId = null) => {
+    try {
+      await activityService.deleteComment(commentId);
+
+      if (parentCommentId) {
+        // Remove reply from parent comment
+        setComments(prevComments =>
+          prevComments.map(comment => {
+            if (comment.id === parentCommentId) {
+              return {
+                ...comment,
+                replies: (comment.replies || []).filter(reply => reply.id !== commentId)
+              };
+            }
+            return comment;
+          })
+        );
+      } else {
+        // Remove top-level comment
+        setComments(prevComments => prevComments.filter(comment => comment.id !== commentId));
+      }
+    } catch (err) {
+      console.error('Failed to delete comment:', err);
+      throw err;
+    }
+  };
+
   useEffect(() => {
     fetchComments();
   }, [fetchComments]);
@@ -208,7 +235,8 @@ export function useActivityComments(activityId) {
     loading,
     error,
     refetch: fetchComments,
-    createComment
+    createComment,
+    deleteComment
   };
 }
 
