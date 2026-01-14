@@ -318,9 +318,9 @@ export default function RateCharacters() {
                   {character.role && (
                     <div className={`absolute top-2 left-2 px-2 py-1 rounded text-xs font-bold text-white`} style={{
                       backgroundColor: character.role === 'MAIN'
-                        ? '#3797F0'  // 주연: 진한 파란색 (테마색)
+                        ? '#3797F0'  // 주연: 파란색 (테마색)
                         : character.role === 'SUPPORTING'
-                        ? '#60A5FA'  // 조연: 연한 파란색 (테마색 계열)
+                        ? '#F59E0B'  // 조연: 주황색 (파란색과 대비)
                         : '#9CA3AF',  // 엑스트라: 회색
                       color: 'white'
                     }}>
