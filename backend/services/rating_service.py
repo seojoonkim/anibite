@@ -152,10 +152,10 @@ def get_user_ratings(
             average_rating=None
         )
 
-    # RATED 또는 필터 없음: feed_activities에서 빠르게 조회
+    # RATED 또는 필터 없음: activities 테이블에서 조회
     # 전체 개수
     total = db.execute_query(
-        """SELECT COUNT(*) as total FROM feed_activities
+        """SELECT COUNT(*) as total FROM activities
            WHERE user_id = ? AND activity_type = 'anime_rating'""",
         (user_id,),
         fetch_one=True
@@ -165,7 +165,7 @@ def get_user_ratings(
     avg_row = db.execute_query(
         """
         SELECT AVG(rating) as avg_rating
-        FROM feed_activities
+        FROM activities
         WHERE user_id = ? AND activity_type = 'anime_rating' AND rating IS NOT NULL
         """,
         (user_id,),
@@ -173,7 +173,7 @@ def get_user_ratings(
     )
     average_rating = avg_row['avg_rating'] if avg_row and avg_row['avg_rating'] else None
 
-    # 평점 목록 - feed_activities에서 조회
+    # 평점 목록 - activities 테이블에서 조회
     limit_clause = f"LIMIT {limit}" if limit else ""
     rows = db.execute_query(
         f"""
@@ -191,7 +191,7 @@ def get_user_ratings(
             item_image as image_url,
             NULL as season_year,
             NULL as episodes
-        FROM feed_activities
+        FROM activities
         WHERE user_id = ? AND activity_type = 'anime_rating'
         ORDER BY activity_time DESC
         {limit_clause}
