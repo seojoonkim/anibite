@@ -31,7 +31,7 @@ export default function WriteReviews() {
 
       // Load ratings without reviews (최적화: 리뷰가 없는 항목만 가져오기)
       const [animeRatingsData, characterRatingsData] = await Promise.all([
-        ratingService.getMyRatings({ status: 'RATED_WITHOUT_REVIEW', limit: 50 }),
+        ratingService.getMyRatings({ without_review: true, limit: 50 }),
         characterService.getMyRatedCharacters({ limit: 50 })
       ]);
 
