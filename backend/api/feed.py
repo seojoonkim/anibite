@@ -151,6 +151,7 @@ def enrich_activities_with_engagement(activities: List[Dict], current_user_id: O
 @router.get("/", response_model=List[Dict])
 def get_feed(
     following_only: bool = Query(False),
+    user_id: Optional[int] = Query(None, description="Filter by specific user"),
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
     current_user: UserResponse = Depends(get_current_user),
@@ -160,10 +161,16 @@ def get_feed(
     활동 피드
 
     following_only=true: 팔로잉하는 사용자들의 활동만
-    following_only=false: 모든 사용자의 활동
+    user_id=X: 특정 사용자의 활동만
+    기본: 모든 사용자의 활동
     """
-    if following_only:
+    # 특정 사용자 피드
+    if user_id is not None:
+        activities = get_user_feed(user_id, current_user.id, limit, offset)
+    # 팔로잉 피드
+    elif following_only:
         activities = get_following_feed(current_user.id, limit, offset)
+    # 전체 피드
     else:
         activities = get_global_feed(limit, offset)
 
