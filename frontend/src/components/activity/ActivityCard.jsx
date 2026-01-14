@@ -382,17 +382,27 @@ export default function ActivityCard({
         <div className="flex-1 min-w-0">
           {/* Item Title */}
           {finalShowOptions.showItemTitle && activity.item_title && (
-            <Link
-              to={getActivityLink()}
-              className="block mb-1 text-base font-semibold text-gray-800 hover:text-[#A8E6CF] transition-colors"
-            >
-              {activity.item_title_korean || activity.item_title}
+            <div className="mb-2">
+              <Link
+                to={getActivityLink()}
+                className="block text-base font-semibold text-gray-800 hover:text-[#A8E6CF] transition-colors"
+              >
+                {activity.activity_type === 'character_rating' ? (
+                  <>
+                    {activity.item_title} <span className="text-gray-600">({activity.item_title_korean})</span>
+                  </>
+                ) : (
+                  <>
+                    {activity.item_title_korean || activity.item_title}
+                  </>
+                )}
+              </Link>
               {activity.anime_title && (
-                <span className="text-xs text-gray-500 ml-1">
-                  ({activity.anime_title_korean || activity.anime_title})
-                </span>
+                <div className="text-xs text-gray-500 mt-0.5">
+                  from: {activity.anime_title_korean || activity.anime_title}
+                </div>
               )}
-            </Link>
+            </div>
           )}
 
           {/* Rating */}
