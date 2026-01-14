@@ -21,6 +21,7 @@ class CharacterReviewUpdate(BaseModel):
     title: Optional[str] = Field(None, max_length=100)
     content: Optional[str] = Field(None, min_length=10, max_length=5000)
     is_spoiler: Optional[bool] = None
+    rating: Optional[float] = Field(None, ge=0.5, le=5.0, description="별점 (선택사항, 0.5~5.0)")
 
 
 class CharacterReviewResponse(BaseModel):

@@ -78,7 +78,7 @@ def create_character_review(user_id: int, review_data: CharacterReviewCreate) ->
 
 
 def update_character_review(review_id: int, user_id: int, review_data: CharacterReviewUpdate) -> CharacterReviewResponse:
-    """캐릭터 리뷰 수정"""
+    """캐릭터 리뷰 수정 (별점도 함께 업데이트 가능)"""
 
     # 리뷰 존재 및 권한 확인
     existing = db.execute_query(
@@ -101,6 +101,11 @@ def update_character_review(review_id: int, user_id: int, review_data: Character
 
     character_id = existing['character_id']
 
+    # 별점이 제공되면 먼저 업데이트
+    if review_data.rating is not None:
+        from services.character_service import create_or_update_character_rating
+        create_or_update_character_rating(user_id, character_id, rating=review_data.rating)
+
     # 수정할 필드만 업데이트
     update_fields = []
     params = []
@@ -117,18 +122,17 @@ def update_character_review(review_id: int, user_id: int, review_data: Character
         update_fields.append("is_spoiler = ?")
         params.append(1 if review_data.is_spoiler else 0)
 
-    if not update_fields:
-        return get_character_review_by_id(review_id)
+    if update_fields:
+        update_fields.append("updated_at = CURRENT_TIMESTAMP")
+        params.append(review_id)
 
-    update_fields.append("updated_at = CURRENT_TIMESTAMP")
-    params.append(review_id)
-
-    db.execute_update(
-        f"UPDATE character_reviews SET {', '.join(update_fields)} WHERE id = ?",
-        tuple(params)
-    )
+        db.execute_update(
+            f"UPDATE character_reviews SET {', '.join(update_fields)} WHERE id = ?",
+            tuple(params)
+        )
 
     # Sync to activities (리뷰 수정 시 activities도 업데이트)
+    # Note: 별점 업데이트 시 이미 sync가 호출되었지만, 리뷰 내용도 반영하기 위해 다시 호출
     from services.character_service import _sync_character_rating_to_activities
     _sync_character_rating_to_activities(user_id, character_id)
 
