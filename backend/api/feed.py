@@ -1,9 +1,8 @@
 """
 Feed API Router
 활동 피드
-Updated: 2026-01-14
 """
-from fastapi import APIRouter, Query, Depends, HTTPException
+from fastapi import APIRouter, Query, Depends
 from typing import List, Dict, Optional
 from services.feed_service import get_global_feed, get_user_feed, get_following_feed
 from models.user import UserResponse
@@ -151,34 +150,24 @@ def enrich_activities_with_engagement(activities: List[Dict], current_user_id: O
 @router.get("/", response_model=List[Dict])
 def get_feed(
     following_only: bool = Query(False),
-    user_id: Optional[int] = Query(None, description="특정 사용자의 활동만 보기"),
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
-    current_user: Optional[UserResponse] = Depends(get_current_user_optional),
+    current_user: UserResponse = Depends(get_current_user),
     db: Database = Depends(get_db)
 ):
     """
     활동 피드
 
-    - following_only=true: 팔로잉하는 사용자들의 활동만 (로그인 필요)
-    - user_id=<id>: 특정 사용자의 활동만 (로그인 선택)
-    - 기본: 모든 사용자의 활동 (로그인 선택)
+    following_only=true: 팔로잉하는 사용자들의 활동만
+    following_only=false: 모든 사용자의 활동
     """
-    # 팔로잉 피드는 로그인 필수
     if following_only:
-        if current_user is None:
-            raise HTTPException(status_code=401, detail="Authentication required for following feed")
         activities = get_following_feed(current_user.id, limit, offset)
-    # 특정 사용자 피드
-    elif user_id is not None:
-        activities = get_user_feed(user_id, current_user.id if current_user else None, limit, offset)
-    # 전체 피드
     else:
         activities = get_global_feed(limit, offset)
 
     # 좋아요/댓글 정보 추가
-    current_user_id = current_user.id if current_user else None
-    return enrich_activities_with_engagement(activities, current_user_id, db)
+    return enrich_activities_with_engagement(activities, current_user.id, db)
 
 
 @router.get("/user/{user_id}", response_model=List[Dict])
