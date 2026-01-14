@@ -225,23 +225,28 @@ export default function ActivityCard({
   };
 
   const handleBookmarkClick = () => {
+    console.log('Bookmark button clicked!', { user, bookmarked, activityId: activity.id });
+
     if (!user) {
       alert(language === 'ko' ? '로그인이 필요합니다.' : 'Please login first.');
       return;
     }
 
     const bookmarks = JSON.parse(localStorage.getItem('anipass_bookmarks') || '[]');
+    console.log('Current bookmarks:', bookmarks);
 
     if (bookmarked) {
       // Remove bookmark
       const newBookmarks = bookmarks.filter(id => id !== activity.id);
       localStorage.setItem('anipass_bookmarks', JSON.stringify(newBookmarks));
       setBookmarked(false);
+      console.log('Bookmark removed. New bookmarks:', newBookmarks);
     } else {
       // Add bookmark
       const newBookmarks = [...bookmarks, activity.id];
       localStorage.setItem('anipass_bookmarks', JSON.stringify(newBookmarks));
       setBookmarked(true);
+      console.log('Bookmark added. New bookmarks:', newBookmarks);
     }
   };
 
@@ -505,7 +510,6 @@ export default function ActivityCard({
               style={{
                 color: bookmarked ? '#FFD700' : '#6B7280'
               }}
-              title={language === 'ko' ? '저장하기' : 'Bookmark'}
             >
               {bookmarked ? (
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -516,6 +520,9 @@ export default function ActivityCard({
                   <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                 </svg>
               )}
+              <span className="text-sm font-medium">
+                {language === 'ko' ? '저장하기' : 'Bookmark'}
+              </span>
             </button>
       </div>
 
