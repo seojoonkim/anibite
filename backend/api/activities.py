@@ -110,7 +110,7 @@ class CommentResponse(BaseModel):
 CommentResponse.model_rebuild()
 
 
-@router.get("/", response_model=ActivityListResponse)
+@router.get("", response_model=ActivityListResponse)
 def get_activities_endpoint(
     activity_type: Optional[str] = Query(None, description="Filter by type: anime_rating, character_rating, user_post"),
     user_id: Optional[int] = Query(None, description="Filter by user ID"),
@@ -167,7 +167,7 @@ def get_activity_endpoint(
     return ActivityResponse(**activity)
 
 
-@router.post("/", response_model=ActivityResponse)
+@router.post("", response_model=ActivityResponse)
 def create_activity_endpoint(
     activity_data: ActivityCreate,
     current_user: UserResponse = Depends(get_current_user)
