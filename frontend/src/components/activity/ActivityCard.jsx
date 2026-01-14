@@ -305,8 +305,8 @@ export default function ActivityCard({
     <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 hover:shadow-[0_2px_12px_rgba(0,0,0,0.12)] transition-all">
       {/* Header: User Info + Activity Type + Timestamp */}
       {finalShowOptions.showUserInfo && (
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-start gap-3">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
             {/* User Avatar */}
             <Link to={`/user/${activity.user_id}`} className="flex-shrink-0">
               {activity.avatar_url && !avatarError ? (
