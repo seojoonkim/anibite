@@ -35,7 +35,7 @@ export default function MyAniPass() {
   const isOwnProfile = !userId || parseInt(userId) === user?.id;
   const [profileUser, setProfileUser] = useState(null);
   const displayUser = isOwnProfile ? user : profileUser;
-  const [activeTab, setActiveTab] = useState('feed');
+  const [activeTab, setActiveTab] = useState('anime'); // TEMP: Changed from 'feed' to 'anime' to avoid feed loading issue
   const [animeSubMenu, setAnimeSubMenu] = useState('all'); // 애니 서브메뉴: all, 5, 4, 3, 2, 1, 0, watchlist, pass
   const [characterSubMenu, setCharacterSubMenu] = useState('all'); // 캐릭터 서브메뉴: all, 5, 4, 3, 2, 1, 0, want, pass
 
@@ -389,29 +389,38 @@ export default function MyAniPass() {
         filterCharactersBySubMenu(allCharactersData || [], characterSubMenu);
         setLoadedTabs(prev => ({ ...prev, character: true }));
       } else if (activeTab === 'feed') {
-        const targetUserId = userId || user?.id;
-        // 빠른 로딩: 초기 10개만 로드
-        const feedData = await feedService.getUserFeed(targetUserId, 10, 0);
-        setUserActivities(feedData || []);
-        setFeedOffset(10);
-        setHasMoreFeed(feedData && feedData.length === 10);
+        try {
+          const targetUserId = userId || user?.id;
+          // 빠른 로딩: 초기 10개만 로드
+          const feedData = await feedService.getUserFeed(targetUserId, 10, 0);
+          setUserActivities(feedData || []);
+          setFeedOffset(10);
+          setHasMoreFeed(feedData && feedData.length === 10);
 
-        // Initialize likes and comments state
-        const likesState = {};
-        const commentsState = {};
-        feedData.forEach(activity => {
-          const key = `${activity.activity_type}_${activity.user_id}_${activity.item_id}`;
-          likesState[key] = {
-            count: activity.likes_count || 0,
-            liked: Boolean(activity.user_has_liked)
-          };
-          commentsState[key] = [];
-        });
-        setActivityLikes(likesState);
-        setComments(commentsState);
-        setExpandedComments(new Set());
+          // Initialize likes and comments state
+          const likesState = {};
+          const commentsState = {};
+          feedData.forEach(activity => {
+            const key = `${activity.activity_type}_${activity.user_id}_${activity.item_id}`;
+            likesState[key] = {
+              count: activity.likes_count || 0,
+              liked: Boolean(activity.user_has_liked)
+            };
+            commentsState[key] = [];
+          });
+          setActivityLikes(likesState);
+          setComments(commentsState);
+          setExpandedComments(new Set());
 
-        setLoadedTabs(prev => ({ ...prev, feed: true }));
+          setLoadedTabs(prev => ({ ...prev, feed: true }));
+        } catch (error) {
+          console.error('Failed to load feed:', error);
+          // Set empty state on error
+          setUserActivities([]);
+          setFeedOffset(0);
+          setHasMoreFeed(false);
+          setLoadedTabs(prev => ({ ...prev, feed: true }));
+        }
 
         // 로딩 완료 (댓글은 사용자가 클릭할 때만 로드)
         setLoading(false);
