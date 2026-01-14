@@ -70,9 +70,24 @@ def create_or_update_rating(user_id: int, rating_data: RatingCreate) -> RatingRe
             (user_id, rating_data.anime_id, final_rating, rating_data.status.value)
         )
 
-    # RATED 상태일 때만 activities에 추가 (트리거가 동작하지 않을 경우를 대비)
+    # RATED 상태일 때 activities 동기화 확인
+    # 트리거가 동작했는지 확인하고, 동작하지 않았으면 수동 동기화
     if rating_data.status == RatingStatus.RATED and rating_data.rating:
-        _sync_to_activities(user_id, rating_data.anime_id)
+        # Check if trigger worked
+        activity_exists = db.execute_query(
+            """
+            SELECT 1 FROM activities
+            WHERE activity_type = 'anime_rating'
+              AND user_id = ?
+              AND item_id = ?
+            """,
+            (user_id, rating_data.anime_id),
+            fetch_one=True
+        )
+
+        # If trigger didn't work, manually sync
+        if not activity_exists:
+            _sync_to_activities(user_id, rating_data.anime_id)
 
     # 사용자 통계 업데이트
     _update_user_stats(user_id)
@@ -439,10 +454,10 @@ def _sync_to_activities(user_id: int, anime_id: int):
     )
 
     if data:
-        # activities 테이블에 INSERT
+        # activities 테이블에 INSERT (OR REPLACE로 중복 방지)
         db.execute_update(
             """
-            INSERT INTO activities (
+            INSERT OR REPLACE INTO activities (
                 activity_type, user_id, item_id, activity_time,
                 username, display_name, avatar_url, otaku_score,
                 item_title, item_title_korean, item_image,
