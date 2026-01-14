@@ -224,16 +224,24 @@ export default function MyAniPass() {
       filtered = animeData;
     } else if (submenu === '5') {
       filtered = animeData.filter(a => a.category === 'rated' && a.rating === 5.0);
+    } else if (submenu === '4.5') {
+      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 4.5);
     } else if (submenu === '4') {
-      filtered = animeData.filter(a => a.category === 'rated' && a.rating >= 4.0 && a.rating < 5.0);
+      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 4.0);
+    } else if (submenu === '3.5') {
+      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 3.5);
     } else if (submenu === '3') {
-      filtered = animeData.filter(a => a.category === 'rated' && a.rating >= 3.0 && a.rating < 4.0);
+      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 3.0);
+    } else if (submenu === '2.5') {
+      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 2.5);
     } else if (submenu === '2') {
-      filtered = animeData.filter(a => a.category === 'rated' && a.rating >= 2.0 && a.rating < 3.0);
+      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 2.0);
+    } else if (submenu === '1.5') {
+      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 1.5);
     } else if (submenu === '1') {
-      filtered = animeData.filter(a => a.category === 'rated' && a.rating >= 1.0 && a.rating < 2.0);
-    } else if (submenu === '0') {
-      filtered = animeData.filter(a => a.category === 'rated' && a.rating >= 0.5 && a.rating < 1.0);
+      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 1.0);
+    } else if (submenu === '0.5') {
+      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 0.5);
     } else if (submenu === 'watchlist') {
       filtered = animeData.filter(a => a.category === 'watchlist');
     } else if (submenu === 'pass') {
@@ -253,16 +261,24 @@ export default function MyAniPass() {
     } else if (submenu === '5') {
       // RATED 상태이고 rating이 5.0인 것만
       filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 5.0);
+    } else if (submenu === '4.5') {
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 4.5);
     } else if (submenu === '4') {
-      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating >= 4.0 && c.rating < 5.0);
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 4.0);
+    } else if (submenu === '3.5') {
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 3.5);
     } else if (submenu === '3') {
-      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating >= 3.0 && c.rating < 4.0);
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 3.0);
+    } else if (submenu === '2.5') {
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 2.5);
     } else if (submenu === '2') {
-      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating >= 2.0 && c.rating < 3.0);
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 2.0);
+    } else if (submenu === '1.5') {
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 1.5);
     } else if (submenu === '1') {
-      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating >= 1.0 && c.rating < 2.0);
-    } else if (submenu === '0') {
-      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating >= 0.5 && c.rating < 1.0);
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 1.0);
+    } else if (submenu === '0.5') {
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 0.5);
     } else if (submenu === 'want') {
       filtered = charactersData.filter(c => c.status === 'WANT_TO_KNOW');
     } else if (submenu === 'pass') {
@@ -828,11 +844,15 @@ export default function MyAniPass() {
   const groupAnimeByCategory = (items) => {
     const groups = {
       '5': items.filter(item => item.category === 'rated' && item.rating === 5.0),
-      '4': items.filter(item => item.category === 'rated' && item.rating >= 4.0 && item.rating < 5.0),
-      '3': items.filter(item => item.category === 'rated' && item.rating >= 3.0 && item.rating < 4.0),
-      '2': items.filter(item => item.category === 'rated' && item.rating >= 2.0 && item.rating < 3.0),
-      '1': items.filter(item => item.category === 'rated' && item.rating >= 1.0 && item.rating < 2.0),
-      '0': items.filter(item => item.category === 'rated' && item.rating >= 0.5 && item.rating < 1.0),
+      '4.5': items.filter(item => item.category === 'rated' && item.rating === 4.5),
+      '4': items.filter(item => item.category === 'rated' && item.rating === 4.0),
+      '3.5': items.filter(item => item.category === 'rated' && item.rating === 3.5),
+      '3': items.filter(item => item.category === 'rated' && item.rating === 3.0),
+      '2.5': items.filter(item => item.category === 'rated' && item.rating === 2.5),
+      '2': items.filter(item => item.category === 'rated' && item.rating === 2.0),
+      '1.5': items.filter(item => item.category === 'rated' && item.rating === 1.5),
+      '1': items.filter(item => item.category === 'rated' && item.rating === 1.0),
+      '0.5': items.filter(item => item.category === 'rated' && item.rating === 0.5),
       'watchlist': items.filter(item => item.category === 'watchlist'),
       'pass': items.filter(item => item.category === 'pass')
     };
@@ -843,11 +863,15 @@ export default function MyAniPass() {
   const groupCharactersByCategory = (items) => {
     const groups = {
       '5': items.filter(item => item.rating === 5.0),
-      '4': items.filter(item => item.rating >= 4.0 && item.rating < 5.0),
-      '3': items.filter(item => item.rating >= 3.0 && item.rating < 4.0),
-      '2': items.filter(item => item.rating >= 2.0 && item.rating < 3.0),
-      '1': items.filter(item => item.rating >= 1.0 && item.rating < 2.0),
-      '0': items.filter(item => item.rating >= 0.5 && item.rating < 1.0),
+      '4.5': items.filter(item => item.rating === 4.5),
+      '4': items.filter(item => item.rating === 4.0),
+      '3.5': items.filter(item => item.rating === 3.5),
+      '3': items.filter(item => item.rating === 3.0),
+      '2.5': items.filter(item => item.rating === 2.5),
+      '2': items.filter(item => item.rating === 2.0),
+      '1.5': items.filter(item => item.rating === 1.5),
+      '1': items.filter(item => item.rating === 1.0),
+      '0.5': items.filter(item => item.rating === 0.5),
       'want': items.filter(item => item.status === 'WANT_TO_KNOW'),
       'pass': items.filter(item => item.status === 'PASS')
     };
@@ -1289,14 +1313,18 @@ export default function MyAniPass() {
                     <div className="space-y-8">
                       {(() => {
                         const groups = groupAnimeByCategory(displayedAnime);
-                        const categoryOrder = ['5', '4', '3', '2', '1', '0', 'watchlist', 'pass'];
+                        const categoryOrder = ['5', '4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5', 'watchlist', 'pass'];
                         const categoryLabels = {
-                          '5': language === 'ko' ? '⭐ 5점' : '⭐ 5 Stars',
-                          '4': language === 'ko' ? '⭐ 4점대' : '⭐ 4.0-4.9',
-                          '3': language === 'ko' ? '⭐ 3점대' : '⭐ 3.0-3.9',
-                          '2': language === 'ko' ? '⭐ 2점대' : '⭐ 2.0-2.9',
-                          '1': language === 'ko' ? '⭐ 1점대' : '⭐ 1.0-1.9',
-                          '0': language === 'ko' ? '⭐ 0점대' : '⭐ 0.5-0.9',
+                          '5': language === 'ko' ? '⭐ 5점' : '⭐ 5.0',
+                          '4.5': language === 'ko' ? '⭐ 4.5점' : '⭐ 4.5',
+                          '4': language === 'ko' ? '⭐ 4점' : '⭐ 4.0',
+                          '3.5': language === 'ko' ? '⭐ 3.5점' : '⭐ 3.5',
+                          '3': language === 'ko' ? '⭐ 3점' : '⭐ 3.0',
+                          '2.5': language === 'ko' ? '⭐ 2.5점' : '⭐ 2.5',
+                          '2': language === 'ko' ? '⭐ 2점' : '⭐ 2.0',
+                          '1.5': language === 'ko' ? '⭐ 1.5점' : '⭐ 1.5',
+                          '1': language === 'ko' ? '⭐ 1점' : '⭐ 1.0',
+                          '0.5': language === 'ko' ? '⭐ 0.5점' : '⭐ 0.5',
                           'watchlist': language === 'ko' ? '📋 보고싶어요' : '📋 Watchlist',
                           'pass': language === 'ko' ? '🚫 관심없어요' : '🚫 Pass'
                         };
@@ -1449,14 +1477,18 @@ export default function MyAniPass() {
                     <div className="space-y-8">
                       {(() => {
                         const groups = groupCharactersByCategory(displayedCharacters);
-                        const categoryOrder = ['5', '4', '3', '2', '1', '0', 'want', 'pass'];
+                        const categoryOrder = ['5', '4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5', 'want', 'pass'];
                         const categoryLabels = {
-                          '5': language === 'ko' ? '⭐ 5점' : '⭐ 5 Stars',
-                          '4': language === 'ko' ? '⭐ 4점대' : '⭐ 4.0-4.9',
-                          '3': language === 'ko' ? '⭐ 3점대' : '⭐ 3.0-3.9',
-                          '2': language === 'ko' ? '⭐ 2점대' : '⭐ 2.0-2.9',
-                          '1': language === 'ko' ? '⭐ 1점대' : '⭐ 1.0-1.9',
-                          '0': language === 'ko' ? '⭐ 0점대' : '⭐ 0.5-0.9',
+                          '5': language === 'ko' ? '⭐ 5점' : '⭐ 5.0',
+                          '4.5': language === 'ko' ? '⭐ 4.5점' : '⭐ 4.5',
+                          '4': language === 'ko' ? '⭐ 4점' : '⭐ 4.0',
+                          '3.5': language === 'ko' ? '⭐ 3.5점' : '⭐ 3.5',
+                          '3': language === 'ko' ? '⭐ 3점' : '⭐ 3.0',
+                          '2.5': language === 'ko' ? '⭐ 2.5점' : '⭐ 2.5',
+                          '2': language === 'ko' ? '⭐ 2점' : '⭐ 2.0',
+                          '1.5': language === 'ko' ? '⭐ 1.5점' : '⭐ 1.5',
+                          '1': language === 'ko' ? '⭐ 1점' : '⭐ 1.0',
+                          '0.5': language === 'ko' ? '⭐ 0.5점' : '⭐ 0.5',
                           'want': language === 'ko' ? '💭 알고싶어요' : '💭 Want to Know',
                           'pass': language === 'ko' ? '🚫 관심없어요' : '🚫 Pass'
                         };

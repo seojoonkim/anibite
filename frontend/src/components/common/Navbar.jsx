@@ -272,7 +272,7 @@ export default function Navbar() {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`px-3 py-2 rounded-md text-sm font-semibold transition-colors whitespace-nowrap ${
+                  className={`px-3 py-2 rounded-md text-sm font-normal transition-colors whitespace-nowrap ${
                     isActive(item.path)
                       ? 'bg-[#3797F0] text-white'
                       : 'text-black hover:text-gray-500 hover:bg-gray-100'
