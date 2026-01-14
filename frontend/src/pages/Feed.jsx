@@ -289,23 +289,25 @@ export default function Feed() {
           }
         }
 
-        // 리뷰 내용 업데이트
-        const reviewId = editingActivity.id; // activity.id is actually the review/rating id
-        if (isAnime) {
-          await reviewService.updateReview(reviewId, {
-            content: formData.content,
-            is_spoiler: formData.is_spoiler
-          });
-        } else {
-          await characterReviewService.updateReview(reviewId, {
-            content: formData.content,
-            is_spoiler: formData.is_spoiler
-          });
+        // 리뷰 내용이 있으면 리뷰 업데이트
+        if (formData.content && formData.content.trim()) {
+          const reviewId = editingActivity.id; // activity.id is actually the review/rating id
+          if (isAnime) {
+            await reviewService.updateReview(reviewId, {
+              content: formData.content,
+              is_spoiler: formData.is_spoiler
+            });
+          } else {
+            await characterReviewService.updateReview(reviewId, {
+              content: formData.content,
+              is_spoiler: formData.is_spoiler
+            });
+          }
         }
       }
 
       // Refresh activities
-      await refetch();
+      await resetActivities();
     } catch (err) {
       console.error('Failed to save:', err);
       throw err;
@@ -340,7 +342,7 @@ export default function Feed() {
       }
 
       // Refresh activities
-      await refetch();
+      await resetActivities();
     } catch (err) {
       console.error('Failed to delete:', err);
       alert(language === 'ko' ? '삭제에 실패했습니다.' : 'Failed to delete.');

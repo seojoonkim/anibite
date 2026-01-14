@@ -37,18 +37,23 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
     e.preventDefault();
     setError('');
 
-    if (mode !== 'edit_rating' && !formData.content.trim()) {
-      setError(language === 'ko' ? '리뷰 내용을 입력해주세요.' : 'Please enter review content.');
-      return;
-    }
-
-    if (mode !== 'edit_rating' && formData.content.trim().length < 10) {
-      setError(language === 'ko' ? '리뷰는 최소 10자 이상 작성해주세요.' : 'Review must be at least 10 characters.');
-      return;
-    }
-
+    // 별점 필수
     if (formData.rating === 0) {
       setError(language === 'ko' ? '별점을 선택해주세요.' : 'Please select a rating.');
+      return;
+    }
+
+    // 리뷰 내용 검증 (edit_rating 모드가 아니고 내용이 있을 경우에만)
+    if (mode !== 'edit_rating' && formData.content.trim()) {
+      if (formData.content.trim().length < 10) {
+        setError(language === 'ko' ? '리뷰는 최소 10자 이상 작성해주세요.' : 'Review must be at least 10 characters.');
+        return;
+      }
+    }
+
+    // add_review 모드에서는 리뷰 내용 필수
+    if (mode === 'add_review' && !formData.content.trim()) {
+      setError(language === 'ko' ? '리뷰 내용을 입력해주세요.' : 'Please enter review content.');
       return;
     }
 
@@ -102,19 +107,17 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
           {/* Item Info */}
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-4">
-              {activity?.item_image && (
-                <img
-                  src={activity.item_image}
-                  alt={activity.item_title}
-                  className="w-16 h-20 object-cover rounded"
-                  onError={(e) => {
-                    e.target.src = '/placeholder-anime.svg';
-                  }}
-                />
-              )}
+              <img
+                src={activity?.item_image || '/placeholder-anime.svg'}
+                alt={activity?.item_title_korean || activity?.item_title || 'Item'}
+                className="w-16 h-20 object-cover rounded bg-gray-200"
+                onError={(e) => {
+                  e.target.src = '/placeholder-anime.svg';
+                }}
+              />
               <div>
                 <h3 className="font-semibold text-gray-900">
-                  {activity?.item_title_korean || activity?.item_title}
+                  {activity?.item_title_korean || activity?.item_title || 'Unknown'}
                 </h3>
                 {activity?.item_title_korean && activity?.item_title && (
                   <p className="text-sm text-gray-600">{activity.item_title}</p>
