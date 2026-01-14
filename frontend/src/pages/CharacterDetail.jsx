@@ -307,16 +307,9 @@ export default function CharacterDetail() {
       setShowReviewForm(false);
       setIsEditingReview(false);
 
-      // 병렬로 데이터 새로고침
-      const [charData, reviewData, myReviewData] = await Promise.all([
-        characterService.getCharacterDetail(id),
-        characterReviewService.getCharacterReviews(id, { page: 1, page_size: 10 }),
-        characterReviewService.getMyReview(id).catch(() => null)
-      ]);
-
-      if (charData) setCharacter(charData);
-      if (reviewData) processReviews(reviewData);
-      if (myReviewData) processMyReview(myReviewData);
+      // 전체 데이터 다시 로드
+      await loadAllData();
+      await refetchActivities();
 
       setTimeout(() => setReviewSuccess(''), 3000);
     } catch (err) {
