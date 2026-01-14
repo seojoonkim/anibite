@@ -242,6 +242,271 @@ def delete_character_rating(user_id: int, character_id: int) -> bool:
     return True
 
 
+def get_user_character_ratings(
+    user_id: int,
+    status_filter: Optional[str] = None,
+    limit: Optional[int] = None,
+    without_review: bool = False
+) -> Dict:
+    """
+    사용자의 캐릭터 평점 조회 (activities 테이블 사용으로 최적화)
+    """
+    # activities는 RATED 상태만 저장하므로, 다른 status는 원본 테이블 사용
+    if status_filter and status_filter != 'RATED':
+        # WANT_TO_KNOW, NOT_INTERESTED 등은 character_ratings 테이블에서 직접 조회
+        where_clause = "cr.user_id = ? AND cr.status = ?"
+        params = [user_id, status_filter]
+
+        total = db.execute_query(
+            f"SELECT COUNT(*) as total FROM character_ratings cr WHERE {where_clause}",
+            tuple(params),
+            fetch_one=True
+        )['total']
+
+        limit_clause = f"LIMIT {limit}" if limit else ""
+        rows = db.execute_query(
+            f"""
+            SELECT
+                cr.*,
+                c.name_full,
+                c.name_native,
+                COALESCE('/' || c.image_local, c.image_url) as image_url,
+                (SELECT a.id FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = c.id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
+                 LIMIT 1) as anime_id,
+                (SELECT COALESCE(a.title_korean, a.title_romaji) FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = c.id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
+                 LIMIT 1) as anime_title
+            FROM character_ratings cr
+            JOIN character c ON cr.character_id = c.id
+            WHERE {where_clause}
+            ORDER BY cr.updated_at DESC
+            {limit_clause}
+            """,
+            tuple(params)
+        )
+
+        items = [dict_from_row(row) for row in rows]
+
+        return {
+            'items': items,
+            'total': total,
+            'average_rating': None
+        }
+
+    # RATED 또는 필터 없음: activities 테이블에서 조회
+    if without_review:
+        # 리뷰가 없는 항목만: review_content가 NULL이거나 빈 문자열인 것
+        total = db.execute_query(
+            """
+            SELECT COUNT(*) as total FROM activities
+            WHERE user_id = ? AND activity_type = 'character_rating'
+            AND (review_content IS NULL OR review_content = '')
+            """,
+            (user_id,),
+            fetch_one=True
+        )['total']
+
+        # 평균 평점 (리뷰 없는 항목들의)
+        avg_row = db.execute_query(
+            """
+            SELECT AVG(rating) as avg_rating
+            FROM activities
+            WHERE user_id = ? AND activity_type = 'character_rating' AND rating IS NOT NULL
+            AND (review_content IS NULL OR review_content = '')
+            """,
+            (user_id,),
+            fetch_one=True
+        )
+        average_rating = avg_row['avg_rating'] if avg_row and avg_row['avg_rating'] else None
+
+        # 평점 목록 (리뷰 없는 것만)
+        limit_clause = f"LIMIT {limit}" if limit else ""
+        rows = db.execute_query(
+            f"""
+            SELECT
+                id,
+                item_id as character_id,
+                user_id,
+                rating,
+                'RATED' as status,
+                activity_time as updated_at,
+                created_at,
+                item_title as name_full,
+                item_title_korean as name_native,
+                item_image as image_url,
+                NULL as anime_id,
+                NULL as anime_title
+            FROM activities
+            WHERE user_id = ? AND activity_type = 'character_rating'
+            AND (review_content IS NULL OR review_content = '')
+            ORDER BY activity_time DESC
+            {limit_clause}
+            """,
+            (user_id,)
+        )
+    else:
+        # 전체 개수
+        total = db.execute_query(
+            """SELECT COUNT(*) as total FROM activities
+               WHERE user_id = ? AND activity_type = 'character_rating'""",
+            (user_id,),
+            fetch_one=True
+        )['total']
+
+        # 평균 평점
+        avg_row = db.execute_query(
+            """
+            SELECT AVG(rating) as avg_rating
+            FROM activities
+            WHERE user_id = ? AND activity_type = 'character_rating' AND rating IS NOT NULL
+            """,
+            (user_id,),
+            fetch_one=True
+        )
+        average_rating = avg_row['avg_rating'] if avg_row and avg_row['avg_rating'] else None
+
+        # 평점 목록 - activities 테이블에서 조회
+        limit_clause = f"LIMIT {limit}" if limit else ""
+        rows = db.execute_query(
+            f"""
+            SELECT
+                id,
+                item_id as character_id,
+                user_id,
+                rating,
+                'RATED' as status,
+                activity_time as updated_at,
+                created_at,
+                item_title as name_full,
+                item_title_korean as name_native,
+                item_image as image_url,
+                NULL as anime_id,
+                NULL as anime_title
+            FROM activities
+            WHERE user_id = ? AND activity_type = 'character_rating'
+            ORDER BY activity_time DESC
+            {limit_clause}
+            """,
+            (user_id,)
+        )
+
+    items = [dict_from_row(row) for row in rows]
+
+    return {
+        'items': items,
+        'total': total,
+        'average_rating': average_rating
+    }
+
+
+def get_all_user_character_ratings(user_id: int) -> Dict:
+    """
+    사용자의 모든 캐릭터 평점을 한 번에 조회 (RATED, WANT_TO_KNOW, NOT_INTERESTED)
+    3개의 API 호출을 1개로 줄여 성능 향상
+    """
+    # Part 1: RATED - activities 테이블에서 빠르게 조회
+    rated_rows = db.execute_query(
+        """
+        SELECT
+            id,
+            item_id as character_id,
+            user_id,
+            rating,
+            'RATED' as status,
+            activity_time as updated_at,
+            created_at,
+            item_title as name_full,
+            item_title_korean as name_native,
+            item_image as image_url,
+            anime_id,
+            anime_title
+        FROM activities
+        WHERE user_id = ? AND activity_type = 'character_rating'
+        ORDER BY activity_time DESC
+        """,
+        (user_id,)
+    )
+
+    # Part 2: WANT_TO_KNOW - character_ratings 테이블에서 조회
+    want_rows = db.execute_query(
+        """
+        SELECT
+            cr.*,
+            c.name_full,
+            c.name_native,
+            COALESCE('/' || c.image_local, c.image_url) as image_url,
+            (SELECT a.id FROM anime a
+             JOIN anime_character ac ON a.id = ac.anime_id
+             WHERE ac.character_id = c.id
+             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
+             LIMIT 1) as anime_id,
+            (SELECT COALESCE(a.title_korean, a.title_romaji) FROM anime a
+             JOIN anime_character ac ON a.id = ac.anime_id
+             WHERE ac.character_id = c.id
+             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
+             LIMIT 1) as anime_title
+        FROM character_ratings cr
+        JOIN character c ON cr.character_id = c.id
+        WHERE cr.user_id = ? AND cr.status = 'WANT_TO_KNOW'
+        ORDER BY cr.updated_at DESC
+        """,
+        (user_id,)
+    )
+
+    # Part 3: NOT_INTERESTED - character_ratings 테이블에서 조회
+    pass_rows = db.execute_query(
+        """
+        SELECT
+            cr.*,
+            c.name_full,
+            c.name_native,
+            COALESCE('/' || c.image_local, c.image_url) as image_url,
+            (SELECT a.id FROM anime a
+             JOIN anime_character ac ON a.id = ac.anime_id
+             WHERE ac.character_id = c.id
+             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
+             LIMIT 1) as anime_id,
+            (SELECT COALESCE(a.title_korean, a.title_romaji) FROM anime a
+             JOIN anime_character ac ON a.id = ac.anime_id
+             WHERE ac.character_id = c.id
+             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
+             LIMIT 1) as anime_title
+        FROM character_ratings cr
+        JOIN character c ON cr.character_id = c.id
+        WHERE cr.user_id = ? AND cr.status = 'NOT_INTERESTED'
+        ORDER BY cr.updated_at DESC
+        """,
+        (user_id,)
+    )
+
+    # 평균 평점 계산 (RATED만)
+    avg_row = db.execute_query(
+        """
+        SELECT AVG(rating) as avg_rating
+        FROM activities
+        WHERE user_id = ? AND activity_type = 'character_rating' AND rating IS NOT NULL
+        """,
+        (user_id,),
+        fetch_one=True
+    )
+    average_rating = avg_row['avg_rating'] if avg_row and avg_row['avg_rating'] else None
+
+    return {
+        'rated': [dict_from_row(row) for row in rated_rows],
+        'want_to_know': [dict_from_row(row) for row in want_rows],
+        'not_interested': [dict_from_row(row) for row in pass_rows],
+        'total_rated': len(rated_rows),
+        'total_want_to_know': len(want_rows),
+        'total_not_interested': len(pass_rows),
+        'average_rating': average_rating
+    }
+
+
 def get_user_character_stats(user_id: int) -> Dict:
     """
     사용자의 캐릭터 평가 통계
