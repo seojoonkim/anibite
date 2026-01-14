@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import StarRating from './StarRating';
 
@@ -89,7 +90,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
     return language === 'ko' ? '리뷰 수정' : 'Edit Review';
   };
 
-  return (
+  const modalContent = (
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black bg-opacity-50"
       onClick={(e) => {
@@ -221,4 +222,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
       </div>
     </div>
   );
+
+  // Render modal using React Portal to ensure it's not affected by parent z-index
+  return createPortal(modalContent, document.body);
 }
