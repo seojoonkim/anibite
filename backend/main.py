@@ -101,6 +101,20 @@ if not os.path.exists(uploads_dir):
 app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
 
+# Startup event - Fix triggers on server start
+@app.on_event("startup")
+async def startup_event():
+    """서버 시작 시 트리거 자동 수정"""
+    print("\n🔧 Checking and fixing database triggers...")
+    try:
+        from scripts.fix_railway_triggers import fix_triggers
+        fix_triggers()
+        print("✅ Triggers fixed successfully!\n")
+    except Exception as e:
+        print(f"⚠️ Failed to fix triggers: {e}")
+        print("Server will continue, but rating save may fail.\n")
+
+
 # Root endpoint
 @app.get("/")
 def root():
