@@ -281,9 +281,9 @@ export default function CharacterDetail() {
     }
 
     try {
-      if (isEditingReview && myReview && myReview.review_id) {
+      if (isEditingReview && myReview && myReview.id) {
         // 수정 시: rating을 리뷰 API에 함께 전송
-        await characterReviewService.updateReview(myReview.review_id, {
+        await characterReviewService.updateReview(myReview.id, {
           content: reviewData.content,
           is_spoiler: reviewData.is_spoiler,
           rating: reviewData.rating  // 별점도 함께 전송
