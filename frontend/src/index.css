@@ -30,13 +30,15 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
   position: relative;
-  zoom: 0.9; /* 전체 UI 10% 축소 */
 }
 
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  zoom: 0.9; /* 전체 UI 10% 축소 */
+  width: 111.11%; /* 0.9로 축소되므로 100%를 유지하려면 111.11% 필요 */
+  transform-origin: top left;
 }
 
 /* English text - 세련되고 모던한 Inter */
