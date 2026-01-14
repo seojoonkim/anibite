@@ -401,3 +401,32 @@ def create_activity_comment(
     )
 
     return dict_from_row(comment)
+
+
+def delete_activity_comment(comment_id: int, user_id: int) -> bool:
+    """Delete a comment (only by the author)"""
+    db = default_db
+
+    # Verify comment exists and user is the author
+    comment = db.execute_query(
+        "SELECT id FROM activity_comments WHERE id = ? AND user_id = ?",
+        (comment_id, user_id),
+        fetch_one=True
+    )
+
+    if not comment:
+        return False
+
+    # Delete replies first (cascade)
+    db.execute_update(
+        "DELETE FROM activity_comments WHERE parent_comment_id = ?",
+        (comment_id,)
+    )
+
+    # Delete the comment
+    rowcount = db.execute_update(
+        "DELETE FROM activity_comments WHERE id = ? AND user_id = ?",
+        (comment_id, user_id)
+    )
+
+    return rowcount > 0

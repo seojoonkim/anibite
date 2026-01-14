@@ -97,7 +97,8 @@ export default function ActivityCard({
   const {
     comments,
     loading: commentsLoading,
-    createComment
+    createComment,
+    deleteComment
   } = useActivityComments(activity.id);
 
   // Helper functions
@@ -317,7 +318,7 @@ export default function ActivityCard({
               <div className="flex items-center gap-2 mb-1">
                 <Link
                   to={`/user/${activity.user_id}`}
-                  className="text-sm font-semibold text-gray-800 hover:text-[#A8E6CF] transition-colors"
+                  className="text-sm font-semibold text-gray-800 hover:text-[#3797F0] transition-colors"
                 >
                   {activity.display_name || activity.username}
                 </Link>
@@ -369,7 +370,7 @@ export default function ActivityCard({
             <div className="mb-2">
               <Link
                 to={getActivityLink()}
-                className="block text-base font-semibold text-gray-800 hover:text-[#A8E6CF] transition-colors"
+                className="block text-base font-semibold text-gray-800 hover:text-[#3797F0] transition-colors"
               >
                 {activity.activity_type === 'character_rating' ? (
                   <>
@@ -384,7 +385,7 @@ export default function ActivityCard({
               {activity.anime_title && (
                 <Link
                   to={`/anime/${activity.anime_id}`}
-                  className="text-xs text-gray-500 mt-0.5 hover:text-[#A8E6CF] transition-colors block"
+                  className="text-xs text-gray-500 mt-0.5 hover:text-[#3797F0] transition-colors block"
                 >
                   from: {activity.anime_title_korean || activity.anime_title}
                 </Link>
@@ -542,7 +543,9 @@ export default function ActivityCard({
           setReplyText={setReplyText}
           onCommentSubmit={handleCommentSubmit}
           onReplySubmit={handleReplySubmit}
+          onDeleteComment={deleteComment}
           getAvatarUrl={getAvatarUrl}
+          currentUser={user}
         />
       )}
     </div>

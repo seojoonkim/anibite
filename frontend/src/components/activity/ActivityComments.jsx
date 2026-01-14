@@ -17,10 +17,11 @@ export default function ActivityComments({
   setReplyText,
   onCommentSubmit,
   onReplySubmit,
-  getAvatarUrl
+  onDeleteComment,
+  getAvatarUrl,
+  currentUser
 }) {
   const { language } = useLanguage();
-  const { user } = useAuth();
 
   const toRoman = (num) => {
     const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
@@ -38,13 +39,13 @@ export default function ActivityComments({
   return (
     <div className="mt-3 border-t pt-3">
       {/* New Comment Input */}
-      {user && (
+      {currentUser && (
         <div className="mb-3">
           <div className="flex gap-2 items-start">
-            {user.avatar_url ? (
+            {currentUser.avatar_url ? (
               <img
-                src={getAvatarUrl(user.avatar_url)}
-                alt={user.display_name || user.username}
+                src={getAvatarUrl(currentUser.avatar_url)}
+                alt={currentUser.display_name || currentUser.username}
                 className="w-7 h-7 rounded-full object-cover flex-shrink-0"
               />
             ) : (
@@ -53,7 +54,7 @@ export default function ActivityComments({
                 style={{ background: 'linear-gradient(to bottom right, #90B2E4, #638CCC)' }}
               >
                 <span className="text-white text-xs font-bold">
-                  {(user.display_name || user.username || '?').charAt(0).toUpperCase()}
+                  {(currentUser.display_name || currentUser.username || '?').charAt(0).toUpperCase()}
                 </span>
               </div>
             )}
@@ -117,16 +118,17 @@ export default function ActivityComments({
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <Link
                         to={`/user/${comment.user_id}`}
-                        className="text-xs font-medium text-gray-700 hover:text-[#A8E6CF]"
+                        className="text-xs font-medium text-gray-700 hover:text-[#3797F0]"
                       >
                         {comment.display_name || comment.username}
                       </Link>
                       <span
-                        className={`text-[10px] px-1 py-0.5 rounded-full ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}
+                        className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}
                       >
                         <span style={{ color: levelInfo.color }} className="font-bold">
                           {levelInfo.icon}
-                        </span>
+                        </span>{' '}
+                        <span style={{ color: levelInfo.color }}>{levelInfo.name}</span>
                       </span>
                       <span className="text-[10px] text-gray-400">
                         {new Date(comment.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US')}
@@ -135,14 +137,28 @@ export default function ActivityComments({
 
                     <p className="text-xs text-gray-700 whitespace-pre-wrap">{comment.content}</p>
 
-                    {user && (
-                      <button
-                        onClick={() => setReplyingTo(comment.id)}
-                        className="mt-0.5 text-[10px] text-gray-500 hover:text-[#A8E6CF]"
-                      >
-                        {language === 'ko' ? '답글' : 'Reply'}
-                      </button>
-                    )}
+                    <div className="flex items-center gap-2 mt-0.5">
+                      {currentUser && (
+                        <button
+                          onClick={() => setReplyingTo(comment.id)}
+                          className="text-[10px] text-gray-500 hover:text-[#3797F0]"
+                        >
+                          {language === 'ko' ? '답글' : 'Reply'}
+                        </button>
+                      )}
+                      {currentUser && currentUser.id === comment.user_id && (
+                        <button
+                          onClick={() => {
+                            if (window.confirm(language === 'ko' ? '댓글을 삭제하시겠습니까?' : 'Delete this comment?')) {
+                              onDeleteComment(comment.id);
+                            }
+                          }}
+                          className="text-[10px] text-red-500 hover:text-red-700"
+                        >
+                          {language === 'ko' ? '삭제' : 'Delete'}
+                        </button>
+                      )}
+                    </div>
 
                     {/* Reply Input */}
                     {replyingTo === comment.id && (
@@ -182,7 +198,7 @@ export default function ActivityComments({
 
                     {/* Replies */}
                     {comment.replies && comment.replies.length > 0 && (
-                      <div className="mt-3 ml-6 space-y-3 border-l-2 border-gray-200 pl-3">
+                      <div className="mt-3 ml-4 space-y-3 border-l-2 border-gray-200 pl-3">
                         {comment.replies.map((reply) => {
                           const replyLevelInfo = getCurrentLevelInfo(reply.otaku_score || 0);
 
@@ -211,16 +227,17 @@ export default function ActivityComments({
                                 <div className="flex items-center gap-2 mb-1">
                                   <Link
                                     to={`/user/${reply.user_id}`}
-                                    className="text-xs font-medium text-gray-700 hover:text-[#A8E6CF]"
+                                    className="text-xs font-medium text-gray-700 hover:text-[#3797F0]"
                                   >
                                     {reply.display_name || reply.username}
                                   </Link>
                                   <span
-                                    className={`text-[10px] px-1 py-0.5 rounded-full ${replyLevelInfo.bgGradient} border ${replyLevelInfo.borderColor}`}
+                                    className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${replyLevelInfo.bgGradient} border ${replyLevelInfo.borderColor}`}
                                   >
                                     <span style={{ color: replyLevelInfo.color }} className="font-bold">
                                       {replyLevelInfo.icon}
-                                    </span>
+                                    </span>{' '}
+                                    <span style={{ color: replyLevelInfo.color }}>{replyLevelInfo.name}</span>
                                   </span>
                                   <span className="text-[10px] text-gray-400">
                                     {new Date(reply.created_at).toLocaleDateString(
@@ -230,6 +247,19 @@ export default function ActivityComments({
                                 </div>
 
                                 <p className="text-xs text-gray-700 whitespace-pre-wrap">{reply.content}</p>
+
+                                {currentUser && currentUser.id === reply.user_id && (
+                                  <button
+                                    onClick={() => {
+                                      if (window.confirm(language === 'ko' ? '답글을 삭제하시겠습니까?' : 'Delete this reply?')) {
+                                        onDeleteComment(reply.id, comment.id);
+                                      }
+                                    }}
+                                    className="mt-0.5 text-[10px] text-red-500 hover:text-red-700"
+                                  >
+                                    {language === 'ko' ? '삭제' : 'Delete'}
+                                  </button>
+                                )}
                               </div>
                             </div>
                           );

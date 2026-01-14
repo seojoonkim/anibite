@@ -15,7 +15,8 @@ from services.activity_service import (
     delete_activity,
     like_activity,
     get_activity_comments,
-    create_activity_comment
+    create_activity_comment,
+    delete_activity_comment
 )
 
 router = APIRouter()
@@ -316,3 +317,21 @@ def create_comment_endpoint(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
+
+
+@router.delete("/comments/{comment_id}")
+def delete_comment_endpoint(
+    comment_id: int,
+    current_user: UserResponse = Depends(get_current_user)
+):
+    """Delete a comment (only by author)"""
+
+    success = delete_activity_comment(comment_id, current_user.id)
+
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Comment not found or not authorized"
+        )
+
+    return {"message": "Comment deleted successfully"}

@@ -97,6 +97,13 @@ export const activityService = {
     return response.data;
   },
 
+  /**
+   * Delete a comment
+   */
+  async deleteComment(commentId) {
+    await api.delete(`/api/activities/comments/${commentId}`);
+  },
+
   // ============================================================================
   // LEGACY COMPATIBILITY METHODS
   // These methods provide compatibility with existing code during migration
