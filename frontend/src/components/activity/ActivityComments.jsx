@@ -128,7 +128,7 @@ export default function ActivityComments({
                         <span style={{ color: levelInfo.color }} className="font-bold">
                           {levelInfo.icon}
                         </span>{' '}
-                        <span style={{ color: levelInfo.color }}>{levelInfo.name}</span>
+                        <span style={{ color: levelInfo.color }}>{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
                       </span>
                       <span className="text-[10px] text-gray-400">
                         {new Date(comment.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US')}
@@ -237,7 +237,7 @@ export default function ActivityComments({
                                     <span style={{ color: replyLevelInfo.color }} className="font-bold">
                                       {replyLevelInfo.icon}
                                     </span>{' '}
-                                    <span style={{ color: replyLevelInfo.color }}>{replyLevelInfo.name}</span>
+                                    <span style={{ color: replyLevelInfo.color }}>{replyLevelInfo.level} - {toRoman(replyLevelInfo.rank)}</span>
                                   </span>
                                   <span className="text-[10px] text-gray-400">
                                     {new Date(reply.created_at).toLocaleDateString(
