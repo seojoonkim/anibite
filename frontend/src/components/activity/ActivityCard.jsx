@@ -475,7 +475,7 @@ export default function ActivityCard({
                   </>
                 )}
               </Link>
-              {activity.anime_title && (
+              {activity.activity_type === 'character_rating' && (activity.anime_title || activity.anime_title_korean) && (
                 <Link
                   to={`/anime/${activity.anime_id}`}
                   className="text-xs text-gray-500 mt-0.5 hover:text-[#3797F0] transition-colors block"

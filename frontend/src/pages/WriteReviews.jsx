@@ -26,6 +26,7 @@ export default function WriteReviews() {
     character: { reviewed: 0, pending: 0 },
     total: { reviewed: 0, pending: 0 }
   });
+  const [toast, setToast] = useState(null); // { message, type: 'success'|'error' }
 
   useEffect(() => {
     loadData();
