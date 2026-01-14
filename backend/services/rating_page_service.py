@@ -37,7 +37,7 @@ def get_anime_for_rating(user_id: int, limit: int = 50, offset: int = 0) -> List
         FROM anime a
         LEFT JOIN user_ratings ur ON a.id = ur.anime_id AND ur.user_id = ?
         WHERE ur.id IS NULL OR ur.status = 'WANT_TO_WATCH'
-        ORDER BY (a.popularity + (RANDOM() % 2000)) DESC
+        ORDER BY (a.popularity + ABS(RANDOM() % 2000)) DESC
         LIMIT ? OFFSET ?
         """,
         (user_id, limit, offset)
@@ -85,7 +85,7 @@ def get_characters_for_rating(user_id: int, limit: int = 50, offset: int = 0) ->
             AND c.name_full NOT LIKE '%Extra%'
             AND c.name_full NOT LIKE '%Background%'
         GROUP BY c.id
-        ORDER BY (c.favourites + (RANDOM() % 500)) DESC
+        ORDER BY (c.favourites + ABS(RANDOM() % 500)) DESC
         LIMIT ? OFFSET ?
         """,
         (user_id, user_id, limit, offset)

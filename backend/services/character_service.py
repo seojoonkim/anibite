@@ -116,7 +116,7 @@ def get_characters_from_rated_anime(user_id: int, limit: int = 100, offset: int 
             ca.role
         FROM RankedCharacters rc
         LEFT JOIN CharacterAnime ca ON ca.character_id = rc.id AND ca.rn = 1
-        ORDER BY (rc.favourites + (RANDOM() % 500)) DESC
+        ORDER BY (rc.favourites + ABS(RANDOM() % 500)) DESC
         LIMIT ? OFFSET ?
         """,
         (user_id, user_id, user_id, limit, offset)
