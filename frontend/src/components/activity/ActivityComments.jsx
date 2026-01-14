@@ -69,17 +69,13 @@ export default function ActivityComments({
                   }
                 }}
                 placeholder={language === 'ko' ? '댓글을 입력하세요...' : 'Write a comment...'}
-                className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#A8E6CF]"
+                className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
                 onClick={onCommentSubmit}
                 disabled={!newCommentText.trim()}
-                className="px-3 py-1.5 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  background: newCommentText.trim()
-                    ? 'linear-gradient(135deg, #A8E6CF 0%, #8EC5FC 100%)'
-                    : '#ccc'
-                }}
+                className="px-3 py-1.5 text-sm font-semibold text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                style={newCommentText.trim() ? { backgroundColor: '#3797F0' } : {}}
               >
                 {language === 'ko' ? '작성' : 'Post'}
               </button>
@@ -162,17 +158,13 @@ export default function ActivityComments({
                             }
                           }}
                           placeholder={language === 'ko' ? '답글을 입력하세요...' : 'Write a reply...'}
-                          className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#A8E6CF]"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                         <button
                           onClick={() => onReplySubmit(comment.id)}
                           disabled={!replyText.trim()}
-                          className="px-2 py-1 text-xs font-medium text-white rounded transition-colors disabled:opacity-50"
-                          style={{
-                            background: replyText.trim()
-                              ? 'linear-gradient(135deg, #A8E6CF 0%, #8EC5FC 100%)'
-                              : '#ccc'
-                          }}
+                          className="px-2 py-1 text-xs font-semibold text-white rounded transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                          style={replyText.trim() ? { backgroundColor: '#3797F0' } : {}}
                         >
                           {language === 'ko' ? '작성' : 'Post'}
                         </button>
