@@ -82,8 +82,10 @@ export default function RateCharacters() {
   const loadCharacters = async (pageNum) => {
     try {
       setLoading(pageNum === 1);
-      const pageSize = 20;
-      const offset = (pageNum - 1) * pageSize;
+      // Increase initial batch size to 40 to avoid auto-loading flicker
+      const pageSize = pageNum === 1 ? 40 : 20;
+      // Calculate offset: first page loads 40, subsequent pages load 20
+      const offset = pageNum === 1 ? 0 : 40 + (pageNum - 2) * 20;
 
       // Use ULTRA FAST optimized endpoint (0.1s target)
       const data = await characterService.getCharactersForRating({
@@ -103,6 +105,7 @@ export default function RateCharacters() {
           }
         });
         setCharacterStatuses(statuses);
+        setPage(1); // Reset to page 1
       } else {
         setCharacters(prev => [...prev, ...items]);
         // Add new character statuses
@@ -120,32 +123,6 @@ export default function RateCharacters() {
       setHasMore(receivedItems === pageSize);
       setLoading(false);
       setLoadingMore(false);
-
-      // Auto-load second batch immediately after first batch
-      if (pageNum === 1 && receivedItems === pageSize) {
-        setTimeout(async () => {
-          try {
-            const data2 = await characterService.getCharactersForRating({
-              limit: pageSize,
-              offset: pageSize
-            });
-            const items2 = data2.items || [];
-            setCharacters(prev => [...prev, ...items2]);
-            // Add new character statuses
-            const newStatuses = {};
-            items2.forEach(char => {
-              if (char.my_status) {
-                newStatuses[char.id] = char.my_status;
-              }
-            });
-            setCharacterStatuses(prev => ({ ...prev, ...newStatuses }));
-            setHasMore(items2.length === pageSize);
-            setPage(2);
-          } catch (err) {
-            console.error('Failed to auto-load more:', err);
-          }
-        }, 100);
-      }
     } catch (err) {
       console.error('Failed to load characters:', err);
       setLoading(false);
