@@ -308,6 +308,8 @@ export default function RateCharacters() {
                     <img
                       src={getImageUrl(character.image_url)}
                       alt={character.name_full}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
                         e.target.src = '/placeholder-anime.svg';
