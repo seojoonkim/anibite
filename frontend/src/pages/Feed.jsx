@@ -17,7 +17,6 @@ export default function Feed() {
 
   const [feedFilter, setFeedFilter] = useState(searchParams.get('filter') || 'all');
   const [newPostContent, setNewPostContent] = useState('');
-  const [savedActivities, setSavedActivities] = useState(new Set());
   const [notifications, setNotifications] = useState([]);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
 
@@ -37,14 +36,6 @@ export default function Feed() {
       autoFetch: feedFilter === 'all' || feedFilter === 'following'
     }
   );
-
-  // Load saved activities from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('savedActivities');
-    if (saved) {
-      setSavedActivities(new Set(JSON.parse(saved)));
-    }
-  }, []);
 
   // Update feedFilter when URL changes
   useEffect(() => {
@@ -76,15 +67,6 @@ export default function Feed() {
     }
   }, [feedFilter]);
 
-  // Reload saved feed from localStorage when filter changes to 'saved'
-  useEffect(() => {
-    if (feedFilter === 'saved') {
-      const saved = localStorage.getItem('savedActivities');
-      if (saved) {
-        setSavedActivities(new Set(JSON.parse(saved)));
-      }
-    }
-  }, [feedFilter]);
 
   const loadNotifications = async () => {
     try {
@@ -150,18 +132,6 @@ export default function Feed() {
     }
   };
 
-  const handleSaveActivity = (activityId) => {
-    setSavedActivities(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(activityId)) {
-        newSet.delete(activityId);
-      } else {
-        newSet.add(activityId);
-      }
-      localStorage.setItem('savedActivities', JSON.stringify([...newSet]));
-      return newSet;
-    });
-  };
 
   const handleCreatePost = async () => {
     if (!newPostContent || !newPostContent.trim()) return;
@@ -210,9 +180,9 @@ export default function Feed() {
     if (feedFilter === 'notifications') {
       return notifications;
     } else if (feedFilter === 'saved') {
-      return activities.filter(activity =>
-        savedActivities.has(`${activity.activity_type}_${activity.user_id}_${activity.item_id}`)
-      );
+      // Use same localStorage key as ActivityCard
+      const bookmarks = JSON.parse(localStorage.getItem('anipass_bookmarks') || '[]');
+      return activities.filter(activity => bookmarks.includes(activity.id));
     }
     return activities;
   };
@@ -393,9 +363,6 @@ export default function Feed() {
             ) : (
               <div className="space-y-4">
                 {filteredActivities.map((activity) => {
-                  const activityKey = `${activity.activity_type}_${activity.user_id}_${activity.item_id}`;
-                  const isSaved = savedActivities.has(activityKey);
-
                   // Render notification-wrapped activity
                   if (activity._notifications) {
                     return (
@@ -416,7 +383,7 @@ export default function Feed() {
 
                   // Regular activity card
                   return (
-                    <div key={activityKey} id={`activity-${activityKey}`}>
+                    <div key={activity.id} id={`activity-${activity.id}`}>
                       <ActivityCard
                         activity={activity}
                         context="feed"
