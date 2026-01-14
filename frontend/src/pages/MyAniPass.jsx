@@ -35,7 +35,7 @@ export default function MyAniPass() {
   const isOwnProfile = !userId || parseInt(userId) === user?.id;
   const [profileUser, setProfileUser] = useState(null);
   const displayUser = isOwnProfile ? user : profileUser;
-  const [activeTab, setActiveTab] = useState('anime'); // TEMP: Changed from 'feed' to 'anime' to avoid feed loading issue
+  const [activeTab, setActiveTab] = useState('feed');
   const [animeSubMenu, setAnimeSubMenu] = useState('all'); // 애니 서브메뉴: all, 5, 4, 3, 2, 1, 0, watchlist, pass
   const [characterSubMenu, setCharacterSubMenu] = useState('all'); // 캐릭터 서브메뉴: all, 5, 4, 3, 2, 1, 0, want, pass
 
