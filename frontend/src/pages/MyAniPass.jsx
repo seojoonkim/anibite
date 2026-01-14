@@ -73,8 +73,11 @@ export default function MyAniPass() {
   const [yearDistribution, setYearDistribution] = useState([]);
   const [allAnime, setAllAnime] = useState([]); // 모든 애니 (평가, 보고싶어요, 관심없어요 포함)
   const [displayedAnime, setDisplayedAnime] = useState([]); // 현재 표시되는 애니
-  const [allCharacters, setAllCharacters] = useState([]); // 모든 캐릭터 평가
+  const [allCharacters, setAllCharacters] = useState([]); // 모든 캐릭터 (평가, 알고싶어요, 관심없어요 포함)
   const [displayedCharacters, setDisplayedCharacters] = useState([]); // 현재 표시되는 캐릭터
+  const [allRatedCharacters, setAllRatedCharacters] = useState([]); // 평가한 캐릭터만
+  const [wantCharacters, setWantCharacters] = useState([]); // 알고싶어요 캐릭터
+  const [passCharacters, setPassCharacters] = useState([]); // 관심없어요 캐릭터
   const [ratedAnime, setRatedAnime] = useState([]);
   const [allRatedAnime, setAllRatedAnime] = useState([]); // 전체 평가 애니 캐시
   const [ratedFilter, setRatedFilter] = useState('all'); // 별점 필터
@@ -218,31 +221,30 @@ export default function MyAniPass() {
 
   // 캐릭터 서브메뉴 필터링
   const filterCharactersBySubMenu = (charactersData, submenu) => {
-    console.log('[MyAniPass] filterCharactersBySubMenu:', { submenu, dataLength: charactersData.length });
     let filtered = [];
 
     if (submenu === 'all') {
       // 모두 선택 시 모든 항목 포함
       filtered = charactersData;
     } else if (submenu === '5') {
-      filtered = charactersData.filter(c => c.rating === 5.0);
+      // RATED 상태이고 rating이 5.0인 것만
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 5.0);
     } else if (submenu === '4') {
-      filtered = charactersData.filter(c => c.rating >= 4.0 && c.rating < 5.0);
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating >= 4.0 && c.rating < 5.0);
     } else if (submenu === '3') {
-      filtered = charactersData.filter(c => c.rating >= 3.0 && c.rating < 4.0);
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating >= 3.0 && c.rating < 4.0);
     } else if (submenu === '2') {
-      filtered = charactersData.filter(c => c.rating >= 2.0 && c.rating < 3.0);
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating >= 2.0 && c.rating < 3.0);
     } else if (submenu === '1') {
-      filtered = charactersData.filter(c => c.rating >= 1.0 && c.rating < 2.0);
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating >= 1.0 && c.rating < 2.0);
     } else if (submenu === '0') {
-      filtered = charactersData.filter(c => c.rating >= 0.5 && c.rating < 1.0);
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating >= 0.5 && c.rating < 1.0);
     } else if (submenu === 'want') {
       filtered = charactersData.filter(c => c.status === 'WANT_TO_KNOW');
     } else if (submenu === 'pass') {
       filtered = charactersData.filter(c => c.status === 'PASS');
     }
 
-    console.log('[MyAniPass] filtered result:', filtered.length);
     setDisplayedCharacters(filtered);
   };
 
@@ -367,32 +369,25 @@ export default function MyAniPass() {
         filterAnimeBySubMenu(allAnimeData, animeSubMenu);
         setLoadedTabs(prev => ({ ...prev, anime: true }));
       } else if (activeTab === 'character') {
-        // Load initial character ratings quickly (50 first)
+        // Load all character ratings (rated, want to know, pass)
         const targetUserId = isOwnProfile ? null : parseInt(userId);
-        const initialCharactersData = isOwnProfile
-          ? await userService.getCharacterRatings({ limit: 50 })
-          : await userService.getUserCharacterRatings(targetUserId, { limit: 50 });
-        setAllCharacters(initialCharactersData || []);
+        const allCharactersData = isOwnProfile
+          ? await userService.getCharacterRatings({ limit: 500 })
+          : await userService.getUserCharacterRatings(targetUserId, { limit: 500 });
 
-        // Apply initial filter immediately
-        filterCharactersBySubMenu(initialCharactersData || [], characterSubMenu);
+        // Separate by status - similar to anime logic
+        const ratedChars = (allCharactersData || []).filter(c => c.status === 'RATED' && c.rating);
+        const wantChars = (allCharactersData || []).filter(c => c.status === 'WANT_TO_KNOW');
+        const passChars = (allCharactersData || []).filter(c => c.status === 'PASS');
+
+        setAllCharacters(allCharactersData || []);
+        setAllRatedCharacters(ratedChars);
+        setWantCharacters(wantChars);
+        setPassCharacters(passChars);
+
+        // Apply initial filter
+        filterCharactersBySubMenu(allCharactersData || [], characterSubMenu);
         setLoadedTabs(prev => ({ ...prev, character: true }));
-        setTabLoading(false);
-
-        // Load remaining characters in background
-        const loadRemainingChars = isOwnProfile
-          ? userService.getCharacterRatings({ limit: 500, offset: 50 })
-          : userService.getUserCharacterRatings(targetUserId, { limit: 500, offset: 50 });
-
-        loadRemainingChars.then(remainingData => {
-          if (remainingData && remainingData.length > 0) {
-            const allData = [...(initialCharactersData || []), ...remainingData];
-            setAllCharacters(allData);
-            filterCharactersBySubMenu(allData, characterSubMenu);
-          }
-        }).catch(err => {
-          console.error('Failed to load remaining characters:', err);
-        });
       } else if (activeTab === 'feed') {
         const targetUserId = userId || user?.id;
         // 빠른 로딩: 초기 10개만 로드
@@ -1324,7 +1319,7 @@ export default function MyAniPass() {
                       }`}
                       style={characterSubMenu === '5' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                     >
-                      ⭐ 5{language === 'ko' ? '점' : ''} ({allCharacters.filter(c => c.rating === 5.0).length})
+                      ⭐ 5{language === 'ko' ? '점' : ''} ({allRatedCharacters.filter(c => c.rating === 5.0).length})
                     </button>
                     <button
                       onClick={() => setCharacterSubMenu('4')}
@@ -1335,7 +1330,7 @@ export default function MyAniPass() {
                       }`}
                       style={characterSubMenu === '4' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                     >
-                      ⭐ 4{language === 'ko' ? '점대' : ''} ({allCharacters.filter(c => c.rating >= 4.0 && c.rating < 5.0).length})
+                      ⭐ 4{language === 'ko' ? '점대' : ''} ({allRatedCharacters.filter(c => c.rating >= 4.0 && c.rating < 5.0).length})
                     </button>
                     <button
                       onClick={() => setCharacterSubMenu('3')}
@@ -1346,7 +1341,7 @@ export default function MyAniPass() {
                       }`}
                       style={characterSubMenu === '3' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                     >
-                      ⭐ 3{language === 'ko' ? '점대' : ''} ({allCharacters.filter(c => c.rating >= 3.0 && c.rating < 4.0).length})
+                      ⭐ 3{language === 'ko' ? '점대' : ''} ({allRatedCharacters.filter(c => c.rating >= 3.0 && c.rating < 4.0).length})
                     </button>
                     <button
                       onClick={() => setCharacterSubMenu('2')}
@@ -1357,7 +1352,7 @@ export default function MyAniPass() {
                       }`}
                       style={characterSubMenu === '2' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                     >
-                      ⭐ 2{language === 'ko' ? '점대' : ''} ({allCharacters.filter(c => c.rating >= 2.0 && c.rating < 3.0).length})
+                      ⭐ 2{language === 'ko' ? '점대' : ''} ({allRatedCharacters.filter(c => c.rating >= 2.0 && c.rating < 3.0).length})
                     </button>
                     <button
                       onClick={() => setCharacterSubMenu('1')}
@@ -1368,7 +1363,7 @@ export default function MyAniPass() {
                       }`}
                       style={characterSubMenu === '1' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                     >
-                      ⭐ 1{language === 'ko' ? '점대' : ''} ({allCharacters.filter(c => c.rating >= 1.0 && c.rating < 2.0).length})
+                      ⭐ 1{language === 'ko' ? '점대' : ''} ({allRatedCharacters.filter(c => c.rating >= 1.0 && c.rating < 2.0).length})
                     </button>
                     <button
                       onClick={() => setCharacterSubMenu('0')}
@@ -1379,7 +1374,7 @@ export default function MyAniPass() {
                       }`}
                       style={characterSubMenu === '0' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                     >
-                      ⭐ 0{language === 'ko' ? '점대' : ''} ({allCharacters.filter(c => c.rating >= 0.5 && c.rating < 1.0).length})
+                      ⭐ 0{language === 'ko' ? '점대' : ''} ({allRatedCharacters.filter(c => c.rating >= 0.5 && c.rating < 1.0).length})
                     </button>
                     <button
                       onClick={() => setCharacterSubMenu('want')}
@@ -1390,7 +1385,7 @@ export default function MyAniPass() {
                       }`}
                       style={characterSubMenu === 'want' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                     >
-                      {language === 'ko' ? '알고싶어요' : 'Want to Know'} ({allCharacters.filter(c => c.status === 'WANT_TO_KNOW').length})
+                      {language === 'ko' ? '알고싶어요' : 'Want to Know'} ({wantCharacters.length})
                     </button>
                     <button
                       onClick={() => setCharacterSubMenu('pass')}
@@ -1401,7 +1396,7 @@ export default function MyAniPass() {
                       }`}
                       style={characterSubMenu === 'pass' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                     >
-                      {language === 'ko' ? '관심없어요' : 'Pass'} ({allCharacters.filter(c => c.status === 'PASS').length})
+                      {language === 'ko' ? '관심없어요' : 'Pass'} ({passCharacters.length})
                     </button>
                   </div>
                 </div>
