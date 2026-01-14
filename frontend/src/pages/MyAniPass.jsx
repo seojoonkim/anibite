@@ -218,6 +218,7 @@ export default function MyAniPass() {
 
   // 캐릭터 서브메뉴 필터링
   const filterCharactersBySubMenu = (charactersData, submenu) => {
+    console.log('[MyAniPass] filterCharactersBySubMenu:', { submenu, dataLength: charactersData.length });
     let filtered = [];
 
     if (submenu === 'all') {
@@ -241,6 +242,7 @@ export default function MyAniPass() {
       filtered = charactersData.filter(c => c.status === 'PASS');
     }
 
+    console.log('[MyAniPass] filtered result:', filtered.length);
     setDisplayedCharacters(filtered);
   };
 
