@@ -164,18 +164,32 @@ def get_feed(
     user_id=X: 특정 사용자의 활동만
     기본: 모든 사용자의 활동
     """
-    # 특정 사용자 피드
-    if user_id is not None:
-        activities = get_user_feed(user_id, current_user.id, limit, offset)
-    # 팔로잉 피드
-    elif following_only:
-        activities = get_following_feed(current_user.id, limit, offset)
-    # 전체 피드
-    else:
-        activities = get_global_feed(limit, offset)
+    try:
+        print(f"[DEBUG] get_feed called: user_id={user_id}, following_only={following_only}, limit={limit}, offset={offset}, current_user={current_user.id}")
 
-    # 좋아요/댓글 정보 추가
-    return enrich_activities_with_engagement(activities, current_user.id, db)
+        # 특정 사용자 피드
+        if user_id is not None:
+            print(f"[DEBUG] Calling get_user_feed({user_id}, {current_user.id}, {limit}, {offset})")
+            activities = get_user_feed(user_id, current_user.id, limit, offset)
+            print(f"[DEBUG] get_user_feed returned {len(activities)} activities")
+        # 팔로잉 피드
+        elif following_only:
+            print(f"[DEBUG] Calling get_following_feed")
+            activities = get_following_feed(current_user.id, limit, offset)
+        # 전체 피드
+        else:
+            print(f"[DEBUG] Calling get_global_feed")
+            activities = get_global_feed(limit, offset)
+
+        print(f"[DEBUG] Calling enrich_activities_with_engagement with {len(activities)} activities")
+        enriched = enrich_activities_with_engagement(activities, current_user.id, db)
+        print(f"[DEBUG] Returning {len(enriched)} enriched activities")
+        return enriched
+    except Exception as e:
+        print(f"[ERROR] get_feed failed: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
+        raise
 
 
 @router.get("/user/{user_id}", response_model=List[Dict])
