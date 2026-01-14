@@ -33,12 +33,11 @@ def get_anime_for_rating(user_id: int, limit: int = 50, offset: int = 0) -> List
             a.season,
             a.season_year,
             a.average_score,
-            ur.status as user_rating_status,
-            RANDOM() as rand_val
+            ur.status as user_rating_status
         FROM anime a
         LEFT JOIN user_ratings ur ON a.id = ur.anime_id AND ur.user_id = ?
         WHERE ur.id IS NULL OR ur.status = 'WANT_TO_WATCH'
-        ORDER BY (COALESCE(a.popularity, 0) * 1.0 / 10000 + rand_val * 0.2) DESC
+        ORDER BY (COALESCE(a.popularity, 0) * 1.0 / 10000 + RANDOM() * 0.2) DESC
         LIMIT ? OFFSET ?
         """,
         (user_id, limit, offset)
@@ -73,8 +72,7 @@ def get_characters_for_rating(user_id: int, limit: int = 50, offset: int = 0) ->
             ac.role,
             a.id as anime_id,
             COALESCE(a.title_korean, a.title_romaji) as anime_title,
-            COALESCE('/' || a.cover_image_local, a.cover_image_url) as anime_cover,
-            RANDOM() as rand_val
+            COALESCE('/' || a.cover_image_local, a.cover_image_url) as anime_cover
         FROM character c
         INNER JOIN anime_character ac ON c.id = ac.character_id
         INNER JOIN anime a ON ac.anime_id = a.id
@@ -87,7 +85,7 @@ def get_characters_for_rating(user_id: int, limit: int = 50, offset: int = 0) ->
             AND c.name_full NOT LIKE '%Extra%'
             AND c.name_full NOT LIKE '%Background%'
         GROUP BY c.id
-        ORDER BY (c.favourites * 1.0 / 1000 + rand_val * 0.2) DESC
+        ORDER BY (c.favourites * 1.0 / 1000 + RANDOM() * 0.2) DESC
         LIMIT ? OFFSET ?
         """,
         (user_id, user_id, limit, offset)
@@ -231,9 +229,9 @@ def get_items_for_review_writing(user_id: int, limit: int = 50) -> List[Dict]:
             WHERE user_id = ? AND activity_type = 'character_rating'
             AND (review_content IS NULL OR review_content = '')
         )
-        SELECT *, RANDOM() as rand_val
+        SELECT *
         FROM combined
-        ORDER BY rand_val DESC, updated_at DESC
+        ORDER BY RANDOM() DESC, updated_at DESC
         LIMIT ?
         """,
         (user_id, user_id, limit)
