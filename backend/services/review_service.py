@@ -90,11 +90,11 @@ def create_review(user_id: int, review_data: ReviewCreate) -> ReviewResponse:
 
 
 def update_review(review_id: int, user_id: int, review_data: ReviewUpdate) -> ReviewResponse:
-    """리뷰 수정"""
+    """리뷰 수정 (별점도 함께 업데이트 가능)"""
 
     # 리뷰 존재 및 권한 확인
     existing = db.execute_query(
-        "SELECT user_id FROM user_reviews WHERE id = ?",
+        "SELECT user_id, anime_id FROM user_reviews WHERE id = ?",
         (review_id,),
         fetch_one=True
     )
@@ -109,6 +109,19 @@ def update_review(review_id: int, user_id: int, review_data: ReviewUpdate) -> Re
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to update this review"
+        )
+
+    anime_id = existing['anime_id']
+
+    # 별점이 제공되면 먼저 업데이트 (triggers will sync activities)
+    if review_data.rating is not None:
+        db.execute_update(
+            """
+            UPDATE user_ratings
+            SET rating = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE user_id = ? AND anime_id = ?
+            """,
+            (review_data.rating, user_id, anime_id)
         )
 
     # 수정할 필드만 업데이트
@@ -127,17 +140,14 @@ def update_review(review_id: int, user_id: int, review_data: ReviewUpdate) -> Re
         update_fields.append("is_spoiler = ?")
         params.append(1 if review_data.is_spoiler else 0)
 
-    if not update_fields:
-        # 수정할 내용이 없으면 기존 리뷰 반환
-        return get_review_by_id(review_id)
+    if update_fields:
+        update_fields.append("updated_at = CURRENT_TIMESTAMP")
+        params.append(review_id)
 
-    update_fields.append("updated_at = CURRENT_TIMESTAMP")
-    params.append(review_id)
-
-    db.execute_update(
-        f"UPDATE user_reviews SET {', '.join(update_fields)} WHERE id = ?",
-        tuple(params)
-    )
+        db.execute_update(
+            f"UPDATE user_reviews SET {', '.join(update_fields)} WHERE id = ?",
+            tuple(params)
+        )
 
     return get_review_by_id(review_id)
 

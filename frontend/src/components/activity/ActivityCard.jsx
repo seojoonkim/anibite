@@ -379,8 +379,8 @@ export default function ActivityCard({
 
       {/* Header: User Info + Activity Type + Timestamp */}
       {finalShowOptions.showUserInfo && (
-        <div className="flex items-center justify-between mb-3 pr-8">
-          <div className="flex items-center gap-2.5">
+        <div className="flex items-start mb-3 pr-8">
+          <div className="flex items-center gap-2.5 flex-1">
             {/* User Avatar */}
             <Link to={`/user/${activity.user_id}`} className="flex-shrink-0">
               {activity.avatar_url && !avatarError ? (
@@ -430,8 +430,8 @@ export default function ActivityCard({
             </div>
           </div>
 
-          {/* Timestamp */}
-          <span className="text-xs text-gray-400">
+          {/* Timestamp - aligned with user info line */}
+          <span className="text-xs text-gray-400 pt-0.5">
             {getRelativeTime(activity.activity_time)}
           </span>
         </div>
