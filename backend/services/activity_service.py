@@ -87,6 +87,7 @@ def get_activities(
         f"""
         SELECT
             a.*,
+            COALESCE(us.otaku_score, a.otaku_score, 0) as otaku_score,
             (SELECT COUNT(*) FROM activity_likes al WHERE al.activity_id = a.id) as likes_count,
             (SELECT COUNT(*) FROM activity_comments ac WHERE ac.activity_id = a.id) as comments_count,
             CASE WHEN ? IS NOT NULL THEN
@@ -94,6 +95,7 @@ def get_activities(
                  WHERE al2.activity_id = a.id AND al2.user_id = ?) > 0
             ELSE 0 END as user_liked
         FROM activities a
+        LEFT JOIN user_stats us ON a.user_id = us.user_id
         WHERE {where_sql}
         ORDER BY a.activity_time DESC
         LIMIT ? OFFSET ?
@@ -132,6 +134,7 @@ def get_activity_by_id(activity_id: int, current_user_id: Optional[int] = None, 
         """
         SELECT
             a.*,
+            COALESCE(us.otaku_score, a.otaku_score, 0) as otaku_score,
             (SELECT COUNT(*) FROM activity_likes al WHERE al.activity_id = a.id) as likes_count,
             (SELECT COUNT(*) FROM activity_comments ac WHERE ac.activity_id = a.id) as comments_count,
             CASE WHEN ? IS NOT NULL THEN
@@ -139,6 +142,7 @@ def get_activity_by_id(activity_id: int, current_user_id: Optional[int] = None, 
                  WHERE al2.activity_id = a.id AND al2.user_id = ?) > 0
             ELSE 0 END as user_liked
         FROM activities a
+        LEFT JOIN user_stats us ON a.user_id = us.user_id
         WHERE a.id = ?
         """,
         tuple(query_params),
