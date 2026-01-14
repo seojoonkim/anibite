@@ -52,7 +52,7 @@ def get_activities(
     if following_only and current_user_id:
         where_clauses.append("""
             a.user_id IN (
-                SELECT followed_id FROM user_follows
+                SELECT following_id FROM user_follows
                 WHERE follower_id = ?
             )
         """)
@@ -372,9 +372,6 @@ def create_activity_comment(
     if not activity:
         raise ValueError(f"Activity {activity_id} not found")
 
-    print(f"[create_activity_comment] Creating comment: activity_id={activity_id}, user_id={user_id}, parent_comment_id={parent_comment_id}")
-    print(f"[create_activity_comment] Activity info: type={activity['activity_type']}, owner={activity['user_id']}, item_id={activity.get('item_id')}")
-
     # Insert comment with legacy columns (activity_type, activity_user_id, item_id)
     comment_id = db.execute_insert(
         """
@@ -386,8 +383,6 @@ def create_activity_comment(
         (activity_id, user_id, parent_comment_id, content,
          activity['activity_type'], activity['user_id'], activity.get('item_id'))
     )
-
-    print(f"[create_activity_comment] Comment created with id={comment_id}")
 
     # Get created comment
     comment = db.execute_query(
