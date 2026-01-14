@@ -220,12 +220,12 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
 
 def get_global_feed(limit: int = 50, offset: int = 0) -> List[Dict]:
     """
-    전체 사용자의 최근 활동 피드 (feed_activities 테이블 사용)
+    전체 사용자의 최근 활동 피드 (activities 테이블 사용)
     - 단일 테이블 조회로 극도로 빠른 성능
     - 30개씩 로드해도 무리 없음
     """
 
-    # feed_activities 테이블에서 직접 조회
+    # activities 테이블에서 직접 조회
     rows = db.execute_query(
         """
         SELECT
@@ -249,7 +249,7 @@ def get_global_feed(limit: int = 50, offset: int = 0) -> List[Dict]:
             review_content,
             post_content,
             0 as comments_count
-        FROM feed_activities
+        FROM activities
         ORDER BY activity_time DESC
         LIMIT ? OFFSET ?
         """,
@@ -332,11 +332,11 @@ def _enrich_comments_count(activities: List[Dict]):
 
 def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, offset: int = 0) -> List[Dict]:
     """
-    특정 사용자의 활동 피드 (feed_activities 테이블 사용)
+    특정 사용자의 활동 피드 (activities 테이블 사용)
     - 단일 테이블 조회로 극도로 빠른 성능
     """
 
-    # feed_activities 테이블에서 user_id로 필터링
+    # activities 테이블에서 user_id로 필터링
     rows = db.execute_query(
         """
         SELECT
@@ -360,7 +360,7 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
             review_content,
             post_content,
             0 as comments_count
-        FROM feed_activities
+        FROM activities
         WHERE user_id = ?
         ORDER BY activity_time DESC
         LIMIT ? OFFSET ?
