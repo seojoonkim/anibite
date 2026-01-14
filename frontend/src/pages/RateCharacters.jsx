@@ -316,15 +316,13 @@ export default function RateCharacters() {
 
                   {/* Role Badge */}
                   {character.role && (
-                    <div className={`absolute top-2 left-2 px-2 py-1 rounded text-xs font-bold ${
-                      character.role === 'MAIN'
-                        ? 'text-white'
+                    <div className={`absolute top-2 left-2 px-2 py-1 rounded text-xs font-bold text-white`} style={{
+                      backgroundColor: character.role === 'MAIN'
+                        ? '#3797F0'  // 주연: 파란색 (테마색)
                         : character.role === 'SUPPORTING'
-                        ? 'text-white'
-                        : 'text-white'
-                    }`} style={{
-                      backgroundColor: character.role === 'MAIN' ? '#FC5185' : character.role === 'SUPPORTING' ? '#A8E6CF' : '#F5F5F5',
-                      color: character.role === 'BACKGROUND' ? '#364F6B' : 'white'
+                        ? '#A8E6CF'  // 조연: 민트그린 (테마색)
+                        : '#9CA3AF',  // 엑스트라: 회색
+                      color: 'white'
                     }}>
                       {character.role === 'MAIN'
                         ? (language === 'ko' ? '주연' : 'Main')
