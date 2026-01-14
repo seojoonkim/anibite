@@ -341,6 +341,13 @@ export default function MyAniPass() {
           userService.getSeasonStats().catch(() => []),
           userService.getGenreCombinations().catch(() => []),
         ]);
+
+        // Ensure average_rating is always available from the start
+        // If not in stats, calculate it from ratingStats
+        if (statsData && !statsData.average_rating && ratingStat && ratingStat.average !== undefined) {
+          statsData.average_rating = ratingStat.average;
+        }
+
         setStats(statsData);
         setGenrePreferences(genreData);
         setWatchTime(watchTimeData);
