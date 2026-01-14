@@ -252,11 +252,11 @@ export default function RateCharacters() {
         return false;
       }
 
-      // Show WANT_TO_WATCH with 10% probability (randomly)
-      if (status === 'WANT_TO_WATCH') {
+      // Show WANT_TO_KNOW with 5% probability
+      if (status === 'WANT_TO_KNOW') {
         // Use character ID as seed for consistent randomness
-        const seed = character.id % 10;
-        return seed === 0; // 10% chance
+        const seed = character.id % 20;
+        return seed === 0; // 5% chance
       }
 
       // Show all other characters
