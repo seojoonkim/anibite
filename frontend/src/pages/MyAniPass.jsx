@@ -118,6 +118,18 @@ export default function MyAniPass() {
   const [failedImages, setFailedImages] = useState(new Set());
 
   useEffect(() => {
+    // Reset states when userId changes (switching between profiles)
+    if (userId !== undefined) {
+      setUserActivities([]);
+      setFeedOffset(0);
+      setHasMoreFeed(true);
+      setLoadedTabs({
+        anipass: false,
+        anime: false,
+        character: false,
+        feed: false
+      });
+    }
     loadData();
     loadFollowData();
   }, [activeTab, userId]);

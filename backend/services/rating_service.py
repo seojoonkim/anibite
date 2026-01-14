@@ -156,17 +156,12 @@ def get_user_ratings(
     # RATED 또는 필터 없음: activities 테이블에서 조회
     # Check if we should filter items without reviews (for WriteReviews page)
     if without_review:
-        # 리뷰가 없는 항목만: anime_rating은 있지만 anime_review가 없는 것
+        # 리뷰가 없는 항목만: review_content가 NULL이거나 빈 문자열인 것
         total = db.execute_query(
             """
-            SELECT COUNT(*) as total FROM activities a1
-            WHERE a1.user_id = ? AND a1.activity_type = 'anime_rating'
-            AND NOT EXISTS (
-                SELECT 1 FROM activities a2
-                WHERE a2.user_id = a1.user_id
-                AND a2.item_id = a1.item_id
-                AND a2.activity_type = 'anime_review'
-            )
+            SELECT COUNT(*) as total FROM activities
+            WHERE user_id = ? AND activity_type = 'anime_rating'
+            AND (review_content IS NULL OR review_content = '')
             """,
             (user_id,),
             fetch_one=True
@@ -175,15 +170,10 @@ def get_user_ratings(
         # 평균 평점 (리뷰 없는 항목들의)
         avg_row = db.execute_query(
             """
-            SELECT AVG(a1.rating) as avg_rating
-            FROM activities a1
-            WHERE a1.user_id = ? AND a1.activity_type = 'anime_rating' AND a1.rating IS NOT NULL
-            AND NOT EXISTS (
-                SELECT 1 FROM activities a2
-                WHERE a2.user_id = a1.user_id
-                AND a2.item_id = a1.item_id
-                AND a2.activity_type = 'anime_review'
-            )
+            SELECT AVG(rating) as avg_rating
+            FROM activities
+            WHERE user_id = ? AND activity_type = 'anime_rating' AND rating IS NOT NULL
+            AND (review_content IS NULL OR review_content = '')
             """,
             (user_id,),
             fetch_one=True
@@ -195,28 +185,23 @@ def get_user_ratings(
         rows = db.execute_query(
             f"""
             SELECT
-                a1.id,
-                a1.item_id as anime_id,
-                a1.user_id,
-                a1.rating,
+                id,
+                item_id as anime_id,
+                user_id,
+                rating,
                 'RATED' as status,
-                a1.activity_time as updated_at,
-                a1.created_at,
-                a1.item_title as title_romaji,
-                a1.item_title as title_english,
-                a1.item_title_korean as title_korean,
-                a1.item_image as image_url,
+                activity_time as updated_at,
+                created_at,
+                item_title as title_romaji,
+                item_title as title_english,
+                item_title_korean as title_korean,
+                item_image as image_url,
                 NULL as season_year,
                 NULL as episodes
-            FROM activities a1
-            WHERE a1.user_id = ? AND a1.activity_type = 'anime_rating'
-            AND NOT EXISTS (
-                SELECT 1 FROM activities a2
-                WHERE a2.user_id = a1.user_id
-                AND a2.item_id = a1.item_id
-                AND a2.activity_type = 'anime_review'
-            )
-            ORDER BY a1.activity_time DESC
+            FROM activities
+            WHERE user_id = ? AND activity_type = 'anime_rating'
+            AND (review_content IS NULL OR review_content = '')
+            ORDER BY activity_time DESC
             {limit_clause}
             """,
             (user_id,)
