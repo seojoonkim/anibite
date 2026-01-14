@@ -13,6 +13,7 @@ import StarRating from '../components/common/StarRating';
 import CharacterRatingWidget from '../components/character/CharacterRatingWidget';
 import ActivityCard from '../components/activity/ActivityCard';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
+import { getCharacterImageUrl, getCharacterImageFallback, getAvatarUrl } from '../utils/imageHelpers';
 
 export default function CharacterDetail() {
   const { id } = useParams();
@@ -652,11 +653,7 @@ export default function CharacterDetail() {
     });
   };
 
-  const getAvatarUrl = (url) => {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${url}`;
-  };
+  // Using imported getAvatarUrl from imageHelpers
 
   const toRoman = (num) => {
     const romanNumerals = ['I', 'II', 'III', 'IV', 'V'];
@@ -675,23 +672,8 @@ export default function CharacterDetail() {
     return date.toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US');
   };
 
-  const getImageUrl = (imageUrl, fallbackUrl = null) => {
-    // 일반론적 해결: R2를 먼저 시도, 실패하면 외부 URL로 fallback
-    // character ID가 있으면 R2에서 먼저 찾기 (onError에서 fallback 처리)
-    if (character?.id) {
-      return `${IMAGE_BASE_URL}/images/characters/${character.id}.jpg`;
-    }
-
-    // character 객체가 없는 경우 (로딩 중) image_url 그대로 사용
-    if (!imageUrl) return '/placeholder-anime.svg';
-    if (imageUrl.startsWith('http')) return imageUrl;
-    if (imageUrl.startsWith('/')) return `${IMAGE_BASE_URL}${imageUrl}`;
-
-    const processedUrl = imageUrl.includes('/covers/')
-      ? imageUrl.replace('/covers/', '/covers_large/')
-      : imageUrl;
-    return `${IMAGE_BASE_URL}${processedUrl}`;
-  };
+  // Use imageHelpers function for consistency with list pages
+  // This ensures proper fallback chain: R2 .jpg → R2 .png → external URL
 
   const getCoverUrl = (coverUrl) => {
     if (!coverUrl) return '/placeholder-anime.svg';
@@ -800,14 +782,24 @@ export default function CharacterDetail() {
             {/* Character Image */}
             <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden">
               <img
-                src={getImageUrl(character.image_url)}
+                src={getCharacterImageUrl(character.id, character.image_url)}
                 alt={character.name_full}
                 className="w-full"
                 onError={(e) => {
-                  // R2 실패 시 외부 URL로 fallback
-                  if (character.image_url && character.image_url.startsWith('http') && !e.target.dataset.fallbackAttempted) {
-                    e.target.dataset.fallbackAttempted = 'true';
-                    e.target.src = character.image_url;
+                  // Fallback chain: R2 .jpg → R2 .png → external URL → placeholder
+                  if (!e.target.dataset.fallbackAttempt) {
+                    e.target.dataset.fallbackAttempt = '1';
+                    // Try .png if .jpg failed
+                    e.target.src = `${IMAGE_BASE_URL}/images/characters/${character.id}.png`;
+                  } else if (e.target.dataset.fallbackAttempt === '1') {
+                    e.target.dataset.fallbackAttempt = '2';
+                    // Try external URL
+                    const fallbackUrl = getCharacterImageFallback(character.image_url);
+                    if (fallbackUrl !== '/placeholder-anime.svg') {
+                      e.target.src = fallbackUrl;
+                    } else {
+                      e.target.src = '/placeholder-anime.svg';
+                    }
                   } else {
                     e.target.src = '/placeholder-anime.svg';
                   }
@@ -1199,11 +1191,21 @@ export default function CharacterDetail() {
                         className="flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
                       >
                         <img
-                          src={getImageUrl(character?.image_url)}
+                          src={getCharacterImageUrl(character?.id, character?.image_url)}
                           alt={character?.name_full}
                           className="w-16 h-24 object-cover rounded border-2 border-transparent hover:border-[#A8E6CF] transition-all"
                           onError={(e) => {
-                            e.target.src = '/placeholder-anime.svg';
+                            // Fallback chain: R2 .jpg → R2 .png → external URL → placeholder
+                            if (!e.target.dataset.thumbFallback) {
+                              e.target.dataset.thumbFallback = '1';
+                              e.target.src = `${IMAGE_BASE_URL}/images/characters/${character.id}.png`;
+                            } else if (e.target.dataset.thumbFallback === '1') {
+                              e.target.dataset.thumbFallback = '2';
+                              const fallbackUrl = getCharacterImageFallback(character.image_url);
+                              e.target.src = fallbackUrl !== '/placeholder-anime.svg' ? fallbackUrl : '/placeholder-anime.svg';
+                            } else {
+                              e.target.src = '/placeholder-anime.svg';
+                            }
                           }}
                         />
                       </Link>
