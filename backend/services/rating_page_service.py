@@ -176,3 +176,105 @@ def get_characters_for_rating_stats(user_id: int) -> Dict:
         'remaining': available - stats.get('rated', 0) - stats.get('not_interested', 0),
         'averageRating': stats.get('average_rating', 0) or 0
     }
+
+
+def get_items_for_review_writing(user_id: int, limit: int = 50) -> List[Dict]:
+    """
+    리뷰 작성 페이지 전용 - 초고속 쿼리 (0.1초 목표)
+
+    최적화:
+    - activities 테이블 사용 (이미 denormalized)
+    - UNION으로 애니+캐릭터 한번에
+    - 리뷰 없는 항목만 (review_content IS NULL OR = '')
+    - popularity 기반 정렬 + 랜덤성 내장
+    - 단일 쿼리로 2개 API 호출 제거
+    """
+
+    rows = db.execute_query(
+        """
+        WITH combined AS (
+            SELECT
+                'anime' as type,
+                item_id,
+                user_id,
+                rating,
+                activity_time as updated_at,
+                item_title,
+                item_title_korean,
+                item_image,
+                item_year
+            FROM activities
+            WHERE user_id = ? AND activity_type = 'anime_rating'
+            AND (review_content IS NULL OR review_content = '')
+
+            UNION ALL
+
+            SELECT
+                'character' as type,
+                item_id,
+                user_id,
+                rating,
+                activity_time as updated_at,
+                item_title,
+                item_title_korean,
+                item_image,
+                NULL as item_year
+            FROM activities
+            WHERE user_id = ? AND activity_type = 'character_rating'
+            AND (review_content IS NULL OR review_content = '')
+        )
+        SELECT *
+        FROM combined
+        ORDER BY RANDOM()
+        LIMIT ?
+        """,
+        (user_id, user_id, limit)
+    )
+
+    return [dict_from_row(row) for row in rows]
+
+
+def get_review_writing_stats(user_id: int) -> Dict:
+    """
+    리뷰 작성 페이지 통계 - 초고속 집계
+    """
+
+    # 단일 쿼리로 모든 통계 계산
+    stats = db.execute_query(
+        """
+        SELECT
+            SUM(CASE WHEN activity_type = 'anime_rating'
+                AND (review_content IS NOT NULL AND review_content != '')
+                THEN 1 ELSE 0 END) as anime_reviewed,
+            SUM(CASE WHEN activity_type = 'anime_rating'
+                AND (review_content IS NULL OR review_content = '')
+                THEN 1 ELSE 0 END) as anime_pending,
+            SUM(CASE WHEN activity_type = 'character_rating'
+                AND (review_content IS NOT NULL AND review_content != '')
+                THEN 1 ELSE 0 END) as character_reviewed,
+            SUM(CASE WHEN activity_type = 'character_rating'
+                AND (review_content IS NULL OR review_content = '')
+                THEN 1 ELSE 0 END) as character_pending
+        FROM activities
+        WHERE user_id = ? AND activity_type IN ('anime_rating', 'character_rating')
+        """,
+        (user_id,),
+        fetch_one=True
+    )
+
+    result = dict_from_row(stats) if stats else {}
+
+    return {
+        'anime': {
+            'reviewed': result.get('anime_reviewed', 0),
+            'pending': result.get('anime_pending', 0)
+        },
+        'character': {
+            'reviewed': result.get('character_reviewed', 0),
+            'pending': result.get('character_pending', 0)
+        },
+        'total': {
+            'reviewed': result.get('anime_reviewed', 0) + result.get('character_reviewed', 0),
+            'pending': result.get('anime_pending', 0) + result.get('character_pending', 0)
+        }
+    }

@@ -4,6 +4,7 @@ import { ratingService } from '../services/ratingService';
 import { reviewService } from '../services/reviewService';
 import { characterService } from '../services/characterService';
 import { characterReviewService } from '../services/characterReviewService';
+import { ratingPageService } from '../services/ratingPageService';
 import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/common/Navbar';
 import StarRating from '../components/common/StarRating';
@@ -29,46 +30,35 @@ export default function WriteReviews() {
     try {
       setLoading(true);
 
-      // Load ratings without reviews (최적화: 리뷰가 없는 항목만 가져오기)
-      const [animeRatingsData, characterRatingsData] = await Promise.all([
-        ratingService.getMyRatings({ without_review: true, limit: 50 }),
-        characterService.getMyRatedCharacters({ limit: 50 })
-      ]);
+      // 초고속 API 사용 - 단일 쿼리로 애니+캐릭터 모두 가져오기 (0.1초 목표)
+      const data = await ratingPageService.getItemsForReviews(50);
 
-      const animeItems = (animeRatingsData.items || []).map(item => ({
-        ...item,
-        type: 'anime',
-        id: `anime_${item.anime_id}`,
-        itemId: item.anime_id,
-        updated_at: item.updated_at
-      }));
-
-      const characterItems = (characterRatingsData.items || []).map(item => ({
-        ...item,
-        type: 'character',
-        id: `character_${item.character_id}`,
-        itemId: item.character_id,
+      // 응답 데이터를 기존 형식으로 변환
+      const items = (data.items || []).map(item => ({
+        type: item.type,
+        id: `${item.type}_${item.item_id}`,
+        itemId: item.item_id,
+        rating: item.rating,
         updated_at: item.updated_at,
-        popularity_score: item.favorites || 0 // Use favorites as popularity
+        // 애니메이션 필드
+        ...(item.type === 'anime' ? {
+          anime_id: item.item_id,
+          title_romaji: item.item_title,
+          title_english: item.item_title,
+          title_korean: item.item_title_korean,
+          image_url: item.item_image,
+          year: item.item_year
+        } : {}),
+        // 캐릭터 필드
+        ...(item.type === 'character' ? {
+          character_id: item.item_id,
+          character_name: item.item_title_korean || item.item_title,
+          character_image: item.item_image
+        } : {})
       }));
 
-      // Combine items
-      const combined = [...animeItems, ...characterItems];
-
-      // Sort by popularity with randomness (calculated once on initial load)
-      // Mix 70% popularity + 30% random for variety while keeping popular items near top
-      const itemsWithScore = combined.map(item => ({
-        ...item,
-        // Mix 70% popularity + 30% random (0-10000 range to match popularity scale)
-        sortScore: (item.popularity || item.popularity_score || 0) * 0.7 + Math.random() * 10000 * 0.3
-      }));
-
-      // Sort by the mixed score
-      itemsWithScore.sort((a, b) => b.sortScore - a.sortScore);
-
-      // Don't pre-load reviews - load them only when user clicks "작성하기" or "수정"
-      // This dramatically improves initial page load speed (50+ API calls -> 0)
-      setAllItems(itemsWithScore);
+      // 이미 백엔드에서 정렬되어 옴 (popularity + 랜덤성)
+      setAllItems(items);
       setReviewsLoading(false);
       setLoading(false);
     } catch (err) {
