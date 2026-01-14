@@ -29,9 +29,9 @@ export default function WriteReviews() {
     try {
       setLoading(true);
 
-      // Load ratings in parallel (최적화: 최근 50개만 가져오기 - 더 빠른 초기 로딩)
+      // Load ratings without reviews (최적화: 리뷰가 없는 항목만 가져오기)
       const [animeRatingsData, characterRatingsData] = await Promise.all([
-        ratingService.getMyRatings({ status: 'RATED', limit: 50 }),
+        ratingService.getMyRatings({ status: 'RATED_WITHOUT_REVIEW', limit: 50 }),
         characterService.getMyRatedCharacters({ limit: 50 })
       ]);
 
