@@ -150,7 +150,6 @@ def enrich_activities_with_engagement(activities: List[Dict], current_user_id: O
 @router.get("/", response_model=List[Dict])
 def get_feed(
     following_only: bool = Query(False),
-    user_id: Optional[int] = Query(None),
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
     current_user: UserResponse = Depends(get_current_user),
@@ -160,16 +159,10 @@ def get_feed(
     활동 피드
 
     following_only=true: 팔로잉하는 사용자들의 활동만
-    user_id=X: 특정 사용자의 활동만
-    기본: 모든 사용자의 활동
+    following_only=false: 모든 사용자의 활동
     """
-    # 특정 사용자 피드
-    if user_id is not None:
-        activities = get_user_feed(user_id, current_user.id, limit, offset)
-    # 팔로잉 피드
-    elif following_only:
+    if following_only:
         activities = get_following_feed(current_user.id, limit, offset)
-    # 전체 피드
     else:
         activities = get_global_feed(limit, offset)
 
@@ -182,13 +175,11 @@ def get_user_activity_feed(
     user_id: int,
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
-    current_user: Optional[UserResponse] = Depends(get_current_user_optional),
+    current_user: UserResponse = Depends(get_current_user),
     db: Database = Depends(get_db)
 ):
     """
     특정 사용자의 활동 피드
-    로그인 선택사항 (로그인 시 user_liked 등 제공)
     """
-    current_user_id = current_user.id if current_user else None
-    activities = get_user_feed(user_id, current_user_id, limit, offset)
-    return enrich_activities_with_engagement(activities, current_user_id, db)
+    activities = get_user_feed(user_id, current_user.id, limit, offset)
+    return enrich_activities_with_engagement(activities, current_user.id, db)
