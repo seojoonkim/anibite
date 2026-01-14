@@ -84,7 +84,6 @@ export default function ActivityCard({
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState('');
   const [avatarError, setAvatarError] = useState(false);
-  const [itemImageError, setItemImageError] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
 
   // Initialize bookmark state from localStorage
@@ -184,20 +183,10 @@ export default function ActivityCard({
 
   const levelInfo = getCurrentLevelInfo(activity.otaku_score || 0);
 
-  // Reset error state when activity changes
-  useEffect(() => {
-    setItemImageError(false);
-  }, [activity.id]);
-
-  // Calculate item image src with useMemo - try R2 first, fallback to original on error
+  // Calculate item image src with useMemo - try R2 first
   const itemImageSrc = useMemo(() => {
     const url = activity.item_image;
     if (!url) return null;
-
-    // If error occurred, use original URL
-    if (itemImageError && url.startsWith('http')) {
-      return url;
-    }
 
     // If it's an AniList character image, try R2 first
     if (url.includes('anilist.co') && url.includes('/character/')) {
@@ -215,12 +204,16 @@ export default function ActivityCard({
 
     // Otherwise use as-is
     return url;
-  }, [activity.item_image, itemImageError]);
+  }, [activity.item_image]);
 
-  // Handle item image load error - fallback to original AniList URL
-  const handleItemImageError = () => {
-    if (!itemImageError) {
-      setItemImageError(true);
+  // Handle item image load error - fallback to original URL without re-rendering
+  const handleItemImageError = (e) => {
+    const originalUrl = activity.item_image;
+    // Only fallback if current src is not already the original URL
+    if (originalUrl && e.target.src !== originalUrl && originalUrl.startsWith('http')) {
+      e.target.src = originalUrl;
+    } else {
+      e.target.src = '/placeholder-anime.svg';
     }
   };
 
