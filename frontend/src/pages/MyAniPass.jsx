@@ -67,7 +67,17 @@ export default function MyAniPass() {
 
     return gradients[Math.abs(hash) % gradients.length];
   };
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState({
+    total_rated: 0,
+    total_want_to_watch: 0,
+    total_pass: 0,
+    average_rating: null,
+    total_reviews: 0,
+    total_character_ratings: 0,
+    total_watch_time_minutes: 0,
+    otaku_score: 0,
+    favorite_genre: null
+  });
   const [genrePreferences, setGenrePreferences] = useState([]);
   const [ratingDistribution, setRatingDistribution] = useState([]);
   const [yearDistribution, setYearDistribution] = useState([]);
@@ -94,6 +104,7 @@ export default function MyAniPass() {
   const [seasonStats, setSeasonStats] = useState([]);
   const [genreCombinations, setGenreCombinations] = useState([]);
   // 탭별 로드 완료 여부 추적
+  const [statsLoaded, setStatsLoaded] = useState(false);
   const [loadedTabs, setLoadedTabs] = useState({
     anipass: false,
     anime: false,
@@ -287,7 +298,7 @@ export default function MyAniPass() {
       }
 
       // Only show full loading screen on initial load
-      if (!stats && isOwnProfile) {
+      if (!statsLoaded && isOwnProfile) {
         setLoading(true);
       } else if (!profileUser && !isOwnProfile) {
         setLoading(true);
@@ -296,9 +307,10 @@ export default function MyAniPass() {
       }
 
       // 내 프로필일 때는 stats 로드
-      if (!stats && isOwnProfile) {
+      if (!statsLoaded && isOwnProfile) {
         const statsData = await userService.getStats();
         setStats(statsData);
+        setStatsLoaded(true);
       }
 
       // 다른 사용자 프로필 정보 로드
@@ -311,6 +323,7 @@ export default function MyAniPass() {
         if (profileData) {
           setProfileUser(profileData.user); // user 객체 설정
           setStats(profileData.stats); // stats 객체 설정
+          setStatsLoaded(true);
         }
         setGenrePreferences(genrePrefs);
       }
@@ -1166,22 +1179,22 @@ export default function MyAniPass() {
               <div>
                 {/* Quick Stats Summary - Always show 4 boxes */}
                 <div className="grid grid-cols-4 gap-4 mb-6">
-                  <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-4">
+                  <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-4" style={{ minHeight: '80px' }}>
                     <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '평가한애니' : 'Rated'}</div>
                     <div className="text-2xl font-bold text-gray-900">{stats?.total_rated ?? 0}</div>
                   </div>
-                  <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-4">
+                  <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-4" style={{ minHeight: '80px' }}>
                     <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '보고싶어요' : 'Watchlist'}</div>
                     <div className="text-2xl font-bold text-gray-900">{stats?.total_want_to_watch ?? 0}</div>
                   </div>
-                  <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-4">
+                  <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-4" style={{ minHeight: '80px' }}>
                     <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '관심없어요' : 'Pass'}</div>
                     <div className="text-2xl font-bold text-gray-900">{stats?.total_pass ?? 0}</div>
                   </div>
-                  <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-4">
+                  <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-4" style={{ minHeight: '80px' }}>
                     <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</div>
                     <div className="text-2xl font-bold text-gray-900">
-                      {stats?.average_rating ? `★ ${stats.average_rating.toFixed(1)}` : '-'}
+                      {stats?.average_rating !== null && stats?.average_rating !== undefined ? `★ ${stats.average_rating.toFixed(1)}` : '-'}
                     </div>
                   </div>
                 </div>
