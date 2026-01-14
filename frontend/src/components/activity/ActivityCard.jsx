@@ -290,19 +290,19 @@ export default function ActivityCard({
       {/* Header: User Info + Activity Type + Timestamp */}
       {finalShowOptions.showUserInfo && (
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             {/* User Avatar */}
             <Link to={`/user/${activity.user_id}`} className="flex-shrink-0">
               {activity.avatar_url && !avatarError ? (
                 <img
                   src={getAvatarUrl(activity.avatar_url)}
                   alt={activity.display_name || activity.username}
-                  className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                  className="w-9 h-9 rounded-full object-cover border border-gray-200"
                   onError={() => setAvatarError(true)}
                 />
               ) : (
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center border border-gray-200"
+                  className="w-9 h-9 rounded-full flex items-center justify-center border border-gray-200"
                   style={{ background: 'linear-gradient(to bottom right, #90B2E4, #638CCC)' }}
                 >
                   <span className="text-white text-sm font-bold">
