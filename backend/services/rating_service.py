@@ -32,6 +32,17 @@ def create_or_update_rating(user_id: int, rating_data: RatingCreate) -> RatingRe
         fetch_one=True
     )
 
+    # Delete from activities first (트리거가 동작하지 않을 경우를 대비)
+    db.execute_update(
+        """
+        DELETE FROM activities
+        WHERE activity_type = 'anime_rating'
+          AND user_id = ?
+          AND item_id = ?
+        """,
+        (user_id, rating_data.anime_id)
+    )
+
     if existing:
         # 수정
         # WANT_TO_WATCH 또는 PASS로 변경 시 rating을 NULL로 설정
@@ -58,6 +69,10 @@ def create_or_update_rating(user_id: int, rating_data: RatingCreate) -> RatingRe
             """,
             (user_id, rating_data.anime_id, final_rating, rating_data.status.value)
         )
+
+    # RATED 상태일 때만 activities에 추가 (트리거가 동작하지 않을 경우를 대비)
+    if rating_data.status == RatingStatus.RATED and rating_data.rating:
+        _sync_to_activities(user_id, rating_data.anime_id)
 
     # 사용자 통계 업데이트
     _update_user_stats(user_id)
@@ -388,6 +403,73 @@ def delete_rating(user_id: int, anime_id: int) -> bool:
         return True
 
     return False
+
+
+def _sync_to_activities(user_id: int, anime_id: int):
+    """user_ratings 데이터를 activities 테이블에 동기화 (트리거 대체)"""
+
+    # 사용자 정보와 평점 정보 조회
+    data = db.execute_query(
+        """
+        SELECT
+            ur.user_id,
+            ur.anime_id,
+            ur.rating,
+            ur.created_at,
+            ur.updated_at,
+            u.username,
+            u.display_name,
+            u.avatar_url,
+            COALESCE(us.otaku_score, 0) as otaku_score,
+            a.title_romaji,
+            a.title_korean,
+            COALESCE('/' || a.cover_image_local, a.cover_image_url) as item_image,
+            r.title as review_title,
+            r.content as review_content,
+            COALESCE(r.is_spoiler, 0) as is_spoiler
+        FROM user_ratings ur
+        JOIN users u ON u.id = ur.user_id
+        JOIN anime a ON a.id = ur.anime_id
+        LEFT JOIN user_stats us ON us.user_id = ur.user_id
+        LEFT JOIN user_reviews r ON r.user_id = ur.user_id AND r.anime_id = ur.anime_id
+        WHERE ur.user_id = ? AND ur.anime_id = ? AND ur.status = 'RATED'
+        """,
+        (user_id, anime_id),
+        fetch_one=True
+    )
+
+    if data:
+        # activities 테이블에 INSERT
+        db.execute_update(
+            """
+            INSERT INTO activities (
+                activity_type, user_id, item_id, activity_time,
+                username, display_name, avatar_url, otaku_score,
+                item_title, item_title_korean, item_image,
+                rating, review_title, review_content, is_spoiler,
+                created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                'anime_rating',
+                data['user_id'],
+                data['anime_id'],
+                data['created_at'],
+                data['username'],
+                data['display_name'],
+                data['avatar_url'],
+                data['otaku_score'],
+                data['title_romaji'],
+                data['title_korean'],
+                data['item_image'],
+                data['rating'],
+                data['review_title'],
+                data['review_content'],
+                data['is_spoiler'],
+                data['created_at'],
+                data['updated_at']
+            )
+        )
 
 
 def _update_user_stats(user_id: int):
