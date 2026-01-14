@@ -11,8 +11,8 @@ export const feedService = {
 
   // Get user feed
   async getUserFeed(userId, limit = 50, offset = 0) {
-    const response = await api.get('/api/feed/', {
-      params: { user_id: userId, limit, offset }
+    const response = await api.get(`/api/feed/user/${userId}`, {
+      params: { limit, offset }
     });
     return response.data;
   },
