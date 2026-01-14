@@ -43,6 +43,16 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
     }
   }, [isOpen, activity, mode]);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = 'unset';
+      };
+    }
+  }, [isOpen]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -92,18 +102,25 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
 
   const modalContent = (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black bg-opacity-50"
+      className="fixed z-[9999] flex items-center justify-center p-4"
       onClick={(e) => {
         // Close modal when clicking on overlay
         if (e.target === e.currentTarget) {
           onClose();
         }
       }}
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+      style={{
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        position: 'fixed'
+      }}
     >
       <div
-        className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative z-[10000]"
-        style={{ border: '5px solid red' }} // DEBUG: make modal visible
+        className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        style={{ position: 'relative', zIndex: 10000 }}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
