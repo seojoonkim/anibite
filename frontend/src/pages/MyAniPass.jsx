@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -119,6 +119,19 @@ export default function MyAniPass() {
   const [replyingTo, setReplyingTo] = useState({});
   const [newPostContent, setNewPostContent] = useState('');
   const [failedImages, setFailedImages] = useState(new Set());
+
+  // Infinite scroll observer ref
+  const observer = useRef();
+  const lastActivityElementRef = useCallback(node => {
+    if (loadingMoreFeed) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMoreFeed) {
+        loadMoreFeed();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loadingMoreFeed, hasMoreFeed]);
 
   useEffect(() => {
     // Reset states when userId changes (switching between profiles)
@@ -1696,10 +1709,12 @@ export default function MyAniPass() {
                     const displayAvatar = currentUser?.avatar_url;
                     const displayName = currentUser?.display_name || currentUser?.username;
                     const currentOtakuScore = stats?.otaku_score || 0;
+                    const isLastActivity = userActivities.length === index + 1;
 
                     return (
                       <div
                         key={`${activity.activity_type}-${activity.user_id}-${activity.item_id}-${index}`}
+                        ref={isLastActivity ? lastActivityElementRef : null}
                         className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-all"
                       >
                         {/* Header - Profile info at the top */}
@@ -2087,24 +2102,12 @@ export default function MyAniPass() {
                       </div>
                     )}
 
-                    {/* Load More / Loading Indicator */}
-                    {userActivities.length > 0 && hasMoreFeed && (
+                    {/* Loading Indicator for Infinite Scroll */}
+                    {userActivities.length > 0 && hasMoreFeed && loadingMoreFeed && (
                       <div className="text-center py-6">
-                        {loadingMoreFeed ? (
-                          <div className="text-gray-600">
-                            {language === 'ko' ? '로딩 중...' : 'Loading...'}
-                          </div>
-                        ) : (
-                          <button
-                            onClick={loadMoreFeed}
-                            className="px-6 py-2 text-white rounded-lg transition-colors"
-                            style={{ backgroundColor: '#3797F0', color: 'white', fontWeight: '600' }}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#1877F2'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = '#3797F0'}
-                          >
-                            {language === 'ko' ? '더 보기' : 'Load More'}
-                          </button>
-                        )}
+                        <div className="text-gray-600">
+                          {language === 'ko' ? '로딩 중...' : 'Loading...'}
+                        </div>
                       </div>
                     )}
 
