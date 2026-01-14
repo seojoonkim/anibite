@@ -224,24 +224,15 @@ export default function MyAniPass() {
       filtered = animeData;
     } else if (submenu === '5') {
       filtered = animeData.filter(a => a.category === 'rated' && a.rating === 5.0);
-    } else if (submenu === '4.5') {
-      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 4.5);
     } else if (submenu === '4') {
-      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 4.0);
-    } else if (submenu === '3.5') {
-      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 3.5);
+      filtered = animeData.filter(a => a.category === 'rated' && a.rating >= 4.0 && a.rating < 5.0);
     } else if (submenu === '3') {
-      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 3.0);
-    } else if (submenu === '2.5') {
-      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 2.5);
+      filtered = animeData.filter(a => a.category === 'rated' && a.rating >= 3.0 && a.rating < 4.0);
     } else if (submenu === '2') {
-      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 2.0);
-    } else if (submenu === '1.5') {
-      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 1.5);
+      filtered = animeData.filter(a => a.category === 'rated' && a.rating >= 2.0 && a.rating < 3.0);
     } else if (submenu === '1') {
-      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 1.0);
-    } else if (submenu === '0.5') {
-      filtered = animeData.filter(a => a.category === 'rated' && a.rating === 0.5);
+      // 1점대 이하: 0.5~1.9
+      filtered = animeData.filter(a => a.category === 'rated' && a.rating >= 0.5 && a.rating < 2.0);
     } else if (submenu === 'watchlist') {
       filtered = animeData.filter(a => a.category === 'watchlist');
     } else if (submenu === 'pass') {
@@ -261,24 +252,15 @@ export default function MyAniPass() {
     } else if (submenu === '5') {
       // RATED 상태이고 rating이 5.0인 것만
       filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 5.0);
-    } else if (submenu === '4.5') {
-      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 4.5);
     } else if (submenu === '4') {
-      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 4.0);
-    } else if (submenu === '3.5') {
-      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 3.5);
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating >= 4.0 && c.rating < 5.0);
     } else if (submenu === '3') {
-      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 3.0);
-    } else if (submenu === '2.5') {
-      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 2.5);
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating >= 3.0 && c.rating < 4.0);
     } else if (submenu === '2') {
-      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 2.0);
-    } else if (submenu === '1.5') {
-      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 1.5);
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating >= 2.0 && c.rating < 3.0);
     } else if (submenu === '1') {
-      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 1.0);
-    } else if (submenu === '0.5') {
-      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating === 0.5);
+      // 1점대 이하: 0.5~1.9
+      filtered = charactersData.filter(c => c.status === 'RATED' && c.rating >= 0.5 && c.rating < 2.0);
     } else if (submenu === 'want') {
       filtered = charactersData.filter(c => c.status === 'WANT_TO_KNOW');
     } else if (submenu === 'pass') {
@@ -1268,18 +1250,7 @@ export default function MyAniPass() {
                       }`}
                       style={animeSubMenu === '1' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                     >
-                      ⭐ 1{language === 'ko' ? '점대' : ''} ({allRatedAnime.filter(a => a.rating >= 1.0 && a.rating < 2.0).length})
-                    </button>
-                    <button
-                      onClick={() => setAnimeSubMenu('0')}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        animeSubMenu === '0'
-                          ? 'text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                      style={animeSubMenu === '0' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
-                    >
-                      ⭐ 0{language === 'ko' ? '점대' : ''} ({allRatedAnime.filter(a => a.rating >= 0.5 && a.rating < 1.0).length})
+                      ⭐ {language === 'ko' ? '1점대 이하' : '≤1.9'} ({allRatedAnime.filter(a => a.rating >= 0.5 && a.rating < 2.0).length})
                     </button>
                     <button
                       onClick={() => setAnimeSubMenu('watchlist')}
@@ -1308,8 +1279,8 @@ export default function MyAniPass() {
 
                 {/* Anime Grid */}
                 {displayedAnime.length > 0 ? (
-                  animeSubMenu === 'all' ? (
-                    // 모두 선택 시 평점별로 그룹화
+                  ['all', '4', '3', '2', '1'].includes(animeSubMenu) ? (
+                    // 모두 또는 범위 필터 선택 시 평점별로 그룹화
                     <div className="space-y-8">
                       {(() => {
                         const groups = groupAnimeByCategory(displayedAnime);
@@ -1350,7 +1321,7 @@ export default function MyAniPass() {
                       })()}
                     </div>
                   ) : (
-                    // 특정 필터 선택 시
+                    // 5점, 보고싶어요, 관심없어요는 단순 그리드
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
                       {displayedAnime.map(renderAnimeCard)}
                     </div>
@@ -1432,18 +1403,7 @@ export default function MyAniPass() {
                       }`}
                       style={characterSubMenu === '1' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                     >
-                      ⭐ 1{language === 'ko' ? '점대' : ''} ({allRatedCharacters.filter(c => c.rating >= 1.0 && c.rating < 2.0).length})
-                    </button>
-                    <button
-                      onClick={() => setCharacterSubMenu('0')}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        characterSubMenu === '0'
-                          ? 'text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                      style={characterSubMenu === '0' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
-                    >
-                      ⭐ 0{language === 'ko' ? '점대' : ''} ({allRatedCharacters.filter(c => c.rating >= 0.5 && c.rating < 1.0).length})
+                      ⭐ {language === 'ko' ? '1점대 이하' : '≤1.9'} ({allRatedCharacters.filter(c => c.rating >= 0.5 && c.rating < 2.0).length})
                     </button>
                     <button
                       onClick={() => setCharacterSubMenu('want')}
@@ -1472,7 +1432,7 @@ export default function MyAniPass() {
 
                 {/* Character Grid */}
                 {displayedCharacters.length > 0 ? (
-                  characterSubMenu === 'all' ? (
+                  ['all', '4', '3', '2', '1'].includes(characterSubMenu) ? (
                     // 모두 선택 시 평점별로 그룹화
                     <div className="space-y-8">
                       {(() => {
