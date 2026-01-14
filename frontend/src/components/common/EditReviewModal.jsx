@@ -27,9 +27,16 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
 
   // Helper to convert relative URLs to absolute
   const getImageUrl = (url) => {
-    if (!url) return '/placeholder-anime.svg';
+    if (!url) {
+      console.log('[EditReviewModal] No image URL provided');
+      return '/placeholder-anime.svg';
+    }
     if (url.startsWith('http')) return url;
-    return `${IMAGE_BASE_URL}${url}`;
+    // Ensure URL starts with /
+    const processedUrl = url.startsWith('/') ? url : `/${url}`;
+    const finalUrl = `${IMAGE_BASE_URL}${processedUrl}`;
+    console.log('[EditReviewModal] Image URL:', { original: url, final: finalUrl });
+    return finalUrl;
   };
 
   useEffect(() => {
@@ -123,13 +130,13 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
         style={{ position: 'relative', zIndex: 10000 }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">{getTitle()}</h2>
+        <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200">
+          <h2 className="text-base font-semibold text-gray-900">{getTitle()}</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -179,40 +186,42 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
           </div>
 
           {/* Review Content */}
-          {mode !== 'edit_rating' && (
-            <>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {language === 'ko' ? '리뷰 내용' : 'Review Content'} *
-                </label>
-                <textarea
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md h-40 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder={language === 'ko' ? '이 작품에 대한 당신의 생각을 공유해주세요...' : 'Share your thoughts about this...'}
-                  required
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  {formData.content.length} / 5000 {language === 'ko' ? '자' : 'characters'}
-                </p>
-              </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {language === 'ko' ? '리뷰 내용' : 'Review Content'}{' '}
+              {mode === 'add_review' ? '*' : (
+                <span className="text-gray-500 font-normal">
+                  ({language === 'ko' ? '선택' : 'Optional'})
+                </span>
+              )}
+            </label>
+            <textarea
+              value={formData.content}
+              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md h-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={language === 'ko' ? '이 작품에 대한 당신의 생각을 공유해주세요...' : 'Share your thoughts about this...'}
+              required={mode === 'add_review'}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              {formData.content.length} / 5000 {language === 'ko' ? '자' : 'characters'}
+            </p>
+          </div>
 
-              {/* Spoiler */}
-              <div className="mb-6">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_spoiler}
-                    onChange={(e) => setFormData({ ...formData, is_spoiler: e.target.checked })}
-                    className="mr-2"
-                  />
-                  <span className="text-sm text-gray-700">
-                    {language === 'ko' ? '스포일러 포함' : 'Contains spoilers'}
-                  </span>
-                </label>
-              </div>
-            </>
-          )}
+          {/* Spoiler */}
+          <div className="mb-6">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                id="spoiler-checkbox"
+                checked={formData.is_spoiler}
+                onChange={(e) => setFormData({ ...formData, is_spoiler: e.target.checked })}
+                className="mr-2"
+              />
+              <span className="text-sm text-gray-700">
+                {language === 'ko' ? '스포일러 포함' : 'Contains spoilers'}
+              </span>
+            </label>
+          </div>
 
           {/* Actions */}
           <div className="flex justify-end gap-3">
