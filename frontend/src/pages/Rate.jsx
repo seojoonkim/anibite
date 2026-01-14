@@ -474,7 +474,7 @@ export default function Rate() {
       setLoading(true);
       // Use ULTRA FAST optimized endpoint (0.1s target)
       const data = await animeService.getAnimeForRating({
-        limit: 50,
+        limit: 20,
         offset: 0
       });
 
@@ -497,12 +497,12 @@ export default function Rate() {
     try {
       setLoading(true);
       const nextPage = page + 1;
-      const offset = (nextPage - 1) * 50;
+      const offset = (nextPage - 1) * 20;
       console.log('Loading page:', nextPage, 'offset:', offset);
 
       // Use ULTRA FAST optimized endpoint (0.1s target)
       const data = await animeService.getAnimeForRating({
-        limit: 50,
+        limit: 20,
         offset: offset
       });
 
@@ -586,7 +586,7 @@ export default function Rate() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {loading && animeList.length === 0 ? (
             // Skeleton cards during initial load
-            Array.from({ length: 12 }).map((_, index) => (
+            Array.from({ length: 8 }).map((_, index) => (
               <div key={`skeleton-${index}`} className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden animate-pulse">
                 {/* Skeleton Image */}
                 <div className="aspect-[3/4] bg-gray-200" />
