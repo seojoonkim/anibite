@@ -482,10 +482,6 @@ export default function AnimeDetail() {
           rating: reviewData.rating  // 별점을 리뷰 API에 함께 전송
         });
 
-        // 리뷰 생성 후 별점 상태 업데이트
-        const ratingResult = await ratingService.getMyRating(parseInt(id));
-        if (ratingResult) setMyRating(ratingResult);
-
         setReviewSuccess(language === 'ko' ? '리뷰가 작성되었습니다.' : 'Review submitted successfully.');
       }
 
@@ -495,19 +491,24 @@ export default function AnimeDetail() {
 
       // 로컬 state만 업데이트 (전체 리프레시 없이)
       if (isEditingReview) {
-        // 리뷰 수정: myReview 업데이트만
-        const updatedMyReview = await reviewService.getMyReview(id).catch(() => null);
-        if (updatedMyReview) {
-          setMyReview(updatedMyReview);
-        }
-      } else {
-        // 새 리뷰 작성: myReview와 anime stats만 업데이트
-        const [myReviewData, animeData] = await Promise.all([
+        // 리뷰 수정: myReview와 myRating 업데이트
+        const [updatedMyReview, updatedMyRating] = await Promise.all([
           reviewService.getMyReview(id).catch(() => null),
+          ratingService.getUserRating(id).catch(() => null)
+        ]);
+
+        if (updatedMyReview) setMyReview(updatedMyReview);
+        if (updatedMyRating) setMyRating(updatedMyRating);
+      } else {
+        // 새 리뷰 작성: myReview, myRating과 anime stats만 업데이트
+        const [myReviewData, myRatingData, animeData] = await Promise.all([
+          reviewService.getMyReview(id).catch(() => null),
+          ratingService.getUserRating(id).catch(() => null),
           animeService.getAnimeById(id)
         ]);
 
         if (myReviewData) setMyReview(myReviewData);
+        if (myRatingData) setMyRating(myRatingData);
         if (animeData) setAnime(animeData);
       }
 
