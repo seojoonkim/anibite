@@ -25,22 +25,39 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
-  // Helper to convert relative URLs to absolute
+  // Helper to convert relative URLs to absolute - same logic as ActivityCard
   const getImageUrl = (url) => {
     if (!url) {
       console.log('[EditReviewModal] No image URL provided');
       return '/placeholder-anime.svg';
     }
-    if (url.startsWith('http')) return url;
-    // Ensure URL starts with /
-    const processedUrl = url.startsWith('/') ? url : `/${url}`;
-    const finalUrl = `${IMAGE_BASE_URL}${processedUrl}`;
-    console.log('[EditReviewModal] Image URL:', { original: url, final: finalUrl });
-    return finalUrl;
+
+    // If it's an AniList character image, try R2 first
+    if (url.includes('anilist.co') && url.includes('/character/')) {
+      const match = url.match(/\/b(\d+)-/);
+      if (match && match[1]) {
+        const characterId = match[1];
+        return `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
+      }
+    }
+
+    // If it's already a relative path, use IMAGE_BASE_URL
+    if (!url.startsWith('http')) {
+      return `${IMAGE_BASE_URL}${url}`;
+    }
+
+    // Otherwise use as-is
+    return url;
   };
 
   useEffect(() => {
     if (isOpen && activity) {
+      console.log('[EditReviewModal] Activity data:', {
+        item_image: activity.item_image,
+        item_title: activity.item_title,
+        item_title_korean: activity.item_title_korean,
+        rating: activity.rating
+      });
       setFormData({
         rating: activity.rating || 0,
         content: activity.review_content || '',
@@ -126,11 +143,11 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
       }}
     >
       <div
-        className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-xl shadow-xl max-w-xl w-full max-h-[90vh] overflow-y-auto"
         style={{ position: 'relative', zIndex: 10000 }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200">
+        <div className="flex items-center justify-between px-5 py-2.5 border-b border-gray-200">
           <h2 className="text-base font-semibold text-gray-900">{getTitle()}</h2>
           <button
             onClick={onClose}
@@ -143,38 +160,38 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
         </div>
 
         {/* Body */}
-        <form onSubmit={handleSubmit} className="p-6">
+        <form onSubmit={handleSubmit} className="p-4">
           {error && (
-            <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-800 rounded-md text-sm">
+            <div className="mb-3 p-2.5 bg-red-100 border border-red-300 text-red-800 rounded-md text-sm">
               {error}
             </div>
           )}
 
           {/* Item Info */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-            <div className="flex items-center gap-4">
+          <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center gap-3">
               <img
                 src={getImageUrl(activity?.item_image)}
                 alt={activity?.item_title_korean || activity?.item_title || 'Item'}
-                className="w-16 h-20 object-cover rounded bg-gray-200"
+                className="w-14 h-[70px] object-cover rounded bg-gray-200 flex-shrink-0"
                 onError={(e) => {
                   e.target.src = '/placeholder-anime.svg';
                 }}
               />
-              <div>
-                <h3 className="font-semibold text-gray-900">
+              <div className="min-w-0 flex-1">
+                <h3 className="font-semibold text-gray-900 text-sm truncate">
                   {activity?.item_title_korean || activity?.item_title || 'Unknown'}
                 </h3>
                 {activity?.item_title_korean && activity?.item_title && (
-                  <p className="text-sm text-gray-600">{activity.item_title}</p>
+                  <p className="text-xs text-gray-600 truncate">{activity.item_title}</p>
                 )}
               </div>
             </div>
           </div>
 
           {/* Rating */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="mb-3">
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
               {language === 'ko' ? '별점' : 'Rating'} *
             </label>
             <StarRating
@@ -186,11 +203,11 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
           </div>
 
           {/* Review Content */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="mb-3">
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
               {language === 'ko' ? '리뷰 내용' : 'Review Content'}{' '}
               {mode === 'add_review' ? '*' : (
-                <span className="text-gray-500 font-normal">
+                <span className="text-gray-500 font-normal text-xs">
                   ({language === 'ko' ? '선택' : 'Optional'})
                 </span>
               )}
@@ -198,7 +215,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
             <textarea
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md h-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md h-28 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder={language === 'ko' ? '이 작품에 대한 당신의 생각을 공유해주세요...' : 'Share your thoughts about this...'}
               required={mode === 'add_review'}
             />
@@ -208,7 +225,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
           </div>
 
           {/* Spoiler */}
-          <div className="mb-6">
+          <div className="mb-4">
             <label className="flex items-center">
               <input
                 type="checkbox"
@@ -224,18 +241,18 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              className="px-5 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
               disabled={saving}
             >
               {language === 'ko' ? '취소' : 'Cancel'}
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:bg-gray-400"
+              className="px-5 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm disabled:bg-gray-400"
               disabled={saving}
             >
               {saving
