@@ -181,16 +181,47 @@ def get_user_activity_feed(
 ):
     """
     특정 사용자의 활동 피드
-    TEMP FIX: Use get_global_feed (which works) and filter by user_id
+    Direct query from activities table for efficiency
     """
-    # Get global feed (this works!)
-    activities = get_global_feed(limit=500, offset=0)
+    from database import dict_from_row
+    from services.feed_service import _enrich_comments_count
 
-    # Filter by user_id
-    filtered = [a for a in activities if a.get('user_id') == user_id]
+    # Direct query from activities table with user_id filter
+    rows = db.execute_query(
+        """
+        SELECT
+            activity_type,
+            user_id,
+            username,
+            display_name,
+            avatar_url,
+            otaku_score,
+            item_id,
+            item_title,
+            item_title_korean,
+            item_image,
+            rating,
+            NULL as status,
+            activity_time,
+            anime_title,
+            anime_title_korean,
+            anime_id,
+            NULL as review_id,
+            review_content,
+            NULL as post_content,
+            0 as comments_count
+        FROM activities
+        WHERE user_id = ?
+        ORDER BY activity_time DESC
+        LIMIT ? OFFSET ?
+        """,
+        (user_id, limit, offset)
+    )
 
-    # Apply offset and limit after filtering
-    paginated = filtered[offset:offset + limit]
+    activities = [dict_from_row(row) for row in rows]
 
-    # 좋아요/댓글 정보 추가
-    return enrich_activities_with_engagement(paginated, current_user.id, db)
+    # Enrich with comments count
+    _enrich_comments_count(activities)
+
+    # Enrich with likes and user engagement
+    return enrich_activities_with_engagement(activities, current_user.id, db)
