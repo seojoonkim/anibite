@@ -376,10 +376,10 @@ def create_activity_comment(
     comment_id = db.execute_insert(
         """
         INSERT INTO activity_comments (
-            activity_id, user_id, parent_comment_id, content, depth, created_at
-        ) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            activity_id, user_id, parent_comment_id, content, created_at
+        ) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
         """,
-        (activity_id, user_id, parent_comment_id, content, 1 if parent_comment_id else 0)
+        (activity_id, user_id, parent_comment_id, content)
     )
 
     # Get created comment
