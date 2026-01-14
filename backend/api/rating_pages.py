@@ -22,6 +22,7 @@ router = APIRouter()
 def get_anime_to_rate(
     limit: int = Query(50, ge=1, le=100, description="한 번에 가져올 개수"),
     offset: int = Query(0, ge=0, description="오프셋"),
+    seed: int = Query(None, description="정렬 시드 (세션별 일관성 유지)"),
     current_user: UserResponse = Depends(get_current_user)
 ) -> Dict:
     """
@@ -29,9 +30,12 @@ def get_anime_to_rate(
 
     특징:
     - 미평가 + WANT_TO_WATCH 항목 반환
-    - 랜덤성 내장 (매번 조금씩 다른 순서)
+    - 세션별 시드로 랜덤 정렬 (새로고침 시 다른 순서, 페이지네이션 일관성 유지)
     - 서브쿼리 0개
     - 목표: 0.1초 이내
+
+    Args:
+        seed: 정렬 시드 (같은 세션에서는 같은 값, 새로고침 시 다른 값)
 
     Returns:
         {
@@ -41,7 +45,7 @@ def get_anime_to_rate(
             "has_more": true
         }
     """
-    items = get_anime_for_rating(current_user.id, limit, offset)
+    items = get_anime_for_rating(current_user.id, limit, offset, seed)
 
     return {
         'items': items,

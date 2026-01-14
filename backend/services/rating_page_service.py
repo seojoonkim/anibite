@@ -6,7 +6,7 @@ from typing import List, Dict
 from database import db, dict_from_row
 
 
-def get_anime_for_rating(user_id: int, limit: int = 50, offset: int = 0) -> List[Dict]:
+def get_anime_for_rating(user_id: int, limit: int = 50, offset: int = 0, seed: int = None) -> List[Dict]:
     """
     애니메이션 평가 페이지 전용 - 초고속 쿼리
 
@@ -14,11 +14,18 @@ def get_anime_for_rating(user_id: int, limit: int = 50, offset: int = 0) -> List
     - 서브쿼리 0개
     - LEFT JOIN으로 user_rating_status만 확인
     - site stats 제거 (불필요)
-    - 랜덤성 내장: popularity에 랜덤 변동 추가
+    - 랜덤성 내장: seed를 사용한 deterministic 랜덤 정렬
     - 인덱스 활용
+
+    Args:
+        seed: 정렬 시드 (세션별로 다르게, 같은 세션에서는 일관성 유지)
 
     목표: 0.1초 이내
     """
+
+    # seed가 없으면 user_id를 기본 시드로 사용
+    if seed is None:
+        seed = user_id
 
     rows = db.execute_query(
         """
@@ -37,10 +44,10 @@ def get_anime_for_rating(user_id: int, limit: int = 50, offset: int = 0) -> List
         FROM anime a
         LEFT JOIN user_ratings ur ON a.id = ur.anime_id AND ur.user_id = ?
         WHERE ur.id IS NULL OR ur.status = 'WANT_TO_WATCH'
-        ORDER BY (a.popularity + (a.id % 100)) DESC, a.id ASC
+        ORDER BY (a.popularity + ((a.id * ?) % 1000)) DESC, a.id ASC
         LIMIT ? OFFSET ?
         """,
-        (user_id, limit, offset)
+        (user_id, seed, limit, offset)
     )
 
     return [dict_from_row(row) for row in rows]
