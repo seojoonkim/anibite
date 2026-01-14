@@ -259,7 +259,7 @@ export default function AnimeDetail() {
       loadReviewComments(reviewId);
 
       // 리뷰 목록 새로고침 (댓글 수 업데이트)
-      const reviewData = await reviewService.getAnimeReviews(id, { limit: 10 });
+      const reviewData = await reviewService.getAnimeReviews(id, { page: 1, page_size: 10 });
       if (reviewData) processReviews(reviewData);
     } catch (err) {
       console.error('[AnimeDetail] Failed to create comment:', err);
@@ -279,7 +279,7 @@ export default function AnimeDetail() {
       loadReviewComments(review);
 
       // 댓글 수 업데이트
-      const reviewData = await reviewService.getAnimeReviews(id, { limit: 10 });
+      const reviewData = await reviewService.getAnimeReviews(id, { page: 1, page_size: 10 });
       if (reviewData) processReviews(reviewData);
     } catch (err) {
       console.error('Failed to delete comment:', err);
@@ -343,7 +343,7 @@ export default function AnimeDetail() {
       loadReviewComments(reviewId);
 
       // 댓글 수 업데이트
-      const reviewData = await reviewService.getAnimeReviews(id, { limit: 10 });
+      const reviewData = await reviewService.getAnimeReviews(id, { page: 1, page_size: 10 });
       if (reviewData) processReviews(reviewData);
     } catch (err) {
       console.error('Failed to create reply:', err);
@@ -394,7 +394,7 @@ export default function AnimeDetail() {
       setReviewSuccess(language === 'ko' ? '리뷰가 삭제되었습니다.' : 'Review deleted successfully.');
 
       // 리뷰 목록 새로고침
-      const reviewData = await reviewService.getAnimeReviews(id, { limit: 10 });
+      const reviewData = await reviewService.getAnimeReviews(id, { page: 1, page_size: 10 });
       if (reviewData) processReviews(reviewData);
 
       setTimeout(() => setReviewSuccess(''), 3000);
@@ -455,7 +455,7 @@ export default function AnimeDetail() {
       // 병렬로 데이터 새로고침
       const [animeData, reviewData, myReviewData] = await Promise.all([
         animeService.getAnimeById(id),
-        reviewService.getAnimeReviews(id, { limit: 10 }),
+        reviewService.getAnimeReviews(id, { page: 1, page_size: 10 }),
         reviewService.getMyReview(id).catch(() => null)
       ]);
 
