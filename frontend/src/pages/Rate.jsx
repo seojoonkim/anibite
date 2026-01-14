@@ -29,6 +29,12 @@ function RatingCard({ anime, onRate }) {
     return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
+  // Update status and rating when anime props change
+  useEffect(() => {
+    setStatus(anime.user_rating_status || null);
+    setCurrentRating(anime.user_rating || 0);
+  }, [anime.user_rating_status, anime.user_rating]);
+
   useEffect(() => {
     const updateStarSize = () => {
       if (cardRef.current) {
@@ -517,17 +523,16 @@ export default function Rate() {
 
       await ratingService.rateAnime(animeId, payload);
 
-      // Remove from list if RATED or PASS (keep WANT_TO_WATCH in list)
-      if (status === 'RATED' || status === 'PASS') {
-        setAnimeList(prev => prev.filter(anime => anime.id !== animeId));
-      } else if (status === 'WANT_TO_WATCH') {
-        // Update the anime's status in the list
-        setAnimeList(prev => prev.map(anime =>
-          anime.id === animeId
-            ? { ...anime, user_rating_status: status }
-            : anime
-        ));
-      }
+      // Update the anime's status in the list (keep it visible with color change)
+      setAnimeList(prev => prev.map(anime =>
+        anime.id === animeId
+          ? {
+              ...anime,
+              user_rating_status: status,
+              user_rating: status === 'RATED' ? rating : null
+            }
+          : anime
+      ));
 
       // Reload stats after rating
       await loadStats();
