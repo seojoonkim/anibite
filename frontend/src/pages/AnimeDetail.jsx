@@ -479,14 +479,18 @@ export default function AnimeDetail() {
     try {
       await ratingService.rateAnime(id, { rating, status });
 
-      // 병렬로 데이터 새로고침
-      const [myRatingData, animeData] = await Promise.all([
+      // 병렬로 데이터 새로고침 (리뷰 목록 포함)
+      const [myRatingData, animeData, reviewData] = await Promise.all([
         ratingService.getUserRating(id).catch(() => null),
-        animeService.getAnimeById(id)
+        animeService.getAnimeById(id),
+        reviewService.getAnimeReviews(id, { page: 1, page_size: 10 })
       ]);
 
       if (myRatingData) setMyRating(myRatingData);
       if (animeData) setAnime(animeData);
+      if (reviewData) {
+        setReviews(reviewData.items || []);
+      }
     } catch (err) {
       console.error('Failed to rate:', err);
       alert(language === 'ko' ? '평가를 저장하는데 실패했습니다.' : 'Failed to save rating.');
