@@ -12,12 +12,15 @@
  * />
  */
 import { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useActivityLike, useActivityComments } from '../../hooks/useActivity';
 import { getCurrentLevelInfo } from '../../utils/otakuLevels';
 import ActivityComments from './ActivityComments';
+import ContentMenu from '../common/ContentMenu';
+import { ratingService } from '../../services/ratingService';
+import { characterService } from '../../services/characterService';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL || API_BASE_URL;
@@ -67,6 +70,7 @@ export default function ActivityCard({
 }) {
   const { language } = useLanguage();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Merge context preset with custom showOptions
   const preset = CONTEXT_PRESETS[context] || CONTEXT_PRESETS.feed;
@@ -286,6 +290,53 @@ export default function ActivityCard({
     }
   };
 
+  // ContentMenu handlers
+  const handleEdit = () => {
+    // Navigate to edit page or open edit modal
+    if (activity.activity_type === 'anime_rating') {
+      navigate(`/anime/${activity.item_id}`);
+    } else if (activity.activity_type === 'character_rating') {
+      navigate(`/character/${activity.item_id}`);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      // Delete rating (which should also delete associated review)
+      if (activity.activity_type === 'anime_rating') {
+        await ratingService.deleteRating(activity.item_id);
+      } else if (activity.activity_type === 'character_rating') {
+        await characterService.deleteCharacterRating(activity.item_id);
+      }
+
+      // Refresh the feed
+      if (onUpdate) {
+        onUpdate();
+      }
+    } catch (err) {
+      console.error('Failed to delete:', err);
+      alert(language === 'ko' ? '삭제에 실패했습니다.' : 'Failed to delete.');
+    }
+  };
+
+  const handleEditRating = () => {
+    // Navigate to detail page where user can change rating
+    if (activity.activity_type === 'anime_rating') {
+      navigate(`/anime/${activity.item_id}`);
+    } else if (activity.activity_type === 'character_rating') {
+      navigate(`/character/${activity.item_id}`);
+    }
+  };
+
+  const handleAddReview = () => {
+    // Navigate to detail page where user can add review
+    if (activity.activity_type === 'anime_rating') {
+      navigate(`/anime/${activity.item_id}`);
+    } else if (activity.activity_type === 'character_rating') {
+      navigate(`/character/${activity.item_id}`);
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 hover:shadow-[0_2px_12px_rgba(0,0,0,0.12)] transition-all">
       {/* Header: User Info + Activity Type + Timestamp */}
@@ -339,10 +390,22 @@ export default function ActivityCard({
             </div>
           </div>
 
-          {/* Timestamp */}
-          <span className="text-xs text-gray-400 ml-2 flex-shrink-0">
-            {getRelativeTime(activity.activity_time)}
-          </span>
+          {/* Timestamp + Menu */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <span className="text-xs text-gray-400">
+              {getRelativeTime(activity.activity_time)}
+            </span>
+
+            {/* ContentMenu */}
+            <ContentMenu
+              type={activity.activity_type}
+              item={activity}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onEditRating={handleEditRating}
+              onAddReview={handleAddReview}
+            />
+          </div>
         </div>
       )}
 
