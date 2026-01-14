@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { animeService } from '../services/animeService';
 import { ratingService } from '../services/ratingService';
@@ -40,7 +40,7 @@ export default function AnimeDetail() {
 
   // Use unified activities hook
   const {
-    activities,
+    activities: otherActivities,
     loading: activitiesLoading,
     refetch: refetchActivities
   } = useActivities(
@@ -54,6 +54,46 @@ export default function AnimeDetail() {
       autoFetch: true
     }
   );
+
+  // Combine myRating/myReview with other activities
+  const activities = useMemo(() => {
+    const allActivities = [...otherActivities];
+
+    // If user has rating, add it to the top (if not already in the list)
+    if (myRating && user) {
+      const myActivityIndex = allActivities.findIndex(a => a.user_id === user.id);
+
+      if (myActivityIndex === -1 && (myRating.rating || myReview)) {
+        // Create activity object for my rating/review
+        const myActivity = {
+          id: `my-activity-${id}`,
+          user_id: user.id,
+          username: user.username,
+          display_name: user.display_name,
+          avatar_url: user.avatar_url,
+          activity_type: 'anime_rating',
+          item_id: parseInt(id),
+          item_title: anime?.title_romaji,
+          item_title_korean: anime?.title_korean,
+          item_image: anime?.cover_image_url,
+          rating: myRating.rating,
+          review_content: myReview?.content || null,
+          review_title: myReview?.title || null,
+          is_spoiler: myReview?.is_spoiler || false,
+          activity_time: myReview?.created_at || myRating.created_at || new Date().toISOString(),
+          likes_count: myReview?.likes_count || 0,
+          comments_count: myReview?.comments_count || 0,
+          user_liked: false,
+          otaku_score: user.otaku_score || 0
+        };
+
+        // Add to the beginning
+        allActivities.unshift(myActivity);
+      }
+    }
+
+    return allActivities;
+  }, [otherActivities, myRating, myReview, user, id, anime]);
 
   // 로마 숫자 변환 함수
   const toRoman = (num) => {
