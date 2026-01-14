@@ -231,7 +231,7 @@ def get_items_for_review_writing(user_id: int, limit: int = 50) -> List[Dict]:
         )
         SELECT *
         FROM combined
-        ORDER BY (item_id % 100) DESC, updated_at DESC
+        ORDER BY ABS(RANDOM() % 100) DESC, updated_at DESC
         LIMIT ?
         """,
         (user_id, user_id, limit)
