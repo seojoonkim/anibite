@@ -148,7 +148,10 @@ export default function ActivityCard({
 
   const getRelativeTime = (dateString) => {
     const now = new Date();
-    const date = new Date(dateString);
+
+    // Backend sends UTC time without timezone info, so append 'Z' to parse as UTC
+    const date = new Date(dateString.endsWith('Z') ? dateString : dateString.replace(' ', 'T') + 'Z');
+
     const diffMs = now - date;
     const diffSecs = Math.floor(diffMs / 1000);
     const diffMins = Math.floor(diffSecs / 60);
