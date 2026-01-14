@@ -82,7 +82,7 @@ export default function RateCharacters() {
   const loadCharacters = async (pageNum) => {
     try {
       setLoading(pageNum === 1);
-      const pageSize = 50;
+      const pageSize = 20;
       const offset = (pageNum - 1) * pageSize;
 
       // Use ULTRA FAST optimized endpoint (0.1s target)
@@ -289,7 +289,7 @@ export default function RateCharacters() {
         {loading && characters.length === 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {/* Skeleton cards during initial load */}
-            {Array.from({ length: 15 }).map((_, index) => (
+            {Array.from({ length: 10 }).map((_, index) => (
               <div key={`skeleton-${index}`} className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden animate-pulse">
                 {/* Skeleton Image */}
                 <div className="aspect-[3/4] bg-gray-200" />
