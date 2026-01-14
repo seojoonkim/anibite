@@ -181,6 +181,16 @@ def get_user_activity_feed(
 ):
     """
     특정 사용자의 활동 피드
+    TEMP FIX: Use get_global_feed (which works) and filter by user_id
     """
-    activities = get_user_feed(user_id, current_user.id, limit, offset)
-    return enrich_activities_with_engagement(activities, current_user.id, db)
+    # Get global feed (this works!)
+    activities = get_global_feed(limit=500, offset=0)
+
+    # Filter by user_id
+    filtered = [a for a in activities if a.get('user_id') == user_id]
+
+    # Apply offset and limit after filtering
+    paginated = filtered[offset:offset + limit]
+
+    # 좋아요/댓글 정보 추가
+    return enrich_activities_with_engagement(paginated, current_user.id, db)
