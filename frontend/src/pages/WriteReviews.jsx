@@ -29,9 +29,12 @@ export default function WriteReviews() {
   const loadData = async () => {
     try {
       setLoading(true);
+      console.log('[WriteReviews] Starting to load data...');
 
       // 초고속 API 사용 - 단일 쿼리로 애니+캐릭터 모두 가져오기 (0.1초 목표)
       const data = await ratingPageService.getItemsForReviews(50);
+      console.log('[WriteReviews] API response:', data);
+      console.log('[WriteReviews] Items count:', data?.items?.length || 0);
 
       // 응답 데이터를 기존 형식으로 변환
       const items = (data.items || []).map(item => ({
@@ -57,12 +60,17 @@ export default function WriteReviews() {
         } : {})
       }));
 
+      console.log('[WriteReviews] Processed items:', items.length);
+
       // 이미 백엔드에서 정렬되어 옴 (popularity + 랜덤성)
       setAllItems(items);
       setReviewsLoading(false);
       setLoading(false);
+      console.log('[WriteReviews] Data loading complete');
     } catch (err) {
-      console.error('Failed to load data:', err);
+      console.error('[WriteReviews] Failed to load data:', err);
+      console.error('[WriteReviews] Error details:', err.response?.data || err.message);
+      console.error('[WriteReviews] Error status:', err.response?.status);
       setLoading(false);
       setReviewsLoading(false);
     }
