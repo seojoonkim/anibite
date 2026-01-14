@@ -36,20 +36,20 @@ export default function ActivityComments({
   }
 
   return (
-    <div className="mt-4 border-t pt-4">
+    <div className="mt-3 border-t pt-3">
       {/* New Comment Input */}
       {user && (
-        <div className="mb-4">
-          <div className="flex gap-2">
+        <div className="mb-3">
+          <div className="flex gap-2 items-start">
             {user.avatar_url ? (
               <img
                 src={getAvatarUrl(user.avatar_url)}
                 alt={user.display_name || user.username}
-                className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                className="w-7 h-7 rounded-full object-cover flex-shrink-0"
               />
             ) : (
               <div
-                className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ background: 'linear-gradient(to bottom right, #90B2E4, #638CCC)' }}
               >
                 <span className="text-white text-xs font-bold">
@@ -57,40 +57,40 @@ export default function ActivityComments({
                 </span>
               </div>
             )}
-            <div className="flex-1">
-              <textarea
+            <div className="flex-1 flex gap-2">
+              <input
+                type="text"
                 value={newCommentText}
                 onChange={(e) => setNewCommentText(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey && newCommentText.trim()) {
+                    e.preventDefault();
+                    onCommentSubmit();
+                  }
+                }}
                 placeholder={language === 'ko' ? '댓글을 입력하세요...' : 'Write a comment...'}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#A8E6CF] resize-none"
-                rows="2"
+                className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#A8E6CF]"
               />
-              <div className="mt-2 flex justify-end">
-                <button
-                  onClick={onCommentSubmit}
-                  disabled={!newCommentText.trim()}
-                  className="px-4 py-1.5 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{
-                    background: newCommentText.trim()
-                      ? 'linear-gradient(135deg, #A8E6CF 0%, #8EC5FC 100%)'
-                      : '#ccc'
-                  }}
-                >
-                  {language === 'ko' ? '댓글 작성' : 'Comment'}
-                </button>
-              </div>
+              <button
+                onClick={onCommentSubmit}
+                disabled={!newCommentText.trim()}
+                className="px-3 py-1.5 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  background: newCommentText.trim()
+                    ? 'linear-gradient(135deg, #A8E6CF 0%, #8EC5FC 100%)'
+                    : '#ccc'
+                }}
+              >
+                {language === 'ko' ? '작성' : 'Post'}
+              </button>
             </div>
           </div>
         </div>
       )}
 
       {/* Comments List */}
-      {comments.length === 0 ? (
-        <p className="text-sm text-gray-500 text-center py-4">
-          {language === 'ko' ? '첫 댓글을 작성해보세요!' : 'Be the first to comment!'}
-        </p>
-      ) : (
-        <div className="space-y-4">
+      {comments.length > 0 && (
+        <div className="space-y-3">
           {comments.map((comment) => {
             const levelInfo = getCurrentLevelInfo(comment.otaku_score || 0);
 
@@ -118,31 +118,31 @@ export default function ActivityComments({
                   </Link>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-1.5 mb-0.5">
                       <Link
                         to={`/user/${comment.user_id}`}
-                        className="text-sm font-medium text-gray-700 hover:text-[#A8E6CF]"
+                        className="text-xs font-medium text-gray-700 hover:text-[#A8E6CF]"
                       >
                         {comment.display_name || comment.username}
                       </Link>
                       <span
-                        className={`text-xs px-1.5 py-0.5 rounded-full ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}
+                        className={`text-[10px] px-1 py-0.5 rounded-full ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}
                       >
                         <span style={{ color: levelInfo.color }} className="font-bold">
                           {levelInfo.icon}
                         </span>
                       </span>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-[10px] text-gray-400">
                         {new Date(comment.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US')}
                       </span>
                     </div>
 
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{comment.content}</p>
+                    <p className="text-xs text-gray-700 whitespace-pre-wrap">{comment.content}</p>
 
                     {user && (
                       <button
                         onClick={() => setReplyingTo(comment.id)}
-                        className="mt-1 text-xs text-gray-500 hover:text-[#A8E6CF]"
+                        className="mt-0.5 text-[10px] text-gray-500 hover:text-[#A8E6CF]"
                       >
                         {language === 'ko' ? '답글' : 'Reply'}
                       </button>
@@ -150,37 +150,41 @@ export default function ActivityComments({
 
                     {/* Reply Input */}
                     {replyingTo === comment.id && (
-                      <div className="mt-2 flex gap-2">
-                        <textarea
+                      <div className="mt-1.5 flex gap-2">
+                        <input
+                          type="text"
                           value={replyText}
                           onChange={(e) => setReplyText(e.target.value)}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey && replyText.trim()) {
+                              e.preventDefault();
+                              onReplySubmit(comment.id);
+                            }
+                          }}
                           placeholder={language === 'ko' ? '답글을 입력하세요...' : 'Write a reply...'}
-                          className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#A8E6CF] resize-none"
-                          rows="2"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#A8E6CF]"
                         />
-                        <div className="flex flex-col gap-1">
-                          <button
-                            onClick={() => onReplySubmit(comment.id)}
-                            disabled={!replyText.trim()}
-                            className="px-3 py-1 text-xs font-medium text-white rounded transition-colors disabled:opacity-50"
-                            style={{
-                              background: replyText.trim()
-                                ? 'linear-gradient(135deg, #A8E6CF 0%, #8EC5FC 100%)'
-                                : '#ccc'
-                            }}
-                          >
-                            {language === 'ko' ? '작성' : 'Reply'}
-                          </button>
-                          <button
-                            onClick={() => {
-                              setReplyingTo(null);
-                              setReplyText('');
-                            }}
-                            className="px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
-                          >
-                            {language === 'ko' ? '취소' : 'Cancel'}
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => onReplySubmit(comment.id)}
+                          disabled={!replyText.trim()}
+                          className="px-2 py-1 text-xs font-medium text-white rounded transition-colors disabled:opacity-50"
+                          style={{
+                            background: replyText.trim()
+                              ? 'linear-gradient(135deg, #A8E6CF 0%, #8EC5FC 100%)'
+                              : '#ccc'
+                          }}
+                        >
+                          {language === 'ko' ? '작성' : 'Post'}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setReplyingTo(null);
+                            setReplyText('');
+                          }}
+                          className="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
+                        >
+                          {language === 'ko' ? '취소' : 'Cancel'}
+                        </button>
                       </div>
                     )}
 
