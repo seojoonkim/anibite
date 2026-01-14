@@ -11,7 +11,7 @@
  *   onUpdate={() => refetch()}
  * />
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
@@ -79,7 +79,6 @@ export default function ActivityCard({
   const [replyText, setReplyText] = useState('');
   const [avatarError, setAvatarError] = useState(false);
   const [itemImageError, setItemImageError] = useState(false);
-  const [itemImageSrc, setItemImageSrc] = useState(null);
 
   // Hooks
   const { liked, likesCount, toggleLike } = useActivityLike(
@@ -103,30 +102,6 @@ export default function ActivityCard({
 
   const getAvatarUrl = (url) => {
     if (!url) return null;
-    if (url.startsWith('http')) return url;
-    return `${IMAGE_BASE_URL}${url}`;
-  };
-
-  // Get item image URL - try R2 first, fallback to AniList
-  const getItemImageUrl = (url, fallback = false) => {
-    if (!url) return null;
-
-    // If fallback requested, use original AniList URL
-    if (fallback && url.startsWith('http')) {
-      return url;
-    }
-
-    // If it's an AniList character image, try R2 first
-    if (url.includes('anilist.co') && url.includes('/character/')) {
-      // Extract character ID from URL like: https://s4.anilist.co/file/anilistcdn/character/large/b11-TA5Nuk7EDUZG.jpg
-      const match = url.match(/\/b(\d+)-/);
-      if (match && match[1]) {
-        const characterId = match[1];
-        return `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
-      }
-    }
-
-    // If it's already a relative path or other HTTP URL, use as-is
     if (url.startsWith('http')) return url;
     return `${IMAGE_BASE_URL}${url}`;
   };
@@ -173,17 +148,43 @@ export default function ActivityCard({
 
   const levelInfo = getCurrentLevelInfo(activity.otaku_score || 0);
 
-  // Initialize item image src (try R2 first)
+  // Reset error state when activity changes
   useEffect(() => {
-    setItemImageSrc(getItemImageUrl(activity.item_image, false));
     setItemImageError(false);
-  }, [activity.item_image]);
+  }, [activity.id]);
+
+  // Calculate item image src with useMemo - try R2 first, fallback to original on error
+  const itemImageSrc = useMemo(() => {
+    const url = activity.item_image;
+    if (!url) return null;
+
+    // If error occurred, use original URL
+    if (itemImageError && url.startsWith('http')) {
+      return url;
+    }
+
+    // If it's an AniList character image, try R2 first
+    if (url.includes('anilist.co') && url.includes('/character/')) {
+      const match = url.match(/\/b(\d+)-/);
+      if (match && match[1]) {
+        const characterId = match[1];
+        return `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
+      }
+    }
+
+    // If it's already a relative path, use IMAGE_BASE_URL
+    if (!url.startsWith('http')) {
+      return `${IMAGE_BASE_URL}${url}`;
+    }
+
+    // Otherwise use as-is
+    return url;
+  }, [activity.item_image, itemImageError]);
 
   // Handle item image load error - fallback to original AniList URL
   const handleItemImageError = () => {
     if (!itemImageError) {
       setItemImageError(true);
-      setItemImageSrc(getItemImageUrl(activity.item_image, true));
     }
   };
 
