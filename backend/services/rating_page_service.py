@@ -62,7 +62,7 @@ def get_characters_for_rating(user_id: int, limit: int = 50, offset: int = 0) ->
 
     rows = db.execute_query(
         """
-        SELECT DISTINCT
+        SELECT
             c.id,
             c.name_full,
             c.name_native,
@@ -84,6 +84,7 @@ def get_characters_for_rating(user_id: int, limit: int = 50, offset: int = 0) ->
             AND c.name_full NOT LIKE '%Unknown%'
             AND c.name_full NOT LIKE '%Extra%'
             AND c.name_full NOT LIKE '%Background%'
+        GROUP BY c.id
         ORDER BY (c.favourites + (RANDOM() % CAST(c.favourites * 0.2 AS INTEGER) + 1)) DESC
         LIMIT ? OFFSET ?
         """,
