@@ -66,7 +66,9 @@ export default function ActivityCard({
   context = 'feed',
   showOptions = {},
   onUpdate = null,
-  notificationData = null  // Additional data for notification context
+  notificationData = null,  // Additional data for notification context
+  onEditContent = null,  // Custom edit handler (e.g., for detail pages)
+  onDeleteContent = null  // Custom delete handler (e.g., for detail pages)
 }) {
   const { language } = useLanguage();
   const { user } = useAuth();
@@ -292,6 +294,12 @@ export default function ActivityCard({
 
   // ContentMenu handlers
   const handleEdit = () => {
+    // Use custom handler if provided (for detail pages)
+    if (onEditContent) {
+      onEditContent(activity);
+      return;
+    }
+
     // Navigate to edit page or open edit modal
     if (activity.activity_type === 'anime_rating') {
       navigate(`/anime/${activity.item_id}`);
@@ -301,6 +309,12 @@ export default function ActivityCard({
   };
 
   const handleDelete = async () => {
+    // Use custom handler if provided (for detail pages)
+    if (onDeleteContent) {
+      onDeleteContent(activity);
+      return;
+    }
+
     try {
       // Delete rating (which should also delete associated review)
       if (activity.activity_type === 'anime_rating') {
@@ -320,6 +334,12 @@ export default function ActivityCard({
   };
 
   const handleEditRating = () => {
+    // Use custom handler if provided (for detail pages)
+    if (onEditContent) {
+      onEditContent(activity, 'rating');
+      return;
+    }
+
     // Navigate to detail page where user can change rating
     if (activity.activity_type === 'anime_rating') {
       navigate(`/anime/${activity.item_id}`);
@@ -329,6 +349,12 @@ export default function ActivityCard({
   };
 
   const handleAddReview = () => {
+    // Use custom handler if provided (for detail pages)
+    if (onEditContent) {
+      onEditContent(activity, 'add_review');
+      return;
+    }
+
     // Navigate to detail page where user can add review
     if (activity.activity_type === 'anime_rating') {
       navigate(`/anime/${activity.item_id}`);
