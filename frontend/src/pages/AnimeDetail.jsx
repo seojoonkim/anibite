@@ -7,6 +7,7 @@ import { activityService } from '../services/activityService';
 import { useActivities } from '../hooks/useActivity';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import * as ActivityUtils from '../utils/activityUtils';
 import Navbar from '../components/common/Navbar';
 import StarRating from '../components/common/StarRating';
 import RatingWidget from '../components/anime/RatingWidget';

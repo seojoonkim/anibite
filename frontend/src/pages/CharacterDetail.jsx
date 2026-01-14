@@ -7,6 +7,7 @@ import { useActivities } from '../hooks/useActivity';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
+import * as ActivityUtils from '../utils/activityUtils';
 import Navbar from '../components/common/Navbar';
 import StarRating from '../components/common/StarRating';
 import CharacterRatingWidget from '../components/character/CharacterRatingWidget';
@@ -32,6 +33,7 @@ export default function CharacterDetail() {
   const [reviewLikes, setReviewLikes] = useState({});
   const [comments, setComments] = useState({});
   const [expandedComments, setExpandedComments] = useState(new Set());
+  const [savedActivities, setSavedActivities] = useState(new Set());
 
   // Use unified activities hook
   const {
@@ -103,6 +105,14 @@ export default function CharacterDetail() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showEditMenu]);
+
+  // Load saved activities from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('savedActivities');
+    if (saved) {
+      setSavedActivities(new Set(JSON.parse(saved)));
+    }
+  }, []);
 
   const processReviews = (data) => {
     // 내 리뷰는 myReview로 따로 표시하므로, reviews에서는 제외
