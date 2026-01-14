@@ -1073,7 +1073,7 @@ export default function CharacterDetail() {
             <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold">
-                  {language === 'ko' ? '리뷰' : 'Reviews'} ({activities.length})
+                  {language === 'ko' ? '리뷰' : 'Reviews'} ({(myReview ? 1 : 0) + reviews.length})
                 </h3>
                 {!myReview && (
                   <button
