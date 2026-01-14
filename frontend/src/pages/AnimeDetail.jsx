@@ -434,9 +434,9 @@ export default function AnimeDetail() {
       setMyReview(null);
       setReviewSuccess(language === 'ko' ? '리뷰가 삭제되었습니다.' : 'Review deleted successfully.');
 
-      // 리뷰 목록 새로고침
-      const reviewData = await reviewService.getAnimeReviews(id, { page: 1, page_size: 10 });
-      if (reviewData) processReviews(reviewData);
+      // anime stats만 업데이트 (전체 리프레시 없이)
+      const animeData = await animeService.getAnimeById(id);
+      if (animeData) setAnime(animeData);
 
       setTimeout(() => setReviewSuccess(''), 3000);
     } catch (err) {
@@ -493,9 +493,23 @@ export default function AnimeDetail() {
       setShowReviewForm(false);
       setIsEditingReview(false);
 
-      // 전체 데이터 다시 로드
-      await loadAllData();
-      await refetchActivities();
+      // 로컬 state만 업데이트 (전체 리프레시 없이)
+      if (isEditingReview) {
+        // 리뷰 수정: myReview 업데이트만
+        const updatedMyReview = await reviewService.getMyReview(id).catch(() => null);
+        if (updatedMyReview) {
+          setMyReview(updatedMyReview);
+        }
+      } else {
+        // 새 리뷰 작성: myReview와 anime stats만 업데이트
+        const [myReviewData, animeData] = await Promise.all([
+          reviewService.getMyReview(id).catch(() => null),
+          animeService.getAnimeById(id)
+        ]);
+
+        if (myReviewData) setMyReview(myReviewData);
+        if (animeData) setAnime(animeData);
+      }
 
       setTimeout(() => setReviewSuccess(''), 3000);
     } catch (err) {

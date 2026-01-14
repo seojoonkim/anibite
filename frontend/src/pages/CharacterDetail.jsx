@@ -307,9 +307,23 @@ export default function CharacterDetail() {
       setShowReviewForm(false);
       setIsEditingReview(false);
 
-      // 전체 데이터 다시 로드
-      await loadAllData();
-      await refetchActivities();
+      // 로컬 state만 업데이트 (전체 리프레시 없이)
+      if (isEditingReview) {
+        // 리뷰 수정: myReview 업데이트만
+        const updatedMyReview = await characterReviewService.getMyReview(id).catch(() => null);
+        if (updatedMyReview) {
+          setMyReview(updatedMyReview);
+        }
+      } else {
+        // 새 리뷰 작성: myReview와 character stats만 업데이트
+        const [myReviewData, charData] = await Promise.all([
+          characterReviewService.getMyReview(id).catch(() => null),
+          characterService.getCharacterDetail(id)
+        ]);
+
+        if (myReviewData) setMyReview(myReviewData);
+        if (charData) setCharacter(charData);
+      }
 
       setTimeout(() => setReviewSuccess(''), 3000);
     } catch (err) {
@@ -370,14 +384,9 @@ export default function CharacterDetail() {
         : (language === 'ko' ? '리뷰가 삭제되었습니다.' : 'Review deleted successfully.');
       setReviewSuccess(successMessage);
 
-      // 병렬로 데이터 새로고침
-      const [charData, reviewData] = await Promise.all([
-        characterService.getCharacterDetail(id),
-        characterReviewService.getCharacterReviews(id, { page: 1, page_size: 10 })
-      ]);
-
+      // character stats만 업데이트 (전체 리프레시 없이)
+      const charData = await characterService.getCharacterDetail(id);
       if (charData) setCharacter(charData);
-      if (reviewData) processReviews(reviewData);
 
       setTimeout(() => setReviewSuccess(''), 3000);
     } catch (err) {
