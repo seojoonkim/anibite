@@ -76,6 +76,7 @@ export default function ActivityCard({
   const [newCommentText, setNewCommentText] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState('');
+  const [avatarError, setAvatarError] = useState(false);
 
   // Hooks
   const { liked, likesCount, toggleLike } = useActivityLike(
@@ -215,11 +216,12 @@ export default function ActivityCard({
               <div className="flex items-center gap-2">
                 {/* User Avatar */}
                 <Link to={`/user/${activity.user_id}`} className="flex-shrink-0">
-                  {activity.avatar_url ? (
+                  {activity.avatar_url && !avatarError ? (
                     <img
                       src={getAvatarUrl(activity.avatar_url)}
                       alt={activity.display_name || activity.username}
                       className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                      onError={() => setAvatarError(true)}
                     />
                   ) : (
                     <div
