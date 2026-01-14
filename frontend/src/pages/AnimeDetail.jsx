@@ -419,7 +419,7 @@ export default function AnimeDetail() {
       setReviewData({
         content: myReview.content,
         is_spoiler: myReview.is_spoiler,
-        rating: myRating?.rating || 0
+        rating: myReview?.user_rating || myRating?.rating || 0
       });
       setIsEditingReview(true);
       setShowReviewForm(true);
@@ -465,15 +465,11 @@ export default function AnimeDetail() {
 
     try {
       if (isEditingReview && myReview) {
-        // 수정 시: 별점은 별도로 저장하고 리뷰만 수정
-        if (reviewData.rating && (!myRating || myRating.rating !== reviewData.rating)) {
-          const ratingResult = await ratingService.rateAnime(parseInt(id), { rating: reviewData.rating, status: 'RATED' });
-          setMyRating(ratingResult);
-        }
-
+        // 수정 시: rating을 리뷰 API에 함께 전송
         await reviewService.updateReview(myReview.id, {
           content: reviewData.content,
-          is_spoiler: reviewData.is_spoiler
+          is_spoiler: reviewData.is_spoiler,
+          rating: reviewData.rating  // 별점도 함께 전송
         });
         setReviewSuccess(language === 'ko' ? '리뷰가 수정되었습니다.' : 'Review updated successfully.');
       } else {
@@ -494,14 +490,19 @@ export default function AnimeDetail() {
 
       // 로컬 state만 업데이트 (전체 리프레시 없이)
       if (isEditingReview) {
-        // 리뷰 수정: myReview와 myRating 업데이트
-        const [updatedMyReview, updatedMyRating] = await Promise.all([
+        // 리뷰 수정: myReview, myRating, anime 업데이트
+        const [updatedMyReview, updatedMyRating, updatedAnime] = await Promise.all([
           reviewService.getMyReview(id).catch(() => null),
-          ratingService.getUserRating(id).catch(() => null)
+          ratingService.getUserRating(id).catch(() => null),
+          animeService.getAnimeById(id).catch(() => null)
         ]);
 
         if (updatedMyReview) setMyReview(updatedMyReview);
         if (updatedMyRating) setMyRating(updatedMyRating);
+        if (updatedAnime) setAnime(updatedAnime);
+
+        // Refresh activities list to update review list immediately
+        await refetchActivities();
       } else {
         // 새 리뷰 작성: myReview, myRating과 anime stats만 업데이트
         const [myReviewData, myRatingData, animeData] = await Promise.all([
@@ -1230,57 +1231,67 @@ export default function AnimeDetail() {
 
               {activities.length > 0 ? (
                 <div className="space-y-4">
-                  {activities.map((activity) => (
-                    <ActivityCard
-                      key={activity.id}
-                      activity={activity}
-                      context="anime_page"
-                      onUpdate={refetchActivities}
-                      onEditContent={(activity, mode) => {
-                        // Only allow editing own content
-                        if (user && activity.user_id === user.id) {
-                          if (mode === 'add_review' || !myReview) {
-                            // Open review form for adding review
-                            setReviewData({
-                              content: '',
-                              is_spoiler: false,
-                              rating: myRating?.rating || 0
-                            });
-                            setIsEditingReview(false);
-                            setShowReviewForm(true);
-                          } else {
-                            // Open review form for editing
-                            handleEditReview();
-                          }
-                        }
-                      }}
-                      onDeleteContent={async (activity) => {
-                        // Only allow deleting own content
-                        if (user && activity.user_id === user.id) {
-                          if (myReview) {
-                            // Delete review (and associated rating)
-                            await handleDeleteReview();
-                          } else if (myRating) {
-                            // Delete rating only
-                            if (!confirm(language === 'ko' ? '평가를 삭제하시겠습니까?' : 'Delete this rating?')) return;
+                  {activities.map((activity) => {
+                    // Hide the activity card if it's the user's review and the review form is open for editing
+                    const isMyActivity = user && activity.user_id === user.id;
+                    const hideWhileEditing = isMyActivity && showReviewForm && isEditingReview;
 
-                            try {
-                              await ratingService.deleteRating(id);
-                              setMyRating(null);
+                    if (hideWhileEditing) {
+                      return null;
+                    }
 
-                              // Refresh data
-                              const animeData = await animeService.getAnimeById(id);
-                              if (animeData) setAnime(animeData);
-                              await refetchActivities();
-                            } catch (err) {
-                              console.error('Failed to delete rating:', err);
-                              alert(language === 'ko' ? '평가 삭제에 실패했습니다.' : 'Failed to delete rating.');
+                    return (
+                      <ActivityCard
+                        key={activity.id}
+                        activity={activity}
+                        context="anime_page"
+                        onUpdate={refetchActivities}
+                        onEditContent={(activity, mode) => {
+                          // Only allow editing own content
+                          if (user && activity.user_id === user.id) {
+                            if (mode === 'add_review' || !myReview) {
+                              // Open review form for adding review
+                              setReviewData({
+                                content: '',
+                                is_spoiler: false,
+                                rating: myRating?.rating || 0
+                              });
+                              setIsEditingReview(false);
+                              setShowReviewForm(true);
+                            } else {
+                              // Open review form for editing
+                              handleEditReview();
                             }
                           }
-                        }
-                      }}
-                    />
-                  ))}
+                        }}
+                        onDeleteContent={async (activity) => {
+                          // Only allow deleting own content
+                          if (user && activity.user_id === user.id) {
+                            if (myReview) {
+                              // Delete review (and associated rating)
+                              await handleDeleteReview();
+                            } else if (myRating) {
+                              // Delete rating only
+                              if (!confirm(language === 'ko' ? '평가를 삭제하시겠습니까?' : 'Delete this rating?')) return;
+
+                              try {
+                                await ratingService.deleteRating(id);
+                                setMyRating(null);
+
+                                // Refresh data
+                                const animeData = await animeService.getAnimeById(id);
+                                if (animeData) setAnime(animeData);
+                                await refetchActivities();
+                              } catch (err) {
+                                console.error('Failed to delete rating:', err);
+                                alert(language === 'ko' ? '평가 삭제에 실패했습니다.' : 'Failed to delete rating.');
+                              }
+                            }
+                          }
+                        }}
+                      />
+                    );
+                  })}
                 </div>
               ) : (
                 <p className="text-gray-600">{language === 'ko' ? '아직 리뷰가 없습니다.' : 'No reviews yet.'}</p>

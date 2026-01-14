@@ -282,15 +282,11 @@ export default function CharacterDetail() {
 
     try {
       if (isEditingReview && myReview && myReview.review_id) {
-        // 수정 시: 별점은 별도로 저장하고 리뷰만 수정
-        if (!character.my_rating || character.my_rating !== reviewData.rating) {
-          await characterService.rateCharacter(parseInt(id), reviewData.rating);
-          setCharacter({ ...character, my_rating: reviewData.rating });
-        }
-
+        // 수정 시: rating을 리뷰 API에 함께 전송
         await characterReviewService.updateReview(myReview.review_id, {
           content: reviewData.content,
-          is_spoiler: reviewData.is_spoiler
+          is_spoiler: reviewData.is_spoiler,
+          rating: reviewData.rating  // 별점도 함께 전송
         });
         setReviewSuccess(language === 'ko' ? '리뷰가 수정되었습니다.' : 'Review updated successfully.');
       } else {
@@ -314,11 +310,21 @@ export default function CharacterDetail() {
 
       // 로컬 state만 업데이트 (전체 리프레시 없이)
       if (isEditingReview) {
-        // 리뷰 수정: myReview 업데이트만
-        const updatedMyReview = await characterReviewService.getMyReview(id).catch(() => null);
+        // 리뷰 수정: myReview와 character 업데이트
+        const [updatedMyReview, updatedCharacter] = await Promise.all([
+          characterReviewService.getMyReview(id).catch(() => null),
+          characterService.getCharacterDetail(id).catch(() => null)
+        ]);
+
         if (updatedMyReview) {
           setMyReview(updatedMyReview);
         }
+        if (updatedCharacter) {
+          setCharacter(updatedCharacter);
+        }
+
+        // Refresh activities list to update review list immediately
+        await refetchActivities();
       } else {
         // 새 리뷰 작성: myReview와 character stats만 업데이트
         const [myReviewData, charData] = await Promise.all([
@@ -347,7 +353,7 @@ export default function CharacterDetail() {
       setReviewData({
         content: '',
         is_spoiler: false,
-        rating: character.my_rating || 0
+        rating: myReview?.user_rating || character?.my_rating || 0
       });
       setIsEditingReview(false); // 새로 작성하는 것이므로 editing이 아님
       setShowReviewForm(true);
@@ -355,7 +361,7 @@ export default function CharacterDetail() {
       setReviewData({
         content: myReview.content,
         is_spoiler: myReview.is_spoiler,
-        rating: character.my_rating || 0
+        rating: myReview?.user_rating || character?.my_rating || 0
       });
       setIsEditingReview(true);
       setShowReviewForm(true);
@@ -1212,38 +1218,48 @@ export default function CharacterDetail() {
               {/* Reviews */}
               {activities.length > 0 ? (
                 <div className="space-y-4">
-                  {activities.map((activity) => (
-                    <ActivityCard
-                      key={activity.id}
-                      activity={activity}
-                      context="character_page"
-                      onUpdate={refetchActivities}
-                      onEditContent={(activity, mode) => {
-                        // Only allow editing own content
-                        if (user && activity.user_id === user.id) {
-                          if (mode === 'add_review' || !myReview || !myReview.content) {
-                            // Open review form for adding review
-                            setReviewData({
-                              content: '',
-                              is_spoiler: false,
-                              rating: character?.my_rating || 0
-                            });
-                            setIsEditingReview(false);
-                            setShowReviewForm(true);
-                          } else {
-                            // Open review form for editing
-                            handleEditReview();
+                  {activities.map((activity) => {
+                    // Hide the activity card if it's the user's review and the review form is open for editing
+                    const isMyActivity = user && activity.user_id === user.id;
+                    const hideWhileEditing = isMyActivity && showReviewForm && isEditingReview;
+
+                    if (hideWhileEditing) {
+                      return null;
+                    }
+
+                    return (
+                      <ActivityCard
+                        key={activity.id}
+                        activity={activity}
+                        context="character_page"
+                        onUpdate={refetchActivities}
+                        onEditContent={(activity, mode) => {
+                          // Only allow editing own content
+                          if (user && activity.user_id === user.id) {
+                            if (mode === 'add_review' || !myReview || !myReview.content) {
+                              // Open review form for adding review
+                              setReviewData({
+                                content: '',
+                                is_spoiler: false,
+                                rating: character?.my_rating || 0
+                              });
+                              setIsEditingReview(false);
+                              setShowReviewForm(true);
+                            } else {
+                              // Open review form for editing
+                              handleEditReview();
+                            }
                           }
-                        }
-                      }}
-                      onDeleteContent={async (activity) => {
-                        // Only allow deleting own content
-                        if (user && activity.user_id === user.id) {
-                          await handleDeleteReview();
-                        }
-                      }}
-                    />
-                  ))}
+                        }}
+                        onDeleteContent={async (activity) => {
+                          // Only allow deleting own content
+                          if (user && activity.user_id === user.id) {
+                            await handleDeleteReview();
+                          }
+                        }}
+                      />
+                    );
+                  })}
                 </div>
               ) : (
                 <p className="text-gray-600">{language === 'ko' ? '아직 리뷰가 없습니다.' : 'No reviews yet.'}</p>
