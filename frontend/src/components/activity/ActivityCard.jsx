@@ -73,7 +73,7 @@ export default function ActivityCard({
   const finalShowOptions = { ...preset, ...showOptions };
 
   // State
-  const [showComments, setShowComments] = useState(false);
+  const [showComments, setShowComments] = useState(activity.comments_count > 0);
   const [newCommentText, setNewCommentText] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState('');
