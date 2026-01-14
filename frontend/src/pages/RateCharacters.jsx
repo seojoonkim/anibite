@@ -186,6 +186,17 @@ export default function RateCharacters() {
     }
   };
 
+  // Get card background color based on status
+  const getCardBackgroundColor = (characterId) => {
+    const status = characterStatuses[characterId];
+    const hasRating = characters.find(c => c.id === characterId)?.my_rating;
+
+    if (hasRating) return 'bg-[#F5F5F5]'; // RATED
+    if (status === 'WANT_TO_KNOW') return 'bg-[#F5F5F5]';
+    if (status === 'NOT_INTERESTED') return 'bg-gray-200';
+    return 'bg-white';
+  };
+
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.svg';
     if (imageUrl.startsWith('http')) return imageUrl;
@@ -287,7 +298,7 @@ export default function RateCharacters() {
                 ref={(el) => {
                   if (el) cardRefs.current[character.id] = el;
                 }}
-                className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-300"
+                className={`${getCardBackgroundColor(character.id)} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-300`}
                 onMouseEnter={() => setHoveredCharacter(character.id)}
                 onMouseLeave={() => setHoveredCharacter(null)}
               >
