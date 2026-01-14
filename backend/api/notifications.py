@@ -407,22 +407,12 @@ async def get_unread_count(
         print(f"[Notifications API] Last check: {last_check}")
 
         # Count activity_likes after last_check (좋아요 알림)
-        like_count_anime = len(db.execute_query(
+        # Join with activities table to get activity owner
+        like_count = len(db.execute_query(
             """
             SELECT al.id FROM activity_likes al
-            WHERE al.activity_user_id = ?
-            AND al.activity_type IN ('anime_rating', 'anime_review')
-            AND al.created_at > ?
-            AND al.user_id != ?
-            """,
-            (current_user.id, last_check, current_user.id)
-        ))
-
-        like_count_char = len(db.execute_query(
-            """
-            SELECT al.id FROM activity_likes al
-            WHERE al.activity_user_id = ?
-            AND al.activity_type IN ('character_rating', 'character_review')
+            JOIN activities a ON al.activity_id = a.id
+            WHERE a.user_id = ?
             AND al.created_at > ?
             AND al.user_id != ?
             """,
@@ -430,11 +420,12 @@ async def get_unread_count(
         ))
 
         # Count activity_comments after last_check (평점 댓글 알림)
+        # Join with activities table to get activity owner
         comment_count_activity = len(db.execute_query(
             """
             SELECT ac.id FROM activity_comments ac
-            WHERE ac.activity_user_id = ?
-            AND ac.activity_type IN ('anime_rating', 'character_rating')
+            JOIN activities a ON ac.activity_id = a.id
+            WHERE a.user_id = ?
             AND ac.created_at > ?
             AND ac.user_id != ?
             AND ac.parent_comment_id IS NULL
@@ -471,11 +462,11 @@ async def get_unread_count(
             (current_user.id, last_check, current_user.id)
         ))
 
-        total_count = (like_count_anime + like_count_char +
+        total_count = (like_count +
                       comment_count_activity +
                       comment_count_anime_review + comment_count_char_review)
 
-        print(f"[Notifications API] Unread count: {total_count} (likes: {like_count_anime + like_count_char}, comments: {comment_count_activity + comment_count_anime_review + comment_count_char_review})")
+        print(f"[Notifications API] Unread count: {total_count} (likes: {like_count}, comments: {comment_count_activity + comment_count_anime_review + comment_count_char_review})")
 
         return {"count": total_count}
 

@@ -509,23 +509,23 @@ export default function ActivityCard({
             {/* Bookmark Button */}
             <button
               onClick={handleBookmarkClick}
-              className="flex items-center gap-2 transition-all hover:scale-110"
-              style={{
-                color: bookmarked ? '#FFD700' : '#6B7280'
-              }}
+              className="transition-all hover:scale-110"
             >
               {bookmarked ? (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                <svg width="24" height="24" viewBox="0 0 24 24">
+                  <defs>
+                    <linearGradient id="bookmark-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style={{ stopColor: '#FF6B6B', stopOpacity: 1 }} />
+                      <stop offset="100%" style={{ stopColor: '#FF4757', stopOpacity: 1 }} />
+                    </linearGradient>
+                  </defs>
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" fill="url(#bookmark-gradient)" />
                 </svg>
               ) : (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2">
                   <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                 </svg>
               )}
-              <span className="text-sm font-medium">
-                {language === 'ko' ? '저장하기' : 'Bookmark'}
-              </span>
             </button>
       </div>
 
