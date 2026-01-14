@@ -1225,6 +1225,49 @@ export default function AnimeDetail() {
                       activity={activity}
                       context="anime_page"
                       onUpdate={refetchActivities}
+                      onEditContent={(activity, mode) => {
+                        // Only allow editing own content
+                        if (user && activity.user_id === user.id) {
+                          if (mode === 'add_review' || !myReview) {
+                            // Open review form for adding review
+                            setReviewData({
+                              content: '',
+                              is_spoiler: false,
+                              rating: myRating?.rating || 0
+                            });
+                            setIsEditingReview(false);
+                            setShowReviewForm(true);
+                          } else {
+                            // Open review form for editing
+                            handleEditReview();
+                          }
+                        }
+                      }}
+                      onDeleteContent={async (activity) => {
+                        // Only allow deleting own content
+                        if (user && activity.user_id === user.id) {
+                          if (myReview) {
+                            // Delete review (and associated rating)
+                            await handleDeleteReview();
+                          } else if (myRating) {
+                            // Delete rating only
+                            if (!confirm(language === 'ko' ? '평가를 삭제하시겠습니까?' : 'Delete this rating?')) return;
+
+                            try {
+                              await ratingService.deleteRating(id);
+                              setMyRating(null);
+
+                              // Refresh data
+                              const animeData = await animeService.getAnimeById(id);
+                              if (animeData) setAnime(animeData);
+                              await refetchActivities();
+                            } catch (err) {
+                              console.error('Failed to delete rating:', err);
+                              alert(language === 'ko' ? '평가 삭제에 실패했습니다.' : 'Failed to delete rating.');
+                            }
+                          }
+                        }
+                      }}
                     />
                   ))}
                 </div>
