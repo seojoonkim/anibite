@@ -10,7 +10,14 @@ export default function RateCharacters() {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [characters, setCharacters] = useState([]);
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState({
+    total: 0,
+    rated: 0,
+    wantToKnow: 0,
+    notInterested: 0,
+    remaining: 0,
+    averageRating: 0
+  });
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hoveredCharacter, setHoveredCharacter] = useState(null);
@@ -260,38 +267,36 @@ export default function RateCharacters() {
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+        {/* Header with Stats - Always show 4 boxes from first render */}
         <div className="mb-8 flex justify-center items-center">
           {/* Stats */}
-          {stats && (
-            <div className="flex gap-3 items-center">
-              {/* Rated Characters */}
-              <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-                <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '평가했어요' : 'Rated'}</div>
-                <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{(stats.total_rated || 0).toLocaleString()}</div>
-              </div>
-
-              {/* Want to Know */}
-              <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-                <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '알고싶어요' : 'Want to Know'}</div>
-                <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{(stats.total_want_to_know || 0).toLocaleString()}</div>
-              </div>
-
-              {/* Not Interested */}
-              <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-                <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '관심없어요' : 'Not Interested'}</div>
-                <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{(stats.total_not_interested || 0).toLocaleString()}</div>
-              </div>
-
-              {/* Average Rating */}
-              {stats.average_rating > 0 && (
-                <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-                  <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</div>
-                  <div className="text-lg font-bold text-gray-800 text-center tabular-nums">★ {stats.average_rating.toFixed(1)}</div>
-                </div>
-              )}
+          <div className="flex gap-3 items-center">
+            {/* Rated Characters */}
+            <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
+              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '평가했어요' : 'Rated'}</div>
+              <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{(stats.rated || 0).toLocaleString()}</div>
             </div>
-          )}
+
+            {/* Want to Know */}
+            <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
+              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '알고싶어요' : 'Want to Know'}</div>
+              <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{(stats.wantToKnow || 0).toLocaleString()}</div>
+            </div>
+
+            {/* Not Interested */}
+            <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
+              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '관심없어요' : 'Not Interested'}</div>
+              <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{(stats.notInterested || 0).toLocaleString()}</div>
+            </div>
+
+            {/* Average Rating - Always show */}
+            <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
+              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</div>
+              <div className="text-lg font-bold text-gray-800 text-center tabular-nums">
+                {stats.averageRating > 0 ? `★ ${stats.averageRating.toFixed(1)}` : '-'}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Character Grid */}
