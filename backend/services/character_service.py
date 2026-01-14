@@ -151,7 +151,7 @@ def get_character_rating(user_id: int, character_id: int) -> Optional[Dict]:
 
 def create_or_update_character_rating(user_id: int, character_id: int, rating: float = None, status: str = None) -> Dict:
     """
-    캐릭터 평가 생성 또는 수정
+    캐릭터 평가 생성 또는 수정 + activities 테이블 동기화
     """
     # Check if rating exists
     existing = get_character_rating(user_id, character_id)
@@ -194,11 +194,101 @@ def create_or_update_character_rating(user_id: int, character_id: int, rating: f
             (user_id, character_id, rating, status or 'RATED')
         )
 
+    # Sync to activities table (replaces trigger logic - more efficient with single query)
+    _sync_character_rating_to_activities(user_id, character_id)
+
     # Update user stats (otaku score)
     from services.rating_service import _update_user_stats
     _update_user_stats(user_id)
 
     return get_character_rating(user_id, character_id)
+
+
+def _sync_character_rating_to_activities(user_id: int, character_id: int):
+    """
+    character_ratings 변경사항을 activities 테이블에 동기화
+    트리거 대신 Python에서 처리 - 한 번의 쿼리로 모든 정보 가져오기
+    """
+    # Get all data needed for activity in a single query (efficient!)
+    activity_data = db.execute_query(
+        """
+        SELECT
+            cr.user_id,
+            cr.character_id,
+            cr.rating,
+            cr.created_at,
+            cr.updated_at,
+            u.username,
+            u.display_name,
+            u.avatar_url,
+            COALESCE(us.otaku_score, 0) as otaku_score,
+            c.name_full as item_title,
+            c.name_native as item_title_korean,
+            COALESCE('/' || c.image_local, c.image_url) as item_image,
+            r.title as review_title,
+            r.content as review_content,
+            COALESCE(r.is_spoiler, 0) as is_spoiler,
+            COALESCE(r.created_at, cr.updated_at) as activity_time,
+            a.id as anime_id,
+            a.title_romaji as anime_title,
+            a.title_korean as anime_title_korean
+        FROM character_ratings cr
+        JOIN users u ON u.id = cr.user_id
+        JOIN character c ON c.id = cr.character_id
+        LEFT JOIN user_stats us ON u.id = cr.user_id
+        LEFT JOIN character_reviews r ON r.user_id = cr.user_id AND r.character_id = cr.character_id
+        LEFT JOIN (
+            SELECT ac.character_id, a.*
+            FROM anime_character ac
+            JOIN anime a ON a.id = ac.anime_id
+            WHERE ac.character_id = ?
+            ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END
+            LIMIT 1
+        ) a ON a.character_id = cr.character_id
+        WHERE cr.user_id = ? AND cr.character_id = ?
+        """,
+        (character_id, user_id, character_id),
+        fetch_one=True
+    )
+
+    if not activity_data:
+        return
+
+    # Insert or replace activity
+    db.execute_update(
+        """
+        INSERT OR REPLACE INTO activities (
+            activity_type, user_id, item_id, activity_time,
+            username, display_name, avatar_url, otaku_score,
+            item_title, item_title_korean, item_image,
+            rating, review_title, review_content, is_spoiler,
+            anime_id, anime_title, anime_title_korean,
+            created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            'character_rating',
+            activity_data['user_id'],
+            activity_data['character_id'],
+            activity_data['activity_time'],
+            activity_data['username'],
+            activity_data['display_name'],
+            activity_data['avatar_url'],
+            activity_data['otaku_score'],
+            activity_data['item_title'],
+            activity_data['item_title_korean'],
+            activity_data['item_image'],
+            activity_data['rating'],
+            activity_data['review_title'],
+            activity_data['review_content'],
+            activity_data['is_spoiler'],
+            activity_data['anime_id'],
+            activity_data['anime_title'],
+            activity_data['anime_title_korean'],
+            activity_data['created_at'],
+            activity_data['updated_at']
+        )
+    )
 
 
 def delete_character_rating(user_id: int, character_id: int) -> bool:

@@ -52,7 +52,7 @@ def create_character_review(user_id: int, review_data: CharacterReviewCreate) ->
     if review_data.rating is not None:
         try:
             from services.character_service import rate_character
-            # 별점 저장
+            # 별점 저장 (이미 _sync_character_rating_to_activities 호출됨)
             rate_character(user_id, review_data.character_id, review_data.rating)
         except Exception as e:
             # 별점 저장 실패해도 리뷰는 계속 진행
@@ -70,6 +70,10 @@ def create_character_review(user_id: int, review_data: CharacterReviewCreate) ->
          review_data.content, 1 if review_data.is_spoiler else 0)
     )
 
+    # Sync to activities (리뷰 생성 시 activities 업데이트)
+    from services.character_service import _sync_character_rating_to_activities
+    _sync_character_rating_to_activities(user_id, review_data.character_id)
+
     return get_character_review_by_id(review_id)
 
 
@@ -78,7 +82,7 @@ def update_character_review(review_id: int, user_id: int, review_data: Character
 
     # 리뷰 존재 및 권한 확인
     existing = db.execute_query(
-        "SELECT user_id FROM character_reviews WHERE id = ?",
+        "SELECT user_id, character_id FROM character_reviews WHERE id = ?",
         (review_id,),
         fetch_one=True
     )
@@ -94,6 +98,8 @@ def update_character_review(review_id: int, user_id: int, review_data: Character
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to update this review"
         )
+
+    character_id = existing['character_id']
 
     # 수정할 필드만 업데이트
     update_fields = []
@@ -121,6 +127,10 @@ def update_character_review(review_id: int, user_id: int, review_data: Character
         f"UPDATE character_reviews SET {', '.join(update_fields)} WHERE id = ?",
         tuple(params)
     )
+
+    # Sync to activities (리뷰 수정 시 activities도 업데이트)
+    from services.character_service import _sync_character_rating_to_activities
+    _sync_character_rating_to_activities(user_id, character_id)
 
     return get_character_review_by_id(review_id)
 
