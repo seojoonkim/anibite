@@ -66,7 +66,7 @@ export default function CharacterDetail() {
       // 병렬로 모든 데이터 로드
       const promises = [
         characterService.getCharacterDetail(id),
-        characterReviewService.getCharacterReviews(id, { limit: 10 })
+        characterReviewService.getCharacterReviews(id, { page: 1, page_size: 10 })
       ];
 
       if (user) {
@@ -191,7 +191,7 @@ export default function CharacterDetail() {
       // 병렬로 데이터 새로고침
       const [charData, reviewData] = await Promise.all([
         characterService.getCharacterDetail(id),
-        characterReviewService.getCharacterReviews(id, { limit: 10 })
+        characterReviewService.getCharacterReviews(id, { page: 1, page_size: 10 })
       ]);
 
       if (charData) setCharacter(charData);
@@ -269,7 +269,7 @@ export default function CharacterDetail() {
       // 병렬로 데이터 새로고침
       const [charData, reviewData, myReviewData] = await Promise.all([
         characterService.getCharacterDetail(id),
-        characterReviewService.getCharacterReviews(id, { limit: 10 }),
+        characterReviewService.getCharacterReviews(id, { page: 1, page_size: 10 }),
         characterReviewService.getMyReview(id).catch(() => null)
       ]);
 
@@ -339,7 +339,7 @@ export default function CharacterDetail() {
       // 병렬로 데이터 새로고침
       const [charData, reviewData] = await Promise.all([
         characterService.getCharacterDetail(id),
-        characterReviewService.getCharacterReviews(id, { limit: 10 })
+        characterReviewService.getCharacterReviews(id, { page: 1, page_size: 10 })
       ]);
 
       if (charData) setCharacter(charData);
