@@ -226,6 +226,17 @@ def delete_character_rating(user_id: int, character_id: int) -> bool:
         (user_id, character_id)
     )
 
+    # activities 테이블에서 삭제
+    db.execute_update(
+        """
+        DELETE FROM activities
+        WHERE activity_type = 'character_rating'
+        AND user_id = ?
+        AND item_id = ?
+        """,
+        (user_id, character_id)
+    )
+
     # 평점 삭제
     db.execute_update(
         """

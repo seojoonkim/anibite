@@ -63,17 +63,8 @@ export default function ContentMenu({
   };
 
   const handleDelete = () => {
-    const itemName = type === 'anime_rating'
-      ? (item.item_title_korean || item.item_title || item.anime_title)
-      : (item.item_title_korean || item.item_title || item.character_name);
-
-    const message = language === 'ko'
-      ? `"${itemName}"의 평가와 리뷰를 모두 삭제하시겠습니까?`
-      : `Delete rating and review for "${itemName}"?`;
-
-    if (window.confirm(message)) {
-      onDelete();
-    }
+    // Don't show confirm here - parent handler will show it
+    onDelete();
   };
 
   return (
