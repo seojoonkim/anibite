@@ -21,10 +21,26 @@ export default function WriteReviews() {
   const [editContent, setEditContent] = useState('');
   const [editRating, setEditRating] = useState(0);
   const [justCompleted, setJustCompleted] = useState(new Set()); // 방금 작성 완료한 항목
+  const [stats, setStats] = useState({
+    anime: { reviewed: 0, pending: 0 },
+    character: { reviewed: 0, pending: 0 },
+    total: { reviewed: 0, pending: 0 }
+  });
 
   useEffect(() => {
     loadData();
+    loadStats();
   }, []);
+
+  const loadStats = async () => {
+    try {
+      const data = await ratingPageService.getReviewStats();
+      setStats(data);
+      console.log('[WriteReviews] Stats loaded:', data);
+    } catch (err) {
+      console.error('[WriteReviews] Failed to load stats:', err);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -171,6 +187,9 @@ export default function WriteReviews() {
       // Mark as just completed
       setJustCompleted(prev => new Set([...prev, `anime_${animeId}`]));
 
+      // Reload stats to reflect the new review
+      loadStats();
+
       setEditingId(null);
       setEditContent('');
       setEditRating(0);
@@ -241,6 +260,9 @@ export default function WriteReviews() {
       // Mark as just completed
       setJustCompleted(prev => new Set([...prev, `character_${characterId}`]));
 
+      // Reload stats to reflect the new review
+      loadStats();
+
       setEditingId(null);
       setEditContent('');
       setEditRating(0);
@@ -284,15 +306,23 @@ export default function WriteReviews() {
   };
 
   const getFilteredStats = () => {
-    // Get all items based on filter (anime/character/all)
-    const baseFiltered = filter === 'all' ? allItems : allItems.filter(item => item.type === filter);
-
-    // Count how many have reviews
-    const reviewed = baseFiltered.filter(item => reviews[item.id]).length;
-    const total = baseFiltered.length;
-    const remaining = total - reviewed;
-
-    return { total, reviewed, remaining };
+    // Use backend stats (pre-calculated, not real-time)
+    if (filter === 'all') {
+      return {
+        reviewed: stats.total.reviewed,
+        remaining: stats.total.pending
+      };
+    } else if (filter === 'anime') {
+      return {
+        reviewed: stats.anime.reviewed,
+        remaining: stats.anime.pending
+      };
+    } else if (filter === 'character') {
+      return {
+        reviewed: stats.character.reviewed,
+        remaining: stats.character.pending
+      };
+    }
   };
 
   const filteredItems = getFilteredItems();
