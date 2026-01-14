@@ -307,8 +307,11 @@ export default function Feed() {
         }
       }
 
-      // Refresh activities
-      await resetActivities();
+      // Refresh activities: reset and reload
+      resetActivities();
+      // Wait a bit for reset to complete, then reload
+      await new Promise(resolve => setTimeout(resolve, 100));
+      await loadMore(false);
     } catch (err) {
       console.error('Failed to save:', err);
       throw err;
@@ -342,8 +345,11 @@ export default function Feed() {
         }
       }
 
-      // Refresh activities
-      await resetActivities();
+      // Refresh activities: reset and reload
+      resetActivities();
+      // Wait a bit for reset to complete, then reload
+      await new Promise(resolve => setTimeout(resolve, 100));
+      await loadMore(false);
     } catch (err) {
       console.error('Failed to delete:', err);
       alert(language === 'ko' ? '삭제에 실패했습니다.' : 'Failed to delete.');
