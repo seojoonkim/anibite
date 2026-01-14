@@ -2,9 +2,11 @@
 AniPass Backend - FastAPI Application
 왓챠피디아 스타일 애니메이션 평가 플랫폼
 """
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import HTTPException
 from config import ALLOWED_ORIGINS, COVER_IMAGES_DIR
 import os
 
@@ -18,14 +20,42 @@ app = FastAPI(
     redirect_slashes=False,  # Prevent HTTPS->HTTP redirect on Railway
 )
 
-# CORS middleware
+# Debug: Print allowed origins on startup
+print(f"[CORS] Allowed origins: {ALLOWED_ORIGINS}")
+
+# CORS middleware - Must be added before any routes
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,  # Cache preflight requests for 1 hour
 )
+
+
+# Exception handler to ensure CORS headers on error responses
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Add CORS headers to HTTP exception responses"""
+    origin = request.headers.get("origin")
+
+    # Check if origin is allowed
+    if origin and origin in ALLOWED_ORIGINS:
+        headers = {
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Credentials": "true",
+        }
+    else:
+        headers = {}
+
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+        headers=headers,
+    )
+
 
 # Static files (images)
 # 전체 images 폴더를 마운트 (covers, covers_large 등 포함)

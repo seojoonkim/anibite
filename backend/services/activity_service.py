@@ -70,12 +70,17 @@ def get_activities(
     total = total_row['total'] if total_row else 0
 
     # Get activities with engagement counts
-    query_params = params.copy()
+    # IMPORTANT: Parameters must be in the order they appear in the SQL!
+    # Placeholders in SELECT come before WHERE in the SQL text
+    query_params = []
 
-    # ALWAYS add current_user_id twice for liked check (even if None) to match SQL placeholders
+    # Add current_user_id twice for liked check (FIRST in SQL)
     query_params.extend([current_user_id, current_user_id])
 
-    # Add limit and offset
+    # Add WHERE clause params (SECOND in SQL)
+    query_params.extend(params)
+
+    # Add limit and offset (LAST in SQL)
     query_params.extend([limit, offset])
 
     rows = db.execute_query(

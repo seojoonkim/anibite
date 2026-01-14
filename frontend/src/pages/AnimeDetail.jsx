@@ -55,12 +55,6 @@ export default function AnimeDetail() {
     }
   );
 
-  // Debug: Log activities when they change
-  useEffect(() => {
-    console.log('[AnimeDetail] activities loaded:', activities.length, activities);
-  }, [activities]);
-
-
   // 로마 숫자 변환 함수
   const toRoman = (num) => {
     const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
