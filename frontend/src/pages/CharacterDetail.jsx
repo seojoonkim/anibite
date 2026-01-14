@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { characterService } from '../services/characterService';
 import { characterReviewService } from '../services/characterReviewService';
@@ -42,7 +42,7 @@ export default function CharacterDetail() {
 
   // Use unified activities hook
   const {
-    activities,
+    activities: otherActivities,
     loading: activitiesLoading,
     refetch: refetchActivities
   } = useActivities(
@@ -57,10 +57,45 @@ export default function CharacterDetail() {
     }
   );
 
-  // Debug: Log activities when they change
-  useEffect(() => {
-    console.log('[CharacterDetail] activities loaded:', activities.length, activities);
-  }, [activities]);
+  // Combine myReview with other activities
+  const activities = useMemo(() => {
+    const allActivities = [...otherActivities];
+
+    // If user has rating/review, add it to the top (if not already in the list)
+    if (myReview && user) {
+      const myActivityIndex = allActivities.findIndex(a => a.user_id === user.id);
+
+      if (myActivityIndex === -1) {
+        // Create activity object for my rating/review
+        const myActivity = {
+          id: `my-activity-${id}`,
+          user_id: user.id,
+          username: user.username || myReview.username,
+          display_name: user.display_name || myReview.display_name,
+          avatar_url: user.avatar_url || myReview.avatar_url,
+          activity_type: 'character_rating',
+          item_id: parseInt(id),
+          item_title: character?.name_full,
+          item_title_korean: character?.name_native,
+          item_image: character?.image_url,
+          rating: myReview.user_rating || character?.my_rating,
+          review_content: myReview.content || null,
+          review_title: myReview.title || null,
+          is_spoiler: myReview.is_spoiler || false,
+          activity_time: myReview.created_at || new Date().toISOString(),
+          likes_count: myReview.likes_count || 0,
+          comments_count: myReview.comments_count || 0,
+          user_liked: false,
+          otaku_score: myReview.otaku_score || user.otaku_score || 0
+        };
+
+        // Add to the beginning
+        allActivities.unshift(myActivity);
+      }
+    }
+
+    return allActivities;
+  }, [otherActivities, myReview, user, id, character]);
 
   useEffect(() => {
     loadAllData();
@@ -1164,470 +1199,7 @@ export default function CharacterDetail() {
                 </div>
               )}
 
-              {/* My Review */}
-              {myReview && (() => {
-                console.log('[CharacterDetail] Rendering myReview section:', {
-                  id: myReview.id,
-                  user_rating: myReview.user_rating,
-                  content: myReview.content ? 'Has content' : 'No content',
-                  character_my_rating: character?.my_rating,
-                  comments_count: myReview.comments_count
-                });
-                const myReviewLikeInfo = reviewLikes[myReview.id] || { liked: myReview.user_liked || false, count: myReview.likes_count || 0 };
-                const myReviewComments = comments[myReview.id] || [];
-                const isMyReviewExpanded = expandedComments.has(myReview.id);
-                console.log('[CharacterDetail] myReview - expandedComments:', Array.from(expandedComments));
-                console.log('[CharacterDetail] myReview - isMyReviewExpanded:', isMyReviewExpanded);
-                console.log('[CharacterDetail] myReview - myReviewComments length:', myReviewComments.length);
-                // myReview 데이터의 otaku_score 사용
-                const myLevelInfo = getCurrentLevelInfo(myReview.otaku_score || user?.otaku_score || 0);
-
-                return (
-                  <div className="mb-6 bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-blue-200 p-4">
-                    <div className="flex gap-4">
-                      {/* 왼쪽: 캐릭터 이미지 */}
-                      <Link
-                        to={`/character/${id}`}
-                        className="flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
-                      >
-                        <img
-                          src={getCharacterImageUrl(character?.id, character?.image_url)}
-                          alt={character?.name_full}
-                          className="w-16 h-24 object-cover rounded border-2 border-transparent hover:border-[#A8E6CF] transition-all"
-                          onError={(e) => {
-                            // Fallback chain: R2 .jpg → R2 .png → external URL → placeholder
-                            if (!e.target.dataset.thumbFallback) {
-                              e.target.dataset.thumbFallback = '1';
-                              e.target.src = `${IMAGE_BASE_URL}/images/characters/${character.id}.png`;
-                            } else if (e.target.dataset.thumbFallback === '1') {
-                              e.target.dataset.thumbFallback = '2';
-                              const fallbackUrl = getCharacterImageFallback(character.image_url);
-                              e.target.src = fallbackUrl !== '/placeholder-anime.svg' ? fallbackUrl : '/placeholder-anime.svg';
-                            } else {
-                              e.target.src = '/placeholder-anime.svg';
-                            }
-                          }}
-                        />
-                      </Link>
-
-                      {/* 오른쪽: 콘텐츠 */}
-                      <div className="flex-1 min-w-0">
-                        {/* User Info */}
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            {/* User Avatar */}
-                            <Link to={`/user/${user?.id}`} className="flex-shrink-0">
-                              {myReview.avatar_url ? (
-                                <img
-                                  src={getAvatarUrl(myReview.avatar_url)}
-                                  alt={myReview.display_name || myReview.username}
-                                  className="w-8 h-8 rounded-full object-cover border border-gray-200"
-                                />
-                              ) : (
-                                <div className="w-8 h-8 rounded-full flex items-center justify-center border border-gray-200" style={{ background: 'linear-gradient(to bottom right, #90B2E4, #638CCC)' }}>
-                                  <span className="text-white text-xs font-bold">
-                                    {(myReview.display_name || myReview.username || user?.username || '?').charAt(0).toUpperCase()}
-                                  </span>
-                                </div>
-                              )}
-                            </Link>
-                            <Link
-                              to={`/user/${user?.id}`}
-                              className="text-sm font-medium text-gray-700 hover:text-[#A8E6CF] transition-colors"
-                            >
-                              {myReview.display_name || myReview.username || user?.username}
-                            </Link>
-                            <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${myLevelInfo.bgColor} ${myLevelInfo.color}`}>
-                              {myLevelInfo.icon} {myLevelInfo.level} - {toRoman(myLevelInfo.rank)}
-                            </span>
-                            <span className="text-sm text-gray-600">
-                              {language === 'ko' ? '캐릭터를 평가했어요' : 'rated this character'}
-                            </span>
-                            <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded font-medium">
-                              {language === 'ko' ? '내 리뷰' : 'My Review'}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">
-                              {getTimeAgo(myReview.created_at)}
-                            </span>
-                            {/* Edit Menu */}
-                            <div className="relative">
-                              <button
-                                onClick={() => setShowEditMenu(showEditMenu === 'myReview' ? null : 'myReview')}
-                                className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100"
-                              >
-                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                  <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                                </svg>
-                              </button>
-                              {showEditMenu === 'myReview' && (
-                                <div className="absolute right-0 mt-1 w-32 bg-white rounded-md shadow-[0_2px_12px_rgba(0,0,0,0.08)] z-10 border border-gray-200">
-                                  <button
-                                    onClick={() => {
-                                      handleEditReview();
-                                      setShowEditMenu(null);
-                                    }}
-                                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-md"
-                                  >
-                                    {language === 'ko' ? '수정' : 'Edit'}
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      handleDeleteReview();
-                                      setShowEditMenu(null);
-                                    }}
-                                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-md border-t border-gray-200"
-                                  >
-                                    {language === 'ko' ? '삭제' : 'Delete'}
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* 캐릭터 이름 */}
-                        <Link
-                          to={`/character/${id}`}
-                          className="block group"
-                        >
-                          <h3 className="font-semibold text-gray-900 group-hover:text-[#A8E6CF] transition-colors mb-2 group-hover:underline">
-                            {character?.name_full}
-                          </h3>
-                        </Link>
-
-                        {/* Rating */}
-                        {(myReview.user_rating || character?.my_rating) && (myReview.user_rating > 0 || character?.my_rating > 0) && (
-                          <div className="mb-2">
-                            <StarRating rating={myReview.user_rating || character.my_rating} readonly size="sm" />
-                          </div>
-                        )}
-
-                        {/* Review Content */}
-                        {myReview.content && (
-                          <p className="text-sm text-gray-700 mb-3">
-                            {myReview.content}
-                          </p>
-                        )}
-
-                        {/* Like, Comment & Save Buttons */}
-                        <div className="mt-3 flex items-center justify-between">
-                          <div className="flex items-center gap-6">
-                            {/* Like Button */}
-                            <button
-                              onClick={() => handleToggleReviewLike(myReview.id)}
-                              className="flex items-center gap-2 transition-all hover:scale-110"
-                              style={{
-                                color: myReviewLikeInfo.liked ? '#DC2626' : '#6B7280'
-                              }}
-                            >
-                              {myReviewLikeInfo.liked ? (
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                </svg>
-                              ) : (
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                </svg>
-                              )}
-                              <span className="text-sm font-medium">
-                                {language === 'ko' ? '좋아요' : 'Like'}
-                                {myReviewLikeInfo.count > 0 && (
-                                  <> {myReviewLikeInfo.count}</>
-                                )}
-                              </span>
-                            </button>
-
-                            {/* Comment Button */}
-                            <button
-                              onClick={() => toggleComments(myReview.id)}
-                              className="flex items-center gap-2 transition-all hover:scale-110"
-                              style={{ color: '#6B7280' }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.color = '#8EC5FC';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.color = '#6B7280';
-                              }}
-                            >
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-                              </svg>
-                              <span className="text-sm font-medium">
-                                {language === 'ko' ? '댓글 달기' : 'Comment'}
-                                {myReview.comments_count > 0 && (
-                                  <> {myReview.comments_count}</>
-                                )}
-                              </span>
-                            </button>
-                          </div>
-
-                          {/* Save Button */}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleToggleSaveReview(myReview);
-                            }}
-                            className="flex items-center gap-2 transition-all hover:scale-110"
-                            style={{
-                              color: savedActivities.has(`character_rating_${user?.id}_${id}`) ? '#A8E6CF' : '#6B7280'
-                            }}
-                          >
-                            {savedActivities.has(`character_rating_${user?.id}_${id}`) ? (
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-                              </svg>
-                            ) : (
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-                              </svg>
-                            )}
-                            {savedActivities.has(`character_rating_${user?.id}_${id}`) && (
-                              <span className="text-sm font-medium">1</span>
-                            )}
-                          </button>
-                        </div>
-
-                        {/* Comments Section - Same as Other Reviews */}
-                        {isMyReviewExpanded && (
-                          <div className="mt-3 pt-3 border-t border-gray-200">
-                            {/* Comments List */}
-                            {myReviewComments.length > 0 && (
-                              <div className="space-y-3 mb-3">
-                              {myReviewComments.filter(c => !c.parent_comment_id).map((comment) => {
-                            const replies = myReviewComments.filter(r => r.parent_comment_id === comment.id);
-
-                            return (
-                              <div key={comment.id}>
-                                <div className="flex gap-2">
-                                  {comment.avatar_url ? (
-                                    <img
-                                      src={getAvatarUrl(comment.avatar_url)}
-                                      alt={comment.display_name || comment.username}
-                                      className="w-6 h-6 rounded-full object-cover"
-                                    />
-                                  ) : (
-                                    <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(to bottom right, #90B2E4, #638CCC)' }}>
-                                      <span className="text-white text-[10px] font-bold">
-                                        {(comment.display_name || comment.username || '?')[0].toUpperCase()}
-                                      </span>
-                                    </div>
-                                  )}
-
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2">
-                                      <Link
-                                        to={`/user/${comment.user_id}`}
-                                        className="text-xs font-medium text-gray-700 hover:text-[#A8E6CF]"
-                                      >
-                                        {comment.display_name || comment.username}
-                                      </Link>
-                                      {(() => {
-                                        const commentLevelInfo = getCurrentLevelInfo(comment.otaku_score || 0);
-                                        return (
-                                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${commentLevelInfo.bgColor} ${commentLevelInfo.color}`}>
-                                            {commentLevelInfo.icon} {commentLevelInfo.level} - {toRoman(commentLevelInfo.rank)}
-                                          </span>
-                                        );
-                                      })()}
-                                      <span className="text-[10px] text-gray-400">
-                                        {getTimeAgo(comment.created_at)}
-                                      </span>
-                                      {user && user.id === comment.user_id && (
-                                        <button
-                                          onClick={() => handleDeleteComment(myReview.id, comment.id)}
-                                          className="text-[10px] text-red-500 hover:text-red-700"
-                                        >
-                                          {language === 'ko' ? '삭제' : 'Delete'}
-                                        </button>
-                                      )}
-                                    </div>
-                                    <p className="text-sm text-gray-700 mb-1">{comment.content}</p>
-                                    <div className="flex items-center gap-3">
-                                      <button
-                                        onClick={() => handleToggleCommentLike(comment.id)}
-                                        className="flex items-center gap-1 transition-all hover:scale-110"
-                                        style={{
-                                          color: comment.user_liked ? '#DC2626' : '#9CA3AF'
-                                        }}
-                                      >
-                                        {comment.user_liked ? (
-                                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                          </svg>
-                                        ) : (
-                                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                          </svg>
-                                        )}
-                                        {comment.likes_count > 0 && (
-                                          <span className="text-xs">{comment.likes_count}</span>
-                                        )}
-                                      </button>
-                                      <button
-                                        onClick={() => handleReplyClick(myReview.id, comment.id)}
-                                        className="text-[10px]"
-                                        style={{ color: '#9CA3AF' }}
-                                        onMouseEnter={(e) => e.target.style.color = '#8EC5FC'}
-                                        onMouseLeave={(e) => e.target.style.color = '#9CA3AF'}
-                                      >
-                                        {language === 'ko' ? '답글' : 'Reply'}
-                                      </button>
-                                    </div>
-
-                                    {/* Reply Input */}
-                                    {replyingTo[myReview.id] === comment.id && (
-                                      <div className="flex gap-2 mt-2">
-                                        <input
-                                          type="text"
-                                          value={replyText[comment.id] || ''}
-                                          onChange={(e) => setReplyText(prev => ({
-                                            ...prev,
-                                            [comment.id]: e.target.value
-                                          }))}
-                                          onKeyDown={(e) => {
-                                            if (e.key === 'Enter' && !e.shiftKey) {
-                                              e.preventDefault();
-                                              handleSubmitReply(myReview.id, comment.id);
-                                            }
-                                          }}
-                                          placeholder={language === 'ko' ? '답글을 입력하세요...' : 'Write a reply...'}
-                                          className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#A8E6CF]"
-                                          autoFocus
-                                        />
-                                        <button
-                                          onClick={() => handleSubmitReply(myReview.id, comment.id)}
-                                          className="px-3 py-1.5 bg-[#A8E6CF] text-white rounded-lg text-sm hover:bg-[#35a8b0] transition-colors"
-                                        >
-                                          {language === 'ko' ? '등록' : 'Post'}
-                                        </button>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-
-                                {/* Replies */}
-                                {replies.length > 0 && (
-                                  <div className="ml-10 mt-2 space-y-2">
-                                    {replies.map((reply) => {
-                                      return (
-                                        <div key={reply.id} className="flex gap-2">
-                                          {reply.avatar_url ? (
-                                            <img
-                                              src={getAvatarUrl(reply.avatar_url)}
-                                              alt={reply.display_name || reply.username}
-                                              className="w-6 h-6 rounded-full object-cover"
-                                            />
-                                          ) : (
-                                            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(to bottom right, #90B2E4, #638CCC)' }}>
-                                              <span className="text-white text-[10px] font-bold">
-                                                {(reply.display_name || reply.username || '?')[0].toUpperCase()}
-                                              </span>
-                                            </div>
-                                          )}
-
-                                          <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2">
-                                              <Link
-                                                to={`/user/${reply.user_id}`}
-                                                className="text-xs font-medium text-gray-700 hover:text-[#A8E6CF]"
-                                              >
-                                                {reply.display_name || reply.username}
-                                              </Link>
-                                              {(() => {
-                                                const replyLevelInfo = getCurrentLevelInfo(reply.otaku_score || 0);
-                                                return (
-                                                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${replyLevelInfo.bgColor} ${replyLevelInfo.color}`}>
-                                                    {replyLevelInfo.icon} {replyLevelInfo.level} - {toRoman(replyLevelInfo.rank)}
-                                                  </span>
-                                                );
-                                              })()}
-                                              <span className="text-[10px] text-gray-400">
-                                                {getTimeAgo(reply.created_at)}
-                                              </span>
-                                              {user && user.id === reply.user_id && (
-                                                <button
-                                                  onClick={() => handleDeleteComment(myReview.id, reply.id)}
-                                                  className="text-[10px] text-red-500 hover:text-red-700"
-                                                >
-                                                  {language === 'ko' ? '삭제' : 'Delete'}
-                                                </button>
-                                              )}
-                                            </div>
-                                            <p className="text-sm text-gray-700 mb-1">{reply.content}</p>
-                                            <button
-                                              onClick={() => handleToggleCommentLike(reply.id)}
-                                              className="flex items-center gap-1 transition-all hover:scale-110"
-                                              style={{
-                                                color: reply.user_liked ? '#DC2626' : '#9CA3AF'
-                                              }}
-                                            >
-                                              {reply.user_liked ? (
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                                </svg>
-                                              ) : (
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" xmlns="http://www.w3.org/2000/svg">
-                                                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                                </svg>
-                                              )}
-                                              {reply.likes_count > 0 && (
-                                                <span className="text-xs">{reply.likes_count}</span>
-                                              )}
-                                            </button>
-                                          </div>
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                )}
-                              </div>
-                            );
-                              })}
-                              </div>
-                            )}
-
-                            {/* Comment Input */}
-                            {user && (
-                              <div className="flex gap-2">
-                                <input
-                                  type="text"
-                                  value={newComment[myReview.id] || ''}
-                                  onChange={(e) => setNewComment(prev => ({ ...prev, [myReview.id]: e.target.value }))}
-                                  onKeyPress={(e) => {
-                                    if (e.key === 'Enter') {
-                                      handleSubmitComment(myReview.id);
-                                    }
-                                  }}
-                                  placeholder={language === 'ko' ? '댓글을 입력하세요...' : 'Write a comment...'}
-                                  className="flex-1 px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                <button
-                                  onClick={() => handleSubmitComment(myReview.id)}
-                                  className="px-3 py-1.5 text-xs text-white rounded-lg transition-colors"
-                                  style={{ backgroundColor: '#8EC5FC' }}
-                                  onMouseEnter={(e) => e.target.style.backgroundColor = '#638CCC'}
-                                  onMouseLeave={(e) => e.target.style.backgroundColor = '#8EC5FC'}
-                                >
-                                  {language === 'ko' ? '작성' : 'Submit'}
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* Other Reviews */}
-              {(() => {
-                console.log('[CharacterDetail] Rendering reviews section, reviews:', reviews);
-                console.log('[CharacterDetail] reviews.length:', reviews.length);
-                return null;
-              })()}
+              {/* Reviews */}
               {activities.length > 0 ? (
                 <div className="space-y-4">
                   {activities.map((activity) => (
@@ -1636,12 +1208,35 @@ export default function CharacterDetail() {
                       activity={activity}
                       context="character_page"
                       onUpdate={refetchActivities}
+                      onEditContent={(activity, mode) => {
+                        // Only allow editing own content
+                        if (user && activity.user_id === user.id) {
+                          if (mode === 'add_review' || !myReview || !myReview.content) {
+                            // Open review form for adding review
+                            setReviewData({
+                              content: '',
+                              is_spoiler: false,
+                              rating: character?.my_rating || 0
+                            });
+                            setIsEditingReview(false);
+                            setShowReviewForm(true);
+                          } else {
+                            // Open review form for editing
+                            handleEditReview();
+                          }
+                        }
+                      }}
+                      onDeleteContent={async (activity) => {
+                        // Only allow deleting own content
+                        if (user && activity.user_id === user.id) {
+                          await handleDeleteReview();
+                        }
+                      }}
                     />
                   ))}
                 </div>
               ) : (
                 <p className="text-gray-600">{language === 'ko' ? '아직 리뷰가 없습니다.' : 'No reviews yet.'}</p>
-              )}
               )}
             </div>
           </div>
