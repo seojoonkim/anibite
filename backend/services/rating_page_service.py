@@ -37,7 +37,7 @@ def get_anime_for_rating(user_id: int, limit: int = 50, offset: int = 0) -> List
         FROM anime a
         LEFT JOIN user_ratings ur ON a.id = ur.anime_id AND ur.user_id = ?
         WHERE ur.id IS NULL OR ur.status = 'WANT_TO_WATCH'
-        ORDER BY (a.popularity + (RANDOM() % CAST(a.popularity * 0.15 AS INTEGER) + 1)) DESC
+        ORDER BY (a.popularity + (a.id % 100)) DESC, a.id ASC
         LIMIT ? OFFSET ?
         """,
         (user_id, limit, offset)
@@ -85,7 +85,7 @@ def get_characters_for_rating(user_id: int, limit: int = 50, offset: int = 0) ->
             AND c.name_full NOT LIKE '%Extra%'
             AND c.name_full NOT LIKE '%Background%'
         GROUP BY c.id
-        ORDER BY (c.favourites + (RANDOM() % CAST(c.favourites * 0.2 AS INTEGER) + 1)) DESC
+        ORDER BY (c.favourites + (c.id % 50)) DESC, c.id ASC
         LIMIT ? OFFSET ?
         """,
         (user_id, user_id, limit, offset)
@@ -225,7 +225,7 @@ def get_items_for_review_writing(user_id: int, limit: int = 50) -> List[Dict]:
         )
         SELECT *
         FROM combined
-        ORDER BY RANDOM()
+        ORDER BY (item_id % 100) DESC, updated_at DESC
         LIMIT ?
         """,
         (user_id, user_id, limit)
