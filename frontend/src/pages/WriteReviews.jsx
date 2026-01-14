@@ -53,31 +53,44 @@ export default function WriteReviews() {
       console.log('[WriteReviews] Items count:', data?.items?.length || 0);
 
       // 응답 데이터를 기존 형식으로 변환
-      const items = (data.items || []).map(item => ({
-        type: item.type,
-        id: `${item.type}_${item.item_id}`,
-        itemId: item.item_id,
-        rating: item.rating,
-        updated_at: item.updated_at,
-        // 애니메이션 필드
-        ...(item.type === 'anime' ? {
-          anime_id: item.item_id,
-          title_romaji: item.item_title,
-          title_english: item.item_title,
-          title_korean: item.item_title_korean,
-          image_url: item.item_image,
-          year: item.item_year
-        } : {}),
-        // 캐릭터 필드
-        ...(item.type === 'character' ? {
-          character_id: item.item_id,
-          character_name: item.item_title, // English name
-          character_name_native: item.item_title_korean, // Native name
-          character_image: item.item_image,
-          anime_id: item.anime_id,
-          anime_title: item.anime_title_korean || item.anime_title
-        } : {})
-      }));
+      const items = (data.items || []).map(item => {
+        const processed = {
+          type: item.type,
+          id: `${item.type}_${item.item_id}`,
+          itemId: item.item_id,
+          rating: item.rating,
+          updated_at: item.updated_at,
+          // 애니메이션 필드
+          ...(item.type === 'anime' ? {
+            anime_id: item.item_id,
+            title_romaji: item.item_title,
+            title_english: item.item_title,
+            title_korean: item.item_title_korean,
+            image_url: item.item_image,
+            year: item.item_year
+          } : {}),
+          // 캐릭터 필드
+          ...(item.type === 'character' ? {
+            character_id: item.item_id,
+            character_name: item.item_title, // English name
+            character_name_native: item.item_title_korean, // Native name
+            character_image: item.item_image,
+            anime_id: item.anime_id,
+            anime_title: item.anime_title_korean || item.anime_title
+          } : {})
+        };
+
+        // Debug: log character items with anime info
+        if (item.type === 'character') {
+          console.log('[WriteReviews] Character item:', {
+            name: processed.character_name,
+            anime_id: processed.anime_id,
+            anime_title: processed.anime_title
+          });
+        }
+
+        return processed;
+      });
 
       console.log('[WriteReviews] Processed items:', items.length);
 
@@ -511,18 +524,24 @@ export default function WriteReviews() {
                         {item.title_romaji || item.title_english}
                       </p>
                     )}
-                    {item.type === 'character' && item.anime_title && (
+                    {item.type === 'character' && (
                       <p className="text-xs text-gray-500 mb-1">
-                        from:{' '}
-                        {item.anime_id ? (
-                          <Link
-                            to={`/anime/${item.anime_id}`}
-                            className="hover:text-[#737373] hover:underline transition-colors"
-                          >
-                            {item.anime_title}
-                          </Link>
+                        {item.anime_title ? (
+                          <>
+                            from:{' '}
+                            {item.anime_id ? (
+                              <Link
+                                to={`/anime/${item.anime_id}`}
+                                className="hover:text-[#737373] hover:underline transition-colors"
+                              >
+                                {item.anime_title}
+                              </Link>
+                            ) : (
+                              item.anime_title
+                            )}
+                          </>
                         ) : (
-                          item.anime_title
+                          <span style={{ color: '#ff0000' }}>[anime_title missing]</span>
                         )}
                       </p>
                     )}
