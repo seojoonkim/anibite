@@ -374,9 +374,9 @@ def get_five_star_characters(user_id: int) -> List[Dict]:
 
 
 def get_character_ratings(user_id: int, limit: int = 500) -> List[Dict]:
-    """사용자가 평가한 캐릭터 목록 (feed_activities + character_ratings 결합)"""
+    """사용자가 평가한 캐릭터 목록 (activities + character_ratings 결합)"""
 
-    # Part 1: 평점이 있는 캐릭터들 (feed_activities에서 빠르게 조회)
+    # Part 1: 평점이 있는 캐릭터들 (activities에서 빠르게 조회)
     rated_rows = db.execute_query(
         """
         SELECT
@@ -390,7 +390,7 @@ def get_character_ratings(user_id: int, limit: int = 500) -> List[Dict]:
             anime_id,
             anime_title,
             anime_title_korean
-        FROM feed_activities
+        FROM activities
         WHERE user_id = ? AND activity_type = 'character_rating'
         ORDER BY activity_time DESC
         LIMIT ?
