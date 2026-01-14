@@ -11,7 +11,7 @@ from config import ALLOWED_ORIGINS, COVER_IMAGES_DIR
 import os
 
 # Import API routers
-from api import auth, anime, ratings, reviews, comments, users, series, characters, character_ratings, feed, follows, activity_comments, activity_likes, comment_likes, user_posts, character_reviews, notifications, activities
+from api import auth, anime, ratings, reviews, comments, users, series, characters, character_ratings, feed, follows, activity_comments, activity_likes, comment_likes, user_posts, character_reviews, notifications, activities, rating_pages
 
 app = FastAPI(
     title="AniPass API",
@@ -89,6 +89,7 @@ def health_check():
 # Include API routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(activities.router, prefix="/api/activities", tags=["Activities"])  # Unified activities API
+app.include_router(rating_pages.router, prefix="/api/rating-pages", tags=["Rating Pages"])  # Ultra-fast rating pages
 app.include_router(anime.router, prefix="/api/anime", tags=["Anime"])
 app.include_router(ratings.router, prefix="/api/ratings", tags=["Ratings"])
 app.include_router(character_ratings.router, prefix="/api/character-ratings", tags=["Character Ratings"])

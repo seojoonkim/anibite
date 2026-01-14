@@ -58,4 +58,21 @@ export const animeService = {
     const response = await api.get('/api/anime/genres');
     return response.data;
   },
+
+  /**
+   * Get anime for rating page (ULTRA FAST - 0.1s target)
+   * Uses optimized endpoint with built-in randomness
+   */
+  async getAnimeForRating(params = {}) {
+    const response = await api.get('/api/rating-pages/anime', { params });
+    return response.data;
+  },
+
+  /**
+   * Get anime rating page stats (ULTRA FAST)
+   */
+  async getAnimeRatingStats() {
+    const response = await api.get('/api/rating-pages/anime/stats');
+    return response.data;
+  },
 };

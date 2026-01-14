@@ -75,5 +75,22 @@ export const characterService = {
   async getMyRatedCharacters(params = {}) {
     const response = await api.get('/api/characters/rated', { params });
     return response.data;
+  },
+
+  /**
+   * Get characters for rating page (ULTRA FAST - 0.1s target)
+   * Uses optimized endpoint with built-in randomness
+   */
+  async getCharactersForRating(params = {}) {
+    const response = await api.get('/api/rating-pages/characters', { params });
+    return response.data;
+  },
+
+  /**
+   * Get character rating page stats (ULTRA FAST)
+   */
+  async getCharacterRatingStats() {
+    const response = await api.get('/api/rating-pages/characters/stats');
+    return response.data;
   }
 };
