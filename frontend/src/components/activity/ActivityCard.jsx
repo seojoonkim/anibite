@@ -336,7 +336,7 @@ export default function ActivityCard({
   const handleEditRating = () => {
     // Use custom handler if provided (for detail pages)
     if (onEditContent) {
-      onEditContent(activity, 'rating');
+      onEditContent(activity, 'edit_rating');
       return;
     }
 
