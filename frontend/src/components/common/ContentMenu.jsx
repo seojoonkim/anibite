@@ -31,6 +31,15 @@ export default function ContentMenu({
   // Only show menu for own content
   const isOwnContent = user && item.user_id && user.id === item.user_id;
 
+  // Debug log
+  console.log('ContentMenu Debug:', {
+    user: user?.id,
+    item_user_id: item.user_id,
+    isOwnContent,
+    type,
+    item
+  });
+
   if (!isOwnContent) {
     return null;
   }

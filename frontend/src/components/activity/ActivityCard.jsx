@@ -338,10 +338,22 @@ export default function ActivityCard({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 hover:shadow-[0_2px_12px_rgba(0,0,0,0.12)] transition-all">
+    <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 hover:shadow-[0_2px_12px_rgba(0,0,0,0.12)] transition-all relative">
+      {/* ContentMenu - Always visible for own content */}
+      <div className="absolute top-3 right-3">
+        <ContentMenu
+          type={activity.activity_type}
+          item={activity}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onEditRating={handleEditRating}
+          onAddReview={handleAddReview}
+        />
+      </div>
+
       {/* Header: User Info + Activity Type + Timestamp */}
       {finalShowOptions.showUserInfo && (
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 pr-8">
           <div className="flex items-center gap-2.5">
             {/* User Avatar */}
             <Link to={`/user/${activity.user_id}`} className="flex-shrink-0">
@@ -390,22 +402,10 @@ export default function ActivityCard({
             </div>
           </div>
 
-          {/* Timestamp + Menu */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <span className="text-xs text-gray-400">
-              {getRelativeTime(activity.activity_time)}
-            </span>
-
-            {/* ContentMenu */}
-            <ContentMenu
-              type={activity.activity_type}
-              item={activity}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onEditRating={handleEditRating}
-              onAddReview={handleAddReview}
-            />
-          </div>
+          {/* Timestamp */}
+          <span className="text-xs text-gray-400">
+            {getRelativeTime(activity.activity_time)}
+          </span>
         </div>
       )}
 
