@@ -32,6 +32,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
   };
 
   useEffect(() => {
+    console.log('[EditReviewModal] useEffect:', { isOpen, activity, mode });
     if (isOpen && activity) {
       setFormData({
         rating: activity.rating || 0,
@@ -40,7 +41,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
       });
       setError('');
     }
-  }, [isOpen, activity]);
+  }, [isOpen, activity, mode]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -77,7 +78,12 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    console.log('[EditReviewModal] Not rendering - isOpen is false');
+    return null;
+  }
+
+  console.log('[EditReviewModal] Rendering modal:', { isOpen, activity, mode });
 
   const getTitle = () => {
     if (mode === 'edit_rating') {
