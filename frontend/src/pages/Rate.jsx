@@ -534,13 +534,13 @@ export default function Rate() {
               <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{stats.pass.toLocaleString()}</div>
             </div>
 
-            {/* Average Rating */}
-            {stats.averageRating > 0 && (
-              <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-                <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</div>
-                <div className="text-lg font-bold text-gray-800 text-center tabular-nums">★ {stats.averageRating.toFixed(1)}</div>
+            {/* Average Rating - Always show */}
+            <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
+              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</div>
+              <div className="text-lg font-bold text-gray-800 text-center tabular-nums">
+                {stats.averageRating > 0 ? `★ ${stats.averageRating.toFixed(1)}` : '-'}
               </div>
-            )}
+            </div>
           </div>
         </div>
 
