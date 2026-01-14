@@ -292,13 +292,18 @@ export default function Feed() {
 
         // 리뷰 내용이 있으면 리뷰 업데이트
         if (formData.content && formData.content.trim()) {
-          const reviewId = editingActivity.id; // activity.id is actually the review/rating id
+          // Get the actual review ID from the review table (not activity ID)
+          let reviewId;
           if (isAnime) {
+            const myReview = await reviewService.getMyReview(editingActivity.item_id);
+            reviewId = myReview.review_id || myReview.id;
             await reviewService.updateReview(reviewId, {
               content: formData.content,
               is_spoiler: formData.is_spoiler
             });
           } else {
+            const myReview = await characterReviewService.getMyReview(editingActivity.item_id);
+            reviewId = myReview.review_id || myReview.id;
             await characterReviewService.updateReview(reviewId, {
               content: formData.content,
               is_spoiler: formData.is_spoiler
