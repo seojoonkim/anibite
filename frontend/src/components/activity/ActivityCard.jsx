@@ -364,23 +364,11 @@ export default function ActivityCard({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 hover:shadow-[0_2px_12px_rgba(0,0,0,0.12)] transition-all relative">
-      {/* ContentMenu - Always visible for own content */}
-      <div className="absolute top-3 right-3">
-        <ContentMenu
-          type={activity.activity_type}
-          item={activity}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onEditRating={handleEditRating}
-          onAddReview={handleAddReview}
-        />
-      </div>
-
-      {/* Header: User Info + Activity Type + Timestamp */}
+    <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 hover:shadow-[0_2px_12px_rgba(0,0,0,0.12)] transition-all">
+      {/* Header: User Info + Activity Type + Timestamp + Menu */}
       {finalShowOptions.showUserInfo && (
-        <div className="flex mb-3 pr-8">
-          <div className="flex items-center gap-2.5 flex-1">
+        <div className="flex items-center mb-3 gap-2">
+          <div className="flex items-center gap-2.5 flex-1 min-w-0">
             {/* User Avatar */}
             <Link to={`/user/${activity.user_id}`} className="flex-shrink-0">
               {activity.avatar_url && !avatarError ? (
@@ -406,7 +394,7 @@ export default function ActivityCard({
 
             {/* User Info + Activity Type */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Link
                   to={`/user/${activity.user_id}`}
                   className="text-sm font-semibold text-gray-800 hover:text-[#3797F0] transition-colors"
@@ -430,11 +418,21 @@ export default function ActivityCard({
             </div>
           </div>
 
-          {/* Timestamp - vertically centered with avatar */}
-          <div className="flex items-center h-9">
-            <span className="text-xs text-gray-400">
-              {getRelativeTime(activity.activity_time)}
-            </span>
+          {/* Timestamp */}
+          <span className="text-xs text-gray-400 flex-shrink-0">
+            {getRelativeTime(activity.activity_time)}
+          </span>
+
+          {/* ContentMenu - Aligned with header */}
+          <div className="flex-shrink-0">
+            <ContentMenu
+              type={activity.activity_type}
+              item={activity}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onEditRating={handleEditRating}
+              onAddReview={handleAddReview}
+            />
           </div>
         </div>
       )}
