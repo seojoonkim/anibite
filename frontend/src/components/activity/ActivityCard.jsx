@@ -381,6 +381,16 @@ export default function ActivityCard({
                 </span>
               </button>
             </div>
+
+            {/* Bookmark Button */}
+            <button
+              className="flex items-center gap-2 transition-all hover:scale-110 text-gray-600 hover:text-[#FFD700]"
+              title={language === 'ko' ? '저장하기' : 'Bookmark'}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+              </svg>
+            </button>
           </div>
 
           {/* Comments Section */}
