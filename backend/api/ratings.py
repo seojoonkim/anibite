@@ -16,6 +16,7 @@ from services.rating_service import (
     create_or_update_rating,
     get_user_rating_for_anime,
     get_user_ratings,
+    get_all_user_ratings,
     delete_rating
 )
 from api.deps import get_current_user
@@ -38,6 +39,29 @@ def create_rating(
     이미 평점이 있으면 수정됨
     """
     return create_or_update_rating(current_user.id, rating_data)
+
+
+@router.get("/me/all")
+def get_all_my_ratings(
+    current_user: UserResponse = Depends(get_current_user)
+):
+    """
+    내 모든 평점을 한 번에 조회 (RATED, WANT_TO_WATCH, PASS)
+
+    3개의 API 호출을 1개로 줄여 로딩 속도 비약적 향상
+
+    Returns:
+        {
+            "rated": [...],
+            "watchlist": [...],
+            "pass": [...],
+            "total_rated": 0,
+            "total_watchlist": 0,
+            "total_pass": 0,
+            "average_rating": 0.0
+        }
+    """
+    return get_all_user_ratings(current_user.id)
 
 
 @router.get("/me", response_model=UserRatingListResponse)
@@ -87,6 +111,29 @@ def delete_my_rating(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Rating not found"
         )
+
+
+@router.get("/user/{user_id}/all")
+def get_all_user_ratings_by_id(
+    user_id: int
+):
+    """
+    다른 사용자의 모든 평점을 한 번에 조회 (RATED, WANT_TO_WATCH, PASS)
+
+    3개의 API 호출을 1개로 줄여 로딩 속도 비약적 향상
+
+    Returns:
+        {
+            "rated": [...],
+            "watchlist": [...],
+            "pass": [...],
+            "total_rated": 0,
+            "total_watchlist": 0,
+            "total_pass": 0,
+            "average_rating": 0.0
+        }
+    """
+    return get_all_user_ratings(user_id)
 
 
 @router.get("/user/{user_id}", response_model=UserRatingListResponse)
