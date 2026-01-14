@@ -72,9 +72,8 @@ def get_activities(
     # Get activities with engagement counts
     query_params = params.copy()
 
-    # Add current_user_id twice for liked check
-    if current_user_id:
-        query_params.extend([current_user_id, current_user_id])
+    # ALWAYS add current_user_id twice for liked check (even if None) to match SQL placeholders
+    query_params.extend([current_user_id, current_user_id])
 
     # Add limit and offset
     query_params.extend([limit, offset])
@@ -118,9 +117,8 @@ def get_activities(
 def get_activity_by_id(activity_id: int, current_user_id: Optional[int] = None) -> Optional[Dict]:
     """Get a single activity by ID"""
 
-    query_params = [activity_id]
-    if current_user_id:
-        query_params.extend([current_user_id, current_user_id])
+    # ALWAYS add current_user_id twice (even if None) to match SQL placeholders, then activity_id
+    query_params = [current_user_id, current_user_id, activity_id]
 
     row = db.execute_query(
         """
