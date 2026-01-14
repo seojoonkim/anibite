@@ -323,7 +323,7 @@ def get_activity_comments(activity_id: int) -> List[Dict]:
     rows = db.execute_query(
         """
         SELECT
-            ac.id, ac.activity_id, ac.user_id, ac.content, ac.created_at,
+            ac.id, ac.activity_id, ac.user_id, ac.content, ac.created_at, ac.parent_comment_id,
             u.username, u.display_name, u.avatar_url,
             COALESCE(us.otaku_score, 0) as otaku_score
         FROM activity_comments ac
