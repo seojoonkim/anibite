@@ -5,9 +5,10 @@ Handles all user activities (anime ratings/reviews, character ratings/reviews, u
 from a single 'activities' table.
 """
 from typing import List, Optional, Dict
-from database import db, dict_from_row
+from database import Database, dict_from_row
 
 def get_activities(
+    db: Database,
     activity_type: Optional[str] = None,
     user_id: Optional[int] = None,
     item_id: Optional[int] = None,
