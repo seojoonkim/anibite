@@ -120,3 +120,15 @@ conn.close()
 
 print("✅ Database initialization complete!")
 print(f"Database file size: {DB_PATH.stat().st_size} bytes")
+
+# Fix triggers to use INSERT OR REPLACE
+print("\n🔧 Fixing database triggers...")
+try:
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent))
+    from scripts.fix_railway_triggers import fix_triggers
+    fix_triggers()
+    print("✅ Triggers fixed successfully!")
+except Exception as e:
+    print(f"⚠️ Failed to fix triggers: {e}")
+    print("Triggers will be fixed on first API call.")
