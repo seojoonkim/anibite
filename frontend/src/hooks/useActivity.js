@@ -104,6 +104,12 @@ export function useActivityLike(activityId, initialLiked = false, initialCount =
   const [likesCount, setLikesCount] = useState(initialCount);
   const [loading, setLoading] = useState(false);
 
+  // Update state when props change (e.g., after parent refetch)
+  useEffect(() => {
+    setLiked(initialLiked);
+    setLikesCount(initialCount);
+  }, [initialLiked, initialCount]);
+
   const toggleLike = async () => {
     if (loading) return;
 
@@ -117,10 +123,12 @@ export function useActivityLike(activityId, initialLiked = false, initialCount =
 
     try {
       const result = await activityService.toggleLike(activityId);
+      console.log('Like API response:', result); // Debug log
       setLiked(result.liked);
       setLikesCount(result.likes_count);
     } catch (err) {
       console.error('Failed to toggle like:', err);
+      alert('좋아요 처리에 실패했습니다. 다시 시도해주세요.');
       // Revert on error
       setLiked(prevLiked);
       setLikesCount(prevCount);
