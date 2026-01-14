@@ -30,6 +30,7 @@ export default function AnimeDetail() {
   const [reviewError, setReviewError] = useState('');
   const [reviewSuccess, setReviewSuccess] = useState('');
   const [failedImages, setFailedImages] = useState(new Set());
+  const [showEditMenu, setShowEditMenu] = useState(null);
 
   // Use unified activities hook
   const {

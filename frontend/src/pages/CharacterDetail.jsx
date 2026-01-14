@@ -27,6 +27,7 @@ export default function CharacterDetail() {
   const [reviewData, setReviewData] = useState({ content: '', is_spoiler: false, rating: 0 });
   const [reviewError, setReviewError] = useState('');
   const [reviewSuccess, setReviewSuccess] = useState('');
+  const [showEditMenu, setShowEditMenu] = useState(null);
 
   // Use unified activities hook
   const {
