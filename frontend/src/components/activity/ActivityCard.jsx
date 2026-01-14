@@ -127,38 +127,14 @@ export default function ActivityCard({
 
     if (activity.activity_type === 'anime_rating') {
       if (hasReview) {
-        return language === 'ko' ? (
-          <>
-            <span className="font-bold" style={{ fontSize: '0.9375rem' }}>애니</span>를 리뷰했어요
-          </>
-        ) : (
-          <>reviewed an <span className="font-bold" style={{ fontSize: '0.9375rem' }}>anime</span></>
-        );
+        return language === 'ko' ? '애니를 리뷰했어요' : 'reviewed an anime';
       }
-      return language === 'ko' ? (
-        <>
-          <span className="font-bold" style={{ fontSize: '0.9375rem' }}>애니</span>를 평가했어요
-        </>
-      ) : (
-        <>rated an <span className="font-bold" style={{ fontSize: '0.9375rem' }}>anime</span></>
-      );
+      return language === 'ko' ? '애니를 평가했어요' : 'rated an anime';
     } else if (activity.activity_type === 'character_rating') {
       if (hasReview) {
-        return language === 'ko' ? (
-          <>
-            <span className="font-bold" style={{ fontSize: '0.9375rem' }}>캐릭터</span>를 리뷰했어요
-          </>
-        ) : (
-          <>reviewed a <span className="font-bold" style={{ fontSize: '0.9375rem' }}>character</span></>
-        );
+        return language === 'ko' ? '캐릭터를 리뷰했어요' : 'reviewed a character';
       }
-      return language === 'ko' ? (
-        <>
-          <span className="font-bold" style={{ fontSize: '0.9375rem' }}>캐릭터</span>를 평가했어요
-        </>
-      ) : (
-        <>rated a <span className="font-bold" style={{ fontSize: '0.9375rem' }}>character</span></>
-      );
+      return language === 'ko' ? '캐릭터를 평가했어요' : 'rated a character';
     } else if (activity.activity_type === 'user_post') {
       return language === 'ko' ? '포스트를 작성했어요' : 'created a post';
     }
