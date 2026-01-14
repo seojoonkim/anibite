@@ -5,9 +5,14 @@ import { useLanguage } from '../context/LanguageContext';
 import { useActivities } from '../hooks/useActivity';
 import { activityService } from '../services/activityService';
 import { notificationService } from '../services/notificationService';
+import { ratingService } from '../services/ratingService';
+import { reviewService } from '../services/reviewService';
+import { characterService } from '../services/characterService';
+import { characterReviewService } from '../services/characterReviewService';
 import Navbar from '../components/common/Navbar';
 import ActivityCard from '../components/activity/ActivityCard';
 import NotificationCard from '../components/feed/NotificationCard';
+import EditReviewModal from '../components/common/EditReviewModal';
 import { getAvatarUrl as getAvatarUrlHelper } from '../utils/imageHelpers';
 
 export default function Feed() {
@@ -19,6 +24,11 @@ export default function Feed() {
   const [newPostContent, setNewPostContent] = useState('');
   const [notifications, setNotifications] = useState([]);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
+
+  // Edit modal state
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingActivity, setEditingActivity] = useState(null);
+  const [editMode, setEditMode] = useState('edit'); // 'edit' | 'add_review' | 'edit_rating'
 
   // Use unified activities hook for all/following filters
   const {
@@ -189,6 +199,118 @@ export default function Feed() {
 
   const filteredActivities = getFilteredActivities();
   const isLoading = feedFilter === 'notifications' ? notificationsLoading : loading;
+
+  // Edit modal handlers
+  const handleEditContent = (activity, mode = 'edit') => {
+    setEditingActivity(activity);
+    setEditMode(mode);
+    setEditModalOpen(true);
+  };
+
+  const handleSaveEdit = async (formData) => {
+    if (!editingActivity) return;
+
+    const isAnime = editingActivity.activity_type === 'anime_rating';
+
+    try {
+      if (editMode === 'edit_rating') {
+        // 별점만 수정
+        if (isAnime) {
+          await ratingService.rateAnime(editingActivity.item_id, {
+            rating: formData.rating,
+            status: 'RATED'
+          });
+        } else {
+          await characterService.rateCharacter(editingActivity.item_id, formData.rating);
+        }
+      } else if (editMode === 'add_review') {
+        // 리뷰 추가
+        if (isAnime) {
+          await reviewService.createReview({
+            anime_id: editingActivity.item_id,
+            rating: formData.rating,
+            content: formData.content,
+            is_spoiler: formData.is_spoiler
+          });
+        } else {
+          await characterReviewService.createReview({
+            character_id: editingActivity.item_id,
+            rating: formData.rating,
+            content: formData.content,
+            is_spoiler: formData.is_spoiler
+          });
+        }
+      } else {
+        // 리뷰 수정
+        // 별점이 변경되었으면 별점도 업데이트
+        if (formData.rating !== editingActivity.rating) {
+          if (isAnime) {
+            await ratingService.rateAnime(editingActivity.item_id, {
+              rating: formData.rating,
+              status: 'RATED'
+            });
+          } else {
+            await characterService.rateCharacter(editingActivity.item_id, formData.rating);
+          }
+        }
+
+        // 리뷰 내용 업데이트
+        const reviewId = editingActivity.id; // activity.id is actually the review/rating id
+        if (isAnime) {
+          await reviewService.updateReview(reviewId, {
+            content: formData.content,
+            is_spoiler: formData.is_spoiler
+          });
+        } else {
+          await characterReviewService.updateReview(reviewId, {
+            content: formData.content,
+            is_spoiler: formData.is_spoiler
+          });
+        }
+      }
+
+      // Refresh activities
+      await refetch();
+    } catch (err) {
+      console.error('Failed to save:', err);
+      throw err;
+    }
+  };
+
+  const handleDeleteContent = async (activity) => {
+    const isAnime = activity.activity_type === 'anime_rating';
+    const hasReview = activity.review_content && activity.review_content.trim();
+
+    const confirmMessage = language === 'ko'
+      ? (hasReview ? '리뷰를 삭제하시겠습니까?' : '평가를 삭제하시겠습니까?')
+      : (hasReview ? 'Delete this review?' : 'Delete this rating?');
+
+    if (!confirm(confirmMessage)) return;
+
+    try {
+      if (hasReview) {
+        // 리뷰 삭제
+        if (isAnime) {
+          await reviewService.deleteReview(activity.id);
+        } else {
+          await characterReviewService.deleteReview(activity.id);
+        }
+      } else {
+        // 평가만 삭제
+        if (isAnime) {
+          await ratingService.deleteRating(activity.item_id);
+        } else {
+          await characterService.deleteCharacterRating(activity.item_id);
+        }
+      }
+
+      // Refresh activities
+      await refetch();
+    } catch (err) {
+      console.error('Failed to delete:', err);
+      alert(language === 'ko' ? '삭제에 실패했습니다.' : 'Failed to delete.');
+    }
+  };
 
   return (
     <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
@@ -376,6 +498,8 @@ export default function Feed() {
                           activity={activity}
                           context="notification"
                           onUpdate={refetch}
+                          onEditContent={handleEditContent}
+                          onDeleteContent={handleDeleteContent}
                         />
                       </NotificationCard>
                     );
@@ -388,6 +512,8 @@ export default function Feed() {
                         activity={activity}
                         context="feed"
                         onUpdate={refetch}
+                        onEditContent={handleEditContent}
+                        onDeleteContent={handleDeleteContent}
                       />
                     </div>
                   );
@@ -416,6 +542,18 @@ export default function Feed() {
           border: 2px solid #A8E6CF !important;
         }
       `}</style>
+
+      {/* Edit Review Modal */}
+      <EditReviewModal
+        isOpen={editModalOpen}
+        onClose={() => {
+          setEditModalOpen(false);
+          setEditingActivity(null);
+        }}
+        activity={editingActivity}
+        onSave={handleSaveEdit}
+        mode={editMode}
+      />
     </div>
   );
 }
