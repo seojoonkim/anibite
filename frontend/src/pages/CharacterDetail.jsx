@@ -218,11 +218,12 @@ export default function CharacterDetail() {
   const handleRatingChange = async (rating) => {
     try {
       if (rating === 0) {
-        await characterService.rateCharacter(id, null);
+        await characterService.deleteCharacterRating(id);
         setCharacter({ ...character, my_rating: null });
         setMyReview(null);
       } else {
-        await characterService.rateCharacter(id, rating);
+        // rateCharacter expects an object, not a direct rating value
+        await characterService.rateCharacter(id, { rating });
         setCharacter({ ...character, my_rating: rating });
         // 평점 입력 후 내 리뷰 섹션에 바로 표시
         const myReviewData = await characterReviewService.getMyReview(id).catch(() => null);
@@ -248,7 +249,8 @@ export default function CharacterDetail() {
 
   const handleStatusChange = async (status) => {
     try {
-      await characterService.rateCharacter(id, null, status);
+      // rateCharacter expects an object with status property
+      await characterService.rateCharacter(id, { status });
       setCharacter({ ...character, my_status: status });
       const charData = await characterService.getCharacterDetail(id);
       if (charData) setCharacter(charData);
