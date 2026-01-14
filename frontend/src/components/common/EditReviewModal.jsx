@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import StarRating from './StarRating';
 
-const IMAGE_BASE_URL = import.meta.env.VITE_API_URL || 'https://anipass-production.up.railway.app';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL || API_BASE_URL;
 
 /**
  * EditReviewModal - 리뷰 수정 모달
@@ -27,10 +28,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
 
   // Helper to convert relative URLs to absolute - same logic as ActivityCard
   const getImageUrl = (url) => {
-    if (!url) {
-      console.log('[EditReviewModal] No image URL provided');
-      return '/placeholder-anime.svg';
-    }
+    if (!url) return '/placeholder-anime.svg';
 
     // If it's an AniList character image, try R2 first
     if (url.includes('anilist.co') && url.includes('/character/')) {
@@ -52,12 +50,6 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
 
   useEffect(() => {
     if (isOpen && activity) {
-      console.log('[EditReviewModal] Activity data:', {
-        item_image: activity.item_image,
-        item_title: activity.item_title,
-        item_title_korean: activity.item_title_korean,
-        rating: activity.rating
-      });
       setFormData({
         rating: activity.rating || 0,
         content: activity.review_content || '',
