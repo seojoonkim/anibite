@@ -438,6 +438,9 @@ export default function AnimeDetail() {
       const animeData = await animeService.getAnimeById(id);
       if (animeData) setAnime(animeData);
 
+      // Refresh activities list
+      await refetchActivities();
+
       setTimeout(() => setReviewSuccess(''), 3000);
     } catch (err) {
       console.error('Failed to delete review:', err);

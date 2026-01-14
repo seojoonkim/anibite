@@ -229,13 +229,16 @@ export default function CharacterDetail() {
         if (myReviewData) processMyReview(myReviewData);
       }
 
-      // 병렬로 데이터 새로고침
+      // 병렬로 데이터 새로고침 (BUT preserve the locally updated my_rating)
       const [charData, reviewData] = await Promise.all([
         characterService.getCharacterDetail(id),
         characterReviewService.getCharacterReviews(id, { page: 1, page_size: 10 })
       ]);
 
-      if (charData) setCharacter(charData);
+      // Preserve the locally updated my_rating to prevent overwrite with stale data
+      if (charData) {
+        setCharacter({ ...charData, my_rating: rating === 0 ? null : rating });
+      }
       if (reviewData) processReviews(reviewData);
     } catch (err) {
       console.error('Failed to rate character:', err);
@@ -387,6 +390,9 @@ export default function CharacterDetail() {
       // character stats만 업데이트 (전체 리프레시 없이)
       const charData = await characterService.getCharacterDetail(id);
       if (charData) setCharacter(charData);
+
+      // Refresh activities list
+      await refetchActivities();
 
       setTimeout(() => setReviewSuccess(''), 3000);
     } catch (err) {
