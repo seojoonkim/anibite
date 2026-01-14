@@ -71,6 +71,20 @@ def create_indexes():
         CREATE INDEX IF NOT EXISTS idx_character_ratings_user_status
         ON character_ratings(user_id, status)
         """,
+
+        # ===== 리뷰 작성 페이지 =====
+
+        # activities: (user_id, activity_type, review_content) - 리뷰 없는 항목 조회
+        """
+        CREATE INDEX IF NOT EXISTS idx_activities_user_type_review
+        ON activities(user_id, activity_type, review_content)
+        """,
+
+        # activities: (activity_time) - 최근 평가 순 정렬용
+        """
+        CREATE INDEX IF NOT EXISTS idx_activities_time
+        ON activities(activity_time DESC)
+        """,
     ]
 
     print("Creating indexes for rating page performance...")
@@ -87,6 +101,7 @@ def create_indexes():
     print("\nTest with:")
     print("  curl http://localhost:8000/api/rating-pages/anime")
     print("  curl http://localhost:8000/api/rating-pages/characters")
+    print("  curl http://localhost:8000/api/rating-pages/write-reviews")
 
 
 if __name__ == "__main__":

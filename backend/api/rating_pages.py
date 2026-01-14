@@ -9,7 +9,9 @@ from services.rating_page_service import (
     get_anime_for_rating,
     get_characters_for_rating,
     get_anime_for_rating_stats,
-    get_characters_for_rating_stats
+    get_characters_for_rating_stats,
+    get_items_for_review_writing,
+    get_review_writing_stats
 )
 from api.deps import get_current_user
 
@@ -120,3 +122,68 @@ def get_character_rating_stats(
         }
     """
     return get_characters_for_rating_stats(current_user.id)
+
+
+@router.get("/write-reviews")
+def get_items_for_reviews(
+    limit: int = Query(50, ge=1, le=100, description="한 번에 가져올 개수"),
+    current_user: UserResponse = Depends(get_current_user)
+) -> Dict:
+    """
+    리뷰 작성 페이지 - 초고속 쿼리 (0.1초 목표)
+
+    특징:
+    - 애니메이션 + 캐릭터 통합 (단일 쿼리)
+    - 리뷰 없는 항목만 반환
+    - popularity 기반 정렬 + 랜덤성 내장
+    - activities 테이블 사용으로 최적화
+
+    Returns:
+        {
+            "items": [
+                {
+                    "type": "anime" | "character",
+                    "item_id": 123,
+                    "rating": 4.5,
+                    "updated_at": "...",
+                    "item_title": "...",
+                    "item_title_korean": "...",
+                    "item_image": "...",
+                    "item_popularity": 1000,
+                    "item_year": 2023
+                },
+                ...
+            ]
+        }
+    """
+    items = get_items_for_review_writing(current_user.id, limit)
+
+    return {
+        'items': items
+    }
+
+
+@router.get("/write-reviews/stats")
+def get_review_stats(
+    current_user: UserResponse = Depends(get_current_user)
+) -> Dict:
+    """
+    리뷰 작성 통계
+
+    Returns:
+        {
+            "anime": {
+                "reviewed": 50,
+                "pending": 30
+            },
+            "character": {
+                "reviewed": 20,
+                "pending": 15
+            },
+            "total": {
+                "reviewed": 70,
+                "pending": 45
+            }
+        }
+    """
+    return get_review_writing_stats(current_user.id)
