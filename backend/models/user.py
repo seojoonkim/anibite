@@ -55,6 +55,7 @@ class UserResponse(BaseModel):
     avatar_url: Optional[str]
     bio: Optional[str]
     created_at: datetime
+    otaku_score: Optional[float] = 0.0
 
     class Config:
         from_attributes = True

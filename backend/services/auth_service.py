@@ -71,9 +71,14 @@ def register_user(user_data: UserRegister) -> TokenResponse:
 def login_user(login_data: UserLogin) -> TokenResponse:
     """로그인 (사용자명 또는 이메일)"""
 
-    # 사용자 조회 (username 또는 email)
+    # 사용자 조회 (username 또는 email) + otaku_score
     user_row = db.execute_query(
-        "SELECT * FROM users WHERE username = ? OR email = ?",
+        """
+        SELECT u.*, COALESCE(us.otaku_score, 0.0) as otaku_score
+        FROM users u
+        LEFT JOIN user_stats us ON u.id = us.user_id
+        WHERE u.username = ? OR u.email = ?
+        """,
         (login_data.username, login_data.username),
         fetch_one=True
     )
@@ -104,7 +109,12 @@ def login_user(login_data: UserLogin) -> TokenResponse:
 def get_user_by_id(user_id: int) -> Optional[UserResponse]:
     """ID로 사용자 조회"""
     user_row = db.execute_query(
-        "SELECT * FROM users WHERE id = ?",
+        """
+        SELECT u.*, COALESCE(us.otaku_score, 0.0) as otaku_score
+        FROM users u
+        LEFT JOIN user_stats us ON u.id = us.user_id
+        WHERE u.id = ?
+        """,
         (user_id,),
         fetch_one=True
     )
@@ -119,7 +129,12 @@ def get_user_by_id(user_id: int) -> Optional[UserResponse]:
 def get_user_by_username(username: str) -> Optional[UserResponse]:
     """Username으로 사용자 조회"""
     user_row = db.execute_query(
-        "SELECT * FROM users WHERE username = ?",
+        """
+        SELECT u.*, COALESCE(us.otaku_score, 0.0) as otaku_score
+        FROM users u
+        LEFT JOIN user_stats us ON u.id = us.user_id
+        WHERE u.username = ?
+        """,
         (username,),
         fetch_one=True
     )

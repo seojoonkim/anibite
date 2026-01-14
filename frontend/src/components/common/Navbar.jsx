@@ -16,30 +16,17 @@ export default function Navbar() {
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
-  const [otakuScore, setOtakuScore] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
   const [lastCheckTime, setLastCheckTime] = useState(null);
   const notificationRef = useRef(null);
+
+  // Use otaku_score from AuthContext (global state) to prevent flickering
+  const otakuScore = user?.otaku_score || 0;
 
   const toRoman = (num) => {
     const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
     return romanNumerals[num - 1] || num;
   };
-
-  useEffect(() => {
-    const fetchUserStats = async () => {
-      if (user) {
-        try {
-          const stats = await userService.getStats();
-          setOtakuScore(stats.otaku_score || 0);
-        } catch (err) {
-          console.error('Failed to fetch user stats:', err);
-        }
-      }
-    };
-
-    fetchUserStats();
-  }, [user]);
 
   // 드롭다운 바깥 클릭 시 닫기
   useEffect(() => {
