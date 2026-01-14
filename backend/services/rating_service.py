@@ -262,6 +262,96 @@ def get_user_ratings(
     )
 
 
+def get_all_user_ratings(user_id: int) -> Dict:
+    """
+    사용자의 모든 평점을 한 번에 조회 (RATED, WANT_TO_WATCH, PASS)
+    3개의 API 호출을 1개로 줄여 성능 향상
+    """
+    # Part 1: RATED - activities 테이블에서 빠르게 조회
+    rated_rows = db.execute_query(
+        """
+        SELECT
+            id,
+            item_id as anime_id,
+            user_id,
+            rating,
+            'RATED' as status,
+            activity_time as updated_at,
+            created_at,
+            item_title as title_romaji,
+            item_title as title_english,
+            item_title_korean as title_korean,
+            item_image as image_url,
+            NULL as season_year,
+            NULL as episodes
+        FROM activities
+        WHERE user_id = ? AND activity_type = 'anime_rating'
+        ORDER BY activity_time DESC
+        """,
+        (user_id,)
+    )
+
+    # Part 2: WANT_TO_WATCH - user_ratings 테이블에서 조회
+    watchlist_rows = db.execute_query(
+        """
+        SELECT
+            ur.*,
+            a.title_romaji,
+            a.title_english,
+            a.title_korean,
+            a.cover_image_url as image_url,
+            a.season_year,
+            a.episodes
+        FROM user_ratings ur
+        JOIN anime a ON ur.anime_id = a.id
+        WHERE ur.user_id = ? AND ur.status = 'WANT_TO_WATCH'
+        ORDER BY ur.updated_at DESC
+        """,
+        (user_id,)
+    )
+
+    # Part 3: PASS - user_ratings 테이블에서 조회
+    pass_rows = db.execute_query(
+        """
+        SELECT
+            ur.*,
+            a.title_romaji,
+            a.title_english,
+            a.title_korean,
+            a.cover_image_url as image_url,
+            a.season_year,
+            a.episodes
+        FROM user_ratings ur
+        JOIN anime a ON ur.anime_id = a.id
+        WHERE ur.user_id = ? AND ur.status = 'PASS'
+        ORDER BY ur.updated_at DESC
+        """,
+        (user_id,)
+    )
+
+    # 평균 평점 계산 (RATED만)
+    avg_row = db.execute_query(
+        """
+        SELECT AVG(rating) as avg_rating
+        FROM activities
+        WHERE user_id = ? AND activity_type = 'anime_rating' AND rating IS NOT NULL
+        """,
+        (user_id,),
+        fetch_one=True
+    )
+    average_rating = avg_row['avg_rating'] if avg_row and avg_row['avg_rating'] else None
+
+    return {
+        'rated': [RatingResponse(**dict_from_row(row)) for row in rated_rows],
+        'watchlist': [RatingResponse(**dict_from_row(row)) for row in watchlist_rows],
+        'pass': [RatingResponse(**dict_from_row(row)) for row in pass_rows],
+        'total_rated': len(rated_rows),
+        'total_watchlist': len(watchlist_rows),
+        'total_pass': len(pass_rows),
+        'average_rating': average_rating
+    }
+
+
 def delete_rating(user_id: int, anime_id: int) -> bool:
     """평점 삭제 (관련 댓글과 좋아요도 함께 삭제)"""
 
