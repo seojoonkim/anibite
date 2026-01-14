@@ -18,7 +18,6 @@ html {
   scrollbar-gutter: stable;
   width: 100%;
   height: 100%;
-  font-size: 90%; /* 전체 컴포넌트 10% 축소 */
 }
 
 body {
@@ -31,6 +30,7 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
   position: relative;
+  zoom: 0.9; /* 전체 UI 10% 축소 */
 }
 
 #root {
