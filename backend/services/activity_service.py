@@ -5,7 +5,7 @@ Handles all user activities (anime ratings/reviews, character ratings/reviews, u
 from a single 'activities' table.
 """
 from typing import List, Optional, Dict
-from database import Database, dict_from_row
+from database import Database, dict_from_row, db as default_db
 
 def get_activities(
     db: Database,
@@ -114,8 +114,11 @@ def get_activities(
     }
 
 
-def get_activity_by_id(activity_id: int, current_user_id: Optional[int] = None) -> Optional[Dict]:
+def get_activity_by_id(activity_id: int, current_user_id: Optional[int] = None, db: Database = None) -> Optional[Dict]:
     """Get a single activity by ID"""
+
+    if db is None:
+        db = default_db
 
     # ALWAYS add current_user_id twice (even if None) to match SQL placeholders, then activity_id
     query_params = [current_user_id, current_user_id, activity_id]
@@ -165,6 +168,7 @@ def create_activity(
     Note: Usually activities are created via triggers when ratings/reviews are created.
     This method is mainly for user_posts.
     """
+    db = default_db
 
     # Get user info
     user = db.execute_query(
@@ -212,6 +216,7 @@ def update_activity(
 
     Note: Rating updates should go through user_ratings table (triggers will sync)
     """
+    db = default_db
 
     # Verify ownership
     activity = get_activity_by_id(activity_id, user_id)
@@ -255,6 +260,7 @@ def delete_activity(activity_id: int, user_id: int) -> bool:
     Note: For anime/character ratings, delete the source rating (triggers will sync)
     This is mainly for user_posts.
     """
+    db = default_db
 
     # Verify ownership
     activity = get_activity_by_id(activity_id, user_id)
@@ -284,6 +290,7 @@ def delete_activity(activity_id: int, user_id: int) -> bool:
 
 def like_activity(activity_id: int, user_id: int) -> bool:
     """Like an activity"""
+    db = default_db
 
     # Check if already liked
     existing = db.execute_query(
@@ -310,6 +317,7 @@ def like_activity(activity_id: int, user_id: int) -> bool:
 
 def get_activity_comments(activity_id: int) -> List[Dict]:
     """Get comments for an activity"""
+    db = default_db
 
     # Get top-level comments
     rows = db.execute_query(
@@ -357,6 +365,7 @@ def create_activity_comment(
     parent_comment_id: Optional[int] = None
 ) -> Dict:
     """Create a comment on an activity"""
+    db = default_db
 
     # Verify activity exists
     activity = get_activity_by_id(activity_id)
