@@ -72,6 +72,11 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
     setHoverRating(isLeftHalf ? position - 0.5 : position);
   };
 
+  const handleMouseLeave = () => {
+    if (readonly || !onRatingChange) return;
+    setHoverRating(0);
+  };
+
   const StarIcon = ({ type }) => {
     const gradientStyle = {
       background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)',
@@ -114,7 +119,6 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
     <div
       className={`flex items-center ${alignClasses[align]}`}
       ref={containerRef}
-      onMouseLeave={() => setHoverRating(0)}
     >
       <div
         className={`flex items-center ${gapClasses[size]} ${sizeClass}`}
@@ -126,6 +130,7 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
             type="button"
             onClick={(e) => handleClick(e, position)}
             onMouseMove={(e) => handleMouseMove(e, position)}
+            onMouseLeave={handleMouseLeave}
             disabled={readonly}
             className={`${sizeClasses[size]} ${
               readonly ? 'cursor-default' : 'cursor-pointer hover:scale-110'

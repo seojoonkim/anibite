@@ -278,8 +278,6 @@ export default function Feed() {
         }
       } else {
         // 리뷰 수정
-        console.log('Edit mode: edit, formData:', formData, 'activity:', editingActivity);
-
         // 리뷰 내용이 있으면 리뷰 업데이트 (별점도 함께 전달)
         if (formData.content && formData.content.trim()) {
           // Get the actual review ID from the review table (not activity ID)
@@ -287,11 +285,6 @@ export default function Feed() {
           if (isAnime) {
             const myReview = await reviewService.getMyReview(editingActivity.item_id);
             reviewId = myReview.review_id || myReview.id;
-            console.log('Anime review update, reviewId:', reviewId, 'data:', {
-              content: formData.content,
-              is_spoiler: formData.is_spoiler,
-              rating: formData.rating
-            });
             await reviewService.updateReview(reviewId, {
               content: formData.content,
               is_spoiler: formData.is_spoiler,
@@ -300,11 +293,6 @@ export default function Feed() {
           } else {
             const myReview = await characterReviewService.getMyReview(editingActivity.item_id);
             reviewId = myReview.review_id || myReview.id;
-            console.log('Character review update, reviewId:', reviewId, 'data:', {
-              content: formData.content,
-              is_spoiler: formData.is_spoiler,
-              rating: formData.rating
-            });
             await characterReviewService.updateReview(reviewId, {
               content: formData.content,
               is_spoiler: formData.is_spoiler,
@@ -313,7 +301,6 @@ export default function Feed() {
           }
         } else if (formData.rating !== editingActivity.rating) {
           // 리뷰 내용 없이 별점만 변경된 경우
-          console.log('Rating only change, rating:', formData.rating);
           if (isAnime) {
             await ratingService.rateAnime(editingActivity.item_id, {
               rating: formData.rating,
