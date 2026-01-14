@@ -23,15 +23,27 @@ export const ratingService = {
     }
   },
 
-  // Get all user's ratings
+  // Get all user's ratings (single status filter)
   async getMyRatings(params = {}) {
     const response = await api.get('/api/ratings/me', { params });
     return response.data;
   },
 
-  // Get other user's ratings (public)
+  // Get ALL user's ratings at once (RATED, WANT_TO_WATCH, PASS) - 3x faster!
+  async getAllMyRatings() {
+    const response = await api.get('/api/ratings/me/all');
+    return response.data;
+  },
+
+  // Get other user's ratings (public, single status filter)
   async getUserRatings(userId, params = {}) {
     const response = await api.get(`/api/ratings/user/${userId}`, { params });
+    return response.data;
+  },
+
+  // Get ALL other user's ratings at once (RATED, WANT_TO_WATCH, PASS) - 3x faster!
+  async getAllUserRatings(userId) {
+    const response = await api.get(`/api/ratings/user/${userId}/all`);
     return response.data;
   },
 
