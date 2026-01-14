@@ -226,6 +226,7 @@ def get_global_feed(limit: int = 50, offset: int = 0) -> List[Dict]:
     """
 
     # activities 테이블에서 직접 조회
+    # Note: activities 테이블에는 review_id, post_content 컬럼이 없음
     rows = db.execute_query(
         """
         SELECT
@@ -245,9 +246,9 @@ def get_global_feed(limit: int = 50, offset: int = 0) -> List[Dict]:
             anime_title,
             anime_title_korean,
             anime_id,
-            review_id,
+            NULL as review_id,
             review_content,
-            post_content,
+            NULL as post_content,
             0 as comments_count
         FROM activities
         ORDER BY activity_time DESC
@@ -337,6 +338,7 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
     """
 
     # activities 테이블에서 user_id로 필터링
+    # Note: activities 테이블에는 review_id, post_content 컬럼이 없음
     rows = db.execute_query(
         """
         SELECT
@@ -356,9 +358,9 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
             anime_title,
             anime_title_korean,
             anime_id,
-            review_id,
+            NULL as review_id,
             review_content,
-            post_content,
+            NULL as post_content,
             0 as comments_count
         FROM activities
         WHERE user_id = ?
