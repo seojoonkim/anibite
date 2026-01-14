@@ -584,13 +584,28 @@ export default function Rate() {
 
         {/* Anime Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-          {animeList.map((anime) => (
-            <RatingCard key={anime.id} anime={anime} onRate={handleRate} />
-          ))}
+          {loading && animeList.length === 0 ? (
+            // Skeleton cards during initial load
+            Array.from({ length: 12 }).map((_, index) => (
+              <div key={`skeleton-${index}`} className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden animate-pulse">
+                {/* Skeleton Image */}
+                <div className="aspect-[3/4] bg-gray-200" />
+                {/* Skeleton Title */}
+                <div className="p-4 space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                  <div className="h-3 bg-gray-200 rounded w-1/2" />
+                </div>
+              </div>
+            ))
+          ) : (
+            animeList.map((anime) => (
+              <RatingCard key={anime.id} anime={anime} onRate={handleRate} />
+            ))
+          )}
         </div>
 
-        {/* Loading indicator */}
-        {loading && (
+        {/* Loading more indicator */}
+        {loading && animeList.length > 0 && (
           <div className="text-center py-8">
             <div className="text-gray-600">{t('loading')}</div>
           </div>

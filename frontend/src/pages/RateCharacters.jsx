@@ -287,8 +287,20 @@ export default function RateCharacters() {
 
         {/* Character Grid */}
         {loading && characters.length === 0 ? (
-          <div className="text-center py-8">
-            <div className="text-gray-600">{language === 'ko' ? '로딩 중...' : 'Loading...'}</div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {/* Skeleton cards during initial load */}
+            {Array.from({ length: 15 }).map((_, index) => (
+              <div key={`skeleton-${index}`} className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden animate-pulse">
+                {/* Skeleton Image */}
+                <div className="aspect-[3/4] bg-gray-200" />
+                {/* Skeleton Info */}
+                <div className="p-3 space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-4/5" />
+                  <div className="h-3 bg-gray-200 rounded w-3/5" />
+                  <div className="h-3 bg-gray-200 rounded w-2/3" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : filteredCharacters.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
