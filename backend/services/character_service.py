@@ -203,30 +203,9 @@ def create_or_update_character_rating(user_id: int, character_id: int, rating: f
 
 def delete_character_rating(user_id: int, character_id: int) -> bool:
     """
-    캐릭터 평가 삭제 (관련 댓글과 좋아요도 함께 삭제)
+    캐릭터 평가 삭제 (activities 삭제 시 CASCADE로 댓글/좋아요도 자동 삭제)
     """
-    # 먼저 관련 activity 댓글과 좋아요 삭제
-    db.execute_update(
-        """
-        DELETE FROM activity_comments
-        WHERE activity_type = 'character_rating'
-        AND activity_user_id = ?
-        AND item_id = ?
-        """,
-        (user_id, character_id)
-    )
-
-    db.execute_update(
-        """
-        DELETE FROM activity_likes
-        WHERE activity_type = 'character_rating'
-        AND activity_user_id = ?
-        AND item_id = ?
-        """,
-        (user_id, character_id)
-    )
-
-    # activities 테이블에서 삭제
+    # activities 테이블에서 삭제 (CASCADE로 comments/likes 자동 삭제)
     db.execute_update(
         """
         DELETE FROM activities
