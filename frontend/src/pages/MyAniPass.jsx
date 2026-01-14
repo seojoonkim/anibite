@@ -389,38 +389,17 @@ export default function MyAniPass() {
         filterCharactersBySubMenu(allCharactersData || [], characterSubMenu);
         setLoadedTabs(prev => ({ ...prev, character: true }));
       } else if (activeTab === 'feed') {
-        try {
-          const targetUserId = userId || user?.id;
-          // 빠른 로딩: 초기 10개만 로드
-          const feedData = await feedService.getUserFeed(targetUserId, 10, 0);
-          setUserActivities(feedData || []);
-          setFeedOffset(10);
-          setHasMoreFeed(feedData && feedData.length === 10);
+        // TEMP: Disable feed API calls to test if other UI elements work
+        console.log('[DEBUG] Feed tab activated but API call disabled for testing');
 
-          // Initialize likes and comments state
-          const likesState = {};
-          const commentsState = {};
-          feedData.forEach(activity => {
-            const key = `${activity.activity_type}_${activity.user_id}_${activity.item_id}`;
-            likesState[key] = {
-              count: activity.likes_count || 0,
-              liked: Boolean(activity.user_has_liked)
-            };
-            commentsState[key] = [];
-          });
-          setActivityLikes(likesState);
-          setComments(commentsState);
-          setExpandedComments(new Set());
-
-          setLoadedTabs(prev => ({ ...prev, feed: true }));
-        } catch (error) {
-          console.error('Failed to load feed:', error);
-          // Set empty state on error
-          setUserActivities([]);
-          setFeedOffset(0);
-          setHasMoreFeed(false);
-          setLoadedTabs(prev => ({ ...prev, feed: true }));
-        }
+        // Set empty feed state
+        setUserActivities([]);
+        setFeedOffset(0);
+        setHasMoreFeed(false);
+        setActivityLikes({});
+        setComments({});
+        setExpandedComments(new Set());
+        setLoadedTabs(prev => ({ ...prev, feed: true }));
 
         // 로딩 완료 (댓글은 사용자가 클릭할 때만 로드)
         setLoading(false);
