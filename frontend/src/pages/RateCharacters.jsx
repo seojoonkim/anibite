@@ -237,31 +237,6 @@ export default function RateCharacters() {
     });
   }, [characters, characterStatuses]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
-        <Navbar />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-          {/* Header Skeleton */}
-          <div className="mb-6">
-            <div className="h-8 w-64 bg-white rounded animate-pulse mb-4"></div>
-            <div className="h-12 w-full max-w-md bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] animate-pulse"></div>
-          </div>
-          {/* Character Grid Skeleton */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((i) => (
-              <div key={i} className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-3 animate-pulse">
-                <div className="w-full aspect-[3/4] bg-gray-200 rounded mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
       <Navbar />
@@ -300,7 +275,11 @@ export default function RateCharacters() {
         </div>
 
         {/* Character Grid */}
-        {filteredCharacters.length > 0 ? (
+        {loading && characters.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="text-gray-600">{language === 'ko' ? '로딩 중...' : 'Loading...'}</div>
+          </div>
+        ) : filteredCharacters.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {filteredCharacters.map((character) => (
               <div
