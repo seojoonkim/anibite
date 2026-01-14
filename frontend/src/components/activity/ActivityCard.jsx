@@ -387,6 +387,8 @@ export default function ActivityCard({
                 <img
                   src={getAvatarUrl(activity.avatar_url)}
                   alt={activity.display_name || activity.username}
+                  loading="lazy"
+                  decoding="async"
                   className="w-9 h-9 rounded-full object-cover border border-gray-200"
                   onError={() => setAvatarError(true)}
                 />
@@ -446,6 +448,8 @@ export default function ActivityCard({
             <img
               src={itemImageSrc}
               alt={activity.item_title || ''}
+              loading="lazy"
+              decoding="async"
               className="w-16 h-24 object-cover rounded border-2 border-transparent hover:border-[#A8E6CF] transition-all"
               onError={handleItemImageError}
             />

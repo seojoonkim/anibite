@@ -46,7 +46,7 @@ export default function Feed() {
     {
       followingOnly: feedFilter === 'following'
     },
-    20
+    10
   );
 
   // Reset activities when filter changes
