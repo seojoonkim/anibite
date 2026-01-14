@@ -107,11 +107,12 @@ def get_user_rating_for_anime(user_id: int, anime_id: int) -> Optional[RatingRes
 def get_user_ratings(
     user_id: int,
     status_filter: Optional[RatingStatus] = None,
-    limit: Optional[int] = None
+    limit: Optional[int] = None,
+    without_review: bool = False
 ) -> UserRatingListResponse:
-    """사용자의 모든 평점 조회 (feed_activities 테이블 사용으로 최적화)"""
+    """사용자의 모든 평점 조회 (activities 테이블 사용으로 최적화)"""
 
-    # feed_activities는 RATED 상태만 저장하므로, 다른 status는 원본 테이블 사용
+    # activities는 RATED 상태만 저장하므로, 다른 status는 원본 테이블 사용
     if status_filter and status_filter != RatingStatus.RATED:
         # WANT_TO_WATCH, PASS 등은 user_ratings 테이블에서 직접 조회
         where_clause = "ur.user_id = ? AND ur.status = ?"
@@ -154,8 +155,6 @@ def get_user_ratings(
 
     # RATED 또는 필터 없음: activities 테이블에서 조회
     # Check if we should filter items without reviews (for WriteReviews page)
-    without_review = status_filter and status_filter.value == 'RATED_WITHOUT_REVIEW'
-
     if without_review:
         # 리뷰가 없는 항목만: anime_rating은 있지만 anime_review가 없는 것
         total = db.execute_query(

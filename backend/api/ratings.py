@@ -43,6 +43,7 @@ def create_rating(
 @router.get("/me", response_model=UserRatingListResponse)
 def get_my_ratings(
     status: Optional[RatingStatus] = Query(None, description="상태 필터"),
+    without_review: bool = Query(False, description="리뷰 없는 평점만 조회"),
     limit: Optional[int] = Query(None, ge=1, le=1000, description="최대 개수"),
     current_user: UserResponse = Depends(get_current_user)
 ):
@@ -50,9 +51,10 @@ def get_my_ratings(
     내 평점 목록 조회
 
     - status: RATED, WANT_TO_WATCH, PASS
+    - without_review: True일 경우 리뷰가 없는 평점만 조회
     - limit: 최대 개수
     """
-    return get_user_ratings(current_user.id, status, limit)
+    return get_user_ratings(current_user.id, status, limit, without_review)
 
 
 @router.get("/anime/{anime_id}", response_model=Optional[RatingResponse])
