@@ -28,6 +28,10 @@ export default function CharacterDetail() {
   const [reviewError, setReviewError] = useState('');
   const [reviewSuccess, setReviewSuccess] = useState('');
   const [showEditMenu, setShowEditMenu] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [reviewLikes, setReviewLikes] = useState({});
+  const [comments, setComments] = useState({});
+  const [expandedComments, setExpandedComments] = useState(new Set());
 
   // Use unified activities hook
   const {

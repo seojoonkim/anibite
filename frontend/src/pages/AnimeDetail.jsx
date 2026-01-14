@@ -31,6 +31,11 @@ export default function AnimeDetail() {
   const [reviewSuccess, setReviewSuccess] = useState('');
   const [failedImages, setFailedImages] = useState(new Set());
   const [showEditMenu, setShowEditMenu] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [reviewLikes, setReviewLikes] = useState({});
+  const [comments, setComments] = useState({});
+  const [expandedComments, setExpandedComments] = useState(new Set());
+  const [savedActivities, setSavedActivities] = useState(new Set());
 
   // Use unified activities hook
   const {
