@@ -3,7 +3,7 @@ Feed API Router
 활동 피드
 Updated: 2026-01-14
 """
-from fastapi import APIRouter, Query, Depends
+from fastapi import APIRouter, Query, Depends, HTTPException
 from typing import List, Dict, Optional
 from services.feed_service import get_global_feed, get_user_feed, get_following_feed
 from models.user import UserResponse
@@ -167,7 +167,6 @@ def get_feed(
     # 팔로잉 피드는 로그인 필수
     if following_only:
         if current_user is None:
-            from fastapi import HTTPException
             raise HTTPException(status_code=401, detail="Authentication required for following feed")
         activities = get_following_feed(current_user.id, limit, offset)
     # 특정 사용자 피드
