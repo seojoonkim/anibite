@@ -71,8 +71,11 @@ export default function WriteReviews() {
         // 캐릭터 필드
         ...(item.type === 'character' ? {
           character_id: item.item_id,
-          character_name: item.item_title_korean || item.item_title,
-          character_image: item.item_image
+          character_name: item.item_title, // English name
+          character_name_native: item.item_title_korean, // Native name
+          character_image: item.item_image,
+          anime_id: item.anime_id,
+          anime_title: item.anime_title_korean || item.anime_title
         } : {})
       }));
 
