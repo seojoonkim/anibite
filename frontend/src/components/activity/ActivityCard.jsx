@@ -122,6 +122,49 @@ export default function ActivityCard({
     return null;
   };
 
+  const getActivityTypeMessage = () => {
+    const hasReview = activity.review_title || activity.review_content;
+
+    if (activity.activity_type === 'anime_rating') {
+      if (hasReview) {
+        return language === 'ko' ? (
+          <>
+            <span className="font-bold" style={{ fontSize: '0.9375rem' }}>애니</span>를 리뷰했어요
+          </>
+        ) : (
+          <>reviewed an <span className="font-bold" style={{ fontSize: '0.9375rem' }}>anime</span></>
+        );
+      }
+      return language === 'ko' ? (
+        <>
+          <span className="font-bold" style={{ fontSize: '0.9375rem' }}>애니</span>를 평가했어요
+        </>
+      ) : (
+        <>rated an <span className="font-bold" style={{ fontSize: '0.9375rem' }}>anime</span></>
+      );
+    } else if (activity.activity_type === 'character_rating') {
+      if (hasReview) {
+        return language === 'ko' ? (
+          <>
+            <span className="font-bold" style={{ fontSize: '0.9375rem' }}>캐릭터</span>를 리뷰했어요
+          </>
+        ) : (
+          <>reviewed a <span className="font-bold" style={{ fontSize: '0.9375rem' }}>character</span></>
+        );
+      }
+      return language === 'ko' ? (
+        <>
+          <span className="font-bold" style={{ fontSize: '0.9375rem' }}>캐릭터</span>를 평가했어요
+        </>
+      ) : (
+        <>rated a <span className="font-bold" style={{ fontSize: '0.9375rem' }}>character</span></>
+      );
+    } else if (activity.activity_type === 'user_post') {
+      return language === 'ko' ? '포스트를 작성했어요' : 'created a post';
+    }
+    return '';
+  };
+
   const toRoman = (num) => {
     const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
     return romanNumerals[num - 1] || num;
@@ -260,7 +303,66 @@ export default function ActivityCard({
 
   return (
     <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 hover:shadow-[0_2px_12px_rgba(0,0,0,0.12)] transition-all">
-      <div className={finalShowOptions.showItemImage ? 'flex gap-4' : ''}>
+      {/* Header: User Info + Activity Type + Timestamp */}
+      {finalShowOptions.showUserInfo && (
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-start gap-3">
+            {/* User Avatar */}
+            <Link to={`/user/${activity.user_id}`} className="flex-shrink-0">
+              {activity.avatar_url && !avatarError ? (
+                <img
+                  src={getAvatarUrl(activity.avatar_url)}
+                  alt={activity.display_name || activity.username}
+                  className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                  onError={() => setAvatarError(true)}
+                />
+              ) : (
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center border border-gray-200"
+                  style={{ background: 'linear-gradient(to bottom right, #90B2E4, #638CCC)' }}
+                >
+                  <span className="text-white text-sm font-bold">
+                    {(activity.display_name || activity.username || '?').charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
+            </Link>
+
+            {/* User Info + Activity Type */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <Link
+                  to={`/user/${activity.user_id}`}
+                  className="text-sm font-semibold text-gray-800 hover:text-[#A8E6CF] transition-colors"
+                >
+                  {activity.display_name || activity.username}
+                </Link>
+                <span
+                  className={`text-xs px-2 py-0.5 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}
+                >
+                  <span style={{ color: levelInfo.color }} className="font-bold">
+                    {levelInfo.icon}
+                  </span>{' '}
+                  <span className="text-gray-700">
+                    {levelInfo.level} - {toRoman(levelInfo.rank)}
+                  </span>
+                </span>
+                <span className="text-sm text-gray-600">
+                  {getActivityTypeMessage()}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Timestamp */}
+          <span className="text-xs text-gray-400 ml-2 flex-shrink-0">
+            {getRelativeTime(activity.activity_time)}
+          </span>
+        </div>
+      )}
+
+      {/* Content: Item Image + Details */}
+      <div className="flex gap-4">
         {/* Item Image (anime/character thumbnail) */}
         {finalShowOptions.showItemImage && activity.item_image && itemImageSrc && (
           <Link
@@ -276,66 +378,13 @@ export default function ActivityCard({
           </Link>
         )}
 
-        {/* Main Content */}
+        {/* Item Details */}
         <div className="flex-1 min-w-0">
-          {/* User Info Header */}
-          {finalShowOptions.showUserInfo && (
-            <div className="flex items-start justify-between mb-2">
-              <div className="flex items-center gap-2">
-                {/* User Avatar */}
-                <Link to={`/user/${activity.user_id}`} className="flex-shrink-0">
-                  {activity.avatar_url && !avatarError ? (
-                    <img
-                      src={getAvatarUrl(activity.avatar_url)}
-                      alt={activity.display_name || activity.username}
-                      className="w-8 h-8 rounded-full object-cover border border-gray-200"
-                      onError={() => setAvatarError(true)}
-                    />
-                  ) : (
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center border border-gray-200"
-                      style={{ background: 'linear-gradient(to bottom right, #90B2E4, #638CCC)' }}
-                    >
-                      <span className="text-white text-xs font-bold">
-                        {(activity.display_name || activity.username || '?').charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
-                </Link>
-
-                {/* Username & Level */}
-                <div className="flex items-center gap-2">
-                  <Link
-                    to={`/user/${activity.user_id}`}
-                    className="text-sm font-medium text-gray-700 hover:text-[#A8E6CF] transition-colors"
-                  >
-                    {activity.display_name || activity.username}
-                  </Link>
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}
-                  >
-                    <span style={{ color: levelInfo.color }} className="font-bold">
-                      {levelInfo.icon}
-                    </span>{' '}
-                    <span className="text-gray-700">
-                      {levelInfo.level} - {toRoman(levelInfo.rank)}
-                    </span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Timestamp */}
-              <span className="text-xs text-gray-400 ml-2">
-                {getRelativeTime(activity.activity_time)}
-              </span>
-            </div>
-          )}
-
-          {/* Item Title (for context where it should be shown) */}
+          {/* Item Title */}
           {finalShowOptions.showItemTitle && activity.item_title && (
             <Link
               to={getActivityLink()}
-              className="block mb-2 text-sm font-medium text-gray-800 hover:text-[#A8E6CF] transition-colors"
+              className="block mb-1 text-base font-semibold text-gray-800 hover:text-[#A8E6CF] transition-colors"
             >
               {activity.item_title_korean || activity.item_title}
               {activity.anime_title && (
@@ -410,9 +459,11 @@ export default function ActivityCard({
               )}
             </div>
           )}
+        </div>
+      </div>
 
-          {/* Like, Comment Buttons */}
-          <div className="mt-3 flex items-center justify-between">
+      {/* Actions: Like, Comment, Bookmark */}
+      <div className="mt-4 flex items-center justify-between">
             <div className="flex items-center gap-6">
               {/* Like Button */}
               <button
@@ -471,26 +522,24 @@ export default function ActivityCard({
                 </svg>
               )}
             </button>
-          </div>
-
-          {/* Comments Section */}
-          {showComments && (
-            <ActivityComments
-              comments={comments}
-              loading={commentsLoading}
-              newCommentText={newCommentText}
-              setNewCommentText={setNewCommentText}
-              replyingTo={replyingTo}
-              setReplyingTo={setReplyingTo}
-              replyText={replyText}
-              setReplyText={setReplyText}
-              onCommentSubmit={handleCommentSubmit}
-              onReplySubmit={handleReplySubmit}
-              getAvatarUrl={getAvatarUrl}
-            />
-          )}
-        </div>
       </div>
+
+      {/* Comments Section */}
+      {showComments && (
+        <ActivityComments
+          comments={comments}
+          loading={commentsLoading}
+          newCommentText={newCommentText}
+          setNewCommentText={setNewCommentText}
+          replyingTo={replyingTo}
+          setReplyingTo={setReplyingTo}
+          replyText={replyText}
+          setReplyText={setReplyText}
+          onCommentSubmit={handleCommentSubmit}
+          onReplySubmit={handleReplySubmit}
+          getAvatarUrl={getAvatarUrl}
+        />
+      )}
     </div>
   );
 }
