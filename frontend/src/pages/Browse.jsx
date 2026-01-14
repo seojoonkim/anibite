@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { animeService } from '../services/animeService';
 import { useLanguage } from '../context/LanguageContext';
@@ -9,7 +9,8 @@ import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 export default function Browse() {
   const { t, getAnimeTitle, language } = useLanguage();
   const [animeList, setAnimeList] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState('');
   // 초기 검색어를 비워두고 인기순으로 정렬하여 표시
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,20 +22,50 @@ export default function Browse() {
   });
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const observerRef = useRef(null);
+  const loadMoreTriggerRef = useRef(null);
 
   useEffect(() => {
     loadAnime(true);
   }, [searchTerm, filters]);
 
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !initialLoading && !loadingMore) {
+          handleLoadMore();
+        }
+      },
+      { threshold: 0.1, rootMargin: '200px' }
+    );
+
+    if (loadMoreTriggerRef.current) {
+      observer.observe(loadMoreTriggerRef.current);
+    }
+
+    observerRef.current = observer;
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [hasMore, initialLoading, loadingMore, page]);
+
   const loadAnime = async (resetList = false) => {
     try {
-      setLoading(true);
+      if (resetList) {
+        setInitialLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
       setError('');
 
       const currentPage = resetList ? 1 : page;
       const params = {
         page: currentPage,
-        limit: 50,
+        limit: 10,
         search: searchTerm || undefined,
         genre: filters.genre || undefined,
         year: filters.year || undefined,
@@ -52,11 +83,13 @@ export default function Browse() {
       }
 
       setHasMore(data.has_more || false);
-      setLoading(false);
+      setInitialLoading(false);
+      setLoadingMore(false);
     } catch (err) {
       console.error('Failed to load anime:', err);
       setError('애니메이션을 불러오는데 실패했습니다.');
-      setLoading(false);
+      setInitialLoading(false);
+      setLoadingMore(false);
     }
   };
 
@@ -190,7 +223,7 @@ export default function Browse() {
         )}
 
         {/* Anime List - Table Format */}
-        {loading && animeList.length === 0 ? (
+        {initialLoading && animeList.length === 0 ? (
           <div className="flex justify-center items-center h-64">
             <div className="text-xl text-gray-600">{t('loading')}</div>
           </div>
@@ -334,18 +367,19 @@ export default function Browse() {
               </div>
             </div>
 
-            {/* Load More Button */}
-            {hasMore && (
-              <div className="flex justify-center">
-                <button
-                  onClick={handleLoadMore}
-                  disabled={loading}
-                  className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white px-8 py-3 rounded-lg font-medium shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? t('loading') : t('loadMore')}
-                </button>
-              </div>
-            )}
+            {/* Infinite scroll trigger */}
+            <div ref={loadMoreTriggerRef} className="h-20 flex items-center justify-center">
+              {loadingMore && (
+                <div className="text-gray-500 text-sm">
+                  {language === 'ko' ? '로딩 중...' : 'Loading...'}
+                </div>
+              )}
+              {!initialLoading && !loadingMore && !hasMore && animeList.length > 0 && (
+                <div className="text-gray-400 text-sm">
+                  {language === 'ko' ? '모든 애니메이션을 불러왔습니다' : 'All anime loaded'}
+                </div>
+              )}
+            </div>
           </>
         )}
       </div>
