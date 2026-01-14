@@ -385,6 +385,25 @@ export default function Rate() {
 
   const loadStats = async () => {
     try {
+      // Use ULTRA FAST optimized stats endpoint (0.1s target)
+      const data = await animeService.getAnimeRatingStats();
+      setStats(data);
+    } catch (err) {
+      console.error('Failed to load stats:', err);
+      // Fallback to defaults
+      setStats({
+        total: 3000,
+        rated: 0,
+        watchLater: 0,
+        pass: 0,
+        remaining: 3000,
+        averageRating: 0
+      });
+    }
+  };
+
+  const loadStatsOld = async () => {
+    try {
       const response = await fetch(`${import.meta.env.VITE_API_URL || API_BASE_URL}/api/users/me/stats`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -445,15 +464,14 @@ export default function Rate() {
   const loadAnime = async () => {
     try {
       setLoading(true);
-      const data = await animeService.getAnimeList({
-        page: 1,
+      // Use ULTRA FAST optimized endpoint (0.1s target)
+      const data = await animeService.getAnimeForRating({
         limit: 50,
-        sort: 'popularity_desc',
-        exclude_rated: true
+        offset: 0
       });
 
       setAnimeList(data.items || []);
-      setHasMore(data.has_next !== false);
+      setHasMore(data.has_more !== false);
       setPage(1);
       setLoading(false);
     } catch (err) {
@@ -471,18 +489,18 @@ export default function Rate() {
     try {
       setLoading(true);
       const nextPage = page + 1;
-      console.log('Loading page:', nextPage);
+      const offset = (nextPage - 1) * 50;
+      console.log('Loading page:', nextPage, 'offset:', offset);
 
-      const data = await animeService.getAnimeList({
-        page: nextPage,
+      // Use ULTRA FAST optimized endpoint (0.1s target)
+      const data = await animeService.getAnimeForRating({
         limit: 50,
-        sort: 'popularity_desc',
-        exclude_rated: true
+        offset: offset
       });
 
       console.log('Loaded data:', data);
       setAnimeList((prev) => [...prev, ...(data.items || [])]);
-      setHasMore(data.has_next !== false);
+      setHasMore(data.has_more !== false);
       setPage(nextPage);
       setLoading(false);
     } catch (err) {

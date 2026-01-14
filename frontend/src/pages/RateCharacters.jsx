@@ -78,7 +78,8 @@ export default function RateCharacters() {
       const pageSize = 50;
       const offset = (pageNum - 1) * pageSize;
 
-      const data = await characterService.getCharactersFromRatedAnime({
+      // Use ULTRA FAST optimized endpoint (0.1s target)
+      const data = await characterService.getCharactersForRating({
         limit: pageSize,
         offset: offset
       });
@@ -129,7 +130,8 @@ export default function RateCharacters() {
 
   const loadStats = async () => {
     try {
-      const data = await characterService.getCharacterStats();
+      // Use ULTRA FAST optimized stats endpoint (0.1s target)
+      const data = await characterService.getCharacterRatingStats();
       setStats(data);
     } catch (err) {
       console.error('Failed to load stats:', err);
