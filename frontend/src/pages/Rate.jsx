@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { animeService } from '../services/animeService';
 import { ratingService } from '../services/ratingService';
@@ -562,6 +562,30 @@ export default function Rate() {
     }
   };
 
+  // Filter anime list - show WANT_TO_WATCH with only 5% probability
+  const filteredAnimeList = useMemo(() => {
+    return animeList.filter(anime => {
+      // Exclude already rated anime
+      if (anime.user_rating && anime.user_rating > 0) {
+        return false;
+      }
+
+      // Always exclude PASS
+      if (anime.user_rating_status === 'PASS') {
+        return false;
+      }
+
+      // Show WANT_TO_WATCH with 5% probability
+      if (anime.user_rating_status === 'WANT_TO_WATCH') {
+        const seed = anime.id % 20; // 1 in 20 = 5%
+        return seed === 0;
+      }
+
+      // Show all other anime
+      return true;
+    });
+  }, [animeList]);
+
   return (
     <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
       <Navbar />
@@ -615,7 +639,7 @@ export default function Rate() {
               </div>
             ))
           ) : (
-            animeList.map((anime) => (
+            filteredAnimeList.map((anime) => (
               <RatingCard key={anime.id} anime={anime} onRate={handleRate} />
             ))
           )}
