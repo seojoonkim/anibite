@@ -517,10 +517,23 @@ export default function Rate() {
 
       await ratingService.rateAnime(animeId, payload);
 
+      // Remove from list if RATED or PASS (keep WANT_TO_WATCH in list)
+      if (status === 'RATED' || status === 'PASS') {
+        setAnimeList(prev => prev.filter(anime => anime.id !== animeId));
+      } else if (status === 'WANT_TO_WATCH') {
+        // Update the anime's status in the list
+        setAnimeList(prev => prev.map(anime =>
+          anime.id === animeId
+            ? { ...anime, user_rating_status: status }
+            : anime
+        ));
+      }
+
       // Reload stats after rating
       await loadStats();
     } catch (err) {
       console.error('Failed to rate:', err);
+      alert('평가 저장에 실패했습니다. 다시 시도해주세요.');
       throw err;
     }
   };
