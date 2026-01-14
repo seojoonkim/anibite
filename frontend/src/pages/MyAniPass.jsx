@@ -353,30 +353,22 @@ export default function MyAniPass() {
         setSeasonStats(seasonDist);
         setGenreCombinations(genreCombo);
       } else if (activeTab === 'anime') {
-        // Load all anime (rated, watchlist, pass)
+        // Load all anime (rated, watchlist, pass) - Single API call for 3x speed!
         const targetUserId = isOwnProfile ? null : parseInt(userId);
-        const [ratedData, watchlistData, passData] = await Promise.all([
-          isOwnProfile
-            ? ratingService.getMyRatings({ limit: 500, status: 'RATED' })
-            : ratingService.getUserRatings(targetUserId, { limit: 500, status: 'RATED' }),
-          isOwnProfile
-            ? ratingService.getMyRatings({ limit: 100, status: 'WANT_TO_WATCH' })
-            : ratingService.getUserRatings(targetUserId, { limit: 100, status: 'WANT_TO_WATCH' }),
-          isOwnProfile
-            ? ratingService.getMyRatings({ limit: 100, status: 'PASS' })
-            : ratingService.getUserRatings(targetUserId, { limit: 100, status: 'PASS' })
-        ]);
+        const allRatingsData = isOwnProfile
+          ? await ratingService.getAllMyRatings()
+          : await ratingService.getAllUserRatings(targetUserId);
 
         const allAnimeData = [
-          ...(ratedData.items || []).map(item => ({ ...item, category: 'rated' })),
-          ...(watchlistData.items || []).map(item => ({ ...item, category: 'watchlist' })),
-          ...(passData.items || []).map(item => ({ ...item, category: 'pass' }))
+          ...(allRatingsData.rated || []).map(item => ({ ...item, category: 'rated' })),
+          ...(allRatingsData.watchlist || []).map(item => ({ ...item, category: 'watchlist' })),
+          ...(allRatingsData.pass || []).map(item => ({ ...item, category: 'pass' }))
         ];
 
         setAllAnime(allAnimeData);
-        setAllRatedAnime(ratedData.items || []);
-        setWatchlistAnime(watchlistData.items || []);
-        setPassAnime(passData.items || []);
+        setAllRatedAnime(allRatingsData.rated || []);
+        setWatchlistAnime(allRatingsData.watchlist || []);
+        setPassAnime(allRatingsData.pass || []);
 
         // Apply initial filter
         filterAnimeBySubMenu(allAnimeData, animeSubMenu);
