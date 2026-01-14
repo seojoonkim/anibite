@@ -6,7 +6,7 @@ from typing import List, Dict
 from database import db, dict_from_row
 
 
-def get_anime_for_rating(user_id: int, limit: int = 50, offset: int = 0, seed: int = None) -> List[Dict]:
+def get_anime_for_rating(user_id: int, limit: int = 50, offset: int = 0) -> List[Dict]:
     """
     애니메이션 평가 페이지 전용 - 초고속 쿼리
 
@@ -14,18 +14,11 @@ def get_anime_for_rating(user_id: int, limit: int = 50, offset: int = 0, seed: i
     - 서브쿼리 0개
     - LEFT JOIN으로 user_rating_status만 확인
     - site stats 제거 (불필요)
-    - 랜덤성 내장: seed를 사용한 deterministic 랜덤 정렬
+    - 가중치 랜덤 정렬: 인기도 기반 + 랜덤 변동 (대체로 인기작이 앞에)
     - 인덱스 활용
-
-    Args:
-        seed: 정렬 시드 (세션별로 다르게, 같은 세션에서는 일관성 유지)
 
     목표: 0.1초 이내
     """
-
-    # seed가 없으면 user_id를 기본 시드로 사용
-    if seed is None:
-        seed = user_id
 
     rows = db.execute_query(
         """
@@ -44,10 +37,10 @@ def get_anime_for_rating(user_id: int, limit: int = 50, offset: int = 0, seed: i
         FROM anime a
         LEFT JOIN user_ratings ur ON a.id = ur.anime_id AND ur.user_id = ?
         WHERE ur.id IS NULL OR ur.status = 'WANT_TO_WATCH'
-        ORDER BY (a.popularity + ((a.id * ?) % 1000)) DESC, a.id ASC
+        ORDER BY (a.popularity + (RANDOM() % 2000)) DESC
         LIMIT ? OFFSET ?
         """,
-        (user_id, seed, limit, offset)
+        (user_id, limit, offset)
     )
 
     return [dict_from_row(row) for row in rows]
@@ -61,7 +54,7 @@ def get_characters_for_rating(user_id: int, limit: int = 50, offset: int = 0) ->
     - 단일 쿼리로 단순화
     - CTE 제거
     - 평가한 애니의 캐릭터 중 미평가만
-    - 랜덤성 내장: favourites에 랜덤 변동 추가
+    - 가중치 랜덤 정렬: 인기도 기반 + 랜덤 변동 (대체로 인기 캐릭터가 앞에)
     - 인덱스 활용
 
     목표: 0.1초 이내
@@ -92,7 +85,7 @@ def get_characters_for_rating(user_id: int, limit: int = 50, offset: int = 0) ->
             AND c.name_full NOT LIKE '%Extra%'
             AND c.name_full NOT LIKE '%Background%'
         GROUP BY c.id
-        ORDER BY (c.favourites + (c.id % 50)) DESC, c.id ASC
+        ORDER BY (c.favourites + (RANDOM() % 500)) DESC
         LIMIT ? OFFSET ?
         """,
         (user_id, user_id, limit, offset)
