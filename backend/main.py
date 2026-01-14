@@ -46,6 +46,8 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         headers = {
             "Access-Control-Allow-Origin": origin,
             "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Methods": "*",
+            "Access-Control-Allow-Headers": "*",
         }
     else:
         headers = {}
@@ -53,6 +55,35 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     return JSONResponse(
         status_code=exc.status_code,
         content={"detail": exc.detail},
+        headers=headers,
+    )
+
+
+# Handle all other exceptions (500 errors)
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    """Handle unexpected errors with CORS headers"""
+    origin = request.headers.get("origin")
+
+    # Log the error
+    print(f"[ERROR] {type(exc).__name__}: {str(exc)}")
+    import traceback
+    traceback.print_exc()
+
+    # Add CORS headers if origin is allowed
+    if origin and origin in ALLOWED_ORIGINS:
+        headers = {
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Methods": "*",
+            "Access-Control-Allow-Headers": "*",
+        }
+    else:
+        headers = {}
+
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "Internal server error"},
         headers=headers,
     )
 

@@ -19,7 +19,8 @@ export const reviewService = {
       const response = await api.get(`/api/reviews/anime/${animeId}/my-review`);
       return response.data;
     } catch (error) {
-      if (error.response?.status === 404) {
+      // Silently handle 404 (no review exists) and network errors
+      if (error.response?.status === 404 || error.code === 'ERR_NETWORK') {
         return null;
       }
       throw error;
