@@ -20,6 +20,21 @@ app = FastAPI(
     redirect_slashes=False,  # Prevent HTTPS->HTTP redirect on Railway
 )
 
+# Startup event to ensure database schema is up to date
+@app.on_event("startup")
+async def startup_event():
+    """Run on application startup"""
+    print("[Startup] Ensuring database schema is up to date...")
+    try:
+        from scripts.ensure_schema import main as ensure_schema
+        ensure_schema()
+        print("[Startup] ✓ Schema check complete")
+    except Exception as e:
+        print(f"[Startup] ⚠️  Schema check failed: {e}")
+        # Don't fail startup, just log the error
+        import traceback
+        traceback.print_exc()
+
 # Debug: Print allowed origins on startup
 print(f"[CORS] Allowed origins: {ALLOWED_ORIGINS}")
 
