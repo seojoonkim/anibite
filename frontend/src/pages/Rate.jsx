@@ -491,7 +491,12 @@ export default function Rate() {
               limit: 20,
               offset: 20
             });
-            setAnimeList(prev => [...prev, ...(data2.items || [])]);
+            // Remove duplicates by ID
+            setAnimeList(prev => {
+              const existingIds = new Set(prev.map(a => a.id));
+              const newItems = (data2.items || []).filter(item => !existingIds.has(item.id));
+              return [...prev, ...newItems];
+            });
             setHasMore(data2.has_more !== false);
             setPage(2);
           } catch (err) {
@@ -524,7 +529,13 @@ export default function Rate() {
       });
 
       console.log('Loaded data:', data);
-      setAnimeList((prev) => [...prev, ...(data.items || [])]);
+      // Remove duplicates by ID
+      setAnimeList((prev) => {
+        const existingIds = new Set(prev.map(a => a.id));
+        const newItems = (data.items || []).filter(item => !existingIds.has(item.id));
+        console.log(`Adding ${newItems.length} new items (filtered ${data.items.length - newItems.length} duplicates)`);
+        return [...prev, ...newItems];
+      });
       setHasMore(data.has_more !== false);
       setPage(nextPage);
       setLoading(false);
