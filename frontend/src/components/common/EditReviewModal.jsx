@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import StarRating from './StarRating';
 
+const IMAGE_BASE_URL = import.meta.env.VITE_API_URL || 'https://anipass-production.up.railway.app';
+
 /**
  * EditReviewModal - 리뷰 수정 모달
  *
@@ -21,6 +23,13 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
   });
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+
+  // Helper to convert relative URLs to absolute
+  const getImageUrl = (url) => {
+    if (!url) return '/placeholder-anime.svg';
+    if (url.startsWith('http')) return url;
+    return `${IMAGE_BASE_URL}${url}`;
+  };
 
   useEffect(() => {
     if (isOpen && activity) {
@@ -108,7 +117,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-4">
               <img
-                src={activity?.item_image || '/placeholder-anime.svg'}
+                src={getImageUrl(activity?.item_image)}
                 alt={activity?.item_title_korean || activity?.item_title || 'Item'}
                 className="w-16 h-20 object-cover rounded bg-gray-200"
                 onError={(e) => {
