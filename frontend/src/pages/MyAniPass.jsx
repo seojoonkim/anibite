@@ -568,6 +568,23 @@ export default function MyAniPass() {
       } else if (activeTab === 'feed') {
         try {
           const targetUserId = userId || user?.id;
+
+          // Load stats if not loaded yet
+          if (!statsLoaded) {
+            if (isOwnProfile) {
+              const statsData = await userService.getStats();
+              setStats(statsData);
+              setStatsLoaded(true);
+            } else {
+              const profileData = await userService.getUserProfile(targetUserId);
+              if (profileData) {
+                setProfileUser(profileData.user);
+                setStats(profileData.stats);
+                setStatsLoaded(true);
+              }
+            }
+          }
+
           const feedData = await feedService.getUserFeed(targetUserId, 10, 0);
           setUserActivities(feedData || []);
           setFeedOffset(10);
