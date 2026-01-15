@@ -148,18 +148,7 @@ export default function MyAniPass() {
 
   // Infinite scroll observer ref
   const observer = useRef();
-
-  // Infinite scroll callback - uses closure to access loadMoreFeed
-  const lastActivityElementRef = useCallback(node => {
-    if (loadingMoreFeed) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMoreFeed) {
-        loadMoreFeed();
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [loadingMoreFeed, hasMoreFeed]);
+  const loadMoreFeedRef = useRef();
 
   // Update URL when activeTab changes
   const changeTab = useCallback((newTab) => {
@@ -855,6 +844,41 @@ export default function MyAniPass() {
       setLoadingMoreFeed(false);
     }
   }, [loadingMoreFeed, hasMoreFeed, userId, user?.id, feedOffset]);
+
+  // Keep ref updated with latest loadMoreFeed
+  loadMoreFeedRef.current = loadMoreFeed;
+
+  // Infinite scroll callback - uses ref to access latest loadMoreFeed
+  const lastActivityElementRef = useCallback(node => {
+    console.log('[InfiniteScroll] lastActivityElementRef called', {
+      node: !!node,
+      loadingMoreFeed,
+      hasMoreFeed,
+      loadMoreFeedRef: !!loadMoreFeedRef.current
+    });
+
+    if (loadingMoreFeed) return;
+    if (observer.current) observer.current.disconnect();
+
+    observer.current = new IntersectionObserver(entries => {
+      console.log('[InfiniteScroll] IntersectionObserver triggered', {
+        isIntersecting: entries[0].isIntersecting,
+        hasMoreFeed
+      });
+
+      if (entries[0].isIntersecting && hasMoreFeed) {
+        console.log('[InfiniteScroll] Calling loadMoreFeed');
+        if (loadMoreFeedRef.current) {
+          loadMoreFeedRef.current();
+        }
+      }
+    });
+
+    if (node) {
+      console.log('[InfiniteScroll] Observing node');
+      observer.current.observe(node);
+    }
+  }, [loadingMoreFeed, hasMoreFeed]);
 
   const loadComments = async (activity) => {
     try {
@@ -1751,6 +1775,15 @@ export default function MyAniPass() {
                     const displayName = displayUser?.display_name || displayUser?.username;
                     const currentOtakuScore = stats?.otaku_score || 0;
                     const isLastActivity = userActivities.length === index + 1;
+
+                    if (isLastActivity) {
+                      console.log('[InfiniteScroll] Rendering last activity', {
+                        index,
+                        total: userActivities.length,
+                        hasMoreFeed,
+                        loadingMoreFeed
+                      });
+                    }
 
                     return (
                       <ActivityCard
