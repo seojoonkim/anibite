@@ -524,12 +524,12 @@ export default function WriteReviews() {
 
                   <Link
                     to={item.type === 'anime' ? `/anime/${item.itemId}` : `/character/${item.itemId}`}
-                    className="flex-shrink-0 hover:opacity-90 transition-opacity cursor-pointer"
+                    className="flex-shrink-0 cursor-pointer overflow-hidden group"
                   >
                     <img
                       src={getImageUrl(item.type === 'anime' ? item.image_url : item.character_image)}
                       alt={item.type === 'anime' ? getAnimeTitle(item) : item.character_name}
-                      className="w-32 h-48 object-cover object-top"
+                      className="w-32 h-48 object-cover object-top group-hover:scale-110 transition-transform duration-900"
                       onError={(e) => {
                         e.target.src = '/placeholder-anime.svg';
                       }}
