@@ -216,7 +216,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
             <textarea
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md h-28 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md h-28 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               placeholder={language === 'ko' ? '이 작품에 대한 당신의 생각을 공유해주세요...' : 'Share your thoughts about this...'}
               required={mode === 'add_review'}
             />

@@ -70,7 +70,7 @@ export default function ActivityComments({
                   }
                 }}
                 placeholder={language === 'ko' ? '댓글을 입력하세요...' : 'Write a comment...'}
-                className="flex-1 px-3 py-1.5 text-[15px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-1.5 text-[15px] border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <button
                 onClick={onCommentSubmit}
@@ -174,7 +174,7 @@ export default function ActivityComments({
                             }
                           }}
                           placeholder={language === 'ko' ? '답글을 입력하세요...' : 'Write a reply...'}
-                          className="flex-1 px-2 py-1 text-[13px] border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="flex-1 px-2 py-1 text-[13px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                         />
                         <button
                           onClick={() => onReplySubmit(comment.id)}

@@ -495,7 +495,7 @@ export default function Feed() {
                       value={newPostContent}
                       onChange={(e) => setNewPostContent(e.target.value)}
                       placeholder={language === 'ko' ? '무슨 생각을 하고 계신가요?' : "What's on your mind?"}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
                       rows="3"
                     />
                     <div className="flex justify-end mt-2">
