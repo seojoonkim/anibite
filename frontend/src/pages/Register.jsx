@@ -40,8 +40,18 @@ export default function Register() {
     const result = await register(registerData);
 
     if (result.success) {
-      // Registration successful - redirect to home
-      navigate('/');
+      if (result.requiresVerification) {
+        // Email verification required - redirect to email sent page
+        navigate('/email-sent', {
+          state: {
+            email: result.email,
+            username: result.username
+          }
+        });
+      } else {
+        // Registration successful and auto-logged in (legacy flow)
+        navigate('/');
+      }
     } else {
       setError(result.error);
     }
