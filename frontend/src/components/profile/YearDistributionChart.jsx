@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 export default function YearDistributionChart({ distribution }) {
   if (!distribution || distribution.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-lg shadow-md p-6 w-full h-full flex flex-col">
         <h3 className="text-xl font-bold mb-4">연도별 시청 분포</h3>
         <p className="text-gray-600">아직 평가한 애니메이션이 없습니다.</p>
       </div>
@@ -42,7 +42,7 @@ export default function YearDistributionChart({ distribution }) {
   const sortedData = [...distribution].sort((a, b) => a.year - b.year);
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+    <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 w-full h-full flex flex-col">
       <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">연도별 시청 분포</h3>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={sortedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>

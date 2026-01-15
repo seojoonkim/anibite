@@ -52,7 +52,7 @@ export default function RatingStatsCard({ stats }) {
   const generosityScore = Math.max(0, Math.min(100, ((stats.mean_rating - 1.0) / 4.0) * 100));
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6">
+    <div className="bg-white rounded-2xl shadow-md p-6 w-full h-full flex flex-col">
       <h3 className="text-lg font-bold mb-4 text-gray-800">평가 성향</h3>
 
       <div className="space-y-4">

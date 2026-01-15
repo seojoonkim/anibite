@@ -6,7 +6,7 @@ export default function GenreCombinationChart({ combinations }) {
   const maxCount = Math.max(...combinations.map(c => c.count));
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6">
+    <div className="bg-white rounded-2xl shadow-md p-6 w-full h-full flex flex-col">
       <h3 className="text-lg font-bold mb-4 text-gray-800">좋아하는 장르 조합 Top 10</h3>
 
       <div className="space-y-2">
