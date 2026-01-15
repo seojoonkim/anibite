@@ -224,6 +224,7 @@ def update_activity(
     Update activity review content
 
     Note: Rating updates should go through user_ratings table (triggers will sync)
+    For user_posts, also updates the source user_posts table to maintain consistency
     """
     db = default_db
 
@@ -232,7 +233,7 @@ def update_activity(
     if not activity or activity['user_id'] != user_id:
         return None
 
-    # Build update query
+    # Build update query for activities table
     updates = []
     params = []
 
@@ -259,6 +260,15 @@ def update_activity(
         tuple(params)
     )
 
+    # If this is a user_post, also update the source user_posts table
+    if activity.get('activity_type') == 'user_post' and review_content is not None:
+        item_id = activity.get('item_id')
+        if item_id:
+            db.execute_update(
+                "UPDATE user_posts SET content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?",
+                (review_content, item_id, user_id)
+            )
+
     return get_activity_by_id(activity_id, user_id)
 
 
@@ -267,7 +277,7 @@ def delete_activity(activity_id: int, user_id: int) -> bool:
     Delete an activity
 
     Note: For anime/character ratings, delete the source rating (triggers will sync)
-    This is mainly for user_posts.
+    For user_posts, also deletes the source user_posts record to maintain consistency
     """
     db = default_db
 
@@ -275,6 +285,15 @@ def delete_activity(activity_id: int, user_id: int) -> bool:
     activity = get_activity_by_id(activity_id, user_id)
     if not activity or activity['user_id'] != user_id:
         return False
+
+    # If this is a user_post, delete from user_posts table first
+    if activity.get('activity_type') == 'user_post':
+        item_id = activity.get('item_id')
+        if item_id:
+            db.execute_update(
+                "DELETE FROM user_posts WHERE id = ? AND user_id = ?",
+                (item_id, user_id)
+            )
 
     # Delete related comments
     db.execute_update(
