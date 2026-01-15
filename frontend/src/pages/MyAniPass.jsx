@@ -1729,60 +1729,57 @@ export default function MyAniPass() {
                   {/* 통계 */}
                   <div className="w-full">
                     {stats && (
-                      <div className="space-y-3 flex-1">
-                          <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-[#8EC5FC]/10 to-[#638CCC]/10 border border-[#8EC5FC]/30 hover:shadow-md transition-all duration-300">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#8EC5FC] to-[#638CCC] flex items-center justify-center text-white text-xl">
-                                📺
-                              </div>
-                              <div className="flex-1">
-                                <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '평가한 애니' : 'Rated Anime'}</div>
-                                <div className="text-2xl font-bold text-[#638CCC]">
-                                  {stats.total_rated || 0}
-                                </div>
+                      <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-6">
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#8EC5FC] to-[#638CCC] flex items-center justify-center text-white text-xl flex-shrink-0">
+                              📺
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '평가한 애니' : 'Rated Anime'}</div>
+                              <div className="text-2xl font-bold text-[#638CCC]">
+                                {stats.total_rated || 0}
                               </div>
                             </div>
                           </div>
-                          <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-[#90B2E4]/10 to-[#8EC5FC]/10 border border-[#90B2E4]/30 hover:shadow-md transition-all duration-300">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#90B2E4] to-[#8EC5FC] flex items-center justify-center text-white text-xl">
-                                ⭐
-                              </div>
-                              <div className="flex-1">
-                                <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '보고싶어요' : 'Watchlist'}</div>
-                                <div className="text-2xl font-bold text-[#638CCC]">
-                                  {stats.total_want_to_watch || 0}
-                                </div>
+
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#90B2E4] to-[#8EC5FC] flex items-center justify-center text-white text-xl flex-shrink-0">
+                              ⭐
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '보고싶어요' : 'Watchlist'}</div>
+                              <div className="text-2xl font-bold text-[#638CCC]">
+                                {stats.total_want_to_watch || 0}
                               </div>
                             </div>
                           </div>
-                          <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-amber-400/10 to-yellow-400/10 border border-amber-300/30 hover:shadow-md transition-all duration-300">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-yellow-400 flex items-center justify-center text-white text-xl">
-                                ✨
-                              </div>
-                              <div className="flex-1">
-                                <div className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-0.5">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</div>
-                                <div className="text-2xl font-bold text-amber-600">
-                                  {stats.average_rating ? `★ ${stats.average_rating.toFixed(1)}` : '-'}
-                                </div>
+
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-yellow-400 flex items-center justify-center text-white text-xl flex-shrink-0">
+                              ✨
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-0.5">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</div>
+                              <div className="text-2xl font-bold text-amber-600">
+                                {stats.average_rating ? `★ ${stats.average_rating.toFixed(1)}` : '-'}
                               </div>
                             </div>
                           </div>
-                          <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-[#638CCC]/10 to-purple-400/10 border border-[#638CCC]/30 hover:shadow-md transition-all duration-300">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#638CCC] to-purple-400 flex items-center justify-center text-white text-xl">
-                                ⏱️
-                              </div>
-                              <div className="flex-1">
-                                <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '시청 시간' : 'Watch Time'}</div>
-                                <div className="text-2xl font-bold text-[#638CCC]">
-                                  {formatWatchTime(watchTime?.total_minutes)}
-                                </div>
+
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#638CCC] to-purple-400 flex items-center justify-center text-white text-xl flex-shrink-0">
+                              ⏱️
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '시청 시간' : 'Watch Time'}</div>
+                              <div className="text-2xl font-bold text-[#638CCC]">
+                                {formatWatchTime(watchTime?.total_minutes)}
                               </div>
                             </div>
                           </div>
                         </div>
+                      </div>
                     )}
                   </div>
 
