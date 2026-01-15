@@ -20,6 +20,7 @@ export default function Navbar() {
   const [lastCheckTime, setLastCheckTime] = useState(null);
   const notificationRef = useRef(null);
   const userMenuRef = useRef(null);
+  const mobileUserMenuRef = useRef(null);
 
   // Initialize from localStorage cache to prevent flickering
   const [otakuScore, setOtakuScore] = useState(() => {
@@ -73,7 +74,8 @@ export default function Navbar() {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setShowNotificationDropdown(false);
       }
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target) &&
+          mobileUserMenuRef.current && !mobileUserMenuRef.current.contains(event.target)) {
         setShowUserMenu(false);
       }
     };
@@ -238,14 +240,14 @@ export default function Navbar() {
         width: '111.11%',
         marginLeft: '-5.555%'
       }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 items-center h-16 md:gap-6">
-            {/* Logo - takes same space as sidebar */}
-            <div className="flex items-center md:col-span-1">
-              <Link to="/feed" className="flex items-center gap-2 text-2xl font-bold text-black hover:opacity-60 transition-opacity group">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 items-center h-12 md:h-16 md:gap-6">
+            {/* Logo and Mobile User Menu */}
+            <div className="flex items-center justify-between md:col-span-1">
+              <Link to="/feed" className="flex items-center gap-1.5 md:gap-2 text-lg md:text-2xl font-bold text-black hover:opacity-60 transition-opacity group">
                 {/* AniPass Logo Icon */}
                 <div className="relative">
-                  <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg className="w-8 h-8 md:w-11 md:h-11" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                       <linearGradient id="instagramGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" style={{ stopColor: '#833AB4' }} />
@@ -302,6 +304,83 @@ export default function Navbar() {
                 </div>
                 <span className="">AniPass</span>
               </Link>
+
+              {/* Mobile User Menu - Only visible on mobile */}
+              {user && (
+                <div className="md:hidden relative" ref={mobileUserMenuRef}>
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="text-[#262626] hover:bg-gray-100 text-xs font-medium px-1.5 py-0.5 rounded-md transition-colors flex items-center gap-1.5"
+                  >
+                    {user.avatar_url ? (
+                      <img
+                        src={getAvatarUrl(user.avatar_url)}
+                        alt={user.display_name || user.username}
+                        className="w-7 h-7 rounded-full object-cover border border-[#DBDBDB]"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center border border-[#DBDBDB]" style={{ backgroundColor: '#FAFAFA' }}>
+                        <span className="text-[#262626] text-xs font-bold">
+                          {(user.display_name || user.username || '?').charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                    <span className="text-xs font-medium max-w-[80px] truncate">{user.display_name || user.username}</span>
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {showUserMenu && (
+                    <div className="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-[0_4px_16px_rgba(0,0,0,0.12)] z-50" style={{ borderColor: '#DBDBDB', borderWidth: '1px' }}>
+                      <button
+                        onClick={handleMyAnipass}
+                        className="block w-full text-left px-4 py-3 text-sm font-medium rounded-t-md transition-colors"
+                        style={{
+                          backgroundColor: '#FAFAFA',
+                          color: '#262626',
+                          borderBottom: '1px solid #DBDBDB'
+                        }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = '#F0F0F0'}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = '#FAFAFA'}
+                      >
+                        <div className="flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                          </svg>
+                          <span>내 애니패스</span>
+                        </div>
+                      </button>
+                      <button
+                        onClick={handleSettings}
+                        className="block w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <span>설정</span>
+                        </div>
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-md transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                          </svg>
+                          <span>로그아웃</span>
+                        </div>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Desktop Menu and Right Side - Aligned with feed content area */}
@@ -479,19 +558,19 @@ export default function Navbar() {
 
       {/* Mobile Bottom Navigation - Only visible on mobile */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_4px_16px_rgba(0,0,0,0.12)] z-50">
-        <div className="grid grid-cols-6 h-16">
+        <div className="grid grid-cols-6 h-14">
           {menuItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex flex-col items-center justify-center gap-0.5 transition-colors ${
+              className={`flex flex-col items-center justify-center gap-0.5 transition-colors py-1 ${
                 isActive(item.path)
                   ? 'bg-[#3797F0] text-white'
                   : 'text-gray-600 hover:text-gray-800'
               }`}
             >
-              {item.icon}
-              <span className="text-[10px] font-medium">
+              <div className="scale-90">{item.icon}</div>
+              <span className="text-[9px] font-medium">
                 {item.labelKo ? (language === 'ko' ? item.labelKo : item.labelEn) : item.label}
               </span>
             </Link>
@@ -500,7 +579,7 @@ export default function Navbar() {
       </div>
 
       {/* Spacer for mobile bottom nav */}
-      <div className="md:hidden h-16" />
+      <div className="md:hidden h-14" />
     </>
   );
 }
