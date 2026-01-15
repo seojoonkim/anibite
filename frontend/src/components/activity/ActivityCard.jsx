@@ -89,6 +89,17 @@ export default function ActivityCard({
   const [showEditModal, setShowEditModal] = useState(false);
   const [editPostContent, setEditPostContent] = useState('');
 
+  // Debug: Log activity data when component mounts (only for user_post)
+  useEffect(() => {
+    if (activity.activity_type === 'user_post') {
+      console.log('=== ActivityCard received user_post ===');
+      console.log('review_id:', activity.review_id);
+      console.log('item_id:', activity.item_id);
+      console.log('user_id:', activity.user_id);
+      console.log('Full activity:', activity);
+    }
+  }, [activity]);
+
   // Initialize bookmark state from localStorage
   useEffect(() => {
     const bookmarks = JSON.parse(localStorage.getItem('anipass_bookmarks') || '[]');
