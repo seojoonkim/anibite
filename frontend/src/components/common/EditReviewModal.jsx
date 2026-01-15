@@ -171,11 +171,20 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
                 }}
               />
               <div className="min-w-0 flex-1">
-                <h3 className="font-semibold text-gray-900 text-sm truncate">
-                  {activity?.item_title_korean || activity?.item_title || 'Unknown'}
+                <h3 className="font-semibold text-gray-900 text-sm">
+                  {activity?.activity_type === 'character_rating' ? (
+                    <>
+                      {activity?.item_title}{' '}
+                      <span className="text-gray-600">({activity?.item_title_korean})</span>
+                    </>
+                  ) : (
+                    activity?.item_title_korean || activity?.item_title || 'Unknown'
+                  )}
                 </h3>
-                {activity?.item_title_korean && activity?.item_title && (
-                  <p className="text-xs text-gray-600 truncate">{activity.item_title}</p>
+                {activity?.activity_type === 'character_rating' && (activity?.anime_title || activity?.anime_title_korean) && (
+                  <p className="text-xs text-gray-600 mt-0.5">
+                    from: {activity.anime_title_korean || activity.anime_title}
+                  </p>
                 )}
               </div>
             </div>
