@@ -19,10 +19,14 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('token');
 
       if (storedUser && token) {
-        // Set stored user first to avoid flicker
-        setUser(storedUser);
+        const hasOtakuScore = storedUser.otaku_score !== undefined && storedUser.otaku_score !== null;
 
-        // Then fetch latest user data from API (includes otaku_score)
+        // If otaku_score exists, set user immediately to avoid flicker
+        if (hasOtakuScore) {
+          setUser(storedUser);
+        }
+
+        // Fetch latest user data from API (includes otaku_score)
         try {
           const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
             headers: {
@@ -34,9 +38,16 @@ export const AuthProvider = ({ children }) => {
             const freshUserData = await response.json();
             setUser(freshUserData);
             localStorage.setItem('user', JSON.stringify(freshUserData));
+          } else if (!hasOtakuScore) {
+            // If API fails and we don't have otaku_score, still set stored user
+            setUser(storedUser);
           }
         } catch (err) {
           console.error('Failed to refresh user data:', err);
+          // If API fails and we don't have otaku_score, still set stored user
+          if (!hasOtakuScore) {
+            setUser(storedUser);
+          }
         }
       }
       setLoading(false);
