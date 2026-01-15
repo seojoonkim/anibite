@@ -23,6 +23,7 @@ import ContentMenu from '../common/ContentMenu';
 import { ratingService } from '../../services/ratingService';
 import { characterService } from '../../services/characterService';
 import { userPostService } from '../../services/userPostService';
+import { activityService } from '../../services/activityService';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL || API_BASE_URL;
