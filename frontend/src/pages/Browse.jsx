@@ -203,7 +203,7 @@ export default function Browse() {
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="flex items-center gap-2 md:block">
-              <label className="text-xs font-medium text-gray-700 md:block md:mb-1 whitespace-nowrap">
+              <label className="w-12 text-xs font-medium text-gray-700 md:w-auto md:block md:mb-1 whitespace-nowrap">
                 {t('sort')}
               </label>
               <select
@@ -221,7 +221,7 @@ export default function Browse() {
             </div>
 
             <div className="flex items-center gap-2 md:block">
-              <label className="text-xs font-medium text-gray-700 md:block md:mb-1 whitespace-nowrap">
+              <label className="w-12 text-xs font-medium text-gray-700 md:w-auto md:block md:mb-1 whitespace-nowrap">
                 {t('status')}
               </label>
               <select
@@ -237,7 +237,7 @@ export default function Browse() {
             </div>
 
             <div className="flex items-center gap-2 md:block">
-              <label className="text-xs font-medium text-gray-700 md:block md:mb-1 whitespace-nowrap">
+              <label className="w-12 text-xs font-medium text-gray-700 md:w-auto md:block md:mb-1 whitespace-nowrap">
                 {t('year')}
               </label>
               <input
@@ -250,7 +250,7 @@ export default function Browse() {
             </div>
 
             <div className="flex items-center gap-2 md:block">
-              <label className="text-xs font-medium text-gray-700 md:block md:mb-1 whitespace-nowrap">
+              <label className="w-12 text-xs font-medium text-gray-700 md:w-auto md:block md:mb-1 whitespace-nowrap">
                 {t('genre')}
               </label>
               <input
