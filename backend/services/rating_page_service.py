@@ -7,7 +7,7 @@ import random
 from database import db, dict_from_row
 
 
-def get_anime_for_rating(user_id: int, limit: int = 50, offset: int = 0) -> List[Dict]:
+def get_anime_for_rating(user_id: int, limit: int = 50) -> List[Dict]:
     """
     애니메이션 평가 페이지 전용 - 초고속 쿼리
 
@@ -78,7 +78,7 @@ def get_anime_for_rating(user_id: int, limit: int = 50, offset: int = 0) -> List
         return items
 
 
-def get_characters_for_rating(user_id: int, limit: int = 50, offset: int = 0) -> List[Dict]:
+def get_characters_for_rating(user_id: int, limit: int = 50) -> List[Dict]:
     """
     캐릭터 평가 페이지 전용 - 초고속 쿼리
 
