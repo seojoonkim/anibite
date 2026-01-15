@@ -62,12 +62,22 @@ export const AuthProvider = ({ children }) => {
       if (token && userData) {
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(userData));
+        // Set user's preferred language
+        if (userData.preferred_language) {
+          localStorage.setItem('language', userData.preferred_language);
+          window.location.reload(); // Reload to apply language change
+        }
         setUser(userData);
         return { success: true, user: userData };
       }
 
       // Otherwise, perform normal login
       const data = await authService.login(credentials);
+      // Set user's preferred language
+      if (data.user.preferred_language) {
+        localStorage.setItem('language', data.user.preferred_language);
+        window.location.reload(); // Reload to apply language change
+      }
       setUser(data.user);
       return { success: true, user: data.user };
     } catch (error) {
@@ -84,6 +94,11 @@ export const AuthProvider = ({ children }) => {
       const data = await authService.register(userData);
 
       // User is automatically verified and logged in
+      // Set user's preferred language
+      if (data.user.preferred_language) {
+        localStorage.setItem('language', data.user.preferred_language);
+        window.location.reload(); // Reload to apply language change
+      }
       setUser(data.user);
       return { success: true, user: data.user };
     } catch (error) {

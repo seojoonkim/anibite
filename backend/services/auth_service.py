@@ -35,10 +35,10 @@ def register_user(user_data: UserRegister) -> TokenResponse:
     user_id = db.execute_insert(
         """
         INSERT INTO users (username, email, password_hash, display_name,
-                          is_verified, created_at, updated_at)
-        VALUES (?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                          preferred_language, is_verified, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         """,
-        (user_data.username, user_data.email, hashed_password, user_data.display_name)
+        (user_data.username, user_data.email, hashed_password, user_data.display_name, user_data.preferred_language)
     )
 
     # 사용자 통계 초기화

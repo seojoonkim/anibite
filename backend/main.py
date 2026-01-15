@@ -155,8 +155,18 @@ app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 # Startup event - Fix triggers on server start
 @app.on_event("startup")
 async def startup_event():
-    """서버 시작 시 트리거 자동 수정"""
-    print("\n🔧 Checking and fixing database triggers...")
+    """서버 시작 시 데이터베이스 마이그레이션 및 트리거 수정"""
+    # Add preferred_language column if needed
+    print("\n🗄️ Checking database schema...")
+    try:
+        from scripts.add_preferred_language import add_preferred_language_column
+        add_preferred_language_column()
+        print("✅ Database schema up to date!\n")
+    except Exception as e:
+        print(f"⚠️ Failed to update schema: {e}\n")
+
+    # Fix triggers
+    print("🔧 Checking and fixing database triggers...")
     try:
         from scripts.fix_railway_triggers import fix_triggers
         fix_triggers()

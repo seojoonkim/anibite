@@ -15,6 +15,7 @@ class UserRegister(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=8, max_length=100)
     display_name: Optional[str] = Field(None, max_length=50)
+    preferred_language: str = Field(default='ko', pattern='^(ko|en)$')
 
     @field_validator('username')
     @classmethod
@@ -54,6 +55,7 @@ class UserResponse(BaseModel):
     display_name: Optional[str]
     avatar_url: Optional[str]
     bio: Optional[str]
+    preferred_language: Optional[str] = 'ko'
     created_at: datetime
     otaku_score: Optional[float] = 0.0
 
