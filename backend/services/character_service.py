@@ -3,6 +3,7 @@ Character Service
 캐릭터 관련 비즈니스 로직
 """
 from typing import List, Dict, Optional
+import random
 from database import db, dict_from_row
 
 
@@ -52,7 +53,9 @@ def get_characters_from_rated_anime(user_id: int, limit: int = 100, offset: int 
     사용자가 평가한 애니메이션의 캐릭터들 조회 (평가하지 않은 캐릭터만)
     같은 캐릭터가 여러 애니메이션에 나오면 가장 인기있는 애니메이션 하나만 표시
     """
-    # 먼저 캐릭터 기본 정보와 최우선 애니메이션 ID를 가져옴
+    # Fetch more items than needed (3x) for randomization
+    fetch_limit = limit * 3
+
     rows = db.execute_query(
         """
         WITH RankedCharacters AS (
@@ -116,13 +119,35 @@ def get_characters_from_rated_anime(user_id: int, limit: int = 100, offset: int 
             ca.role
         FROM RankedCharacters rc
         LEFT JOIN CharacterAnime ca ON ca.character_id = rc.id AND ca.rn = 1
-        ORDER BY (rc.favourites * 1.0 / 1000 + RANDOM() * 0.2) DESC
-        LIMIT ? OFFSET ?
+        ORDER BY COALESCE(rc.favourites, 0) DESC
+        LIMIT ?
         """,
-        (user_id, user_id, user_id, limit, offset)
+        (user_id, user_id, user_id, fetch_limit)
     )
 
-    return [dict_from_row(row) for row in rows]
+    items = [dict_from_row(row) for row in rows]
+
+    # Weighted random: shuffle within popularity tiers
+    if len(items) > limit:
+        tier_size = len(items) // 3
+        top_tier = items[:tier_size]
+        mid_tier = items[tier_size:tier_size*2]
+        low_tier = items[tier_size*2:]
+
+        random.shuffle(top_tier)
+        random.shuffle(mid_tier)
+        random.shuffle(low_tier)
+
+        top_count = int(limit * 0.5)
+        mid_count = int(limit * 0.3)
+        low_count = limit - top_count - mid_count
+
+        result = top_tier[:top_count] + mid_tier[:mid_count] + low_tier[:low_count]
+        random.shuffle(result)
+        return result
+    else:
+        random.shuffle(items)
+        return items
 
 
 def get_character_rating(user_id: int, character_id: int) -> Optional[Dict]:
