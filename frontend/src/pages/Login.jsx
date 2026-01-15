@@ -30,7 +30,7 @@ export default function Login() {
       if (result.error && result.error.toLowerCase().includes('not verified')) {
         setEmailNotVerified(true);
         setUserEmail(username.includes('@') ? username : '');
-        setError('이메일 인증이 완료되지 않았습니다.');
+        setError('Email verification is not complete.');
       } else {
         setError(result.error);
       }
@@ -96,10 +96,10 @@ export default function Login() {
             </svg>
             <h1 className="text-3xl font-bold text-gray-900">AniPass</h1>
           </div>
-          <p className="text-gray-600 text-center">당신의 애니메이션 여정</p>
+          <p className="text-gray-600 text-center">Your Anime Journey</p>
         </div>
 
-        <h2 className="text-xl font-semibold text-center mb-6 text-gray-800">로그인</h2>
+        <h2 className="text-xl font-semibold text-center mb-6 text-gray-800">Login</h2>
 
         {error && (
           <div className={`px-4 py-3 rounded mb-4 ${
@@ -113,7 +113,7 @@ export default function Login() {
                 onClick={() => navigate('/resend-verification', { state: { email: userEmail } })}
                 className="text-sm underline hover:no-underline"
               >
-                인증 이메일 재전송하기 →
+                Resend verification email →
               </button>
             )}
           </div>
@@ -122,30 +122,30 @@ export default function Login() {
         <form onSubmit={handleSubmit}>
           <div className="mb-5">
             <label className="block text-gray-700 text-sm font-semibold mb-2">
-              {language === 'ko' ? '아이디 또는 이메일' : 'ID or Email'}
+              Username or Email
             </label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder={language === 'ko' ? '아이디 또는 이메일을 입력하세요' : 'Enter your ID or email'}
+              placeholder="Enter your username or email"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
               required
             />
             <p className="text-xs text-gray-500 mt-1.5">
-              {language === 'ko' ? '회원가입 시 입력한 아이디 또는 이메일로 로그인할 수 있습니다' : 'You can login with your ID or email'}
+              You can login with your username or email
             </p>
           </div>
 
           <div className="mb-6">
             <label className="block text-gray-700 text-sm font-semibold mb-2">
-              {language === 'ko' ? '비밀번호' : 'Password'}
+              Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder={language === 'ko' ? '비밀번호를 입력하세요' : 'Enter your password'}
+              placeholder="Enter your password"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
               required
             />
@@ -163,14 +163,14 @@ export default function Login() {
               e.target.style.backgroundColor = '#3797F0';
             }}
           >
-            {loading ? (language === 'ko' ? '로그인 중...' : 'Logging in...') : (language === 'ko' ? '로그인' : 'Login')}
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
         <p className="text-center mt-6 text-gray-600 text-sm">
-          {language === 'ko' ? '계정이 없으신가요?' : "Don't have an account?"}{' '}
+          Don't have an account?{' '}
           <Link to="/register" className="font-semibold hover:underline" style={{ color: '#3797F0' }}>
-            {language === 'ko' ? '회원가입' : 'Register'}
+            Sign up
           </Link>
         </p>
       </div>

@@ -29,7 +29,7 @@ export default function Register() {
 
     // 비밀번호 확인
     if (formData.password !== formData.passwordConfirm) {
-      setError('비밀번호가 일치하지 않습니다');
+      setError('Passwords do not match');
       return;
     }
 
@@ -105,10 +105,10 @@ export default function Register() {
             </svg>
             <h1 className="text-3xl font-bold text-gray-900">AniPass</h1>
           </div>
-          <p className="text-gray-600 text-center">당신의 애니메이션 여정</p>
+          <p className="text-gray-600 text-center">Your Anime Journey</p>
         </div>
 
-        <h2 className="text-xl font-semibold text-center mb-6 text-gray-800">회원가입</h2>
+        <h2 className="text-xl font-semibold text-center mb-6 text-gray-800">Sign Up</h2>
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -119,13 +119,14 @@ export default function Register() {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-semibold mb-2">
-              사용자명 *
+              Username *
             </label>
             <input
               type="text"
               name="username"
               value={formData.username}
               onChange={handleChange}
+              placeholder="Choose a username"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
               required
               minLength={3}
@@ -134,13 +135,14 @@ export default function Register() {
 
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-semibold mb-2">
-              이메일 *
+              Email *
             </label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
+              placeholder="Enter your email"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
               required
             />
@@ -148,26 +150,28 @@ export default function Register() {
 
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-semibold mb-2">
-              표시 이름
+              Display Name
             </label>
             <input
               type="text"
               name="display_name"
               value={formData.display_name}
               onChange={handleChange}
+              placeholder="How should we call you?"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
             />
           </div>
 
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-semibold mb-2">
-              비밀번호 * (최소 8자)
+              Password * (min. 8 characters)
             </label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
+              placeholder="Create a password"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
               required
               minLength={8}
@@ -176,13 +180,14 @@ export default function Register() {
 
           <div className="mb-6">
             <label className="block text-gray-700 text-sm font-semibold mb-2">
-              비밀번호 확인 *
+              Confirm Password *
             </label>
             <input
               type="password"
               name="passwordConfirm"
               value={formData.passwordConfirm}
               onChange={handleChange}
+              placeholder="Confirm your password"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
               required
             />
@@ -200,14 +205,14 @@ export default function Register() {
               e.target.style.backgroundColor = '#3797F0';
             }}
           >
-            {loading ? '가입 중...' : '회원가입'}
+            {loading ? 'Creating account...' : 'Sign Up'}
           </button>
         </form>
 
         <p className="text-center mt-6 text-gray-600 text-sm">
-          이미 계정이 있으신가요?{' '}
+          Already have an account?{' '}
           <Link to="/login" className="font-semibold hover:underline" style={{ color: '#3797F0' }}>
-            로그인
+            Login
           </Link>
         </p>
       </div>
