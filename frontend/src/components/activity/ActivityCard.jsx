@@ -350,12 +350,13 @@ const ActivityCard = forwardRef(({
       if (activity.activity_type === 'user_post') {
         // user_post의 ID는 review_id 또는 item_id에 있을 수 있음
         const postId = activity.review_id || activity.item_id;
-        if (!postId) {
-          console.error('Post ID not found in activity:', activity);
-          alert(language === 'ko' ? '포스트 ID를 찾을 수 없습니다.' : 'Post ID not found.');
-          return;
+        if (postId) {
+          // If we have the post ID, use userPostService (deletes from user_posts table)
+          await userPostService.deletePost(postId);
+        } else {
+          // If no post ID, use activityService with activity.id (deletes from both tables via backend)
+          await activityService.deleteActivity(activity.id);
         }
-        await userPostService.deletePost(postId);
       } else if (activity.activity_type === 'anime_rating') {
         await ratingService.deleteRating(activity.item_id);
       } else if (activity.activity_type === 'character_rating') {
@@ -412,13 +413,16 @@ const ActivityCard = forwardRef(({
       // user_post의 ID는 review_id 또는 item_id에 있을 수 있음
       const postId = activity.review_id || activity.item_id;
 
-      if (!postId) {
-        console.error('Post ID not found in activity:', activity);
-        alert(language === 'ko' ? '포스트 ID를 찾을 수 없습니다.' : 'Post ID not found.');
-        return;
+      if (postId) {
+        // If we have the post ID, use userPostService (updates user_posts table)
+        await userPostService.updatePost(postId, editPostContent);
+      } else {
+        // If no post ID, use activityService with activity.id (updates activities table + user_posts via backend)
+        await activityService.updateActivity(activity.id, {
+          review_content: editPostContent
+        });
       }
 
-      await userPostService.updatePost(postId, editPostContent);
       setShowEditModal(false);
 
       // Refresh the feed to show updated content
