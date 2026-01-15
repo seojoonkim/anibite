@@ -227,7 +227,7 @@ export default function Navbar() {
   return (
     <>
       {/* Desktop & Mobile Top Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 h-16" style={{
+      <nav className="fixed top-0 left-0 right-0 z-50 h-9 md:h-16" style={{
         position: 'fixed',
         top: 0,
         left: 0,
