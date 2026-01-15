@@ -9,6 +9,7 @@ export default function Register() {
     password: '',
     passwordConfirm: '',
     display_name: '',
+    preferred_language: 'ko',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -160,6 +161,22 @@ export default function Register() {
               placeholder="How should we call you?"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
             />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-semibold mb-2">
+              Preferred Language / 선호 언어 *
+            </label>
+            <select
+              name="preferred_language"
+              value={formData.preferred_language}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
+              required
+            >
+              <option value="ko">한국어 (Korean)</option>
+              <option value="en">English</option>
+            </select>
           </div>
 
           <div className="mb-4">
