@@ -109,7 +109,7 @@ export default function AnimeDetail() {
     setError(null);
 
     try {
-      // 애니메이션 기본 정보 먼저 로드 (가장 중요)
+      // 1단계: 애니메이션 기본 정보 먼저 로드하고 즉시 표시
       const animeData = await animeService.getAnimeById(id);
 
       if (!animeData) {
@@ -118,30 +118,32 @@ export default function AnimeDetail() {
         return;
       }
 
-      // 애니메이션 정보 설정
+      // 기본 정보 설정하고 즉시 화면 표시
       setAnime(animeData);
+      setLoading(false); // 여기서 로딩 해제 - 기본 정보 바로 표시
 
-      // 나머지 데이터는 병렬로 로드 (실패해도 괜찮음)
-      const [myRatingData, myReviewData] = await Promise.all([
-        user ? ratingService.getUserRating(id).catch(() => null) : Promise.resolve(null),
-        user ? reviewService.getMyReview(id).catch(() => null) : Promise.resolve(null)
-      ]);
+      // 2단계: 내 평점/리뷰는 백그라운드에서 로드 (화면은 이미 표시 중)
+      if (user) {
+        const [myRatingData, myReviewData] = await Promise.all([
+          ratingService.getUserRating(id).catch(() => null),
+          reviewService.getMyReview(id).catch(() => null)
+        ]);
 
-      // 내 평점
-      if (myRatingData) {
-        setMyRating(myRatingData);
+        // 내 평점
+        if (myRatingData) {
+          setMyRating(myRatingData);
+        }
+
+        // 내 리뷰
+        if (myReviewData) {
+          processMyReview(myReviewData);
+        }
       }
 
-      // 내 리뷰
-      if (myReviewData) {
-        processMyReview(myReviewData);
-      }
-
-      // 다른 사람들의 활동은 useActivities hook에서 자동으로 로드됨
+      // 3단계: 다른 사람들의 활동은 useActivities hook에서 자동으로 로드됨
     } catch (err) {
       console.error('Failed to load anime data:', err);
       setError(`데이터를 불러오는데 실패했습니다: ${err.message || '알 수 없는 오류'}`);
-    } finally {
       setLoading(false);
     }
   };
