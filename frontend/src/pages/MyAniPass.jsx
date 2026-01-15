@@ -149,6 +149,18 @@ export default function MyAniPass() {
   // Infinite scroll observer ref
   const observer = useRef();
 
+  // Infinite scroll callback - uses closure to access loadMoreFeed
+  const lastActivityElementRef = useCallback(node => {
+    if (loadingMoreFeed) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMoreFeed) {
+        loadMoreFeed();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loadingMoreFeed, hasMoreFeed]);
+
   // Update URL when activeTab changes
   const changeTab = useCallback((newTab) => {
     setActiveTab(newTab);
@@ -798,18 +810,6 @@ export default function MyAniPass() {
       setLoadingMoreFeed(false);
     }
   }, [loadingMoreFeed, hasMoreFeed, userId, user?.id, feedOffset]);
-
-  // Infinite scroll callback - defined after loadMoreFeed
-  const lastActivityElementRef = useCallback(node => {
-    if (loadingMoreFeed) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMoreFeed) {
-        loadMoreFeed();
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [loadingMoreFeed, hasMoreFeed]);
 
   const loadComments = async (activity) => {
     try {
