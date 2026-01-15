@@ -27,6 +27,7 @@ import RatingStatsCard from '../components/profile/RatingStatsCard';
 import StudioStats from '../components/profile/StudioStats';
 import SeasonStats from '../components/profile/SeasonStats';
 import GenreCombinationChart from '../components/profile/GenreCombinationChart';
+import ActivityCard from '../components/activity/ActivityCard';
 import api from '../services/api';
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';

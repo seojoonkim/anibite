@@ -362,82 +362,14 @@ export default function WriteReviews() {
 
   const filteredItems = getFilteredItems();
   const currentStats = getFilteredStats();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
-        <Navbar />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-          {/* Real Filter Toggle - Clickable */}
-          <div className="mb-12 relative">
-            <div className="flex gap-2 w-fit mb-4">
-              <button
-                onClick={() => setFilter('all')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  filter === 'all'
-                    ? 'bg-[#3797F0] text-white font-semibold'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {language === 'ko' ? '모두' : 'All'}
-              </button>
-              <button
-                onClick={() => setFilter('anime')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  filter === 'anime'
-                    ? 'bg-[#3797F0] text-white font-semibold'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {language === 'ko' ? '애니' : 'Anime'}
-              </button>
-              <button
-                onClick={() => setFilter('character')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  filter === 'character'
-                    ? 'bg-[#3797F0] text-white font-semibold'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {language === 'ko' ? '캐릭터' : 'Character'}
-              </button>
-            </div>
-            {/* Stats Skeleton */}
-            <div className="absolute left-1/2 top-0 -translate-x-1/2 flex gap-3">
-              {[1, 2].map((i) => (
-                <div key={i} className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] px-4 py-2.5 animate-pulse min-w-[100px]">
-                  <div className="h-3 w-16 bg-gray-200 rounded mb-1 mx-auto"></div>
-                  <div className="h-5 w-12 bg-gray-200 rounded mx-auto"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Review Cards Skeleton */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-max items-start">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 animate-pulse overflow-hidden self-start">
-                <div className="flex items-start">
-                  <div className="w-32 h-48 bg-gray-200 flex-shrink-0"></div>
-                  <div className="flex-1 p-6 flex flex-col">
-                    <div className="h-5 w-3/4 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-4 w-1/2 bg-gray-200 rounded mb-3"></div>
-                    <div className="h-10 w-full bg-gray-200 rounded"></div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const hasStats = stats.total.reviewed !== undefined;
 
   return (
     <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        {/* Filter Toggle and Stats */}
+        {/* Filter Toggle and Stats - Always visible */}
         <div className="mb-12 relative">
           {/* Filter Toggle */}
           <div className="flex gap-2 w-fit">
@@ -473,21 +405,50 @@ export default function WriteReviews() {
             </button>
           </div>
 
-          {/* Stats - Center Aligned */}
+          {/* Stats - Show skeleton or actual data */}
           <div className="absolute left-1/2 top-0 -translate-x-1/2 flex gap-3">
-            <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '작성완료' : 'Completed'}</div>
-              <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{currentStats.reviewed.toLocaleString()}</div>
-            </div>
-            <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '작성대기' : 'Pending'}</div>
-              <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{currentStats.remaining.toLocaleString()}</div>
-            </div>
+            {hasStats ? (
+              <>
+                <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
+                  <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '작성완료' : 'Completed'}</div>
+                  <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{currentStats.reviewed.toLocaleString()}</div>
+                </div>
+                <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
+                  <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '작성대기' : 'Pending'}</div>
+                  <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{currentStats.remaining.toLocaleString()}</div>
+                </div>
+              </>
+            ) : (
+              <>
+                {[1, 2].map((i) => (
+                  <div key={i} className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] px-4 py-2.5 animate-pulse min-w-[100px]">
+                    <div className="h-3 w-16 bg-gray-200 rounded mb-1 mx-auto"></div>
+                    <div className="h-5 w-12 bg-gray-200 rounded mx-auto"></div>
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         </div>
 
-        {/* Review Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-max items-start">
+        {/* Review Cards Grid - Show skeleton or actual cards */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-max items-start">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 animate-pulse overflow-hidden self-start">
+                <div className="flex items-start">
+                  <div className="w-32 h-48 bg-gray-200 flex-shrink-0"></div>
+                  <div className="flex-1 p-6 flex flex-col">
+                    <div className="h-5 w-3/4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 w-1/2 bg-gray-200 rounded mb-3"></div>
+                    <div className="h-10 w-full bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-max items-start">
           {filteredItems.map((item) => {
             const hasReview = reviews[item.id];
             const isEditing = editingId === item.id;
@@ -669,26 +630,26 @@ export default function WriteReviews() {
               </div>
             );
           })}
-        </div>
-
-        {filteredItems.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-gray-600">
-              {filter === 'all'
-                ? '아직 평가한 애니나 캐릭터가 없습니다.'
-                : filter === 'anime'
-                ? '아직 평가한 애니가 없습니다.'
-                : '아직 평가한 캐릭터가 없습니다.'
-              }
-            </p>
-            <p className="text-sm text-gray-500 mt-2">
-              {filter === 'all'
-                ? '애니나 캐릭터를 평가하면 리뷰를 작성할 수 있습니다.'
-                : filter === 'anime'
-                ? '애니를 평가하면 리뷰를 작성할 수 있습니다.'
-                : '캐릭터를 평가하면 리뷰를 작성할 수 있습니다.'
-              }
-            </p>
+          {filteredItems.length === 0 && (
+            <div className="text-center py-16">
+              <p className="text-gray-600">
+                {filter === 'all'
+                  ? '아직 평가한 애니나 캐릭터가 없습니다.'
+                  : filter === 'anime'
+                  ? '아직 평가한 애니가 없습니다.'
+                  : '아직 평가한 캐릭터가 없습니다.'
+                }
+              </p>
+              <p className="text-sm text-gray-500 mt-2">
+                {filter === 'all'
+                  ? '애니나 캐릭터를 평가하면 리뷰를 작성할 수 있습니다.'
+                  : filter === 'anime'
+                  ? '애니를 평가하면 리뷰를 작성할 수 있습니다.'
+                  : '캐릭터를 평가하면 리뷰를 작성할 수 있습니다.'
+                }
+              </p>
+            </div>
+          )}
           </div>
         )}
       </div>
