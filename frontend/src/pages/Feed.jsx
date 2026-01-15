@@ -430,7 +430,14 @@ export default function Feed() {
 
       if (isUserPost) {
         // 일반 포스트 삭제
-        await userPostService.deletePost(activity.review_id);
+        // user_post의 ID는 review_id 또는 item_id에 있을 수 있음
+        const postId = activity.review_id || activity.item_id;
+        if (!postId) {
+          console.error('Post ID not found in activity:', activity);
+          alert(language === 'ko' ? '포스트 ID를 찾을 수 없습니다.' : 'Post ID not found.');
+          return;
+        }
+        await userPostService.deletePost(postId);
       } else if (deleteType === 'review_only' && hasReview) {
         // 리뷰만 삭제 (별점은 유지)
         if (isAnime) {
