@@ -312,18 +312,15 @@ export default function RateCharacters() {
                 }}
                 className={`${getCardBackgroundColor(character.id)} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out ${
                   character._animating ? 'scale-110' : 'scale-100'
-                }`}
+                } ${status === 'NOT_INTERESTED' ? 'opacity-50' : 'opacity-100'}`}
                 style={{
-                  borderWidth: (hasRated || status === 'NOT_INTERESTED') ? '2px' : '0px',
+                  borderWidth: hasRated ? '2px' : '0px',
                   borderStyle: 'solid',
                   borderImage: hasRated
                     ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%) 1'
                     : 'none',
-                  borderColor: status === 'NOT_INTERESTED' ? '#9CA3AF' : 'transparent',
                   boxShadow: hasRated
                     ? '0 4px 20px rgba(225, 48, 108, 0.3)'
-                    : status === 'NOT_INTERESTED'
-                    ? '0 4px 20px rgba(156, 163, 175, 0.2)'
                     : undefined
                 }}
                 onMouseEnter={() => setHoveredCharacter(character.id)}
