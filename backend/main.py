@@ -57,6 +57,17 @@ async def startup_event():
         print(f"[Startup DEBUG] Recent user_posts:")
         for post in recent_posts:
             print(f"  - ID: {post[0]}, user_id: {post[1]}, created_at: {post[2]}")
+
+        # Show user 4's activity breakdown
+        user4_anime = db.execute_query("SELECT COUNT(*) FROM activities WHERE user_id = 4 AND activity_type = 'anime_rating'")
+        user4_char = db.execute_query("SELECT COUNT(*) FROM activities WHERE user_id = 4 AND activity_type = 'character_rating'")
+        user4_post = db.execute_query("SELECT COUNT(*) FROM activities WHERE user_id = 4 AND activity_type = 'user_post'")
+        user4_total = db.execute_query("SELECT COUNT(*) FROM activities WHERE user_id = 4")
+        print(f"[Startup DEBUG] User 4 activities:")
+        print(f"  - anime_rating: {user4_anime[0][0] if user4_anime else 0}")
+        print(f"  - character_rating: {user4_char[0][0] if user4_char else 0}")
+        print(f"  - user_post: {user4_post[0][0] if user4_post else 0}")
+        print(f"  - TOTAL: {user4_total[0][0] if user4_total else 0}")
     except Exception as e:
         print(f"[Startup DEBUG] Failed to log database info: {e}")
 
