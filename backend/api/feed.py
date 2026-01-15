@@ -149,6 +149,8 @@ def enrich_activities_with_engagement(activities: List[Dict], current_user_id: O
         except Exception as e:
             # Engagement enrichment 실패 시 기본값 설정
             print(f"[WARNING] Failed to enrich activity {activity.get('activity_type')} for user {activity.get('user_id')}: {e}")
+            import traceback
+            traceback.print_exc()
             activity.setdefault('likes_count', 0)
             activity.setdefault('user_liked', False)
             activity.setdefault('user_has_liked', False)
