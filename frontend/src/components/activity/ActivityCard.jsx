@@ -11,7 +11,7 @@
  *   onUpdate={() => refetch()}
  * />
  */
-import { useState, useEffect, useMemo, forwardRef } from 'react';
+import { useState, useEffect, useMemo, forwardRef, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
@@ -88,6 +88,15 @@ const ActivityCard = forwardRef(({
   const [bookmarked, setBookmarked] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editPostContent, setEditPostContent] = useState('');
+  const editModalTextareaRef = useRef(null);
+
+  // Focus textarea when edit modal opens, without scrolling
+  useEffect(() => {
+    if (showEditModal && editModalTextareaRef.current) {
+      // Prevent auto-scroll by using preventScroll option
+      editModalTextareaRef.current.focus({ preventScroll: true });
+    }
+  }, [showEditModal]);
 
   // Debug: Log activity data when component mounts (only for user_post)
   useEffect(() => {
@@ -698,12 +707,12 @@ const ActivityCard = forwardRef(({
               {language === 'ko' ? '포스트 수정' : 'Edit Post'}
             </h3>
             <textarea
+              ref={editModalTextareaRef}
               value={editPostContent}
               onChange={(e) => setEditPostContent(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-3 mb-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={6}
               placeholder={language === 'ko' ? '내용을 입력하세요...' : 'Enter content...'}
-              autoFocus
             />
             <div className="flex gap-2 justify-end">
               <button
