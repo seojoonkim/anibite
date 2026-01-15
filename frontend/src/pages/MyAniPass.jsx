@@ -308,6 +308,81 @@ export default function MyAniPass() {
         return;
       }
 
+      const targetUserId = isOwnProfile ? user?.id : userId;
+      const cacheKey = `profile_${targetUserId}_${activeTab}`;
+
+      // Try loading from cache first
+      let cachedData = null;
+      try {
+        const cached = sessionStorage.getItem(cacheKey);
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          // Use cache if less than 2 minutes old
+          if (Date.now() - timestamp < 120000) {
+            cachedData = data;
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load cache:', err);
+      }
+
+      // If we have cached data, use it immediately
+      if (cachedData) {
+        if (activeTab === 'anime') {
+          setAllAnime(cachedData.allAnime || []);
+          setAllRatedAnime(cachedData.allRatedAnime || []);
+          setWatchlistAnime(cachedData.watchlistAnime || []);
+          setPassAnime(cachedData.passAnime || []);
+          setStats(prev => ({ ...prev, ...cachedData.stats }));
+          filterAnimeBySubMenu(cachedData.allAnime || [], animeSubMenu);
+          setLoadedTabs(prev => ({ ...prev, anime: true }));
+          setLoading(false);
+          setTabLoading(false);
+          return;
+        } else if (activeTab === 'character') {
+          setAllCharacters(cachedData.allCharacters || []);
+          setAllRatedCharacters(cachedData.allRatedCharacters || []);
+          setWantCharacters(cachedData.wantCharacters || []);
+          setPassCharacters(cachedData.passCharacters || []);
+          filterCharactersBySubMenu(cachedData.allCharacters || [], characterSubMenu);
+          setLoadedTabs(prev => ({ ...prev, character: true }));
+          setLoading(false);
+          setTabLoading(false);
+          return;
+        } else if (activeTab === 'anipass') {
+          setStats(cachedData.stats || stats);
+          setGenrePreferences(cachedData.genrePreferences || []);
+          setWatchTime(cachedData.watchTime || null);
+          setRatingDistribution(cachedData.ratingDistribution || []);
+          setYearDistribution(cachedData.yearDistribution || []);
+          setFormatDistribution(cachedData.formatDistribution || []);
+          setEpisodeLengthDistribution(cachedData.episodeLengthDistribution || []);
+          setRatingStats(cachedData.ratingStats || null);
+          setStudioStats(cachedData.studioStats || []);
+          setSeasonStats(cachedData.seasonStats || []);
+          setGenreCombinations(cachedData.genreCombinations || []);
+          setLoadedTabs(prev => ({ ...prev, anipass: true }));
+          setLoading(false);
+          setTabLoading(false);
+          return;
+        } else if (activeTab === 'feed') {
+          setUserActivities(cachedData.userActivities || []);
+          setFeedOffset(10);
+          setHasMoreFeed(cachedData.userActivities && cachedData.userActivities.length === 10);
+          const likesState = {};
+          const commentsState = {};
+          (cachedData.userActivities || []).forEach(activity => {
+            likesState[activity.id] = activity.user_liked || false;
+            commentsState[activity.id] = [];
+          });
+          setActivityLikes(likesState);
+          setComments(commentsState);
+          setLoading(false);
+          setTabLoading(false);
+          return;
+        }
+      }
+
       // Only show full loading screen on initial load
       if (!statsLoaded && isOwnProfile) {
         setLoading(true);
@@ -317,19 +392,25 @@ export default function MyAniPass() {
         setTabLoading(true);
       }
 
-      // 내 프로필일 때는 stats 로드
+      // 내 프로필일 때는 stats와 follow data를 병렬로 로드
       if (!statsLoaded && isOwnProfile) {
-        const statsData = await userService.getStats();
+        const [statsData, followCounts] = await Promise.all([
+          userService.getStats(),
+          followService.getFollowCounts(user?.id).catch(() => ({ followers_count: 0, following_count: 0 }))
+        ]);
         setStats(statsData);
         setStatsLoaded(true);
+        setFollowCounts(followCounts);
       }
 
-      // 다른 사용자 프로필 정보 로드
+      // 다른 사용자 프로필 정보와 follow data를 병렬로 로드
       if (!isOwnProfile && !profileUser) {
         const targetUserId = parseInt(userId);
-        const [profileData, genrePrefs] = await Promise.all([
+        const [profileData, genrePrefs, followCounts, followStatus] = await Promise.all([
           userService.getUserProfile(targetUserId).catch(() => null),
-          userService.getUserGenrePreferences(targetUserId).catch(() => [])
+          userService.getUserGenrePreferences(targetUserId).catch(() => []),
+          followService.getFollowCounts(targetUserId).catch(() => ({ followers_count: 0, following_count: 0 })),
+          followService.isFollowing(targetUserId).catch(() => ({ is_following: false }))
         ]);
         if (profileData) {
           setProfileUser(profileData.user); // user 객체 설정
@@ -337,6 +418,8 @@ export default function MyAniPass() {
           setStatsLoaded(true);
         }
         setGenrePreferences(genrePrefs);
+        setFollowCounts(followCounts);
+        setIsFollowing(followStatus.is_following);
       }
 
       if (activeTab === 'anipass') {
@@ -384,6 +467,28 @@ export default function MyAniPass() {
         setSeasonStats(seasonDist);
         setGenreCombinations(genreCombo);
         setLoadedTabs(prev => ({ ...prev, anipass: true }));
+
+        // Save to cache
+        try {
+          sessionStorage.setItem(cacheKey, JSON.stringify({
+            data: {
+              stats: statsData,
+              genrePreferences: genreData,
+              watchTime: watchTimeData,
+              ratingDistribution: ratingDist,
+              yearDistribution: yearDist,
+              formatDistribution: formatDist,
+              episodeLengthDistribution: episodeDist,
+              ratingStats: ratingStat,
+              studioStats: studioDist,
+              seasonStats: seasonDist,
+              genreCombinations: genreCombo
+            },
+            timestamp: Date.now()
+          }));
+        } catch (err) {
+          console.error('Failed to save cache:', err);
+        }
       } else if (activeTab === 'anime') {
         // Load all anime (rated, watchlist, pass) - Single API call for 3x speed!
         const targetUserId = isOwnProfile ? null : parseInt(userId);
@@ -414,6 +519,27 @@ export default function MyAniPass() {
         // Apply initial filter
         filterAnimeBySubMenu(allAnimeData, animeSubMenu);
         setLoadedTabs(prev => ({ ...prev, anime: true }));
+
+        // Save to cache
+        try {
+          sessionStorage.setItem(cacheKey, JSON.stringify({
+            data: {
+              allAnime: allAnimeData,
+              allRatedAnime: allRatingsData.rated || [],
+              watchlistAnime: allRatingsData.watchlist || [],
+              passAnime: allRatingsData.pass || [],
+              stats: {
+                average_rating: allRatingsData.average_rating,
+                total_rated: allRatingsData.total_rated || 0,
+                total_want_to_watch: allRatingsData.total_watchlist || 0,
+                total_pass: allRatingsData.total_pass || 0
+              }
+            },
+            timestamp: Date.now()
+          }));
+        } catch (err) {
+          console.error('Failed to save cache:', err);
+        }
       } else if (activeTab === 'character') {
         // Load all character ratings (rated, want to know, pass)
         const targetUserId = isOwnProfile ? null : parseInt(userId);
@@ -434,6 +560,21 @@ export default function MyAniPass() {
         // Apply initial filter
         filterCharactersBySubMenu(allCharactersData || [], characterSubMenu);
         setLoadedTabs(prev => ({ ...prev, character: true }));
+
+        // Save to cache
+        try {
+          sessionStorage.setItem(cacheKey, JSON.stringify({
+            data: {
+              allCharacters: allCharactersData || [],
+              allRatedCharacters: ratedChars,
+              wantCharacters: wantChars,
+              passCharacters: passChars
+            },
+            timestamp: Date.now()
+          }));
+        } catch (err) {
+          console.error('Failed to save cache:', err);
+        }
       } else if (activeTab === 'feed') {
         try {
           const targetUserId = userId || user?.id;
@@ -458,6 +599,18 @@ export default function MyAniPass() {
           setExpandedComments(new Set());
 
           setLoadedTabs(prev => ({ ...prev, feed: true }));
+
+          // Save to cache
+          try {
+            sessionStorage.setItem(cacheKey, JSON.stringify({
+              data: {
+                userActivities: feedData || []
+              },
+              timestamp: Date.now()
+            }));
+          } catch (err) {
+            console.error('Failed to save cache:', err);
+          }
         } catch (error) {
           console.error('Failed to load feed:', error);
           setUserActivities([]);
@@ -496,8 +649,8 @@ export default function MyAniPass() {
       });
     }
     loadData();
-    loadFollowData();
-  }, [activeTab, userId, loadData, loadFollowData]);
+    // loadFollowData(); // Now batched in loadData
+  }, [activeTab, userId, loadData]);
 
   const formatWatchTime = (minutes) => {
     if (!minutes) return '0시간';

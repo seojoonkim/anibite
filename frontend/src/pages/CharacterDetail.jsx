@@ -6,6 +6,7 @@ import { activityService } from '../services/activityService';
 import { useActivities } from '../hooks/useActivity';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
+import { getPrefetchedData } from '../hooks/usePrefetch';
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
 import * as ActivityUtils from '../utils/activityUtils';
 import StarRating from '../components/common/StarRating';
@@ -103,6 +104,25 @@ export default function CharacterDetail() {
   const loadAllData = async () => {
     setLoading(true);
     try {
+      // Check for prefetched data first
+      const prefetched = getPrefetchedData('character', id, user?.id);
+
+      if (prefetched) {
+        // Use prefetched data for instant display
+        if (prefetched.character) {
+          setCharacter(prefetched.character);
+          setError(null);
+          setLoading(false);
+        }
+        if (prefetched.reviews) {
+          processReviews(prefetched.reviews);
+        }
+        if (prefetched.myReview) {
+          processMyReview(prefetched.myReview);
+        }
+        return; // Skip API calls, data is already fresh from prefetch
+      }
+
       // 1단계: 캐릭터 기본 정보 먼저 로드하고 즉시 표시
       const characterData = await characterService.getCharacterDetail(id);
 

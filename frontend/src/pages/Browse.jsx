@@ -1,12 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { animeService } from '../services/animeService';
+import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { usePrefetch } from '../hooks/usePrefetch';
 import StarRating from '../components/common/StarRating';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 export default function Browse() {
+  const { user } = useAuth();
   const { t, getAnimeTitle, language } = useLanguage();
+  const { handleAnimeMouseEnter, handleMouseLeave } = usePrefetch();
   const [animeList, setAnimeList] = useState([]);
   const [initialLoading, setInitialLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -24,7 +28,41 @@ export default function Browse() {
   const observerRef = useRef(null);
   const loadMoreTriggerRef = useRef(null);
 
+  // Cache management
+  const [cachedData, setCachedData] = useState(null);
+  const cacheLoadedRef = useRef(false);
+
+  // Generate cache key based on current filters
+  const getCacheKey = () => {
+    const key = `browse_cache_${searchTerm}_${filters.genre}_${filters.year}_${filters.status}_${filters.sort}`;
+    return key;
+  };
+
+  // Load cached data on mount
   useEffect(() => {
+    if (!cacheLoadedRef.current) {
+      try {
+        const cacheKey = getCacheKey();
+        const cached = sessionStorage.getItem(cacheKey);
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          // Use cache if less than 2 minutes old
+          if (Date.now() - timestamp < 120000) {
+            setCachedData(data);
+            setAnimeList(data);
+            setInitialLoading(false);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load cache:', err);
+      }
+      cacheLoadedRef.current = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    setCachedData(null);
+    cacheLoadedRef.current = false;
     loadAnime(true);
   }, [searchTerm, filters]);
 
@@ -77,6 +115,19 @@ export default function Browse() {
       if (resetList) {
         setAnimeList(data.items || []);
         setPage(1);
+
+        // Cache first page data
+        if (currentPage === 1 && data.items && data.items.length > 0) {
+          try {
+            const cacheKey = getCacheKey();
+            sessionStorage.setItem(cacheKey, JSON.stringify({
+              data: data.items,
+              timestamp: Date.now()
+            }));
+          } catch (err) {
+            console.error('Failed to save cache:', err);
+          }
+        }
       } else {
         setAnimeList((prev) => [...prev, ...(data.items || [])]);
       }
@@ -271,6 +322,8 @@ export default function Browse() {
                         <tr
                           key={anime.id}
                           className="hover:bg-gray-50 transition-colors"
+                          onMouseEnter={() => handleAnimeMouseEnter(anime.id, user)}
+                          onMouseLeave={handleMouseLeave}
                         >
                           {/* Poster */}
                           <td className="px-4 py-2">
