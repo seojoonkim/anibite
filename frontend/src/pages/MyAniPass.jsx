@@ -11,6 +11,9 @@ import { activityLikeService } from '../services/activityLikeService';
 import { commentLikeService } from '../services/commentLikeService';
 import { userPostService } from '../services/userPostService';
 import * as ActivityUtils from '../utils/activityUtils';
+import { reviewService } from '../services/reviewService';
+import { characterReviewService } from '../services/characterReviewService';
+import { characterService } from '../services/characterService';
 import Navbar from '../components/common/Navbar';
 import OtakuMeter from '../components/profile/OtakuMeter';
 import GenrePreferences from '../components/profile/GenrePreferences';
@@ -130,6 +133,10 @@ export default function MyAniPass() {
   const [replyingTo, setReplyingTo] = useState({});
   const [newPostContent, setNewPostContent] = useState('');
   const [failedImages, setFailedImages] = useState(new Set());
+  // 삭제 모달 상태
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [activityToDelete, setActivityToDelete] = useState(null);
+  const [deleteMenuOpen, setDeleteMenuOpen] = useState(null);
 
   // Infinite scroll observer ref
   const observer = useRef();
@@ -740,6 +747,55 @@ export default function MyAniPass() {
     } catch (err) {
       console.error('Failed to delete comment:', err);
       alert(language === 'ko' ? '댓글 삭제에 실패했습니다.' : 'Failed to delete comment.');
+    }
+  };
+
+  const handleOpenDeleteModal = (activity) => {
+    setActivityToDelete(activity);
+    setShowDeleteModal(true);
+    setDeleteMenuOpen(null);
+  };
+
+  const handleDeleteActivity = async (deleteType) => {
+    if (!activityToDelete) return;
+
+    try {
+      const activity = activityToDelete;
+      const hasReview = activity.review_content && activity.review_content.trim();
+
+      if (deleteType === 'review_only' && hasReview) {
+        // 리뷰만 삭제 (별점은 유지)
+        if (activity.activity_type === 'character_rating' && activity.review_id) {
+          await characterReviewService.deleteReview(activity.review_id);
+        } else if (activity.review_id) {
+          await reviewService.deleteReview(activity.review_id);
+        }
+      } else {
+        // 별점까지 모두 삭제
+        if (activity.activity_type === 'character_rating') {
+          await characterService.deleteCharacterRating(activity.item_id);
+        } else if (activity.activity_type === 'anime_rating') {
+          await ratingService.deleteRating(activity.item_id);
+        }
+      }
+
+      // Remove from UI
+      setUserActivities(prev => prev.filter(a =>
+        !(a.activity_type === activity.activity_type &&
+          a.user_id === activity.user_id &&
+          a.item_id === activity.item_id)
+      ));
+
+      setShowDeleteModal(false);
+      setActivityToDelete(null);
+
+      // Reload stats
+      if (isOwnProfile) {
+        loadStats();
+      }
+    } catch (err) {
+      console.error('Failed to delete activity:', err);
+      alert(language === 'ko' ? '삭제에 실패했습니다.' : 'Failed to delete.');
     }
   };
 
@@ -1732,7 +1788,7 @@ export default function MyAniPass() {
                       >
                         {/* Header - Profile info at the top */}
                         <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
                             {/* User Avatar */}
                             <Link to={isOwnProfile ? `/my-anipass` : `/user/${activity.user_id}`} className="flex-shrink-0">
                               {displayAvatar ? (
@@ -1772,9 +1828,34 @@ export default function MyAniPass() {
                               </span>
                             )}
                           </div>
-                          <span className="text-xs text-gray-500">
-                            {getTimeAgo(activity.activity_time)}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500">
+                              {getTimeAgo(activity.activity_time)}
+                            </span>
+                            {/* Delete Menu - Only show for own activities */}
+                            {isOwnProfile && activity.activity_type !== 'user_post' && (
+                              <div className="relative">
+                                <button
+                                  onClick={() => setDeleteMenuOpen(deleteMenuOpen === `${activity.activity_type}_${activity.item_id}` ? null : `${activity.activity_type}_${activity.item_id}`)}
+                                  className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                  </svg>
+                                </button>
+                                {deleteMenuOpen === `${activity.activity_type}_${activity.item_id}` && (
+                                  <div className="absolute right-0 mt-1 w-32 bg-white rounded-md shadow-lg z-10 border border-gray-200">
+                                    <button
+                                      onClick={() => handleOpenDeleteModal(activity)}
+                                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                    >
+                                      {language === 'ko' ? '삭제' : 'Delete'}
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
 
                         {/* Main Content Wrapper */}
@@ -2189,6 +2270,69 @@ export default function MyAniPass() {
                     ? (language === 'ko' ? '팔로워가 없습니다.' : 'No followers yet.')
                     : (language === 'ko' ? '팔로잉하는 사용자가 없습니다.' : 'Not following anyone yet.')}
                 </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Delete Modal */}
+        {showDeleteModal && activityToDelete && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowDeleteModal(false)}>
+            <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                {language === 'ko' ? '삭제 옵션' : 'Delete Options'}
+              </h3>
+
+              {activityToDelete.review_content && activityToDelete.review_content.trim() ? (
+                <>
+                  <p className="text-sm text-gray-700 mb-6">
+                    {language === 'ko'
+                      ? '이 평가에는 리뷰가 포함되어 있습니다. 어떻게 삭제하시겠습니까?'
+                      : 'This rating includes a review. How would you like to delete it?'}
+                  </p>
+                  <div className="flex flex-col gap-3">
+                    <button
+                      onClick={() => handleDeleteActivity('review_only')}
+                      className="w-full px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+                    >
+                      {language === 'ko' ? '리뷰만 삭제 (별점 유지)' : 'Delete review only (Keep rating)'}
+                    </button>
+                    <button
+                      onClick={() => handleDeleteActivity('all')}
+                      className="w-full px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
+                    >
+                      {language === 'ko' ? '별점까지 모두 삭제' : 'Delete rating and review'}
+                    </button>
+                    <button
+                      onClick={() => setShowDeleteModal(false)}
+                      className="w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
+                    >
+                      {language === 'ko' ? '취소' : 'Cancel'}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-gray-700 mb-6">
+                    {language === 'ko'
+                      ? '이 평가를 삭제하시겠습니까?'
+                      : 'Are you sure you want to delete this rating?'}
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => handleDeleteActivity('all')}
+                      className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
+                    >
+                      {language === 'ko' ? '삭제' : 'Delete'}
+                    </button>
+                    <button
+                      onClick={() => setShowDeleteModal(false)}
+                      className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
+                    >
+                      {language === 'ko' ? '취소' : 'Cancel'}
+                    </button>
+                  </div>
+                </>
               )}
             </div>
           </div>

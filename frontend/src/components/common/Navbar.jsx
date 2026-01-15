@@ -295,8 +295,8 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* Desktop Center Menu - Hidden on Mobile - Absolutely Centered */}
-            <div className="hidden md:flex items-center space-x-1 absolute left-1/2 -translate-x-1/2 flex-nowrap">
+            {/* Desktop Menu - Hidden on Mobile - Aligned with feed content */}
+            <div className="hidden md:flex items-center space-x-1 flex-1 flex-nowrap">
               {menuItems.map((item) => (
                 <Link
                   key={item.path}
