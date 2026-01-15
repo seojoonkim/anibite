@@ -15,6 +15,7 @@ import ActivityCard from '../components/activity/ActivityCard';
 import NotificationCard from '../components/feed/NotificationCard';
 import EditReviewModal from '../components/common/EditReviewModal';
 import { getAvatarUrl as getAvatarUrlHelper } from '../utils/imageHelpers';
+import { IMAGE_BASE_URL } from '../config/api';
 
 export default function Feed() {
   const { user } = useAuth();
@@ -202,6 +203,27 @@ export default function Feed() {
 
   const getAvatarUrl = (avatarUrl) => {
     return getAvatarUrlHelper(avatarUrl) || '/placeholder-avatar.png';
+  };
+
+  const getItemImageUrl = (url) => {
+    if (!url) return '/placeholder-anime.svg';
+
+    // If it's an AniList character image, try R2 first
+    if (url.includes('anilist.co') && url.includes('/character/')) {
+      const match = url.match(/\/b(\d+)-/);
+      if (match && match[1]) {
+        const characterId = match[1];
+        return `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
+      }
+    }
+
+    // If it's already a relative path, use IMAGE_BASE_URL
+    if (!url.startsWith('http')) {
+      return `${IMAGE_BASE_URL}${url}`;
+    }
+
+    // Otherwise use as-is
+    return url;
   };
 
   const getTimeAgo = (timestamp) => {
@@ -642,11 +664,11 @@ export default function Feed() {
             <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 flex gap-3">
               {activityToDelete.item_image && (
                 <img
-                  src={activityToDelete.item_image}
+                  src={getItemImageUrl(activityToDelete.item_image)}
                   alt={activityToDelete.item_title_korean || activityToDelete.item_title}
                   className="w-16 h-24 object-cover rounded flex-shrink-0"
                   onError={(e) => {
-                    e.target.style.display = 'none';
+                    e.target.src = '/placeholder-anime.svg';
                   }}
                 />
               )}
