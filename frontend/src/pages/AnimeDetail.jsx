@@ -563,6 +563,14 @@ export default function AnimeDetail() {
       if (reviewData) {
         setReviews(reviewData.items || []);
       }
+
+      // Update myReview rating if it exists
+      if (myReview) {
+        setMyReview({
+          ...myReview,
+          user_rating: rating
+        });
+      }
     } catch (err) {
       console.error('Failed to rate:', err);
       alert(language === 'ko' ? '평가를 저장하는데 실패했습니다.' : 'Failed to save rating.');

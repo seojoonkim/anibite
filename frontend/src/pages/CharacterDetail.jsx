@@ -252,6 +252,14 @@ export default function CharacterDetail() {
         // 평점 입력 후 내 리뷰 섹션에 바로 표시
         const myReviewData = await characterReviewService.getMyReview(id).catch(() => null);
         if (myReviewData) processMyReview(myReviewData);
+
+        // Update myReview rating if it exists
+        if (myReview) {
+          setMyReview({
+            ...myReview,
+            user_rating: rating
+          });
+        }
       }
 
       // 병렬로 데이터 새로고침 (BUT preserve the locally updated my_rating)
