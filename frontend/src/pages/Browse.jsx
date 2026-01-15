@@ -303,10 +303,10 @@ export default function Browse() {
                       <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                         {language === 'ko' ? '화수' : 'Episodes'}
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                         {language === 'ko' ? '장르' : 'Genres'}
                       </th>
-                      <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="hidden md:table-cell px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                         {language === 'ko' ? '평점' : 'Rating'}
                       </th>
                     </tr>
@@ -375,7 +375,7 @@ export default function Browse() {
                           </td>
 
                           {/* Genres */}
-                          <td className="px-4 py-2">
+                          <td className="hidden md:table-cell px-4 py-2">
                             <div className="flex flex-wrap gap-1">
                               {anime.genres && anime.genres.length > 0 ? (
                                 anime.genres.slice(0, 3).map((genre, idx) => (
@@ -393,7 +393,7 @@ export default function Browse() {
                           </td>
 
                           {/* Rating */}
-                          <td className="px-4 py-3 text-center">
+                          <td className="hidden md:table-cell px-4 py-3 text-center">
                             {anime.site_rating_count > 0 ? (
                               <div>
                                 <div className="flex items-center justify-center gap-1">
