@@ -69,12 +69,12 @@ export default function RatingStatsCard({ stats }) {
         </div>
 
         {/* 세부 지표 */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           {/* 관대함 지표 */}
-          <div className="p-4 rounded-xl bg-gradient-to-br from-[#638CCC]/10 to-[#8EC5FC]/10 border border-[#638CCC]/20">
+          <div>
             <div className="text-xs text-[#638CCC] font-semibold mb-1">관대함</div>
             <div className="text-2xl font-bold mb-2 text-[#638CCC]">{generosityScore.toFixed(0)}%</div>
-            <div className="w-full bg-white rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
               <div
                 className="h-2 rounded-full transition-all shadow-sm"
                 style={{ width: `${generosityScore}%`, background: 'linear-gradient(90deg, #638CCC 0%, #8EC5FC 100%)' }}
@@ -84,10 +84,10 @@ export default function RatingStatsCard({ stats }) {
           </div>
 
           {/* 일관성 지표 */}
-          <div className="p-4 rounded-xl bg-gradient-to-br from-[#8EC5FC]/10 to-[#90B2E4]/10 border border-[#8EC5FC]/20">
+          <div>
             <div className="text-xs text-[#638CCC] font-semibold mb-1">일관성</div>
             <div className="text-2xl font-bold mb-2 text-[#8EC5FC]">{consistencyScore.toFixed(0)}%</div>
-            <div className="w-full bg-white rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
               <div
                 className="h-2 rounded-full transition-all shadow-sm"
                 style={{ width: `${consistencyScore}%`, background: 'linear-gradient(90deg, #8EC5FC 0%, #90B2E4 100%)' }}
@@ -98,16 +98,16 @@ export default function RatingStatsCard({ stats }) {
         </div>
 
         {/* 통계 */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="text-center p-3 bg-gray-50 rounded-lg">
+        <div className="grid grid-cols-3 gap-4">
+          <div className="text-center">
             <div className="text-xs text-gray-600 mb-1">평균</div>
             <div className="text-lg font-bold text-gray-700">★ {stats.mean_rating.toFixed(1)}</div>
           </div>
-          <div className="text-center p-3 bg-gray-50 rounded-lg">
+          <div className="text-center">
             <div className="text-xs text-gray-600 mb-1">최고</div>
             <div className="text-lg font-bold" style={{ color: '#8EC5FC' }}>★ {stats.max_rating.toFixed(1)}</div>
           </div>
-          <div className="text-center p-3 bg-gray-50 rounded-lg">
+          <div className="text-center">
             <div className="text-xs text-gray-600 mb-1">최저</div>
             <div className="text-lg font-bold" style={{ color: '#638CCC' }}>★ {stats.min_rating.toFixed(1)}</div>
           </div>

@@ -344,7 +344,7 @@ export default function Browse() {
                           {/* Title */}
                           <td className="px-4 py-2">
                             <Link to={`/anime/${anime.id}`} className="block">
-                              <div className="font-semibold text-gray-900 hover:text-[#A8E6CF] transition-colors">
+                              <div className="font-semibold text-gray-900 hover:text-[#3797F0] transition-colors">
                                 {titles.primary}
                               </div>
                               {titles.secondary && (

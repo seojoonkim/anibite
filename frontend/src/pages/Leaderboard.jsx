@@ -103,7 +103,7 @@ export default function Leaderboard() {
 
                     {/* User */}
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Link to={`/user/${user.id}`} className="flex items-center gap-3 hover:text-[#A8E6CF] transition-colors">
+                      <Link to={`/user/${user.id}`} className="flex items-center gap-3 hover:text-[#3797F0] transition-colors">
                         {user.avatar_url ? (
                           <img
                             src={getAvatarUrl(user.avatar_url)}

@@ -1729,7 +1729,7 @@ export default function MyAniPass() {
                   {/* 통계 */}
                   <div className="w-full">
                     {stats && (
-                      <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-6">
+                      <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-6 h-full">
                         <div className="space-y-4">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#8EC5FC] to-[#638CCC] flex items-center justify-center text-white text-xl flex-shrink-0">
