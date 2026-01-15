@@ -1183,14 +1183,14 @@ export default function MyAniPass() {
                 {/* 상단 그리드: 오타쿠 미터, 통계, 장르 선호도 */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-stretch">
                   {/* 오타쿠 미터 */}
-                  <div className="lg:col-span-1 flex">
+                  <div className="w-full">
                     {stats && <OtakuMeter score={stats.otaku_score || 0} />}
                   </div>
 
                   {/* 통계 */}
-                  <div className="lg:col-span-1 flex">
+                  <div className="w-full">
                     {stats && (
-                      <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 w-full flex flex-col">
+                      <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 w-full h-full flex flex-col">
                         <h3 className="text-lg font-bold mb-6 text-gray-900">{language === 'ko' ? '통계' : 'Statistics'}</h3>
                         <div className="space-y-4 flex-1">
                           <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200">
@@ -1223,43 +1223,43 @@ export default function MyAniPass() {
                   </div>
 
                   {/* 장르 선호도 */}
-                  <div className="lg:col-span-1 flex">
+                  <div className="w-full">
                     <GenrePreferences preferences={genrePreferences} />
                   </div>
                 </div>
 
                 {/* Phase 1 통계 그리드: 포맷, 에피소드 길이, 평가 성향 */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-stretch">
-                  <div className="flex">
+                  <div className="w-full">
                     <FormatDistribution distribution={formatDistribution} />
                   </div>
-                  <div className="flex">
+                  <div className="w-full">
                     <EpisodeLengthChart distribution={episodeLengthDistribution} />
                   </div>
-                  <div className="flex">
+                  <div className="w-full">
                     <RatingStatsCard stats={ratingStats} />
                   </div>
                 </div>
 
                 {/* 차트 그리드: 평점 분포, 연도별 분포 */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:items-stretch">
-                  <div className="flex">
+                  <div className="w-full">
                     <RatingDistributionChart distribution={ratingDistribution} />
                   </div>
-                  <div className="flex">
+                  <div className="w-full">
                     <YearDistributionChart distribution={yearDistribution} />
                   </div>
                 </div>
 
                 {/* Phase 1 & 2 추가 통계: 스튜디오, 장르 조합, 시즌 */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-stretch">
-                  <div className="flex">
+                  <div className="w-full">
                     <StudioStats studios={studioStats} />
                   </div>
-                  <div className="flex">
+                  <div className="w-full">
                     <GenreCombinationChart combinations={genreCombinations} />
                   </div>
-                  <div className="flex">
+                  <div className="w-full">
                     <SeasonStats seasons={seasonStats} />
                   </div>
                 </div>
