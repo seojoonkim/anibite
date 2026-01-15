@@ -218,16 +218,16 @@ function RatingCard({ anime, onRate }) {
 
           {/* Overlay on hover */}
           <div
-            className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-75 transition-all duration-700 flex flex-col items-center justify-center p-4"
+            className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-75 transition-all duration-150 flex flex-col items-center justify-center p-4"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
             }}
           >
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-700 text-center w-full flex flex-col justify-center h-full">
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 text-center w-full flex flex-col justify-center h-full">
               {/* Star Rating */}
               <div
-                className="flex justify-center gap-1 mb-4 sm:mb-6"
+                className="flex justify-center gap-1"
                 style={{ fontSize: starSize }}
                 onMouseLeave={() => setHoverRating(0)}
               >

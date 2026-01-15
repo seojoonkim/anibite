@@ -407,7 +407,7 @@ export default function RateCharacters() {
                   {/* Rating Overlay */}
                   {starSizes[character.id] && (
                     <div
-                      className={`absolute inset-0 bg-black flex items-center justify-center px-2 py-2 z-10 transition-opacity duration-700 ${
+                      className={`absolute inset-0 bg-black flex items-center justify-center px-2 py-2 z-10 transition-opacity duration-150 ${
                         hoveredCharacter === character.id ? 'opacity-100' : 'opacity-0 pointer-events-none'
                       }`}
                       style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
@@ -418,7 +418,7 @@ export default function RateCharacters() {
                       onMouseLeave={() => setHoverRating(prev => ({ ...prev, [character.id]: 0 }))}
                     >
                       <div className="w-full flex flex-col items-center justify-center">
-                        <div className="flex gap-1 mb-3" style={{
+                        <div className="flex gap-1" style={{
                           fontSize: starSizes[character.id]
                         }}>
                           {[1, 2, 3, 4, 5].map((position) => {
