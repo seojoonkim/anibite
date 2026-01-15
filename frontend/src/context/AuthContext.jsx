@@ -62,10 +62,9 @@ export const AuthProvider = ({ children }) => {
       if (token && userData) {
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(userData));
-        // Set user's preferred language
+        // Set user's preferred language (no reload - will apply on next visit)
         if (userData.preferred_language) {
           localStorage.setItem('language', userData.preferred_language);
-          window.location.reload(); // Reload to apply language change
         }
         setUser(userData);
         return { success: true, user: userData };
@@ -73,12 +72,15 @@ export const AuthProvider = ({ children }) => {
 
       // Otherwise, perform normal login
       const data = await authService.login(credentials);
-      // Set user's preferred language
+
+      // Set user's preferred language (no reload - will apply on next visit)
       if (data.user.preferred_language) {
         localStorage.setItem('language', data.user.preferred_language);
-        window.location.reload(); // Reload to apply language change
       }
+
+      // Set user
       setUser(data.user);
+
       return { success: true, user: data.user };
     } catch (error) {
       console.error('Login error:', error);
@@ -106,11 +108,10 @@ export const AuthProvider = ({ children }) => {
         };
       }
 
-      // Legacy: User is automatically verified and logged in (shouldn't happen anymore)
+      // Legacy: User is automatically verified and logged in
       if (data.user) {
         if (data.user.preferred_language) {
           localStorage.setItem('language', data.user.preferred_language);
-          window.location.reload();
         }
         setUser(data.user);
         return { success: true, user: data.user };
