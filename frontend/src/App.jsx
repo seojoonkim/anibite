@@ -156,7 +156,8 @@ function AppRoutes() {
           }
         />
       </Routes>
-    </Suspense>
+      </Suspense>
+    </>
   );
 }
 
