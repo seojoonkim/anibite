@@ -1,7 +1,7 @@
 export default function GenrePreferences({ preferences }) {
   if (!preferences || preferences.length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 w-full h-full flex flex-col">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
           선호 장르
         </h3>
@@ -13,7 +13,7 @@ export default function GenrePreferences({ preferences }) {
   const maxCount = Math.max(...preferences.map((p) => p.count));
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 w-full h-full flex flex-col">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">
         선호 장르 Top 5
       </h3>

@@ -24,7 +24,7 @@ export default function FormatDistribution({ distribution }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6">
+    <div className="bg-white rounded-2xl shadow-md p-6 w-full h-full flex flex-col">
       <h3 className="text-lg font-bold mb-4 text-gray-800">포맷 선호도</h3>
 
       <div className="space-y-3">
