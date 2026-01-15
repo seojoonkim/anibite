@@ -294,7 +294,7 @@ export default function Browse() {
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                         {language === 'ko' ? '제목' : 'Title'}
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                         {language === 'ko' ? '상태' : 'Status'}
                       </th>
                       <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -356,7 +356,7 @@ export default function Browse() {
                           </td>
 
                           {/* Status */}
-                          <td className="px-4 py-2">
+                          <td className="hidden md:table-cell px-4 py-2">
                             {anime.status && (
                               <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusBadge.color}`}>
                                 {statusBadge.text}
