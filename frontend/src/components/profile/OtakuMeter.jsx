@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { levels as otakuLevels, getCurrentLevelInfo as getOtakuLevelInfo } from '../../utils/otakuLevels';
 
 export default function OtakuMeter({ score }) {
@@ -109,7 +110,7 @@ export default function OtakuMeter({ score }) {
       </div>
 
       {/* Roadmap Modal */}
-      {showRoadmap && (
+      {showRoadmap && createPortal(
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[95vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
@@ -180,7 +181,8 @@ export default function OtakuMeter({ score }) {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
