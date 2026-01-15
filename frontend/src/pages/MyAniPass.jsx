@@ -967,7 +967,7 @@ export default function MyAniPass() {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
+      <div className="min-h-screen pt-16 bg-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           {/* Header with Real User Data */}
           <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 mb-8">
@@ -1076,7 +1076,7 @@ export default function MyAniPass() {
   }
 
   return (
-    <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
+    <div className="min-h-screen pt-16 bg-transparent">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
