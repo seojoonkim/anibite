@@ -6,13 +6,18 @@ import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 /**
  * Get character image URL
- * Strategy: Try R2 first by extracting character ID from AniList URL
- * @param {number|null} characterId - Character ID for R2 lookup (may not be AniList ID)
- * @param {string|null} imageUrl - External or database image URL
+ * Strategy: Use character ID directly (it's the AniList ID)
+ * @param {number|null} characterId - AniList character ID for R2 lookup
+ * @param {string|null} imageUrl - External or database image URL (fallback)
  * @returns {string} Image URL to try first
  */
 export const getCharacterImageUrl = (characterId, imageUrl = null) => {
-  // If imageUrl contains AniList character URL, extract the AniList character ID from it
+  // Priority 1: character ID가 있으면 바로 R2에서 찾기 (characterId는 AniList ID)
+  if (characterId) {
+    return `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
+  }
+
+  // Priority 2: imageUrl에서 AniList character ID 추출 시도
   if (imageUrl && imageUrl.includes('anilist.co') && imageUrl.includes('/character/')) {
     const match = imageUrl.match(/\/b(\d+)-/);
     if (match && match[1]) {
@@ -21,12 +26,7 @@ export const getCharacterImageUrl = (characterId, imageUrl = null) => {
     }
   }
 
-  // Fallback: R2 우선 - character ID가 있으면 R2에서 찾기 (though this may not work if characterId is internal DB ID)
-  if (characterId) {
-    return `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
-  }
-
-  // character ID가 없으면 imageUrl 사용
+  // Priority 3: imageUrl을 그대로 사용
   if (!imageUrl) return '/placeholder-anime.svg';
   if (imageUrl.startsWith('http')) return imageUrl;
   if (imageUrl.startsWith('/')) return `${IMAGE_BASE_URL}${imageUrl}`;
