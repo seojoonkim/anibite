@@ -6,13 +6,22 @@ import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 /**
  * Get character image URL
- * Strategy: Try R2 first using character ID, fallback to external URL
- * @param {number|null} characterId - Character ID for R2 lookup
+ * Strategy: Try R2 first by extracting character ID from AniList URL
+ * @param {number|null} characterId - Character ID for R2 lookup (may not be AniList ID)
  * @param {string|null} imageUrl - External or database image URL
  * @returns {string} Image URL to try first
  */
 export const getCharacterImageUrl = (characterId, imageUrl = null) => {
-  // R2 우선: character ID가 있으면 R2에서 먼저 찾기
+  // If imageUrl contains AniList character URL, extract the AniList character ID from it
+  if (imageUrl && imageUrl.includes('anilist.co') && imageUrl.includes('/character/')) {
+    const match = imageUrl.match(/\/b(\d+)-/);
+    if (match && match[1]) {
+      const anilistCharacterId = match[1];
+      return `${IMAGE_BASE_URL}/images/characters/${anilistCharacterId}.jpg`;
+    }
+  }
+
+  // Fallback: R2 우선 - character ID가 있으면 R2에서 찾기 (though this may not work if characterId is internal DB ID)
   if (characterId) {
     return `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
   }
