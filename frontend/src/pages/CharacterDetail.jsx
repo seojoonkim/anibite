@@ -103,39 +103,44 @@ export default function CharacterDetail() {
   const loadAllData = async () => {
     setLoading(true);
     try {
-      // 병렬로 모든 데이터 로드
-      const promises = [
-        characterService.getCharacterDetail(id),
-        characterReviewService.getCharacterReviews(id, { page: 1, page_size: 10 })
+      // 1단계: 캐릭터 기본 정보 먼저 로드하고 즉시 표시
+      const characterData = await characterService.getCharacterDetail(id);
+
+      if (characterData) {
+        setCharacter(characterData);
+        setError(null);
+        setLoading(false); // 여기서 로딩 해제 - 기본 정보 바로 표시
+      } else {
+        setError(language === 'ko' ? '캐릭터 정보를 불러오지 못했습니다.' : 'Failed to load character.');
+        setLoading(false);
+        return;
+      }
+
+      // 2단계: 리뷰와 내 리뷰는 백그라운드에서 로드 (화면은 이미 표시 중)
+      const reviewPromises = [
+        characterReviewService.getCharacterReviews(id, { page: 1, page_size: 10 }).catch(() => null)
       ];
 
       if (user) {
-        promises.push(characterReviewService.getMyReview(id));
+        reviewPromises.push(characterReviewService.getMyReview(id).catch(() => null));
       }
 
-      const results = await Promise.all(promises.map(p => p.catch(e => null)));
-
-      // 캐릭터 상세 정보
-      if (results[0]) {
-        setCharacter(results[0]);
-        setError(null);
-      } else {
-        setError(language === 'ko' ? '캐릭터 정보를 불러오지 못했습니다.' : 'Failed to load character.');
-      }
+      const reviewResults = await Promise.all(reviewPromises);
 
       // 리뷰 목록
-      if (results[1]) {
-        processReviews(results[1]);
+      if (reviewResults[0]) {
+        processReviews(reviewResults[0]);
       }
 
       // 내 리뷰
-      if (user && results[2]) {
-        processMyReview(results[2]);
+      if (user && reviewResults[1]) {
+        processMyReview(reviewResults[1]);
       }
+
+      // 3단계: 다른 사람들의 활동은 useActivities hook에서 자동으로 로드됨
     } catch (err) {
       console.error('Failed to load character data:', err);
       setError(language === 'ko' ? '데이터를 불러오지 못했습니다.' : 'Failed to load data.');
-    } finally {
       setLoading(false);
     }
   };
