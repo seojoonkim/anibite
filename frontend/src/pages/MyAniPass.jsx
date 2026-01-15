@@ -303,8 +303,8 @@ export default function MyAniPass() {
         return;
       }
 
-      // 이미 로드한 탭이면 스킵 (anipass와 feed는 항상 새로 로드)
-      if (loadedTabs[activeTab] && activeTab !== 'anipass' && activeTab !== 'feed') {
+      // 이미 로드한 탭이면 스킵 (anime, character만 캐싱)
+      if (loadedTabs[activeTab] && (activeTab === 'anime' || activeTab === 'character')) {
         return;
       }
 
@@ -478,7 +478,7 @@ export default function MyAniPass() {
       setLoading(false);
       setTabLoading(false);
     }
-  }, [isOwnProfile, activeTab, loadedTabs, statsLoaded, profileUser, userId, user, filterAnimeBySubMenu, animeSubMenu, filterCharactersBySubMenu, characterSubMenu]);
+  }, [isOwnProfile, activeTab, statsLoaded, profileUser, userId, user, filterAnimeBySubMenu, animeSubMenu, filterCharactersBySubMenu, characterSubMenu]);
 
   // Load data when tab or userId changes
   useEffect(() => {
