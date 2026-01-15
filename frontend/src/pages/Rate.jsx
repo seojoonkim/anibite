@@ -165,36 +165,20 @@ function RatingCard({ anime, onRate }) {
 
   const getCardBackgroundColor = () => {
     if (status === 'RATED') return 'bg-[#F5F5F5]';
-    if (status === 'WANT_TO_WATCH') return 'bg-[#F5F5F5]';
+    if (status === 'WANT_TO_WATCH') return 'bg-white';
     if (status === 'PASS') return 'bg-gray-200';
     return 'bg-white';
   };
 
   return (
     <div className="group relative" ref={cardRef}>
-      <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-300 ${animating ? 'scale-105' : 'scale-100'} ${status ? 'opacity-60' : 'opacity-100'}`}>
+      <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-300 ${animating ? 'scale-105' : 'scale-100'} ${
+        status === 'RATED' ? 'ring-2 ring-green-400 shadow-[0_4px_20px_rgba(34,197,94,0.2)]' :
+        status === 'WANT_TO_WATCH' ? 'ring-2 ring-blue-400 shadow-[0_4px_20px_rgba(59,130,246,0.2)]' :
+        status === 'PASS' ? 'ring-2 ring-gray-400 shadow-[0_4px_20px_rgba(156,163,175,0.2)]' : ''
+      }`}>
         {/* Cover Image */}
         <Link to={`/anime/${anime.id}`} className="block relative aspect-[3/4] bg-gray-200 group/image overflow-hidden">
-          {/* Status Badge */}
-          {status && (
-            <div className="absolute top-2 right-2 z-10">
-              {status === 'RATED' && (
-                <span className="px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full shadow-lg">
-                  평가완료
-                </span>
-              )}
-              {status === 'WANT_TO_WATCH' && (
-                <span className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full shadow-lg">
-                  나중에 보기
-                </span>
-              )}
-              {status === 'PASS' && (
-                <span className="px-3 py-1 bg-gray-500 text-white text-xs font-bold rounded-full shadow-lg">
-                  패스
-                </span>
-              )}
-            </div>
-          )}
           <img
             src={getImageUrl(anime.cover_image_url)}
             alt={getAnimeTitle(anime)}
@@ -288,12 +272,22 @@ function RatingCard({ anime, onRate }) {
 
           {/* Status Badge */}
           {status && (
-            <div className={`absolute top-3 right-3 text-white text-xs px-3 py-1.5 rounded-lg font-semibold shadow-[0_2px_12px_rgba(0,0,0,0.08)]`} style={{
-              backgroundColor: status === 'RATED' ? '#A8E6CF' : status === 'WANT_TO_WATCH' ? '#364F6B' : '#95a5a6'
-            }}>
-              {status === 'RATED' && t('ratedBadge')}
-              {status === 'WANT_TO_WATCH' && t('watchLater')}
-              {status === 'PASS' && t('notInterested')}
+            <div className="absolute top-2 right-2 z-10">
+              {status === 'RATED' && (
+                <span className="px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full shadow-lg">
+                  평가완료
+                </span>
+              )}
+              {status === 'WANT_TO_WATCH' && (
+                <span className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full shadow-lg">
+                  보고싶어요
+                </span>
+              )}
+              {status === 'PASS' && (
+                <span className="px-3 py-1 bg-gray-500 text-white text-xs font-bold rounded-full shadow-lg">
+                  패스
+                </span>
+              )}
             </div>
           )}
         </Link>

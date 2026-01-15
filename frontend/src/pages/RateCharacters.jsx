@@ -141,10 +141,19 @@ export default function RateCharacters() {
     try {
       await characterService.rateCharacter(characterId, rating);
 
-      // Update the character in the list
+      // Update the character in both lists for immediate UI update
       setCharacters(characters.map(char =>
         char.id === characterId ? { ...char, my_rating: rating } : char
       ));
+      setAllCharacters(allCharacters.map(char =>
+        char.id === characterId ? { ...char, my_rating: rating } : char
+      ));
+
+      // Clear any previous status when rated
+      setCharacterStatuses(prev => ({
+        ...prev,
+        [characterId]: null
+      }));
 
       // Reload stats
       loadStats();
@@ -162,11 +171,19 @@ export default function RateCharacters() {
 
       await characterService.rateCharacter(characterId, null, newStatus);
 
-      // Update the status in state
+      // Update the status in state for immediate UI update
       setCharacterStatuses(prev => ({
         ...prev,
         [characterId]: newStatus
       }));
+
+      // Update my_status in both character lists
+      setCharacters(characters.map(char =>
+        char.id === characterId ? { ...char, my_status: newStatus } : char
+      ));
+      setAllCharacters(allCharacters.map(char =>
+        char.id === characterId ? { ...char, my_status: newStatus } : char
+      ));
 
       // Reload stats
       loadStats();
@@ -273,7 +290,11 @@ export default function RateCharacters() {
                 ref={(el) => {
                   if (el) cardRefs.current[character.id] = el;
                 }}
-                className={`${getCardBackgroundColor(character.id)} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-300 ${isCompleted ? 'opacity-60' : 'opacity-100'}`}
+                className={`${getCardBackgroundColor(character.id)} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-300 ${
+                  hasRated ? 'ring-2 ring-green-400 shadow-[0_4px_20px_rgba(34,197,94,0.2)]' :
+                  status === 'WANT_TO_KNOW' ? 'ring-2 ring-blue-400 shadow-[0_4px_20px_rgba(59,130,246,0.2)]' :
+                  status === 'NOT_INTERESTED' ? 'ring-2 ring-gray-400 shadow-[0_4px_20px_rgba(156,163,175,0.2)]' : ''
+                }`}
                 onMouseEnter={() => setHoveredCharacter(character.id)}
                 onMouseLeave={() => setHoveredCharacter(null)}
               >
