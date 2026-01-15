@@ -1393,23 +1393,23 @@ export default function MyAniPass() {
                 <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-6 sticky top-4">
                   {/* Profile Picture */}
                   <div className="flex flex-col items-center mb-4">
-                    {(profileUser || user)?.avatar_url ? (
+                    {displayUser?.avatar_url ? (
                       <img
-                        src={getAvatarUrl((profileUser || user).avatar_url)}
-                        alt={(profileUser || user)?.display_name || (profileUser || user)?.username}
+                        src={getAvatarUrl(displayUser.avatar_url)}
+                        alt={displayUser?.display_name || displayUser?.username}
                         className="w-24 h-24 rounded-full object-cover border-2 border-gray-200 mb-3"
                       />
                     ) : (
                       <div className="w-24 h-24 rounded-full flex items-center justify-center border-2 border-gray-200 mb-3" style={{ background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)' }}>
                         <span className="text-white text-2xl font-bold">
-                          {((profileUser || user)?.display_name || (profileUser || user)?.username || '?').charAt(0).toUpperCase()}
+                          {(displayUser?.display_name || displayUser?.username || '?').charAt(0).toUpperCase()}
                         </span>
                       </div>
                     )}
 
                     {/* Name */}
                     <h3 className="text-lg font-bold text-gray-900 text-center">
-                      {(profileUser || user)?.display_name || (profileUser || user)?.username}
+                      {displayUser?.display_name || displayUser?.username}
                     </h3>
 
                     {/* Badge */}
@@ -1529,10 +1529,9 @@ export default function MyAniPass() {
               ) : userActivities.length > 0 ? (
                 <div className="space-y-4">
                   {userActivities.map((activity, index) => {
-                    // Use profile user data instead of activity data for avatar/username
-                    const currentUser = profileUser || user;
-                    const displayAvatar = currentUser?.avatar_url;
-                    const displayName = currentUser?.display_name || currentUser?.username;
+                    // Use displayUser for consistency
+                    const displayAvatar = displayUser?.avatar_url;
+                    const displayName = displayUser?.display_name || displayUser?.username;
                     const currentOtakuScore = stats?.otaku_score || 0;
                     const isLastActivity = userActivities.length === index + 1;
 
