@@ -1,104 +1,101 @@
 """
-Admin API - Temporary endpoints for database maintenance
+Admin API - Temporary endpoints for database migrations
+임시 관리자 API
 """
 from fastapi import APIRouter, HTTPException
-from database import get_db
+from database import db
 
 router = APIRouter()
 
 
-@router.post("/cleanup-orphan-activities")
-def cleanup_orphan_activities():
-    """Delete orphan user_post activities where item_id is NULL"""
-    db = get_db()
-    
-    # Check before
-    before = db.execute_query(
-        "SELECT COUNT(*) FROM activities WHERE activity_type = 'user_post' AND item_id IS NULL"
-    )
-    orphan_count = before[0][0] if before else 0
-    
-    # Delete orphans
-    deleted = db.execute_update(
-        "DELETE FROM activities WHERE activity_type = 'user_post' AND item_id IS NULL"
-    )
-    
-    # Check after
-    after = db.execute_query(
-        "SELECT COUNT(*) FROM activities WHERE activity_type = 'user_post'"
-    )
-    remaining = after[0][0] if after else 0
-    
-    return {
-        "orphans_found": orphan_count,
-        "deleted": deleted,
-        "remaining_activities": remaining
-    }
+@router.post("/verify-all-users")
+def verify_all_users_endpoint():
+    """
+    Verify all existing users (temporary migration endpoint)
+    기존 사용자 모두 인증 완료 처리 (임시 마이그레이션 엔드포인트)
+    """
+    try:
+        # Check current status
+        rows = db.execute_query(
+            "SELECT COUNT(*) as total, SUM(CASE WHEN is_verified = 1 THEN 1 ELSE 0 END) as verified FROM users"
+        )
+        total = rows[0][0] if rows else 0
+        verified_before = rows[0][1] if rows else 0
+        unverified_before = total - verified_before
+
+        # Update all users to verified
+        updated = db.execute_update(
+            """
+            UPDATE users
+            SET is_verified = 1,
+                verification_token = NULL,
+                verification_token_expires = NULL,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE is_verified = 0 OR is_verified IS NULL
+            """
+        )
+
+        # Check updated status
+        rows = db.execute_query(
+            "SELECT COUNT(*) as total, SUM(CASE WHEN is_verified = 1 THEN 1 ELSE 0 END) as verified FROM users"
+        )
+        verified_after = rows[0][1] if rows else 0
+
+        return {
+            "message": "All users verified successfully",
+            "total_users": total,
+            "verified_before": verified_before,
+            "unverified_before": unverified_before,
+            "verified_after": verified_after,
+            "updated": updated
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to verify users: {str(e)}")
 
 
-@router.get("/check-activities")
-def check_activities():
-    """Check user_post activities status"""
-    db = get_db()
+@router.get("/users-status")
+def get_users_status():
+    """
+    Get users verification status
+    사용자 인증 상태 확인
+    """
+    try:
+        rows = db.execute_query(
+            """
+            SELECT
+                COUNT(*) as total,
+                SUM(CASE WHEN is_verified = 1 THEN 1 ELSE 0 END) as verified,
+                SUM(CASE WHEN is_verified = 0 OR is_verified IS NULL THEN 1 ELSE 0 END) as unverified
+            FROM users
+            """
+        )
 
-    # Count user_posts
-    posts = db.execute_query("SELECT COUNT(*) FROM user_posts")
-    posts_count = posts[0][0] if posts else 0
+        total = rows[0][0] if rows else 0
+        verified = rows[0][1] if rows else 0
+        unverified = rows[0][2] if rows else 0
 
-    # Count activities
-    activities = db.execute_query("SELECT COUNT(*) FROM activities WHERE activity_type = 'user_post'")
-    activities_count = activities[0][0] if activities else 0
+        # Get sample unverified users
+        unverified_users = db.execute_query(
+            "SELECT id, username, email, is_verified FROM users WHERE is_verified = 0 OR is_verified IS NULL LIMIT 5"
+        )
 
-    # Count orphans
-    orphans = db.execute_query("SELECT COUNT(*) FROM activities WHERE activity_type = 'user_post' AND item_id IS NULL")
-    orphans_count = orphans[0][0] if orphans else 0
-
-    # Get recent activities
-    recent = db.execute_query(
-        "SELECT user_id, item_id, activity_time FROM activities WHERE activity_type = 'user_post' ORDER BY activity_time DESC LIMIT 5"
-    )
-
-    return {
-        "user_posts_count": posts_count,
-        "activities_count": activities_count,
-        "orphans_count": orphans_count,
-        "recent_activities": [
-            {"user_id": r[0], "item_id": r[1], "activity_time": r[2]}
-            for r in recent
+        unverified_list = [
+            {
+                "id": row[0],
+                "username": row[1],
+                "email": row[2],
+                "is_verified": row[3]
+            }
+            for row in unverified_users
         ]
-    }
 
+        return {
+            "total_users": total,
+            "verified": verified,
+            "unverified": unverified,
+            "unverified_sample": unverified_list
+        }
 
-@router.get("/user-activities/{user_id}")
-def get_user_activities_count(user_id: int):
-    """Get activity counts for a specific user"""
-    db = get_db()
-
-    # Count all activity types
-    anime_ratings = db.execute_query(
-        "SELECT COUNT(*) FROM activities WHERE user_id = ? AND activity_type = 'anime_rating'",
-        (user_id,)
-    )
-
-    character_ratings = db.execute_query(
-        "SELECT COUNT(*) FROM activities WHERE user_id = ? AND activity_type = 'character_rating'",
-        (user_id,)
-    )
-
-    user_posts = db.execute_query(
-        "SELECT COUNT(*) FROM activities WHERE user_id = ? AND activity_type = 'user_post'",
-        (user_id,)
-    )
-
-    total = db.execute_query(
-        "SELECT COUNT(*) FROM activities WHERE user_id = ?",
-        (user_id,)
-    )
-
-    return {
-        "user_id": user_id,
-        "anime_ratings": anime_ratings[0][0] if anime_ratings else 0,
-        "character_ratings": character_ratings[0][0] if character_ratings else 0,
-        "user_posts": user_posts[0][0] if user_posts else 0,
-        "total": total[0][0] if total else 0
-    }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get status: {str(e)}")
