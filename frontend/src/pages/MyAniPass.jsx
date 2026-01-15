@@ -1689,20 +1689,16 @@ export default function MyAniPass() {
                     const isLastActivity = userActivities.length === index + 1;
 
                     return (
-                      <div
+                      <ActivityCard
                         key={`${activity.activity_type}-${activity.user_id}-${activity.item_id}-${index}`}
                         ref={isLastActivity ? lastActivityElementRef : null}
-                        className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-all"
-                      >
-                        <ActivityCard
-                          activity={activity}
-                          context="feed"
-                          onUpdate={() => {
-                            // Reload feed after deletion
-                            loadData();
-                          }}
-                        />
-                      </div>
+                        activity={activity}
+                        context="feed"
+                        onUpdate={() => {
+                          // Reload feed after deletion
+                          loadData();
+                        }}
+                      />
                     );
                   })}
                 </div>
