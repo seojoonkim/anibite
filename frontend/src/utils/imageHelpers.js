@@ -6,15 +6,23 @@ import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 /**
  * Get character image URL
- * Strategy: Use character ID directly (it's the AniList ID)
+ * Strategy: Use character ID directly with proper extension from original URL
  * @param {number|null} characterId - AniList character ID for R2 lookup
- * @param {string|null} imageUrl - External or database image URL (fallback)
+ * @param {string|null} imageUrl - External or database image URL (for extension and fallback)
  * @returns {string} Image URL to try first
  */
 export const getCharacterImageUrl = (characterId, imageUrl = null) => {
-  // Priority 1: character ID가 있으면 바로 R2에서 찾기 (characterId는 AniList ID)
+  // Priority 1: character ID가 있으면 R2에서 찾기 (확장자 추출)
   if (characterId) {
-    return `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
+    // Extract extension from original URL (png, jpg, etc.)
+    let extension = 'jpg'; // default
+    if (imageUrl) {
+      const extMatch = imageUrl.match(/\.(png|jpg|jpeg|webp|gif)(\?|$)/i);
+      if (extMatch && extMatch[1]) {
+        extension = extMatch[1].toLowerCase();
+      }
+    }
+    return `${IMAGE_BASE_URL}/images/characters/${characterId}.${extension}`;
   }
 
   // Priority 2: imageUrl에서 AniList character ID 추출 시도
@@ -22,7 +30,10 @@ export const getCharacterImageUrl = (characterId, imageUrl = null) => {
     const match = imageUrl.match(/\/b(\d+)-/);
     if (match && match[1]) {
       const anilistCharacterId = match[1];
-      return `${IMAGE_BASE_URL}/images/characters/${anilistCharacterId}.jpg`;
+      // Extract extension from URL
+      const extMatch = imageUrl.match(/\.(png|jpg|jpeg|webp|gif)(\?|$)/i);
+      const extension = extMatch && extMatch[1] ? extMatch[1].toLowerCase() : 'jpg';
+      return `${IMAGE_BASE_URL}/images/characters/${anilistCharacterId}.${extension}`;
     }
   }
 
@@ -38,9 +49,22 @@ export const getCharacterImageUrl = (characterId, imageUrl = null) => {
  * Get fallback image URL for character
  * Used in onError handler when R2 image fails
  * @param {string|null} imageUrl - External or database image URL
+ * @param {string|null} currentSrc - Current src that failed (to try alternate extension)
  * @returns {string} Fallback image URL
  */
-export const getCharacterImageFallback = (imageUrl) => {
+export const getCharacterImageFallback = (imageUrl, currentSrc = null) => {
+  // If current src is R2 with one extension, try the other extension
+  if (currentSrc && currentSrc.includes('/images/characters/')) {
+    if (currentSrc.endsWith('.jpg')) {
+      // Try .png
+      return currentSrc.replace(/\.jpg$/, '.png');
+    } else if (currentSrc.endsWith('.png')) {
+      // Try .jpg
+      return currentSrc.replace(/\.png$/, '.jpg');
+    }
+  }
+
+  // Fallback to original URL
   if (!imageUrl) return '/placeholder-anime.svg';
   if (imageUrl.startsWith('http')) return imageUrl;
   return '/placeholder-anime.svg';
