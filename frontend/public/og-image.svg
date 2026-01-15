@@ -1,0 +1,137 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F5F5F7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EEEEF0;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="instagramGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#833AB4;stop-opacity:1" />
+      <stop offset="40%" style="stop-color:#E1306C;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#F77737;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FCAF45;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)" />
+
+  <!-- Content Container -->
+  <g transform="translate(600, 315)">
+    <!-- Logo -->
+    <g transform="translate(-110, -150)">
+      <!-- Card Background with gradient -->
+      <rect x="2" y="6" width="80" height="64" rx="8" fill="url(#instagramGradient)" />
+
+      <!-- Border -->
+      <rect x="2" y="6" width="80" height="64" rx="8" stroke="white" stroke-width="3" opacity="0.4" />
+
+      <!-- Letter A - Bubble/Rounded Style -->
+      <!-- Left side - very rounded -->
+      <path
+        d="M 20 70 Q 24 68 28 62 Q 32 54 34 48 Q 36 40 38 34 Q 40 28 44 24"
+        stroke="white"
+        stroke-width="10"
+        stroke-linecap="round"
+        fill="none"
+      />
+      <!-- Right side - very rounded -->
+      <path
+        d="M 44 24 Q 48 28 50 34 Q 52 40 54 48 Q 56 54 60 62 Q 64 68 68 70"
+        stroke="white"
+        stroke-width="10"
+        stroke-linecap="round"
+        fill="none"
+      />
+      <!-- Cross bar - bubble style -->
+      <ellipse
+        cx="44" cy="52"
+        rx="16" ry="6"
+        fill="white"
+      />
+
+      <!-- Star Icon - Simple & Cute -->
+      <path
+        d="M 44 9 L 49 20 L 60 22 L 52 30 L 54 41 L 44 35 L 34 41 L 36 30 L 28 22 L 39 20 Z"
+        fill="#FCAF45"
+        stroke="white"
+        stroke-width="2.4"
+        stroke-linejoin="round"
+      />
+    </g>
+
+    <!-- Title -->
+    <text
+      x="0"
+      y="-90"
+      font-family="'Inter', 'Pretendard Variable', 'SUIT Variable', sans-serif"
+      font-size="96"
+      font-weight="800"
+      fill="#2D3748"
+      text-anchor="middle"
+      letter-spacing="-0.02em"
+    >
+      AniPass
+    </text>
+
+    <!-- Tagline -->
+    <text
+      x="0"
+      y="10"
+      font-family="'Inter', 'Pretendard Variable', sans-serif"
+      font-size="42"
+      font-weight="500"
+      fill="#4A5568"
+      text-anchor="middle"
+      letter-spacing="-0.01em"
+    >
+      Your Anime Journey
+    </text>
+
+    <!-- Description -->
+    <text
+      x="0"
+      y="70"
+      font-family="'Inter', 'Pretendard Variable', sans-serif"
+      font-size="28"
+      font-weight="400"
+      fill="#718096"
+      text-anchor="middle"
+      letter-spacing="-0.01em"
+    >
+      Rate anime and characters, write reviews,
+    </text>
+    <text
+      x="0"
+      y="110"
+      font-family="'Inter', 'Pretendard Variable', sans-serif"
+      font-size="28"
+      font-weight="400"
+      fill="#718096"
+      text-anchor="middle"
+      letter-spacing="-0.01em"
+    >
+      and track your anime journey
+    </text>
+  </g>
+
+  <!-- Decorative Stars -->
+  <g opacity="0.15">
+    <path
+      d="M 100 100 L 105 110 L 115 112 L 107 120 L 109 130 L 100 125 L 91 130 L 93 120 L 85 112 L 95 110 Z"
+      fill="#3797F0"
+    />
+    <path
+      d="M 1050 120 L 1055 130 L 1065 132 L 1057 140 L 1059 150 L 1050 145 L 1041 150 L 1043 140 L 1035 132 L 1045 130 Z"
+      fill="#E1306C"
+    />
+    <path
+      d="M 150 500 L 155 510 L 165 512 L 157 520 L 159 530 L 150 525 L 141 530 L 143 520 L 135 512 L 145 510 Z"
+      fill="#F77737"
+    />
+    <path
+      d="M 1100 480 L 1105 490 L 1115 492 L 1107 500 L 1109 510 L 1100 505 L 1091 510 L 1093 500 L 1085 492 L 1095 490 Z"
+      fill="#FCAF45"
+    />
+  </g>
+</svg>
