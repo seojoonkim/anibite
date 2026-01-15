@@ -205,7 +205,7 @@ function RatingCard({ anime, onRate }) {
 
           {/* Show clear rating on already rated anime */}
           {status === 'RATED' && currentRating > 0 && (
-            <div className="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity pointer-events-none">
+            <div className="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity pointer-events-none z-10">
               <div className="flex justify-center gap-1" style={{ fontSize: starSize }}>
                 {[1, 2, 3, 4, 5].map((star) => (
                   <span key={star}>
@@ -337,7 +337,7 @@ function RatingCard({ anime, onRate }) {
 
       {/* 시리즈 일괄 처리 모달 */}
       {showSeriesModal && seriesInfo && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={handleSeriesCancel}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]" onClick={handleSeriesCancel}>
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold mb-4">시리즈 일괄 처리</h3>
 

@@ -377,7 +377,7 @@ export default function RateCharacters() {
 
                   {/* Show rating stars on rated characters */}
                   {hasRated && character.my_rating > 0 && hoveredCharacter !== character.id && starSizes[character.id] && (
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
                       <div className="flex gap-1" style={{ fontSize: starSizes[character.id] }}>
                         {[1, 2, 3, 4, 5].map((position) => {
                           const rating = character.my_rating;
