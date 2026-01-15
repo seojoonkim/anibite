@@ -4,7 +4,6 @@ import { animeService } from '../services/animeService';
 import { ratingService } from '../services/ratingService';
 import { seriesService } from '../services/seriesService';
 import { useLanguage } from '../context/LanguageContext';
-import Navbar from '../components/common/Navbar';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 function RatingCard({ anime, onRate }) {
@@ -591,7 +590,6 @@ export default function Rate() {
 
   return (
     <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
-      <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header with Stats */}

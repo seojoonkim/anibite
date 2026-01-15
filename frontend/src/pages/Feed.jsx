@@ -10,7 +10,6 @@ import { ratingService } from '../services/ratingService';
 import { reviewService } from '../services/reviewService';
 import { characterService } from '../services/characterService';
 import { characterReviewService } from '../services/characterReviewService';
-import Navbar from '../components/common/Navbar';
 import ActivityCard from '../components/activity/ActivityCard';
 import NotificationCard from '../components/feed/NotificationCard';
 import EditReviewModal from '../components/common/EditReviewModal';
@@ -395,7 +394,6 @@ export default function Feed() {
 
   return (
     <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
-      <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
