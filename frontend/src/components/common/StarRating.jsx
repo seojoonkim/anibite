@@ -123,6 +123,7 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
       <div
         className={`flex items-center ${gapClasses[size]} ${sizeClass}`}
         style={finalSize ? { fontSize: finalSize } : {}}
+        onMouseLeave={handleMouseLeave}
       >
         {[1, 2, 3, 4, 5].map((position) => (
           <button
@@ -130,7 +131,6 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
             type="button"
             onClick={(e) => handleClick(e, position)}
             onMouseMove={(e) => handleMouseMove(e, position)}
-            onMouseLeave={handleMouseLeave}
             disabled={readonly}
             className={`${sizeClasses[size]} ${
               readonly ? 'cursor-default' : 'cursor-pointer hover:scale-110'
