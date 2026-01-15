@@ -9,7 +9,7 @@ export default function Register() {
     password: '',
     passwordConfirm: '',
     display_name: '',
-    preferred_language: 'ko',
+    preferred_language: 'en',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -177,16 +177,30 @@ export default function Register() {
             <label className="block text-gray-700 text-sm font-semibold mb-2">
               Preferred Language / 선호 언어 *
             </label>
-            <select
-              name="preferred_language"
-              value={formData.preferred_language}
-              onChange={handleChange}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
-              required
-            >
-              <option value="ko">한국어 (Korean)</option>
-              <option value="en">English</option>
-            </select>
+            <div className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg bg-gray-50">
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, preferred_language: 'en' })}
+                className={`flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition-all ${
+                  formData.preferred_language === 'en'
+                    ? 'bg-[#3797F0] text-white shadow-sm'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                English
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, preferred_language: 'ko' })}
+                className={`flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition-all ${
+                  formData.preferred_language === 'ko'
+                    ? 'bg-[#3797F0] text-white shadow-sm'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                한국어
+              </button>
+            </div>
           </div>
 
           <div className="mb-4">
