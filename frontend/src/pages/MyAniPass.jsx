@@ -27,6 +27,7 @@ import StudioStats from '../components/profile/StudioStats';
 import SeasonStats from '../components/profile/SeasonStats';
 import GenreCombinationChart from '../components/profile/GenreCombinationChart';
 import ActivityCard from '../components/activity/ActivityCard';
+import EditReviewModal from '../components/common/EditReviewModal';
 import api from '../services/api';
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
@@ -49,6 +50,11 @@ export default function MyAniPass() {
 
   const [animeSubMenu, setAnimeSubMenu] = useState('all'); // 애니 서브메뉴: all, 5, 4, 3, 2, 1, 0, watchlist, pass
   const [characterSubMenu, setCharacterSubMenu] = useState('all'); // 캐릭터 서브메뉴: all, 5, 4, 3, 2, 1, 0, want, pass
+
+  // Edit modal state
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingActivity, setEditingActivity] = useState(null);
+  const [editMode, setEditMode] = useState('edit'); // 'edit' | 'add_review' | 'edit_rating'
 
   const toRoman = (num) => {
     const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
@@ -286,6 +292,92 @@ export default function MyAniPass() {
       filterCharactersBySubMenu(allCharacters, characterSubMenu);
     }
   }, [characterSubMenu, allCharacters, activeTab, filterCharactersBySubMenu]);
+
+  // Edit modal handlers
+  const handleEditContent = (activity, mode = 'edit') => {
+    setEditingActivity(activity);
+    setEditMode(mode);
+    setEditModalOpen(true);
+  };
+
+  const handleSaveEdit = async (formData) => {
+    if (!editingActivity) return;
+
+    const isAnime = editingActivity.activity_type === 'anime_rating';
+
+    try {
+      if (editMode === 'edit_rating') {
+        // 별점만 수정
+        if (isAnime) {
+          await ratingService.rateAnime(editingActivity.item_id, {
+            rating: formData.rating,
+            status: 'RATED'
+          });
+        } else {
+          await characterService.rateCharacter(editingActivity.item_id, {
+            rating: formData.rating
+          });
+        }
+      } else if (editMode === 'add_review') {
+        // 리뷰 추가
+        if (isAnime) {
+          await reviewService.createReview({
+            anime_id: editingActivity.item_id,
+            rating: formData.rating,
+            content: formData.content,
+            is_spoiler: formData.is_spoiler
+          });
+        } else {
+          await characterReviewService.createReview({
+            character_id: editingActivity.item_id,
+            rating: formData.rating,
+            content: formData.content,
+            is_spoiler: formData.is_spoiler
+          });
+        }
+      } else {
+        // 리뷰 수정
+        if (formData.content && formData.content.trim()) {
+          let reviewId;
+          if (isAnime) {
+            const myReview = await reviewService.getMyReview(editingActivity.item_id);
+            reviewId = myReview.review_id || myReview.id;
+            await reviewService.updateReview(reviewId, {
+              content: formData.content,
+              is_spoiler: formData.is_spoiler,
+              rating: formData.rating
+            });
+          } else {
+            const myReview = await characterReviewService.getMyReview(editingActivity.item_id);
+            reviewId = myReview.review_id || myReview.id;
+            await characterReviewService.updateReview(reviewId, {
+              content: formData.content,
+              is_spoiler: formData.is_spoiler,
+              rating: formData.rating
+            });
+          }
+        } else if (formData.rating !== editingActivity.rating) {
+          // 리뷰 내용 없이 별점만 변경된 경우
+          if (isAnime) {
+            await ratingService.rateAnime(editingActivity.item_id, {
+              rating: formData.rating,
+              status: 'RATED'
+            });
+          } else {
+            await characterService.rateCharacter(editingActivity.item_id, {
+              rating: formData.rating
+            });
+          }
+        }
+      }
+
+      // Refresh data after edit
+      loadData(true);
+    } catch (err) {
+      console.error('Failed to save:', err);
+      throw err;
+    }
+  };
 
   const loadData = useCallback(async (forceRefresh = false) => {
     try {
@@ -1775,6 +1867,7 @@ export default function MyAniPass() {
                           // Reload feed after deletion/update - force refresh to bypass cache
                           loadData(true);
                         }}
+                        onEditContent={activity.activity_type === 'user_post' ? null : handleEditContent}
                       />
                     );
                   })}
@@ -2314,6 +2407,19 @@ export default function MyAniPass() {
           </div>,
           document.body
         )}
+
+        {/* Edit Review Modal */}
+        <EditReviewModal
+          isOpen={editModalOpen}
+          onClose={() => {
+            setEditModalOpen(false);
+            setEditingActivity(null);
+            setEditMode('edit');
+          }}
+          onSave={handleSaveEdit}
+          activity={editingActivity}
+          mode={editMode}
+        />
       </div>
     </div>
   );
