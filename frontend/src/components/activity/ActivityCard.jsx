@@ -21,6 +21,7 @@ import ActivityComments from './ActivityComments';
 import ContentMenu from '../common/ContentMenu';
 import { ratingService } from '../../services/ratingService';
 import { characterService } from '../../services/characterService';
+import { userPostService } from '../../services/userPostService';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL || API_BASE_URL;
@@ -85,6 +86,8 @@ export default function ActivityCard({
   const [replyText, setReplyText] = useState('');
   const [avatarError, setAvatarError] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editPostContent, setEditPostContent] = useState('');
 
   // Initialize bookmark state from localStorage
   useEffect(() => {
@@ -293,7 +296,14 @@ export default function ActivityCard({
       return;
     }
 
-    // Navigate to edit page or open edit modal
+    // For user posts, open edit modal
+    if (activity.activity_type === 'user_post') {
+      setEditPostContent(activity.content || '');
+      setShowEditModal(true);
+      return;
+    }
+
+    // Navigate to edit page for ratings
     if (activity.activity_type === 'anime_rating') {
       navigate(`/anime/${activity.item_id}`);
     } else if (activity.activity_type === 'character_rating') {
@@ -308,9 +318,17 @@ export default function ActivityCard({
       return;
     }
 
+    // Confirm before deleting
+    const confirmMsg = language === 'ko' ? '정말 삭제하시겠습니까?' : 'Are you sure you want to delete this?';
+    if (!window.confirm(confirmMsg)) {
+      return;
+    }
+
     try {
-      // Delete rating (which should also delete associated review)
-      if (activity.activity_type === 'anime_rating') {
+      // Delete based on activity type
+      if (activity.activity_type === 'user_post') {
+        await userPostService.deletePost(activity.item_id);
+      } else if (activity.activity_type === 'anime_rating') {
         await ratingService.deleteRating(activity.item_id);
       } else if (activity.activity_type === 'character_rating') {
         await characterService.deleteCharacterRating(activity.item_id);
@@ -353,6 +371,26 @@ export default function ActivityCard({
       navigate(`/anime/${activity.item_id}`);
     } else if (activity.activity_type === 'character_rating') {
       navigate(`/character/${activity.item_id}`);
+    }
+  };
+
+  const handleSaveEditPost = async () => {
+    if (!editPostContent.trim()) {
+      alert(language === 'ko' ? '내용을 입력해주세요.' : 'Please enter content.');
+      return;
+    }
+
+    try {
+      await userPostService.updatePost(activity.item_id, editPostContent);
+      setShowEditModal(false);
+
+      // Refresh the feed to show updated content
+      if (onUpdate) {
+        onUpdate();
+      }
+    } catch (err) {
+      console.error('Failed to update post:', err);
+      alert(language === 'ko' ? '포스트 수정에 실패했습니다.' : 'Failed to update post.');
     }
   };
 
@@ -534,18 +572,18 @@ export default function ActivityCard({
             <h3 className="text-base font-bold text-gray-900 mb-1">{activity.review_title}</h3>
           )}
 
-          {/* Review Content */}
-          {activity.review_content && (
+          {/* Review Content or User Post Content */}
+          {(activity.review_content || activity.content) && (
             <div className="text-sm text-gray-700 whitespace-pre-wrap">
               {activity.is_spoiler ? (
                 <details className="cursor-pointer">
                   <summary className="text-red-600 font-medium">
                     {language === 'ko' ? '스포일러 포함 (클릭하여 보기)' : 'Spoiler (Click to reveal)'}
                   </summary>
-                  <p className="mt-2">{activity.review_content}</p>
+                  <p className="mt-2">{activity.review_content || activity.content}</p>
                 </details>
               ) : (
-                <p>{activity.review_content}</p>
+                <p>{activity.review_content || activity.content}</p>
               )}
             </div>
           )}
@@ -633,6 +671,45 @@ export default function ActivityCard({
           getAvatarUrl={getAvatarUrl}
           currentUser={user}
         />
+      )}
+
+      {/* Simple Edit Post Modal */}
+      {showEditModal && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setShowEditModal(false)}
+        >
+          <div
+            className="bg-white rounded-xl p-6 max-w-lg w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-bold mb-4 text-gray-800">
+              {language === 'ko' ? '포스트 수정' : 'Edit Post'}
+            </h3>
+            <textarea
+              value={editPostContent}
+              onChange={(e) => setEditPostContent(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3 mb-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={6}
+              placeholder={language === 'ko' ? '내용을 입력하세요...' : 'Enter content...'}
+              autoFocus
+            />
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                {language === 'ko' ? '취소' : 'Cancel'}
+              </button>
+              <button
+                onClick={handleSaveEditPost}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                {language === 'ko' ? '저장' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

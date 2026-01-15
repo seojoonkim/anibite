@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
  * ContentMenu - 컨텐츠 카드 우상단 ... 메뉴
  *
  * @param {object} props
- * @param {string} props.type - 'anime_rating' | 'character_rating'
+ * @param {string} props.type - 'anime_rating' | 'character_rating' | 'user_post'
  * @param {object} props.item - 컨텐츠 아이템 (rating, review 등)
  * @param {function} props.onEdit - 수정 콜백
  * @param {function} props.onDelete - 삭제 콜백
@@ -27,6 +27,7 @@ export default function ContentMenu({
   const menuRef = useRef(null);
 
   const hasReview = item.review_content && item.review_content.trim();
+  const isUserPost = type === 'user_post';
 
   // Only show menu for own content
   const isOwnContent = user && item.user_id && user.id === item.user_id;
@@ -87,16 +88,22 @@ export default function ContentMenu({
       {/* 드롭다운 메뉴 */}
       {isOpen && (
         <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-          {hasReview ? (
+          {isUserPost ? (
+            // 일반 포스트인 경우 - 단순히 "수정"만 표시
+            <button
+              onClick={() => handleAction(onEdit)}
+              className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors text-sm"
+            >
+              {language === 'ko' ? '수정' : 'Edit'}
+            </button>
+          ) : hasReview ? (
             // 리뷰가 있는 경우
-            <>
-              <button
-                onClick={() => handleAction(onEdit)}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors text-sm"
-              >
-                {language === 'ko' ? '리뷰 수정' : 'Edit Review'}
-              </button>
-            </>
+            <button
+              onClick={() => handleAction(onEdit)}
+              className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors text-sm"
+            >
+              {language === 'ko' ? '리뷰 수정' : 'Edit Review'}
+            </button>
           ) : (
             // 리뷰가 없는 경우 (평가만 있음)
             <>

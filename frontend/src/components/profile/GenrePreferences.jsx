@@ -2,7 +2,7 @@ export default function GenrePreferences({ preferences }) {
   if (!preferences || preferences.length === 0) {
     return (
       <div className="bg-gradient-to-br from-white to-purple-50/30 rounded-xl shadow-sm border border-purple-100/50 p-6 w-full h-full flex flex-col">
-        <h3 className="text-lg font-bold bg-gradient-to-r from-[#638CCC] to-purple-500 bg-clip-text text-transparent mb-4">
+        <h3 className="text-lg font-bold text-[#638CCC] mb-4">
           선호 장르
         </h3>
         <p className="text-sm text-gray-500">아직 충분한 데이터가 없습니다.</p>
@@ -26,7 +26,7 @@ export default function GenrePreferences({ preferences }) {
 
   return (
     <div className="bg-gradient-to-br from-white to-purple-50/30 rounded-xl shadow-sm border border-purple-100/50 p-6 w-full h-full flex flex-col">
-      <h3 className="text-lg font-bold bg-gradient-to-r from-[#638CCC] to-purple-500 bg-clip-text text-transparent mb-4">
+      <h3 className="text-lg font-bold text-[#638CCC] mb-4">
         선호 장르 Top 5
       </h3>
 
@@ -37,7 +37,7 @@ export default function GenrePreferences({ preferences }) {
           return (
             <div key={pref.genre}>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-bold bg-gradient-to-r from-[#638CCC] to-[#8EC5FC] bg-clip-text text-transparent">
+                <span className="text-sm font-bold text-[#638CCC]">
                   {pref.genre}
                 </span>
                 <div className="flex items-center gap-2 text-sm">

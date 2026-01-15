@@ -25,7 +25,7 @@ export default function FormatDistribution({ distribution }) {
 
   return (
     <div className="bg-gradient-to-br from-white to-blue-50/20 rounded-2xl shadow-md p-6 w-full h-full flex flex-col border border-blue-100/40">
-      <h3 className="text-lg font-bold mb-4 bg-gradient-to-r from-[#638CCC] to-[#8EC5FC] bg-clip-text text-transparent">포맷 선호도</h3>
+      <h3 className="text-lg font-bold mb-4 text-[#638CCC]">포맷 선호도</h3>
 
       <div className="space-y-3">
         {distribution.map((item) => {
@@ -35,7 +35,7 @@ export default function FormatDistribution({ distribution }) {
           return (
             <div key={item.format}>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-bold bg-gradient-to-r from-[#638CCC] to-[#8EC5FC] bg-clip-text text-transparent">
+                <span className="text-sm font-bold text-[#638CCC]">
                   {formatNames[item.format] || item.format}
                 </span>
                 <div className="flex items-center gap-2">
