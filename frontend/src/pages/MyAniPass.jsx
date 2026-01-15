@@ -1002,19 +1002,17 @@ export default function MyAniPass() {
               >
                 {language === 'ko' ? '피드' : 'Feed'}
               </button>
-              {isOwnProfile && (
-                <button
-                  onClick={() => setActiveTab('anipass')}
-                  className={`px-6 py-3 font-medium transition-colors ${
-                    activeTab === 'anipass'
-                      ? 'border-b-2'
-                      : 'text-gray-600 hover:text-gray-800'
-                  }`}
-                  style={activeTab === 'anipass' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
-                >
-                  {language === 'ko' ? '애니패스' : 'AniPass'}
-                </button>
-              )}
+              <button
+                onClick={() => setActiveTab('anipass')}
+                className={`px-6 py-3 font-medium transition-colors ${
+                  activeTab === 'anipass'
+                    ? 'border-b-2'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+                style={activeTab === 'anipass' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
+              >
+                {language === 'ko' ? '애니패스' : 'AniPass'}
+              </button>
               <button
                 onClick={() => setActiveTab('anime')}
                 className={`px-6 py-3 font-medium transition-colors ${
@@ -1137,19 +1135,17 @@ export default function MyAniPass() {
             >
               {language === 'ko' ? '피드' : 'Feed'}
             </button>
-            {isOwnProfile && (
-              <button
-                onClick={() => setActiveTab('anipass')}
-                className={`px-6 py-3 font-medium transition-colors ${
-                  activeTab === 'anipass'
-                    ? 'border-b-2'
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-                style={activeTab === 'anipass' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
-              >
-                {language === 'ko' ? '애니패스' : 'AniPass'}
-              </button>
-            )}
+            <button
+              onClick={() => setActiveTab('anipass')}
+              className={`px-6 py-3 font-medium transition-colors ${
+                activeTab === 'anipass'
+                  ? 'border-b-2'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+              style={activeTab === 'anipass' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
+            >
+              {language === 'ko' ? '애니패스' : 'AniPass'}
+            </button>
             <button
               onClick={() => setActiveTab('anime')}
               className={`px-6 py-3 font-medium transition-colors ${
