@@ -20,16 +20,25 @@ export default function Navbar() {
   const [lastCheckTime, setLastCheckTime] = useState(null);
   const notificationRef = useRef(null);
   const userMenuRef = useRef(null);
+  const [otakuScore, setOtakuScore] = useState(0);
 
-  // Use otaku_score from AuthContext (global state) to prevent flickering
-  const otakuScore = user?.otaku_score || 0;
-
-  // Debug: log otakuScore
+  // Fetch otaku_score directly from server (don't trust localStorage)
   useEffect(() => {
-    if (user) {
-      console.log('[Navbar] User otaku_score:', user.otaku_score, 'Final score:', otakuScore);
-    }
-  }, [user, otakuScore]);
+    const fetchOtakuScore = async () => {
+      if (user) {
+        try {
+          const stats = await userService.getStats();
+          setOtakuScore(stats.otaku_score || 0);
+        } catch (err) {
+          console.error('[Navbar] Failed to fetch otaku_score:', err);
+          // Fallback to user.otaku_score if API fails
+          setOtakuScore(user.otaku_score || 0);
+        }
+      }
+    };
+
+    fetchOtakuScore();
+  }, [user]);
 
   const toRoman = (num) => {
     const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
