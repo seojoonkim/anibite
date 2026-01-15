@@ -204,6 +204,15 @@ export default function WriteReviews() {
       // Mark as just completed
       setJustCompleted(prev => new Set([...prev, `anime_${animeId}`]));
 
+      // Remove from justCompleted after 3 seconds (animation duration)
+      setTimeout(() => {
+        setJustCompleted(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(`anime_${animeId}`);
+          return newSet;
+        });
+      }, 3000);
+
       // Reload stats to reflect the new review
       loadStats();
 
@@ -276,6 +285,15 @@ export default function WriteReviews() {
 
       // Mark as just completed
       setJustCompleted(prev => new Set([...prev, `character_${characterId}`]));
+
+      // Remove from justCompleted after 3 seconds (animation duration)
+      setTimeout(() => {
+        setJustCompleted(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(`character_${characterId}`);
+          return newSet;
+        });
+      }, 3000);
 
       // Reload stats to reflect the new review
       loadStats();
