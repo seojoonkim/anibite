@@ -607,7 +607,7 @@ export default function WriteReviews() {
                         ) : (
                           <button
                             onClick={() => handleStartEdit(item, '', item.rating)}
-                            className="text-sm text-gray-500 hover:text-gray-700 border border-gray-300 px-4 py-2 rounded hover:border-gray-400 transition-colors"
+                            className="text-sm text-gray-500 hover:text-gray-700 border border-gray-300 px-4 py-2 rounded hover:border-gray-400 transition-all group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-300"
                           >
                             리뷰 작성하기
                           </button>
