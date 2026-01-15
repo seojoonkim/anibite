@@ -317,11 +317,11 @@ export default function RateCharacters() {
                   borderWidth: (hasRated || status === 'NOT_INTERESTED') ? '2px' : '0px',
                   borderStyle: 'solid',
                   borderImage: hasRated
-                    ? 'linear-gradient(135deg, #FF6B35, #FF8C42, #FFA458) 1'
+                    ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%) 1'
                     : 'none',
                   borderColor: status === 'NOT_INTERESTED' ? '#9CA3AF' : 'transparent',
                   boxShadow: hasRated
-                    ? '0 4px 20px rgba(255, 107, 53, 0.3)'
+                    ? '0 4px 20px rgba(225, 48, 108, 0.3)'
                     : status === 'NOT_INTERESTED'
                     ? '0 4px 20px rgba(156, 163, 175, 0.2)'
                     : undefined
