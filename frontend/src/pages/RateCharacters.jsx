@@ -310,15 +310,14 @@ export default function RateCharacters() {
                 ref={(el) => {
                   if (el) cardRefs.current[character.id] = el;
                 }}
-                className={`${getCardBackgroundColor(character.id)} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out ${
+                className={`rounded-lg transition-all duration-500 ease-out ${
                   character._animating ? 'scale-110' : 'scale-100'
-                } ${status === 'NOT_INTERESTED' ? 'opacity-50' : 'opacity-100'}`}
+                }`}
                 style={{
-                  borderWidth: hasRated ? '2px' : '0px',
-                  borderStyle: 'solid',
-                  borderImage: hasRated
-                    ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%) 1'
-                    : 'none',
+                  background: hasRated
+                    ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+                    : 'transparent',
+                  padding: hasRated ? '2px' : '0',
                   boxShadow: hasRated
                     ? '0 4px 20px rgba(225, 48, 108, 0.3)'
                     : undefined
@@ -326,6 +325,9 @@ export default function RateCharacters() {
                 onMouseEnter={() => setHoveredCharacter(character.id)}
                 onMouseLeave={() => setHoveredCharacter(null)}
               >
+                <div className={`${getCardBackgroundColor(character.id)} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out ${
+                  status === 'NOT_INTERESTED' ? 'opacity-50' : 'opacity-100'
+                } ${!hasRated ? 'border border-gray-200' : ''}`}>
                 {/* Character Image */}
                 <Link to={`/character/${character.id}`} className="block">
                   <div className="aspect-[3/4] bg-gray-200 relative overflow-hidden group cursor-pointer">
@@ -507,6 +509,7 @@ export default function RateCharacters() {
                   </div>
 
                 </div>
+              </div>
               </div>
             );
             })}

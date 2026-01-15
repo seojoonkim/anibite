@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, createPortal } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -2276,7 +2276,7 @@ export default function MyAniPass() {
         )}
 
         {/* Delete Modal */}
-        {showDeleteModal && activityToDelete && (
+        {showDeleteModal && activityToDelete && createPortal(
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowDeleteModal(false)}>
             <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
               <h3 className="text-xl font-bold mb-4 text-gray-900">
@@ -2335,7 +2335,8 @@ export default function MyAniPass() {
                 </>
               )}
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </div>
