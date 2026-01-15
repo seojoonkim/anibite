@@ -478,36 +478,31 @@ export default function WriteReviews() {
             return (
               <div
                 key={item.id}
-                className={`bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out overflow-hidden self-start relative ${
-                  isJustCompleted ? '' : 'border border-gray-200'
-                }`}
+                className="rounded-xl transition-all duration-500 ease-out self-start"
+                style={{
+                  background: isJustCompleted
+                    ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+                    : 'transparent',
+                  padding: isJustCompleted ? '2px' : '0',
+                  boxShadow: isJustCompleted
+                    ? '0 4px 20px rgba(225, 48, 108, 0.3)'
+                    : undefined
+                }}
               >
-                {/* Gradient border using pseudo-element */}
-                {isJustCompleted && (
-                  <div
-                    className="absolute inset-0 rounded-xl pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)',
-                      padding: '2px',
-                      WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                      WebkitMaskComposite: 'xor',
-                      maskComposite: 'exclude',
-                      boxShadow: '0 4px 20px rgba(225, 48, 108, 0.3)'
-                    }}
-                  />
-                )}
-
-                <div className="flex items-start relative">
-                  {/* 작성완료 뱃지 */}
-                  {isJustCompleted && (
-                    <div className="absolute top-2 right-2 z-10">
-                      <span className="px-3 py-1 text-white text-xs font-bold rounded-full shadow-lg" style={{
-                        background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
-                      }}>
-                        작성완료
-                      </span>
-                    </div>
-                  )}
+                <div className={`bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out overflow-hidden relative ${
+                  !isJustCompleted ? 'border border-gray-200' : ''
+                }`}>
+                  <div className="flex items-start relative">
+                    {/* 작성완료 뱃지 */}
+                    {isJustCompleted && (
+                      <div className="absolute top-2 right-2 z-10">
+                        <span className="px-3 py-1 text-white text-xs font-bold rounded-full shadow-lg" style={{
+                          background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+                        }}>
+                          작성완료
+                        </span>
+                      </div>
+                    )}
 
                   <Link
                     to={item.type === 'anime' ? `/anime/${item.itemId}` : `/character/${item.itemId}`}
