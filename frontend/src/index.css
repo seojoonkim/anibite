@@ -38,15 +38,13 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  /* transform: scale(0.9) 제거 - GPU 부하 감소 */
-  /* zoom으로 대체하여 렌더링 성능 개선 */
-  zoom: 0.9;
-  -moz-transform: scale(0.9);
-  -moz-transform-origin: top center;
-  width: 100%; /* 111.11%에서 100%로 변경 */
-  margin-left: 0; /* 중앙 정렬 제거 */
-  /* 렌더링 최적화 */
-  contain: layout style;
+  /* 90% 스케일 적용 - 성능 최적화 버전 */
+  transform: scale(0.9);
+  transform-origin: top center;
+  width: 111.11%;
+  margin-left: -5.555%; /* (111.11% - 100%) / 2 = 5.555% */
+  /* GPU 가속만 적용 */
+  will-change: transform;
 }
 
 /* English text - 세련되고 모던한 Inter */
