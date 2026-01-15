@@ -194,7 +194,7 @@ export default function Browse() {
               />
               <button
                 type="submit"
-                className="bg-gradient-to-r from-cyan-400 to-blue-400 hover:from-cyan-500 hover:to-blue-500 text-white px-6 py-2 rounded-lg font-medium shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-all text-sm"
+                className="bg-[#3797F0] hover:bg-[#2a7dc4] text-white px-6 py-2 rounded-lg font-medium shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(55,151,240,0.25)] transition-all text-sm"
               >
                 {t('search')}
               </button>
