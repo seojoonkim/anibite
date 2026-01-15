@@ -762,33 +762,46 @@ export default function MyAniPass() {
 
     try {
       const activity = activityToDelete;
+      const isAnime = activity.activity_type === 'anime_rating';
       const hasReview = activity.review_content && activity.review_content.trim();
 
       if (deleteType === 'review_only' && hasReview) {
         // 리뷰만 삭제 (별점은 유지)
-        if (activity.activity_type === 'character_rating' && activity.review_id) {
-          await characterReviewService.deleteReview(activity.review_id);
-        } else if (activity.review_id) {
-          await reviewService.deleteReview(activity.review_id);
+        if (isAnime) {
+          await reviewService.deleteReview(activity.id);
+        } else {
+          await characterReviewService.deleteReview(activity.id);
         }
       } else {
         // 별점까지 모두 삭제
-        if (activity.activity_type === 'character_rating') {
-          await characterService.deleteCharacterRating(activity.item_id);
-        } else if (activity.activity_type === 'anime_rating') {
+        if (isAnime) {
           await ratingService.deleteRating(activity.item_id);
+        } else {
+          await characterService.deleteCharacterRating(activity.item_id);
         }
       }
 
-      // Remove from UI
-      setUserActivities(prev => prev.filter(a =>
-        !(a.activity_type === activity.activity_type &&
-          a.user_id === activity.user_id &&
-          a.item_id === activity.item_id)
-      ));
-
       setShowDeleteModal(false);
       setActivityToDelete(null);
+
+      // Update UI based on delete type
+      if (deleteType === 'review_only') {
+        // Remove review content but keep rating activity
+        setUserActivities(prev => prev.map(a =>
+          (a.activity_type === activity.activity_type &&
+           a.user_id === activity.user_id &&
+           a.item_id === activity.item_id)
+            ? { ...a, review_content: '', review_id: null }
+            : a
+        ));
+      } else {
+        // Remove entire activity
+        setUserActivities(prev => prev.filter(a =>
+          !(a.activity_type === activity.activity_type &&
+            a.user_id === activity.user_id &&
+            a.item_id === activity.item_id)
+        ));
+      }
 
       // Reload stats
       if (isOwnProfile) {
@@ -2289,15 +2302,34 @@ export default function MyAniPass() {
               </h3>
 
               {/* Show what's being deleted */}
-              <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-sm font-semibold text-gray-900 mb-1">
-                  {activityToDelete.item_title_korean || activityToDelete.item_title}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {activityToDelete.activity_type === 'character_rating'
-                    ? (language === 'ko' ? '캐릭터' : 'Character')
-                    : (language === 'ko' ? '애니메이션' : 'Anime')}
-                </p>
+              <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 flex gap-3">
+                {activityToDelete.item_image && (
+                  <img
+                    src={activityToDelete.item_image}
+                    alt={activityToDelete.item_title_korean || activityToDelete.item_title}
+                    className="w-16 h-24 object-cover rounded flex-shrink-0"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 mb-1">
+                    {activityToDelete.activity_type === 'character_rating'
+                      ? activityToDelete.item_title
+                      : (activityToDelete.item_title_korean || activityToDelete.item_title)}
+                  </p>
+                  {activityToDelete.activity_type === 'character_rating' && activityToDelete.anime_title && (
+                    <p className="text-xs text-gray-600 mb-1">
+                      from: {activityToDelete.anime_title_korean || activityToDelete.anime_title}
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-500">
+                    {activityToDelete.activity_type === 'character_rating'
+                      ? (language === 'ko' ? '캐릭터' : 'Character')
+                      : (language === 'ko' ? '애니메이션' : 'Anime')}
+                  </p>
+                </div>
               </div>
 
               {activityToDelete.review_content && activityToDelete.review_content.trim() ? (

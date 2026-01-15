@@ -376,9 +376,9 @@ export default function Feed() {
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Left Sidebar - Filter Menu */}
-          <aside className="hidden lg:block lg:col-span-1">
+          <aside className="hidden md:block md:col-span-1">
             <div className="sticky top-24 z-40">
               <nav>
                 <div className="flex flex-col gap-2">
@@ -450,7 +450,7 @@ export default function Feed() {
           </aside>
 
           {/* Right Content - Feed */}
-          <div className="lg:col-span-3">
+          <div className="md:col-span-3">
             {/* Post Composer */}
             {user && (
               <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 mb-6">
@@ -639,15 +639,34 @@ export default function Feed() {
             </h3>
 
             {/* Show what's being deleted */}
-            <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-sm font-semibold text-gray-900 mb-1">
-                {activityToDelete.item_title_korean || activityToDelete.item_title}
-              </p>
-              <p className="text-xs text-gray-500">
-                {activityToDelete.activity_type === 'character_rating'
-                  ? (language === 'ko' ? '캐릭터' : 'Character')
-                  : (language === 'ko' ? '애니메이션' : 'Anime')}
-              </p>
+            <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 flex gap-3">
+              {activityToDelete.item_image && (
+                <img
+                  src={activityToDelete.item_image}
+                  alt={activityToDelete.item_title_korean || activityToDelete.item_title}
+                  className="w-16 h-24 object-cover rounded flex-shrink-0"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                />
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-gray-900 mb-1">
+                  {activityToDelete.activity_type === 'character_rating'
+                    ? activityToDelete.item_title
+                    : (activityToDelete.item_title_korean || activityToDelete.item_title)}
+                </p>
+                {activityToDelete.activity_type === 'character_rating' && activityToDelete.anime_title && (
+                  <p className="text-xs text-gray-600 mb-1">
+                    from: {activityToDelete.anime_title_korean || activityToDelete.anime_title}
+                  </p>
+                )}
+                <p className="text-xs text-gray-500">
+                  {activityToDelete.activity_type === 'character_rating'
+                    ? (language === 'ko' ? '캐릭터' : 'Character')
+                    : (language === 'ko' ? '애니메이션' : 'Anime')}
+                </p>
+              </div>
             </div>
 
             {activityToDelete.review_content && activityToDelete.review_content.trim() ? (

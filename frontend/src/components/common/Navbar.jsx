@@ -230,9 +230,9 @@ export default function Navbar() {
         borderBottom: '1px solid #DBDBDB'
       }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-16 relative">
-            {/* Logo */}
-            <div className="flex items-center" style={{ width: '200px' }}>
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_3fr] items-center h-16 md:gap-6">
+            {/* Logo - takes same space as sidebar */}
+            <div className="flex items-center">
               <Link to="/feed" className="flex items-center gap-2 text-2xl font-bold text-black hover:opacity-60 transition-opacity group">
                 {/* AniPass Logo Icon */}
                 <div className="relative">
@@ -295,25 +295,26 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* Desktop Menu - Hidden on Mobile - Aligned with feed content */}
-            <div className="hidden md:flex items-center space-x-1 flex-1 flex-nowrap">
-              {menuItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`px-3 py-2 rounded-md text-sm font-normal transition-colors whitespace-nowrap ${
-                    isActive(item.path)
-                      ? 'bg-[#3797F0] text-white'
-                      : 'text-black hover:text-gray-500 hover:bg-gray-100'
-                  }`}
-                >
-                  {item.labelKo ? (language === 'ko' ? item.labelKo : item.labelEn) : item.label}
-                </Link>
-              ))}
-            </div>
+            {/* Desktop Menu and Right Side - Aligned with feed content area */}
+            <div className="hidden md:flex items-center justify-between">
+              <div className="flex items-center space-x-1">
+                {menuItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`px-3 py-2 rounded-md text-sm font-normal transition-colors whitespace-nowrap ${
+                      isActive(item.path)
+                        ? 'bg-[#3797F0] text-white'
+                        : 'text-black hover:text-gray-500 hover:bg-gray-100'
+                    }`}
+                  >
+                    {item.labelKo ? (language === 'ko' ? item.labelKo : item.labelEn) : item.label}
+                  </Link>
+                ))}
+              </div>
 
-            {/* Right Side - Language & User */}
-            <div className="flex items-center space-x-2 ml-auto pl-8" style={{ minWidth: '300px', justifyContent: 'flex-end' }}>
+              {/* Right Side - Language & User */}
+              <div className="flex items-center space-x-2">
               {/* Language Dropdown */}
               <div className="relative">
                 <button
@@ -461,6 +462,7 @@ export default function Navbar() {
                   )}
                 </div>
               )}
+              </div>
             </div>
           </div>
         </div>
