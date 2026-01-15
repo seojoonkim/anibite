@@ -345,32 +345,33 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
     rows = db.execute_query(
         """
         SELECT
-            activity_type,
-            user_id,
-            username,
-            display_name,
-            avatar_url,
-            otaku_score,
-            item_id,
-            item_title,
-            item_title_korean,
-            item_image,
-            rating,
+            a.activity_type,
+            a.user_id,
+            a.username,
+            a.display_name,
+            a.avatar_url,
+            COALESCE(us.otaku_score, a.otaku_score, 0) as otaku_score,
+            a.item_id,
+            a.item_title,
+            a.item_title_korean,
+            a.item_image,
+            a.rating,
             NULL as status,
-            activity_time,
-            anime_title,
-            anime_title_korean,
-            anime_id,
+            a.activity_time,
+            a.anime_title,
+            a.anime_title_korean,
+            a.anime_id,
             CASE
-                WHEN activity_type = 'user_post' THEN item_id
+                WHEN a.activity_type = 'user_post' THEN a.item_id
                 ELSE NULL
             END as review_id,
-            review_content,
-            review_content as post_content,
+            a.review_content,
+            a.review_content as post_content,
             0 as comments_count
-        FROM activities
-        WHERE user_id = ?
-        ORDER BY activity_time DESC
+        FROM activities a
+        LEFT JOIN user_stats us ON a.user_id = us.user_id
+        WHERE a.user_id = ?
+        ORDER BY a.activity_time DESC
         LIMIT ? OFFSET ?
         """,
         (user_id, limit, offset)
