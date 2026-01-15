@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
+import { createPortal } from 'react-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import ScrollToTop from './components/common/ScrollToTop';
@@ -49,8 +50,8 @@ function AppRoutes() {
 
   return (
     <>
-      {/* Show Navbar on all authenticated pages */}
-      {!isPublicPage && <Navbar />}
+      {/* Show Navbar on all authenticated pages - render to body via portal */}
+      {!isPublicPage && createPortal(<Navbar />, document.body)}
 
       <Suspense fallback={<PageLoader />}>
         <Routes>
