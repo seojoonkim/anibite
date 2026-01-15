@@ -373,6 +373,8 @@ function RatingCard({ anime, onRate }) {
 export default function Rate() {
   const { t, language } = useLanguage();
   const [animeList, setAnimeList] = useState([]);
+  const [allAnimeItems, setAllAnimeItems] = useState([]); // All loaded items
+  const [displayedCount, setDisplayedCount] = useState(0); // How many are displayed
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -472,38 +474,19 @@ export default function Rate() {
   const loadAnime = async () => {
     try {
       setLoading(true);
-      // Use ULTRA FAST optimized endpoint (0.1s target)
+      // Load 100 items at once, paginate on frontend
       const data = await animeService.getAnimeForRating({
-        limit: 20,
-        offset: 0
+        limit: 100
       });
 
-      setAnimeList(data.items || []);
-      setHasMore(data.has_more !== false);
+      const allItems = data.items || [];
+      // Show first 40 items immediately
+      setAnimeList(allItems.slice(0, 40));
+      setAllAnimeItems(allItems);
+      setDisplayedCount(40);
+      setHasMore(allItems.length > 40);
       setPage(1);
       setLoading(false);
-
-      // Auto-load second batch immediately after first batch
-      if (data.has_more !== false) {
-        setTimeout(async () => {
-          try {
-            const data2 = await animeService.getAnimeForRating({
-              limit: 20,
-              offset: 20
-            });
-            // Remove duplicates by ID
-            setAnimeList(prev => {
-              const existingIds = new Set(prev.map(a => a.id));
-              const newItems = (data2.items || []).filter(item => !existingIds.has(item.id));
-              return [...prev, ...newItems];
-            });
-            setHasMore(data2.has_more !== false);
-            setPage(2);
-          } catch (err) {
-            console.error('Failed to auto-load more:', err);
-          }
-        }, 100);
-      }
     } catch (err) {
       console.error('Failed to load anime:', err);
       setLoading(false);
@@ -518,26 +501,12 @@ export default function Rate() {
 
     try {
       setLoading(true);
-      const nextPage = page + 1;
-      const offset = (nextPage - 1) * 20;
-      console.log('Loading page:', nextPage, 'offset:', offset);
-
-      // Use ULTRA FAST optimized endpoint (0.1s target)
-      const data = await animeService.getAnimeForRating({
-        limit: 20,
-        offset: offset
-      });
-
-      console.log('Loaded data:', data);
-      // Remove duplicates by ID
-      setAnimeList((prev) => {
-        const existingIds = new Set(prev.map(a => a.id));
-        const newItems = (data.items || []).filter(item => !existingIds.has(item.id));
-        console.log(`Adding ${newItems.length} new items (filtered ${data.items.length - newItems.length} duplicates)`);
-        return [...prev, ...newItems];
-      });
-      setHasMore(data.has_more !== false);
-      setPage(nextPage);
+      // Frontend pagination: show 20 more items from already loaded data
+      const newDisplayedCount = Math.min(displayedCount + 20, allAnimeItems.length);
+      setAnimeList(allAnimeItems.slice(0, newDisplayedCount));
+      setDisplayedCount(newDisplayedCount);
+      setHasMore(newDisplayedCount < allAnimeItems.length);
+      setPage(page + 1);
       setLoading(false);
     } catch (err) {
       console.error('Failed to load more:', err);

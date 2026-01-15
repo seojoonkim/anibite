@@ -48,7 +48,7 @@ def get_user_rated_characters(user_id: int, limit: int = 100, offset: int = 0) -
     return [dict_from_row(row) for row in rows]
 
 
-def get_characters_from_rated_anime(user_id: int, limit: int = 100, offset: int = 0) -> List[Dict]:
+def get_characters_from_rated_anime(user_id: int, limit: int = 100) -> List[Dict]:
     """
     사용자가 평가한 애니메이션의 캐릭터들 조회 (평가하지 않은 캐릭터만)
     같은 캐릭터가 여러 애니메이션에 나오면 가장 인기있는 애니메이션 하나만 표시

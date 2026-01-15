@@ -20,9 +20,7 @@ router = APIRouter()
 
 @router.get("/anime")
 def get_anime_to_rate(
-    limit: int = Query(50, ge=1, le=100, description="한 번에 가져올 개수"),
-    offset: int = Query(0, ge=0, description="오프셋"),
-    seed: int = Query(None, description="정렬 시드 (세션별 일관성 유지)"),
+    limit: int = Query(50, ge=1, le=200, description="한 번에 가져올 개수"),
     current_user: UserResponse = Depends(get_current_user)
 ) -> Dict:
     """
@@ -30,28 +28,22 @@ def get_anime_to_rate(
 
     특징:
     - 미평가 + WANT_TO_WATCH 항목 반환
-    - 세션별 시드로 랜덤 정렬 (새로고침 시 다른 순서, 페이지네이션 일관성 유지)
+    - 매번 다른 랜덤 순서 (가중치 기반)
     - 서브쿼리 0개
     - 목표: 0.1초 이내
-
-    Args:
-        seed: 정렬 시드 (같은 세션에서는 같은 값, 새로고침 시 다른 값)
+    - 프론트엔드에서 페이지네이션 처리
 
     Returns:
         {
             "items": [...],
-            "limit": 50,
-            "offset": 0,
-            "has_more": true
+            "total": 123
         }
     """
-    items = get_anime_for_rating(current_user.id, limit, offset, seed)
+    items = get_anime_for_rating(current_user.id, limit)
 
     return {
         'items': items,
-        'limit': limit,
-        'offset': offset,
-        'has_more': len(items) == limit
+        'total': len(items)
     }
 
 
@@ -77,8 +69,7 @@ def get_anime_rating_stats(
 
 @router.get("/characters")
 def get_characters_to_rate(
-    limit: int = Query(50, ge=1, le=100, description="한 번에 가져올 개수"),
-    offset: int = Query(0, ge=0, description="오프셋"),
+    limit: int = Query(50, ge=1, le=200, description="한 번에 가져올 개수"),
     current_user: UserResponse = Depends(get_current_user)
 ) -> Dict:
     """
@@ -86,25 +77,22 @@ def get_characters_to_rate(
 
     특징:
     - 평가한 애니의 캐릭터 중 미평가만
-    - 랜덤성 내장 (매번 조금씩 다른 순서)
+    - 매번 다른 랜덤 순서 (가중치 기반)
     - 단일 쿼리 최적화
     - 목표: 0.1초 이내
+    - 프론트엔드에서 페이지네이션 처리
 
     Returns:
         {
             "items": [...],
-            "limit": 50,
-            "offset": 0,
-            "has_more": true
+            "total": 123
         }
     """
-    items = get_characters_for_rating(current_user.id, limit, offset)
+    items = get_characters_for_rating(current_user.id, limit)
 
     return {
         'items': items,
-        'limit': limit,
-        'offset': offset,
-        'has_more': len(items) == limit
+        'total': len(items)
     }
 
 

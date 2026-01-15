@@ -10,6 +10,8 @@ export default function RateCharacters() {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [characters, setCharacters] = useState([]);
+  const [allCharacters, setAllCharacters] = useState([]); // All loaded items
+  const [displayedCount, setDisplayedCount] = useState(0); // How many are displayed
   const [stats, setStats] = useState({
     total: 0,
     rated: 0,
@@ -81,48 +83,29 @@ export default function RateCharacters() {
 
   const loadCharacters = async (pageNum) => {
     try {
-      setLoading(pageNum === 1);
-      // Increase initial batch size to 40 to avoid auto-loading flicker
-      const pageSize = pageNum === 1 ? 40 : 20;
-      // Calculate offset: first page loads 40, subsequent pages load 20
-      const offset = pageNum === 1 ? 0 : 40 + (pageNum - 2) * 20;
-
-      // Use ULTRA FAST optimized endpoint (0.1s target)
+      setLoading(true);
+      // Load 100 items at once, paginate on frontend
       const data = await characterService.getCharactersForRating({
-        limit: pageSize,
-        offset: offset
+        limit: 100
       });
 
       const items = data.items || [];
+      // Show first 40 items immediately
+      setCharacters(items.slice(0, 40));
+      setAllCharacters(items);
+      setDisplayedCount(40);
+      setHasMore(items.length > 40);
+      setPage(1);
 
-      if (pageNum === 1) {
-        setCharacters(items);
-        // Initialize character statuses
-        const statuses = {};
-        items.forEach(char => {
-          if (char.my_status) {
-            statuses[char.id] = char.my_status;
-          }
-        });
-        setCharacterStatuses(statuses);
-        setPage(1); // Reset to page 1
-      } else {
-        setCharacters(prev => [...prev, ...items]);
-        // Add new character statuses
-        const newStatuses = {};
-        items.forEach(char => {
-          if (char.my_status) {
-            newStatuses[char.id] = char.my_status;
-          }
-        });
-        setCharacterStatuses(prev => ({ ...prev, ...newStatuses }));
-      }
-
-      // If we got fewer items than requested, there are no more items
-      const receivedItems = items.length;
-      setHasMore(receivedItems === pageSize);
+      // Initialize character statuses
+      const statuses = {};
+      items.forEach(char => {
+        if (char.my_status) {
+          statuses[char.id] = char.my_status;
+        }
+      });
+      setCharacterStatuses(statuses);
       setLoading(false);
-      setLoadingMore(false);
     } catch (err) {
       console.error('Failed to load characters:', err);
       setLoading(false);
@@ -133,10 +116,14 @@ export default function RateCharacters() {
   const loadMore = useCallback(() => {
     if (!hasMore || loadingMore) return;
     setLoadingMore(true);
-    const nextPage = page + 1;
-    setPage(nextPage);
-    loadCharacters(nextPage);
-  }, [hasMore, loadingMore, page]);
+    // Frontend pagination: show 20 more items from already loaded data
+    const newDisplayedCount = Math.min(displayedCount + 20, allCharacters.length);
+    setCharacters(allCharacters.slice(0, newDisplayedCount));
+    setDisplayedCount(newDisplayedCount);
+    setHasMore(newDisplayedCount < allCharacters.length);
+    setPage(page + 1);
+    setLoadingMore(false);
+  }, [hasMore, loadingMore, page, displayedCount, allCharacters]);
 
   const loadStats = async () => {
     try {
