@@ -1385,11 +1385,191 @@ export default function MyAniPass() {
           </div>
         )}
 
-        {loading ? (
+        {/* Feed tab - show composer and sidebar immediately */}
+        {activeTab === 'feed' && (
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Left Sidebar - Profile Summary - Show when stats loaded */}
+            {stats && (
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-6 sticky top-4">
+                  {/* Profile Picture */}
+                  <div className="flex flex-col items-center mb-4">
+                    {(profileUser || user)?.avatar_url ? (
+                      <img
+                        src={getAvatarUrl((profileUser || user).avatar_url)}
+                        alt={(profileUser || user)?.display_name || (profileUser || user)?.username}
+                        className="w-24 h-24 rounded-full object-cover border-2 border-gray-200 mb-3"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 rounded-full flex items-center justify-center border-2 border-gray-200 mb-3" style={{ background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)' }}>
+                        <span className="text-white text-2xl font-bold">
+                          {((profileUser || user)?.display_name || (profileUser || user)?.username || '?').charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Name */}
+                    <h3 className="text-lg font-bold text-gray-900 text-center">
+                      {(profileUser || user)?.display_name || (profileUser || user)?.username}
+                    </h3>
+
+                    {/* Badge */}
+                    {(() => {
+                      const levelInfo = getCurrentLevelInfo(stats.otaku_score);
+                      return (
+                        <span className={`mt-2 text-sm px-3 py-1 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}>
+                          <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span className="text-gray-700">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
+                        </span>
+                      );
+                    })()}
+                  </div>
+
+                  {/* Stats Summary */}
+                  <div className="space-y-3 pt-4 border-t border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">{language === 'ko' ? '오타쿠 점수' : 'Otaku Score'}</span>
+                      <span className="text-sm font-bold text-gray-900">{Math.round(stats.otaku_score)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">{language === 'ko' ? '평가한 애니' : 'Rated Anime'}</span>
+                      <span className="text-sm font-bold text-gray-900">{stats.total_rated}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">{language === 'ko' ? '평가한 캐릭터' : 'Rated Characters'}</span>
+                      <span className="text-sm font-bold text-gray-900">{stats.total_character_ratings || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">{language === 'ko' ? '작성한 리뷰' : 'Reviews Written'}</span>
+                      <span className="text-sm font-bold text-gray-900">{stats.total_reviews}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</span>
+                      <span className="text-sm font-bold text-gray-900">{stats.average_rating?.toFixed(1) || 'N/A'}</span>
+                    </div>
+                    {displayUser?.created_at && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">{language === 'ko' ? '가입일' : 'Joined'}</span>
+                        <span className="text-sm font-bold text-gray-900">
+                          {new Date(displayUser.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Follow Stats */}
+                  <div className="flex gap-4 justify-center pt-4 border-t border-gray-200 mt-4">
+                    <button
+                      onClick={() => openFollowModal('followers')}
+                      className="flex flex-col items-center hover:text-[#737373] transition-colors"
+                    >
+                      <span className="text-lg font-bold text-gray-900">{followCounts.followers_count}</span>
+                      <span className="text-xs text-gray-600">{language === 'ko' ? '팔로워' : 'Followers'}</span>
+                    </button>
+                    <div className="w-px bg-gray-200"></div>
+                    <button
+                      onClick={() => openFollowModal('following')}
+                      className="flex flex-col items-center hover:text-[#737373] transition-colors"
+                    >
+                      <span className="text-lg font-bold text-gray-900">{followCounts.following_count}</span>
+                      <span className="text-xs text-gray-600">{language === 'ko' ? '팔로잉' : 'Following'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Right Content - Feed */}
+            <div className={stats ? "lg:col-span-3" : "lg:col-span-4"}>
+              {/* Post Composer - Show immediately for own profile */}
+              {isOwnProfile && displayUser && (
+                <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 mb-6">
+                  <div className="flex gap-3">
+                    {displayUser?.avatar_url ? (
+                      <img
+                        src={getAvatarUrl(displayUser.avatar_url)}
+                        alt={displayUser.display_name || displayUser.username}
+                        className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center border border-gray-200" style={{ background: getAvatarGradient(displayUser?.username) }}>
+                        <span className="text-white text-sm font-bold">
+                          {(displayUser?.display_name || displayUser?.username || '?').charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <textarea
+                        value={newPostContent}
+                        onChange={(e) => setNewPostContent(e.target.value)}
+                        placeholder={language === 'ko' ? '무슨 생각을 하고 계신가요?' : "What's on your mind?"}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                        rows="3"
+                      />
+                      <div className="flex justify-end mt-2">
+                        <button
+                          onClick={handleCreatePost}
+                          disabled={!newPostContent.trim()}
+                          className="px-4 py-2 text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                          style={newPostContent.trim() ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                          onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#1877F2')}
+                          onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#3797F0')}
+                        >
+                          {language === 'ko' ? '게시' : 'Post'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Feed Activities */}
+              {loading ? (
+                <div className="flex justify-center items-center h-64">
+                  <div className="text-xl text-gray-600">{language === 'ko' ? '피드 로딩 중...' : 'Loading feed...'}</div>
+                </div>
+              ) : userActivities.length > 0 ? (
+                <div className="space-y-4">
+                  {userActivities.map((activity, index) => {
+                    // Use profile user data instead of activity data for avatar/username
+                    const currentUser = profileUser || user;
+                    const displayAvatar = currentUser?.avatar_url;
+                    const displayName = currentUser?.display_name || currentUser?.username;
+                    const currentOtakuScore = stats?.otaku_score || 0;
+                    const isLastActivity = userActivities.length === index + 1;
+
+                    return (
+                      <div
+                        key={`${activity.activity_type}-${activity.user_id}-${activity.item_id}-${index}`}
+                        ref={isLastActivity ? lastActivityElementRef : null}
+                        className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-all"
+                      >
+                        <ActivityCard
+                          activity={activity}
+                          displayAvatar={displayAvatar}
+                          displayName={displayName}
+                          currentOtakuScore={currentOtakuScore}
+                          isOwnProfile={isOwnProfile}
+                          language={language}
+                          handleDeletePost={handleDeletePost}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-gray-600">
+                  {language === 'ko' ? '아직 활동이 없습니다.' : 'No activity yet.'}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {loading && activeTab !== 'feed' ? (
           <div className="flex justify-center items-center h-64">
             <div className="text-xl text-gray-600">{language === 'ko' ? '로딩 중...' : 'Loading...'}</div>
           </div>
-        ) : (
+        ) : activeTab !== 'feed' && (
           <div className={tabLoading ? 'opacity-50 pointer-events-none' : ''}>
             {activeTab === 'anipass' && (
               <div className="space-y-6">
@@ -1553,9 +1733,16 @@ export default function MyAniPass() {
                       })()}
                     </div>
                   ) : (
-                    // 5점, 보고싶어요, 관심없어요는 단순 그리드
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                      {displayedAnime.map(renderAnimeCard)}
+                    // 5점, 보고싶어요, 관심없어요는 섹션 헤더와 함께 표시
+                    <div>
+                      <h3 className="text-lg font-bold mb-4 text-gray-800">
+                        {animeSubMenu === '5' && (language === 'ko' ? `⭐ 5점 (${displayedAnime.length})` : `⭐ 5.0 (${displayedAnime.length})`)}
+                        {animeSubMenu === 'watchlist' && (language === 'ko' ? `📋 보고싶어요 (${displayedAnime.length})` : `📋 Watchlist (${displayedAnime.length})`)}
+                        {animeSubMenu === 'pass' && (language === 'ko' ? `🚫 관심없어요 (${displayedAnime.length})` : `🚫 Pass (${displayedAnime.length})`)}
+                      </h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                        {displayedAnime.map(renderAnimeCard)}
+                      </div>
                     </div>
                   )
                 ) : (
@@ -1669,9 +1856,15 @@ export default function MyAniPass() {
                       })()}
                     </div>
                   ) : (
-                    // 특정 필터 선택 시
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                      {displayedCharacters.map((character) => {
+                    // 5점, 알고싶어요, 관심없어요는 섹션 헤더와 함께 표시
+                    <div>
+                      <h3 className="text-lg font-bold mb-4 text-gray-800">
+                        {characterSubMenu === '5' && (language === 'ko' ? `⭐ 5점 (${displayedCharacters.length})` : `⭐ 5.0 (${displayedCharacters.length})`)}
+                        {characterSubMenu === 'want' && (language === 'ko' ? `💭 알고싶어요 (${displayedCharacters.length})` : `💭 Want to Know (${displayedCharacters.length})`)}
+                        {characterSubMenu === 'pass' && (language === 'ko' ? `🚫 관심없어요 (${displayedCharacters.length})` : `🚫 Pass (${displayedCharacters.length})`)}
+                      </h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                        {displayedCharacters.map((character) => {
                         // 영어 이름 우선
                         const name = character.character_name || character.character_name_native || '';
 
@@ -1729,6 +1922,7 @@ export default function MyAniPass() {
                           </Link>
                         );
                       })}
+                      </div>
                     </div>
                   )
                 ) : (
@@ -1739,585 +1933,6 @@ export default function MyAniPass() {
               </div>
             )}
 
-            {activeTab === 'feed' && (
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {/* Left Sidebar - Profile Summary */}
-                <div className="lg:col-span-1">
-                  <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-6 sticky top-4">
-                    {/* Profile Picture */}
-                    <div className="flex flex-col items-center mb-4">
-                      {(profileUser || user)?.avatar_url ? (
-                        <img
-                          src={getAvatarUrl((profileUser || user).avatar_url)}
-                          alt={(profileUser || user)?.display_name || (profileUser || user)?.username}
-                          className="w-24 h-24 rounded-full object-cover border-2 border-gray-200 mb-3"
-                        />
-                      ) : (
-                        <div className="w-24 h-24 rounded-full flex items-center justify-center border-2 border-gray-200 mb-3" style={{ background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)' }}>
-                          <span className="text-white text-2xl font-bold">
-                            {((profileUser || user)?.display_name || (profileUser || user)?.username || '?').charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Name */}
-                      <h3 className="text-lg font-bold text-gray-900 text-center">
-                        {(profileUser || user)?.display_name || (profileUser || user)?.username}
-                      </h3>
-
-                      {/* Badge */}
-                      {stats && (() => {
-                        const levelInfo = getCurrentLevelInfo(stats.otaku_score);
-                        return (
-                          <span className={`mt-2 text-sm px-3 py-1 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}>
-                            <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span className="text-gray-700">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
-                          </span>
-                        );
-                      })()}
-                    </div>
-
-                    {/* Stats Summary */}
-                    {stats && (
-                      <div className="space-y-3 pt-4 border-t border-gray-200">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">{language === 'ko' ? '오타쿠 점수' : 'Otaku Score'}</span>
-                          <span className="text-sm font-bold text-gray-900">{Math.round(stats.otaku_score)}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">{language === 'ko' ? '평가한 애니' : 'Rated Anime'}</span>
-                          <span className="text-sm font-bold text-gray-900">{stats.total_rated}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">{language === 'ko' ? '평가한 캐릭터' : 'Rated Characters'}</span>
-                          <span className="text-sm font-bold text-gray-900">{stats.total_character_ratings || 0}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">{language === 'ko' ? '작성한 리뷰' : 'Reviews Written'}</span>
-                          <span className="text-sm font-bold text-gray-900">{stats.total_reviews}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</span>
-                          <span className="text-sm font-bold text-gray-900">{stats.average_rating?.toFixed(1) || 'N/A'}</span>
-                        </div>
-                        {displayUser?.created_at && (
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">{language === 'ko' ? '가입일' : 'Joined'}</span>
-                            <span className="text-sm font-bold text-gray-900">
-                              {new Date(displayUser.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Follow Stats */}
-                    <div className="flex gap-4 justify-center pt-4 border-t border-gray-200 mt-4">
-                      <button
-                        onClick={() => openFollowModal('followers')}
-                        className="flex flex-col items-center hover:text-[#737373] transition-colors"
-                      >
-                        <span className="text-lg font-bold text-gray-900">{followCounts.followers_count}</span>
-                        <span className="text-xs text-gray-600">{language === 'ko' ? '팔로워' : 'Followers'}</span>
-                      </button>
-                      <div className="w-px bg-gray-200"></div>
-                      <button
-                        onClick={() => openFollowModal('following')}
-                        className="flex flex-col items-center hover:text-[#737373] transition-colors"
-                      >
-                        <span className="text-lg font-bold text-gray-900">{followCounts.following_count}</span>
-                        <span className="text-xs text-gray-600">{language === 'ko' ? '팔로잉' : 'Following'}</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Content - Feed */}
-                <div className="lg:col-span-3">
-                  {/* Post Composer - Only show for own profile */}
-                  {isOwnProfile && (
-                    <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 mb-6">
-                      <div className="flex gap-3">
-                        {displayUser?.avatar_url ? (
-                          <img
-                            src={getAvatarUrl(displayUser.avatar_url)}
-                            alt={displayUser.display_name || displayUser.username}
-                            className="w-10 h-10 rounded-full object-cover border border-gray-200"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full flex items-center justify-center border border-gray-200" style={{ background: getAvatarGradient(displayUser?.username) }}>
-                            <span className="text-white text-sm font-bold">
-                              {(displayUser?.display_name || displayUser?.username || '?').charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                        )}
-                        <div className="flex-1">
-                          <textarea
-                            value={newPostContent}
-                            onChange={(e) => setNewPostContent(e.target.value)}
-                            placeholder={language === 'ko' ? '무슨 생각을 하고 계신가요?' : "What's on your mind?"}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-                            rows="3"
-                          />
-                          <div className="flex justify-end mt-2">
-                            <button
-                              onClick={handleCreatePost}
-                              disabled={!newPostContent.trim()}
-                              className="px-4 py-2 text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-                              style={newPostContent.trim() ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
-                              onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#1877F2')}
-                              onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#3797F0')}
-                            >
-                              {language === 'ko' ? '게시' : 'Post'}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="space-y-4">
-                  {userActivities.map((activity, index) => {
-                    // Use profile user data instead of activity data for avatar/username
-                    const currentUser = profileUser || user;
-                    const displayAvatar = currentUser?.avatar_url;
-                    const displayName = currentUser?.display_name || currentUser?.username;
-                    const currentOtakuScore = stats?.otaku_score || 0;
-                    const isLastActivity = userActivities.length === index + 1;
-
-                    return (
-                      <div
-                        key={`${activity.activity_type}-${activity.user_id}-${activity.item_id}-${index}`}
-                        ref={isLastActivity ? lastActivityElementRef : null}
-                        className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-all"
-                      >
-                        {/* Header - Profile info at the top */}
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center gap-2 flex-1 min-w-0">
-                            {/* User Avatar */}
-                            <Link to={isOwnProfile ? `/my-anipass` : `/user/${activity.user_id}`} className="flex-shrink-0">
-                              {displayAvatar ? (
-                                <img
-                                  src={getAvatarUrl(displayAvatar)}
-                                  alt={displayName}
-                                  className="w-8 h-8 rounded-full object-cover border border-gray-200"
-                                  onError={(e) => handleAvatarError(e, activity.user_id)}
-                                />
-                              ) : (
-                                <div className="w-8 h-8 rounded-full flex items-center justify-center border border-gray-200" style={{ background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)' }}>
-                                  <span className="text-white text-xs font-bold">
-                                    {(displayName || '?').charAt(0).toUpperCase()}
-                                  </span>
-                                </div>
-                              )}
-                            </Link>
-                            <Link
-                              to={isOwnProfile ? `/my-anipass` : `/user/${activity.user_id}`}
-                              className="text-base font-medium text-gray-700 hover:text-[#737373] transition-colors"
-                            >
-                              {displayName}
-                            </Link>
-                            {(() => {
-                              const levelInfo = getCurrentLevelInfo(currentOtakuScore);
-                              return (
-                                <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}>
-                                  <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span className="text-gray-700">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
-                                </span>
-                              );
-                            })()}
-                            {activity.activity_type !== 'user_post' && (
-                              <span className="text-sm text-gray-600">
-                                {activity.activity_type === 'anime_rating' && (language === 'ko' ? '애니를 평가했어요' : 'rated an anime')}
-                                {activity.activity_type === 'character_rating' && (language === 'ko' ? '캐릭터를 평가했어요' : 'rated a character')}
-                                {activity.activity_type === 'review' && (language === 'ko' ? '리뷰를 남겼어요' : 'left a review')}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">
-                              {getTimeAgo(activity.activity_time)}
-                            </span>
-                            {/* Delete Menu - Only show for own activities */}
-                            {isOwnProfile && activity.activity_type !== 'user_post' && (
-                              <div className="relative">
-                                <button
-                                  onClick={() => setDeleteMenuOpen(deleteMenuOpen === `${activity.activity_type}_${activity.item_id}` ? null : `${activity.activity_type}_${activity.item_id}`)}
-                                  className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                                >
-                                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                                  </svg>
-                                </button>
-                                {deleteMenuOpen === `${activity.activity_type}_${activity.item_id}` && (
-                                  <div className="absolute right-0 mt-1 w-32 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                                    <button
-                                      onClick={() => handleOpenDeleteModal(activity)}
-                                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                                    >
-                                      {language === 'ko' ? '삭제' : 'Delete'}
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Main Content Wrapper */}
-                        <div>
-                          {/* Content area - Image and info side by side for non-post activities */}
-                          {activity.activity_type !== 'user_post' ? (
-                            <div className="flex gap-4">
-                              {/* Image */}
-                              <Link
-                                to={activity.activity_type === 'character_rating' ? `/character/${activity.item_id}` : `/anime/${activity.item_id}`}
-                                className="flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
-                              >
-                                <img
-                                  src={getImageUrl(activity.item_image)}
-                                  alt={activity.item_title}
-                                  className="w-16 h-24 object-cover rounded border-2 border-transparent hover:border-[#A8E6CF] transition-all"
-                                  onError={(e) => handleImageError(e, activity.item_id)}
-                                />
-                              </Link>
-
-                              {/* Info */}
-                              <div className="flex-1 min-w-0">
-                                {/* Title */}
-                                <Link
-                                  to={activity.activity_type === 'character_rating' ? `/character/${activity.item_id}` : `/anime/${activity.item_id}`}
-                                  className="block group cursor-pointer"
-                                >
-                                  <h3 className="font-semibold text-gray-900 group-hover:text-[#737373] transition-colors mb-1 group-hover:underline">
-                                    {activity.activity_type === 'character_rating' ? (
-                                      <>
-                                        {activity.item_title}
-                                        {activity.item_title_korean && activity.item_title_korean !== activity.item_title && (
-                                          <span className="text-sm text-gray-500 ml-2">({activity.item_title_korean})</span>
-                                        )}
-                                      </>
-                                    ) : (
-                                      activity.item_title_korean || activity.item_title
-                                    )}
-                                  </h3>
-                                </Link>
-
-                                {/* Anime title for character ratings */}
-                                {activity.activity_type === 'character_rating' && activity.anime_title && (
-                                  <p className="text-xs text-gray-500 mb-2">
-                                    from:{' '}
-                                    <Link
-                                      to={`/anime/${activity.anime_id}`}
-                                      className="hover:text-[#737373] hover:underline transition-colors"
-                                    >
-                                      {activity.anime_title_korean || activity.anime_title}
-                                    </Link>
-                                  </p>
-                                )}
-
-                                {/* Rating */}
-                                {activity.rating && (
-                                  <div className="mb-2">
-                                    <StarRating rating={activity.rating} readonly size="sm" />
-                                  </div>
-                                )}
-
-                                {/* Review Content */}
-                                {activity.review_content && (
-                                  <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                                    {activity.review_content}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          ) : (
-                            // User post content
-                            <div>
-                              {activity.post_content && (
-                                <p className="text-sm text-gray-700 whitespace-pre-wrap mb-3">
-                                  {activity.post_content}
-                                </p>
-                              )}
-                            </div>
-                          )}
-
-                          {/* Like and Comment Buttons */}
-                          <div className="mt-3 flex items-center gap-6">
-                            <button
-                            onClick={() => handleToggleActivityLike(activity)}
-                            className="flex items-center gap-2 transition-all hover:scale-110"
-                            style={{
-                              color: activityLikes[getActivityKey(activity)]?.liked ? '#DC2626' : '#6B7280'
-                            }}
-                          >
-                            {activityLikes[getActivityKey(activity)]?.liked ? (
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                              </svg>
-                            ) : (
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                              </svg>
-                            )}
-                            <span className="text-sm font-medium">
-                              {language === 'ko' ? '좋아요' : 'Like'}
-                              {activityLikes[getActivityKey(activity)]?.count > 0 && (
-                                <> {activityLikes[getActivityKey(activity)].count}</>
-                              )}
-                            </span>
-                          </button>
-                          <button
-                            onClick={() => toggleComments(activity)}
-                            className="flex items-center gap-2 transition-all hover:scale-110"
-                            style={{ color: '#6B7280' }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.color = '#737373';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.color = '#6B7280';
-                            }}
-                          >
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-                            </svg>
-                            <span className="text-sm font-medium">
-                              {language === 'ko' ? '댓글 달기' : 'Comment'}
-                              {activity.comments_count > 0 && (
-                                <> {activity.comments_count}</>
-                              )}
-                            </span>
-                            </button>
-                          </div>
-
-                          {/* Comments Section */}
-                          {expandedComments.has(getActivityKey(activity)) && (
-                            <div className="mt-3 pt-3 border-t border-gray-200">
-                            {/* Comments List */}
-                            {comments[getActivityKey(activity)]?.length > 0 && (
-                              <div className="space-y-3 mb-3">
-                                {comments[getActivityKey(activity)].map((comment) => (
-                                  <div key={comment.id} className="space-y-2">
-                                    {/* Main Comment */}
-                                    <div className="flex gap-2">
-                                      {comment.avatar_url ? (
-                                        <img
-                                          src={getAvatarUrl(comment.avatar_url)}
-                                          alt={comment.display_name || comment.username}
-                                          className="w-6 h-6 rounded-full object-cover"
-                                        />
-                                      ) : (
-                                        <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: getAvatarGradient(comment.username) }}>
-                                          <span className="text-white text-[10px] font-bold">
-                                            {(comment.display_name || comment.username || '?')[0].toUpperCase()}
-                                          </span>
-                                        </div>
-                                      )}
-                                      <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2">
-                                          <Link
-                                            to={`/user/${comment.user_id}`}
-                                            className="text-xs font-medium text-gray-700 hover:text-[#737373]"
-                                          >
-                                            {comment.display_name || comment.username}
-                                          </Link>
-                                          <span className="text-[10px] text-gray-400">
-                                            {getTimeAgo(comment.created_at)}
-                                          </span>
-                                          {comment.user_id === user?.id && (
-                                            <button
-                                              onClick={() => handleDeleteComment(activity, comment.id)}
-                                              className="text-[10px] text-red-500 hover:text-red-700"
-                                            >
-                                              {language === 'ko' ? '삭제' : 'Delete'}
-                                            </button>
-                                          )}
-                                        </div>
-                                        <p className="text-xs text-gray-700 mb-1">{comment.content}</p>
-                                        <div className="flex items-center gap-3">
-                                          <button
-                                            onClick={() => handleToggleCommentLike(comment.id)}
-                                            className="flex items-center gap-1 transition-all hover:scale-110"
-                                            style={{
-                                              color: commentLikes[comment.id]?.liked ? '#DC2626' : '#9CA3AF'
-                                            }}
-                                          >
-                                            {commentLikes[comment.id]?.liked ? (
-                                              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                              </svg>
-                                            ) : (
-                                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                              </svg>
-                                            )}
-                                            {commentLikes[comment.id]?.count > 0 && (
-                                              <span className="text-xs">{commentLikes[comment.id].count}</span>
-                                            )}
-                                          </button>
-                                          <button
-                                            onClick={() => handleReplyClick(comment.id)}
-                                            className="text-[10px]"
-                                            style={{ color: '#9CA3AF' }}
-                                            onMouseEnter={(e) => e.target.style.color = '#737373'}
-                                            onMouseLeave={(e) => e.target.style.color = '#9CA3AF'}
-                                          >
-                                            {language === 'ko' ? '답글' : 'Reply'}
-                                          </button>
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    {/* Replies */}
-                                    {comment.replies && comment.replies.length > 0 && (
-                                      <div className="ml-12 space-y-2">
-                                        {comment.replies.map((reply) => (
-                                          <div key={reply.id} className="flex gap-2">
-                                            {reply.avatar_url ? (
-                                              <img
-                                                src={getAvatarUrl(reply.avatar_url)}
-                                                alt={reply.display_name || reply.username}
-                                                className="w-5 h-5 rounded-full object-cover"
-                                              />
-                                            ) : (
-                                              <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)' }}>
-                                                <span className="text-white text-[8px] font-bold">
-                                                  {(reply.display_name || reply.username || '?')[0].toUpperCase()}
-                                                </span>
-                                              </div>
-                                            )}
-                                            <div className="flex-1 min-w-0">
-                                              <div className="flex items-center gap-2">
-                                                <Link
-                                                  to={`/user/${reply.user_id}`}
-                                                  className="text-[10px] font-medium text-gray-700 hover:text-[#737373]"
-                                                >
-                                                  {reply.display_name || reply.username}
-                                                </Link>
-                                                <span className="text-[8px] text-gray-400">
-                                                  {getTimeAgo(reply.created_at)}
-                                                </span>
-                                                {reply.user_id === user?.id && (
-                                                  <button
-                                                    onClick={() => handleDeleteComment(activity, reply.id)}
-                                                    className="text-[8px] text-red-500 hover:text-red-700"
-                                                  >
-                                                    {language === 'ko' ? '삭제' : 'Delete'}
-                                                  </button>
-                                                )}
-                                              </div>
-                                              <p className="text-[10px] text-gray-700 mb-1">{reply.content}</p>
-                                              <button
-                                                onClick={() => handleToggleCommentLike(reply.id)}
-                                                className="flex items-center gap-1 transition-all hover:scale-110"
-                                                style={{
-                                                  color: commentLikes[reply.id]?.liked ? '#DC2626' : '#9CA3AF'
-                                                }}
-                                              >
-                                                {commentLikes[reply.id]?.liked ? (
-                                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                                  </svg>
-                                                ) : (
-                                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                                  </svg>
-                                                )}
-                                                {commentLikes[reply.id]?.count > 0 && (
-                                                  <span className="text-[10px]">{commentLikes[reply.id].count}</span>
-                                                )}
-                                              </button>
-                                            </div>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
-
-                                    {/* Reply Input */}
-                                    {replyingTo[comment.id] && (
-                                      <div className="ml-12 flex gap-2">
-                                        <input
-                                          type="text"
-                                          value={newCommentText[`${getActivityKey(activity)}-${comment.id}`] || ''}
-                                          onChange={(e) => setNewCommentText(prev => ({ ...prev, [`${getActivityKey(activity)}-${comment.id}`]: e.target.value }))}
-                                          onKeyPress={(e) => {
-                                            if (e.key === 'Enter') {
-                                              handleSubmitComment(activity, comment.id);
-                                            }
-                                          }}
-                                          placeholder={language === 'ko' ? '답글을 입력하세요...' : 'Write a reply...'}
-                                          className="flex-1 px-2 py-1 text-[10px] border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                          autoFocus
-                                        />
-                                        <button
-                                          onClick={() => handleSubmitComment(activity, comment.id)}
-                                          className="px-2 py-1 text-[10px] text-white rounded-lg transition-colors"
-                                          style={{ backgroundColor: '#3797F0', color: 'white', fontWeight: '600' }}
-                                          onMouseEnter={(e) => e.target.style.backgroundColor = '#1877F2'}
-                                          onMouseLeave={(e) => e.target.style.backgroundColor = '#3797F0'}
-                                        >
-                                          {language === 'ko' ? '작성' : 'Submit'}
-                                        </button>
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-
-                            {/* Comment Input */}
-                            <div className="flex gap-2">
-                              <input
-                                type="text"
-                                value={newCommentText[getActivityKey(activity)] || ''}
-                                onChange={(e) => setNewCommentText(prev => ({ ...prev, [getActivityKey(activity)]: e.target.value }))}
-                                onKeyPress={(e) => {
-                                  if (e.key === 'Enter') {
-                                    handleSubmitComment(activity);
-                                  }
-                                }}
-                                placeholder={language === 'ko' ? '댓글을 입력하세요...' : 'Write a comment...'}
-                                className="flex-1 px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
-                              />
-                              <button
-                                onClick={() => handleSubmitComment(activity)}
-                                className="px-3 py-1.5 text-xs text-white rounded-lg transition-colors"
-                                style={{ backgroundColor: '#3797F0', color: 'white', fontWeight: '600' }}
-                                onMouseEnter={(e) => e.target.style.backgroundColor = '#1877F2'}
-                                onMouseLeave={(e) => e.target.style.backgroundColor = '#3797F0'}
-                              >
-                                {language === 'ko' ? '작성' : 'Submit'}
-                              </button>
-                            </div>
-                          </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-              })}
-
-                    {userActivities.length === 0 && (
-                      <div className="text-center py-12">
-                        <p className="text-gray-600">{language === 'ko' ? '아직 활동이 없습니다.' : 'No activities yet.'}</p>
-                      </div>
-                    )}
-
-                    {/* Loading Indicator for Infinite Scroll */}
-                    {userActivities.length > 0 && hasMoreFeed && loadingMoreFeed && (
-                      <div className="text-center py-6">
-                        <div className="text-gray-600">
-                          {language === 'ko' ? '로딩 중...' : 'Loading...'}
-                        </div>
-                      </div>
-                    )}
-
-                    {userActivities.length > 0 && !hasMoreFeed && (
-                      <div className="text-center py-6 text-gray-500 text-sm">
-                        {language === 'ko' ? '모든 피드를 불러왔습니다.' : 'All activities loaded.'}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         )}
 
