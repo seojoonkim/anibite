@@ -7,6 +7,7 @@ import { activityService } from '../services/activityService';
 import { useActivities } from '../hooks/useActivity';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { getPrefetchedData } from '../hooks/usePrefetch';
 import * as ActivityUtils from '../utils/activityUtils';
 import StarRating from '../components/common/StarRating';
 import RatingWidget from '../components/anime/RatingWidget';
@@ -109,6 +110,24 @@ export default function AnimeDetail() {
     setError(null);
 
     try {
+      // Check for prefetched data first
+      const prefetched = getPrefetchedData('anime', id, user?.id);
+
+      if (prefetched) {
+        // Use prefetched data for instant display
+        if (prefetched.anime) {
+          setAnime(prefetched.anime);
+          setLoading(false);
+        }
+        if (prefetched.myRating) {
+          setMyRating(prefetched.myRating);
+        }
+        if (prefetched.myReview) {
+          processMyReview(prefetched.myReview);
+        }
+        return; // Skip API calls, data is already fresh from prefetch
+      }
+
       // 1단계: 애니메이션 기본 정보 먼저 로드하고 즉시 표시
       const animeData = await animeService.getAnimeById(id);
 

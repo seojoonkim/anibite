@@ -39,6 +39,10 @@ export default function Feed() {
   const observerRef = useRef(null);
   const loadMoreTriggerRef = useRef(null);
 
+  // Cache state
+  const [cachedActivities, setCachedActivities] = useState(null);
+  const cacheLoadedRef = useRef(false);
+
   // Use pagination hook for infinite scroll
   const {
     activities,
@@ -54,8 +58,45 @@ export default function Feed() {
     10
   );
 
+  // Load cached data on mount for instant display
+  useEffect(() => {
+    if (!cacheLoadedRef.current && feedFilter !== 'notifications' && feedFilter !== 'saved') {
+      try {
+        const cacheKey = `feed_cache_${feedFilter}`;
+        const cached = sessionStorage.getItem(cacheKey);
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          // Use cache if less than 60 seconds old
+          if (Date.now() - timestamp < 60000) {
+            setCachedActivities(data);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load cache:', err);
+      }
+      cacheLoadedRef.current = true;
+    }
+  }, [feedFilter]);
+
+  // Save activities to cache when they update
+  useEffect(() => {
+    if (activities.length > 0 && feedFilter !== 'notifications' && feedFilter !== 'saved') {
+      try {
+        const cacheKey = `feed_cache_${feedFilter}`;
+        sessionStorage.setItem(cacheKey, JSON.stringify({
+          data: activities.slice(0, 20), // Cache first 20 activities
+          timestamp: Date.now()
+        }));
+      } catch (err) {
+        console.error('Failed to save cache:', err);
+      }
+    }
+  }, [activities, feedFilter]);
+
   // Reset activities when filter changes
   useEffect(() => {
+    setCachedActivities(null);
+    cacheLoadedRef.current = false;
     resetActivities();
   }, [feedFilter, resetActivities]);
 
@@ -193,6 +234,15 @@ export default function Feed() {
         content: newPostContent.trim()
       });
       setNewPostContent('');
+
+      // Clear cache on new post
+      try {
+        sessionStorage.removeItem(`feed_cache_${feedFilter}`);
+        setCachedActivities(null);
+      } catch (err) {
+        console.error('Failed to clear cache:', err);
+      }
+
       resetActivities();
     } catch (err) {
       console.error('Failed to create post:', err);
@@ -256,11 +306,17 @@ export default function Feed() {
       const bookmarks = JSON.parse(localStorage.getItem('anipass_bookmarks') || '[]');
       return activities.filter(activity => bookmarks.includes(activity.id));
     }
+
+    // Show cached activities while loading fresh data
+    if (loading && cachedActivities && cachedActivities.length > 0) {
+      return cachedActivities;
+    }
+
     return activities;
   };
 
   const filteredActivities = getFilteredActivities();
-  const isLoading = feedFilter === 'notifications' ? notificationsLoading : loading;
+  const isLoading = feedFilter === 'notifications' ? notificationsLoading : (loading && !cachedActivities);
 
   // Edit modal handlers
   const handleEditContent = (activity, mode = 'edit') => {
@@ -338,6 +394,14 @@ export default function Feed() {
         }
       }
 
+      // Clear cache on edit
+      try {
+        sessionStorage.removeItem(`feed_cache_${feedFilter}`);
+        setCachedActivities(null);
+      } catch (err) {
+        console.error('Failed to clear cache:', err);
+      }
+
       // Refresh activities: reset and reload
       resetActivities();
       // Wait a bit for reset to complete, then reload
@@ -380,6 +444,14 @@ export default function Feed() {
 
       setShowDeleteModal(false);
       setActivityToDelete(null);
+
+      // Clear cache on delete
+      try {
+        sessionStorage.removeItem(`feed_cache_${feedFilter}`);
+        setCachedActivities(null);
+      } catch (err) {
+        console.error('Failed to clear cache:', err);
+      }
 
       // Refresh activities: reset and reload
       resetActivities();
