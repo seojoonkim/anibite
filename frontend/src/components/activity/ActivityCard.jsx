@@ -11,7 +11,7 @@
  *   onUpdate={() => refetch()}
  * />
  */
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, forwardRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
@@ -62,7 +62,7 @@ const CONTEXT_PRESETS = {
   }
 };
 
-export default function ActivityCard({
+const ActivityCard = forwardRef(({
   activity,
   context = 'feed',
   showOptions = {},
@@ -70,7 +70,7 @@ export default function ActivityCard({
   notificationData = null,  // Additional data for notification context
   onEditContent = null,  // Custom edit handler (e.g., for detail pages)
   onDeleteContent = null  // Custom delete handler (e.g., for detail pages)
-}) {
+}, ref) => {
   const { language } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -406,7 +406,7 @@ export default function ActivityCard({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 hover:shadow-[0_2px_12px_rgba(0,0,0,0.12)] transition-all">
+    <div ref={ref} className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 hover:shadow-[0_2px_12px_rgba(0,0,0,0.12)] transition-all">
       {/* Header: User Info + Activity Type + Timestamp + Menu */}
       {finalShowOptions.showUserInfo && (
         <div className="flex items-center mb-3 gap-2">
@@ -724,4 +724,8 @@ export default function ActivityCard({
       )}
     </div>
   );
-}
+});
+
+ActivityCard.displayName = 'ActivityCard';
+
+export default ActivityCard;
