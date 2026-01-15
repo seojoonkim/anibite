@@ -230,9 +230,9 @@ export default function Navbar() {
         borderBottom: '1px solid #DBDBDB'
       }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_3fr] items-center h-16 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 items-center h-16 md:gap-6">
             {/* Logo - takes same space as sidebar */}
-            <div className="flex items-center">
+            <div className="flex items-center md:col-span-1">
               <Link to="/feed" className="flex items-center gap-2 text-2xl font-bold text-black hover:opacity-60 transition-opacity group">
                 {/* AniPass Logo Icon */}
                 <div className="relative">
@@ -296,7 +296,7 @@ export default function Navbar() {
             </div>
 
             {/* Desktop Menu and Right Side - Aligned with feed content area */}
-            <div className="hidden md:flex items-center justify-between">
+            <div className="hidden md:flex items-center justify-between md:col-span-3">
               <div className="flex items-center space-x-1">
                 {menuItems.map((item) => (
                   <Link
