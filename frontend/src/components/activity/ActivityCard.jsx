@@ -381,6 +381,12 @@ export default function ActivityCard({
     }
 
     try {
+      console.log('Activity object:', activity);
+      console.log('Activity ID:', activity.id);
+      console.log('Activity item_id:', activity.item_id);
+      console.log('Activity post_id:', activity.post_id);
+      console.log('Activity user_post_id:', activity.user_post_id);
+      console.log('All activity keys:', Object.keys(activity));
       await userPostService.updatePost(activity.item_id, editPostContent);
       setShowEditModal(false);
 
