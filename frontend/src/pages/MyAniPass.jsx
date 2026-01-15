@@ -1780,7 +1780,7 @@ export default function MyAniPass() {
                             value={newPostContent}
                             onChange={(e) => setNewPostContent(e.target.value)}
                             placeholder={language === 'ko' ? '무슨 생각을 하고 계신가요?' : "What's on your mind?"}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
                             rows="3"
                           />
                           <div className="flex justify-end mt-2">
@@ -2169,7 +2169,7 @@ export default function MyAniPass() {
                                             }
                                           }}
                                           placeholder={language === 'ko' ? '답글을 입력하세요...' : 'Write a reply...'}
-                                          className="flex-1 px-2 py-1 text-[10px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                          className="flex-1 px-2 py-1 text-[10px] border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
                                           autoFocus
                                         />
                                         <button
@@ -2200,7 +2200,7 @@ export default function MyAniPass() {
                                   }
                                 }}
                                 placeholder={language === 'ko' ? '댓글을 입력하세요...' : 'Write a comment...'}
-                                className="flex-1 px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="flex-1 px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
                               />
                               <button
                                 onClick={() => handleSubmitComment(activity)}
