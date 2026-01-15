@@ -35,6 +35,31 @@ async def startup_event():
         import traceback
         traceback.print_exc()
 
+    # Debug: Log database info
+    try:
+        from config import DATABASE_PATH
+        from database import get_db
+        import os
+
+        print(f"[Startup DEBUG] DATABASE_PATH: {DATABASE_PATH}")
+        print(f"[Startup DEBUG] Database file exists: {os.path.exists(DATABASE_PATH)}")
+        if os.path.exists(DATABASE_PATH):
+            print(f"[Startup DEBUG] Database file size: {os.path.getsize(DATABASE_PATH)} bytes")
+
+        db = get_db()
+        user_posts = db.execute_query("SELECT COUNT(*) FROM user_posts")
+        activities_posts = db.execute_query("SELECT COUNT(*) FROM activities WHERE activity_type = 'user_post'")
+        print(f"[Startup DEBUG] user_posts count: {user_posts[0][0] if user_posts else 0}")
+        print(f"[Startup DEBUG] activities (user_post) count: {activities_posts[0][0] if activities_posts else 0}")
+
+        # Show recent user_posts
+        recent_posts = db.execute_query("SELECT id, user_id, created_at FROM user_posts ORDER BY created_at DESC LIMIT 3")
+        print(f"[Startup DEBUG] Recent user_posts:")
+        for post in recent_posts:
+            print(f"  - ID: {post[0]}, user_id: {post[1]}, created_at: {post[2]}")
+    except Exception as e:
+        print(f"[Startup DEBUG] Failed to log database info: {e}")
+
 # Debug: Print allowed origins on startup
 print(f"[CORS] Allowed origins: {ALLOWED_ORIGINS}")
 
