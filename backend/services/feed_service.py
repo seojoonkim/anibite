@@ -378,6 +378,11 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
 
     results = [dict_from_row(row) for row in rows]
 
+    # Debug: Log raw data from SELECT
+    for result in results:
+        if result.get('activity_type') == 'user_post':
+            print(f"[DEBUG get_user_feed SELECT] user_post from DB: item_id={result.get('item_id')}, review_id={result.get('review_id')}, activity_time={result.get('activity_time')}")
+
     # Batch load comments_count for performance
     _enrich_comments_count(results)
 
