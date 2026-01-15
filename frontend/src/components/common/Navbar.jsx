@@ -241,13 +241,13 @@ export default function Navbar() {
         marginLeft: '-5.555%'
       }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 items-center h-12 md:h-16 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 items-center h-11 md:h-16 md:gap-6">
             {/* Logo and Mobile User Menu */}
             <div className="flex items-center justify-between md:col-span-1">
-              <Link to="/feed" className="flex items-center gap-1.5 md:gap-2 text-lg md:text-2xl font-bold text-black hover:opacity-60 transition-opacity group">
+              <Link to="/feed" className="flex items-center gap-1.5 md:gap-2 text-xl md:text-2xl font-bold text-black hover:opacity-60 transition-opacity group">
                 {/* AniPass Logo Icon */}
                 <div className="relative">
-                  <svg className="w-8 h-8 md:w-11 md:h-11" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg className="w-9 h-9 md:w-11 md:h-11" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                       <linearGradient id="instagramGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" style={{ stopColor: '#833AB4' }} />
@@ -310,26 +310,26 @@ export default function Navbar() {
                 <div className="md:hidden relative" ref={mobileUserMenuRef}>
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="text-[#262626] hover:bg-gray-100 text-xs font-medium px-1.5 py-0.5 rounded-md transition-colors flex items-center gap-1.5"
+                    className="text-[#262626] hover:bg-gray-100 text-sm font-medium px-1.5 py-0.5 rounded-md transition-colors flex items-center gap-1.5"
                   >
                     {user.avatar_url ? (
                       <img
                         src={getAvatarUrl(user.avatar_url)}
                         alt={user.display_name || user.username}
-                        className="w-7 h-7 rounded-full object-cover border border-[#DBDBDB]"
+                        className="w-8 h-8 rounded-full object-cover border border-[#DBDBDB]"
                         onError={(e) => {
                           e.target.style.display = 'none';
                         }}
                       />
                     ) : (
-                      <div className="w-7 h-7 rounded-full flex items-center justify-center border border-[#DBDBDB]" style={{ backgroundColor: '#FAFAFA' }}>
-                        <span className="text-[#262626] text-xs font-bold">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center border border-[#DBDBDB]" style={{ backgroundColor: '#FAFAFA' }}>
+                        <span className="text-[#262626] text-sm font-bold">
                           {(user.display_name || user.username || '?').charAt(0).toUpperCase()}
                         </span>
                       </div>
                     )}
-                    <span className="text-xs font-medium max-w-[80px] truncate">{user.display_name || user.username}</span>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span className="text-sm font-medium max-w-[80px] truncate">{user.display_name || user.username}</span>
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
