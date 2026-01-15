@@ -20,15 +20,20 @@ class ResendVerificationRequest(BaseModel):
     email: EmailStr
 
 
-@router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 def register(user_data: UserRegister):
     """
-    회원가입
+    회원가입 - 이메일 인증 필요
 
     - **username**: 3-20자, 영문/숫자만
     - **email**: 유효한 이메일 주소
     - **password**: 최소 8자
     - **display_name**: 표시 이름 (선택)
+    - **preferred_language**: 선호 언어 (ko/en)
+
+    Returns:
+    - **message**: 회원가입 성공 메시지
+    - **email**: 등록된 이메일 (인증 링크가 전송됨)
     """
     return register_user(user_data)
 

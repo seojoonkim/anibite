@@ -12,8 +12,8 @@ from models.user import UserRegister, UserLogin, UserResponse, TokenResponse
 from services.email_service import send_verification_email
 
 
-def register_user(user_data: UserRegister) -> TokenResponse:
-    """회원가입 - 이메일 인증 없이 즉시 가입"""
+def register_user(user_data: UserRegister) -> dict:
+    """회원가입 - 이메일 인증 필요"""
 
     # 중복 확인
     existing_user = db.execute_query(
@@ -31,14 +31,20 @@ def register_user(user_data: UserRegister) -> TokenResponse:
     # 비밀번호 해싱
     hashed_password = hash_password(user_data.password)
 
-    # 사용자 생성 (이메일 인증 없이 바로 verified=1)
+    # 인증 토큰 생성 (24시간 유효)
+    verification_token = secrets.token_urlsafe(32)
+    token_expires = datetime.now() + timedelta(hours=24)
+
+    # 사용자 생성 (is_verified=0, 이메일 인증 필요)
     user_id = db.execute_insert(
         """
         INSERT INTO users (username, email, password_hash, display_name,
-                          preferred_language, is_verified, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                          preferred_language, is_verified, verification_token,
+                          verification_token_expires, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, 0, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         """,
-        (user_data.username, user_data.email, hashed_password, user_data.display_name, user_data.preferred_language)
+        (user_data.username, user_data.email, hashed_password, user_data.display_name,
+         user_data.preferred_language, verification_token, token_expires.isoformat())
     )
 
     # 사용자 통계 초기화
@@ -52,25 +58,23 @@ def register_user(user_data: UserRegister) -> TokenResponse:
         (user_id,)
     )
 
-    # 생성된 사용자 조회 (with otaku_score)
-    user_row = db.execute_query(
-        """
-        SELECT u.*, COALESCE(us.otaku_score, 0.0) as otaku_score
-        FROM users u
-        LEFT JOIN user_stats us ON u.id = us.user_id
-        WHERE u.id = ?
-        """,
-        (user_id,),
-        fetch_one=True
+    # 인증 이메일 전송
+    email_sent = send_verification_email(
+        email=user_data.email,
+        username=user_data.username,
+        verification_token=verification_token
     )
 
-    user_dict = dict_from_row(user_row)
-    user = UserResponse(**user_dict)
+    if not email_sent:
+        # 이메일 전송 실패해도 가입은 완료 (개발 환경에서는 콘솔 출력)
+        print(f"⚠️ Failed to send verification email to {user_data.email}")
 
-    # JWT 토큰 생성 및 반환
-    access_token = create_access_token(data={"sub": user.username})
-
-    return TokenResponse(access_token=access_token, user=user)
+    # 이메일 인증 안내 메시지 반환 (토큰은 반환하지 않음)
+    return {
+        "message": "Registration successful! Please check your email to verify your account.",
+        "email": user_data.email,
+        "username": user_data.username
+    }
 
 
 def login_user(login_data: UserLogin) -> TokenResponse:
@@ -101,6 +105,13 @@ def login_user(login_data: UserLogin) -> TokenResponse:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password"
+        )
+
+    # 이메일 인증 확인
+    if not user_dict.get('is_verified', False):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Please verify your email before logging in. Check your inbox for the verification link."
         )
 
     user = UserResponse(**user_dict)
