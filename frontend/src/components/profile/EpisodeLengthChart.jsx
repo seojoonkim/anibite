@@ -19,7 +19,7 @@ export default function EpisodeLengthChart({ distribution }) {
 
   return (
     <div className="bg-gradient-to-br from-white to-indigo-50/20 rounded-2xl shadow-md p-6 w-full h-full flex flex-col border border-indigo-100/40">
-      <h3 className="text-lg font-bold mb-4 bg-gradient-to-r from-[#638CCC] to-indigo-500 bg-clip-text text-transparent">에피소드 길이 선호도</h3>
+      <h3 className="text-lg font-bold mb-4 text-[#638CCC]">에피소드 길이 선호도</h3>
 
       <div className="space-y-3">
         {distribution.map((item) => {
@@ -29,7 +29,7 @@ export default function EpisodeLengthChart({ distribution }) {
           return (
             <div key={item.length_category}>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-bold bg-gradient-to-r from-[#638CCC] to-indigo-500 bg-clip-text text-transparent">
+                <span className="text-sm font-bold text-[#638CCC]">
                   {lengthNames[item.length_category] || item.length_category}
                 </span>
                 <div className="flex items-center gap-2">

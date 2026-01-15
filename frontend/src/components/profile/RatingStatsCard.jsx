@@ -53,7 +53,7 @@ export default function RatingStatsCard({ stats }) {
 
   return (
     <div className="bg-gradient-to-br from-white to-cyan-50/20 rounded-2xl shadow-md p-6 w-full h-full flex flex-col border border-cyan-100/40">
-      <h3 className="text-lg font-bold mb-4 bg-gradient-to-r from-[#638CCC] to-cyan-500 bg-clip-text text-transparent">평가 성향</h3>
+      <h3 className="text-lg font-bold mb-4 text-[#638CCC]">평가 성향</h3>
 
       <div className="space-y-4">
         {/* 평가 유형 */}
@@ -63,7 +63,7 @@ export default function RatingStatsCard({ stats }) {
               <span className="text-2xl">{tendency.icon}</span>
               <span className="text-sm text-[#638CCC] font-semibold">평가 유형</span>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-[#638CCC] to-[#8EC5FC] bg-clip-text text-transparent">{tendency.label}</span>
+            <span className="text-xl font-bold text-[#638CCC]">{tendency.label}</span>
           </div>
           <p className="text-sm text-gray-600">{tendency.desc}</p>
         </div>
@@ -73,7 +73,7 @@ export default function RatingStatsCard({ stats }) {
           {/* 관대함 지표 */}
           <div className="p-4 rounded-xl bg-gradient-to-br from-[#638CCC]/10 to-[#8EC5FC]/10 border border-[#638CCC]/20">
             <div className="text-xs text-[#638CCC] font-semibold mb-1">관대함</div>
-            <div className="text-2xl font-bold mb-2 bg-gradient-to-r from-[#638CCC] to-[#8EC5FC] bg-clip-text text-transparent">{generosityScore.toFixed(0)}%</div>
+            <div className="text-2xl font-bold mb-2 text-[#638CCC]">{generosityScore.toFixed(0)}%</div>
             <div className="w-full bg-white rounded-full h-2 overflow-hidden">
               <div
                 className="h-2 rounded-full transition-all shadow-sm"
@@ -86,7 +86,7 @@ export default function RatingStatsCard({ stats }) {
           {/* 일관성 지표 */}
           <div className="p-4 rounded-xl bg-gradient-to-br from-[#8EC5FC]/10 to-[#90B2E4]/10 border border-[#8EC5FC]/20">
             <div className="text-xs text-[#638CCC] font-semibold mb-1">일관성</div>
-            <div className="text-2xl font-bold mb-2 bg-gradient-to-r from-[#8EC5FC] to-[#90B2E4] bg-clip-text text-transparent">{consistencyScore.toFixed(0)}%</div>
+            <div className="text-2xl font-bold mb-2 text-[#8EC5FC]">{consistencyScore.toFixed(0)}%</div>
             <div className="w-full bg-white rounded-full h-2 overflow-hidden">
               <div
                 className="h-2 rounded-full transition-all shadow-sm"

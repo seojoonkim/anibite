@@ -28,7 +28,7 @@ export default function SeasonStats({ seasons }) {
 
   return (
     <div className="bg-gradient-to-br from-white to-emerald-50/20 rounded-2xl shadow-md p-6 w-full h-full flex flex-col border border-emerald-100/40">
-      <h3 className="text-lg font-bold mb-4 bg-gradient-to-r from-[#638CCC] to-emerald-500 bg-clip-text text-transparent">시즌 선호도</h3>
+      <h3 className="text-lg font-bold mb-4 text-[#638CCC]">시즌 선호도</h3>
 
       <div className="space-y-3">
         {seasons.map((item) => {
@@ -40,7 +40,7 @@ export default function SeasonStats({ seasons }) {
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">{seasonEmojis[item.season]}</span>
-                  <span className="text-sm font-bold bg-gradient-to-r from-[#638CCC] to-emerald-500 bg-clip-text text-transparent">
+                  <span className="text-sm font-bold text-[#638CCC]">
                     {seasonNames[item.season] || item.season}
                   </span>
                 </div>

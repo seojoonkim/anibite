@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -167,7 +167,7 @@ export default function MyAniPass() {
     }
     loadData();
     loadFollowData();
-  }, [activeTab, userId]);
+  }, [activeTab, userId, loadData]);
 
   const loadFollowData = async () => {
     try {
@@ -223,8 +223,8 @@ export default function MyAniPass() {
     }
   };
 
-  // 애니 서브메뉴 필터링
-  const filterAnimeBySubMenu = (animeData, submenu) => {
+  // 애니 서브메뉴 필터링 (메모이제이션으로 성능 최적화)
+  const filterAnimeBySubMenu = useCallback((animeData, submenu) => {
     let filtered = [];
 
     if (submenu === 'all') {
@@ -248,10 +248,10 @@ export default function MyAniPass() {
     }
 
     setDisplayedAnime(filtered);
-  };
+  }, []);
 
-  // 캐릭터 서브메뉴 필터링
-  const filterCharactersBySubMenu = (charactersData, submenu) => {
+  // 캐릭터 서브메뉴 필터링 (메모이제이션으로 성능 최적화)
+  const filterCharactersBySubMenu = useCallback((charactersData, submenu) => {
     let filtered = [];
 
     if (submenu === 'all') {
@@ -276,22 +276,22 @@ export default function MyAniPass() {
     }
 
     setDisplayedCharacters(filtered);
-  };
+  }, []);
 
   // 서브메뉴 변경 시 필터링
   useEffect(() => {
     if (activeTab === 'anime' && allAnime.length > 0) {
       filterAnimeBySubMenu(allAnime, animeSubMenu);
     }
-  }, [animeSubMenu, allAnime]);
+  }, [animeSubMenu, allAnime, activeTab, filterAnimeBySubMenu]);
 
   useEffect(() => {
     if (activeTab === 'character' && allCharacters.length > 0) {
       filterCharactersBySubMenu(allCharacters, characterSubMenu);
     }
-  }, [characterSubMenu, allCharacters]);
+  }, [characterSubMenu, allCharacters, activeTab, filterCharactersBySubMenu]);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       // 다른 사용자의 프로필을 볼 때는 anipass 탭은 표시 안함
       if (!isOwnProfile && activeTab === 'anipass') {
@@ -473,7 +473,7 @@ export default function MyAniPass() {
       setLoading(false);
       setTabLoading(false);
     }
-  };
+  }, [isOwnProfile, activeTab, loadedTabs, statsLoaded, profileUser, userId, user, filterAnimeBySubMenu, animeSubMenu, filterCharactersBySubMenu, characterSubMenu]);
 
   const formatWatchTime = (minutes) => {
     if (!minutes) return '0시간';
@@ -1191,7 +1191,7 @@ export default function MyAniPass() {
                   <div className="w-full">
                     {stats && (
                       <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 w-full h-full flex flex-col border border-blue-100/50">
-                        <h3 className="text-lg font-bold mb-6 bg-gradient-to-r from-[#638CCC] to-[#8EC5FC] bg-clip-text text-transparent">{language === 'ko' ? '통계' : 'Statistics'}</h3>
+                        <h3 className="text-lg font-bold mb-6 text-[#638CCC]">{language === 'ko' ? '통계' : 'Statistics'}</h3>
                         <div className="space-y-3 flex-1">
                           <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-[#8EC5FC]/10 to-[#638CCC]/10 border border-[#8EC5FC]/30 hover:shadow-md transition-all duration-300">
                             <div className="flex items-center gap-3">
@@ -1200,7 +1200,7 @@ export default function MyAniPass() {
                               </div>
                               <div className="flex-1">
                                 <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '평가한 애니' : 'Rated Anime'}</div>
-                                <div className="text-2xl font-bold bg-gradient-to-r from-[#638CCC] to-[#8EC5FC] bg-clip-text text-transparent">
+                                <div className="text-2xl font-bold text-[#638CCC]">
                                   {stats.total_rated || 0}
                                 </div>
                               </div>
@@ -1213,7 +1213,7 @@ export default function MyAniPass() {
                               </div>
                               <div className="flex-1">
                                 <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '보고싶어요' : 'Watchlist'}</div>
-                                <div className="text-2xl font-bold bg-gradient-to-r from-[#638CCC] to-[#90B2E4] bg-clip-text text-transparent">
+                                <div className="text-2xl font-bold text-[#638CCC]">
                                   {stats.total_want_to_watch || 0}
                                 </div>
                               </div>
@@ -1226,7 +1226,7 @@ export default function MyAniPass() {
                               </div>
                               <div className="flex-1">
                                 <div className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-0.5">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</div>
-                                <div className="text-2xl font-bold bg-gradient-to-r from-amber-600 to-yellow-500 bg-clip-text text-transparent">
+                                <div className="text-2xl font-bold text-amber-600">
                                   {stats.average_rating ? `★ ${stats.average_rating.toFixed(1)}` : '-'}
                                 </div>
                               </div>
@@ -1239,7 +1239,7 @@ export default function MyAniPass() {
                               </div>
                               <div className="flex-1">
                                 <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '시청 시간' : 'Watch Time'}</div>
-                                <div className="text-2xl font-bold bg-gradient-to-r from-[#638CCC] to-purple-500 bg-clip-text text-transparent">
+                                <div className="text-2xl font-bold text-[#638CCC]">
                                   {formatWatchTime(watchTime?.total_minutes)}
                                 </div>
                               </div>

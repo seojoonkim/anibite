@@ -7,7 +7,7 @@ export default function GenreCombinationChart({ combinations }) {
 
   return (
     <div className="bg-gradient-to-br from-white to-violet-50/20 rounded-2xl shadow-md p-6 w-full h-full flex flex-col border border-violet-100/40">
-      <h3 className="text-lg font-bold mb-4 bg-gradient-to-r from-[#638CCC] to-violet-500 bg-clip-text text-transparent">좋아하는 장르 조합 Top 10</h3>
+      <h3 className="text-lg font-bold mb-4 text-[#638CCC]">좋아하는 장르 조합 Top 10</h3>
 
       <div className="space-y-2.5">
         {combinations.map((combo, index) => {
@@ -19,9 +19,9 @@ export default function GenreCombinationChart({ combinations }) {
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <span className="text-xs font-bold text-[#8EC5FC] w-5">#{index + 1}</span>
                   <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                    <span className="text-sm font-bold bg-gradient-to-r from-[#8EC5FC] to-[#638CCC] bg-clip-text text-transparent">{combo.genre1}</span>
+                    <span className="text-sm font-bold text-[#8EC5FC]">{combo.genre1}</span>
                     <span className="text-xs text-gray-400">+</span>
-                    <span className="text-sm font-bold bg-gradient-to-r from-[#638CCC] to-[#90B2E4] bg-clip-text text-transparent">{combo.genre2}</span>
+                    <span className="text-sm font-bold text-[#638CCC]">{combo.genre2}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
