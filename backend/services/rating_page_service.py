@@ -3,6 +3,7 @@ Rating Page Service - Ultra-optimized queries for rating pages
 평가 페이지 전용 초고속 쿼리 (목표: 0.1초 이내)
 """
 from typing import List, Dict
+import random
 from database import db, dict_from_row
 
 
@@ -14,11 +15,14 @@ def get_anime_for_rating(user_id: int, limit: int = 50, offset: int = 0) -> List
     - 서브쿼리 0개
     - LEFT JOIN으로 user_rating_status만 확인
     - site stats 제거 (불필요)
-    - 가중치 랜덤 정렬: 인기도 기반 + 랜덤 변동 (대체로 인기작이 앞에)
+    - 가중치 랜덤 정렬: 인기도 기반, Python에서 랜덤 섞기
     - 인덱스 활용
 
     목표: 0.1초 이내
     """
+
+    # Fetch more items than needed (3x) for randomization
+    fetch_limit = limit * 3
 
     rows = db.execute_query(
         """
@@ -33,17 +37,45 @@ def get_anime_for_rating(user_id: int, limit: int = 50, offset: int = 0) -> List
             a.season,
             a.season_year,
             a.average_score,
+            a.popularity,
             ur.status as user_rating_status
         FROM anime a
         LEFT JOIN user_ratings ur ON a.id = ur.anime_id AND ur.user_id = ?
         WHERE ur.id IS NULL OR ur.status = 'WANT_TO_WATCH'
-        ORDER BY (COALESCE(a.popularity, 0) * 1.0 / 10000 + RANDOM() * 0.2) DESC
-        LIMIT ? OFFSET ?
+        ORDER BY COALESCE(a.popularity, 0) DESC
+        LIMIT ?
         """,
-        (user_id, limit, offset)
+        (user_id, fetch_limit)
     )
 
-    return [dict_from_row(row) for row in rows]
+    items = [dict_from_row(row) for row in rows]
+
+    # Weighted random: shuffle within popularity tiers
+    # Top 30%: high popularity items
+    # Middle 40%: medium popularity items
+    # Bottom 30%: lower popularity items
+    if len(items) > limit:
+        tier_size = len(items) // 3
+        top_tier = items[:tier_size]
+        mid_tier = items[tier_size:tier_size*2]
+        low_tier = items[tier_size*2:]
+
+        # Shuffle each tier
+        random.shuffle(top_tier)
+        random.shuffle(mid_tier)
+        random.shuffle(low_tier)
+
+        # Take from each tier proportionally
+        top_count = int(limit * 0.5)  # 50% from top
+        mid_count = int(limit * 0.3)  # 30% from mid
+        low_count = limit - top_count - mid_count  # 20% from low
+
+        result = top_tier[:top_count] + mid_tier[:mid_count] + low_tier[:low_count]
+        random.shuffle(result)  # Final shuffle
+        return result
+    else:
+        random.shuffle(items)
+        return items
 
 
 def get_characters_for_rating(user_id: int, limit: int = 50, offset: int = 0) -> List[Dict]:
@@ -54,11 +86,14 @@ def get_characters_for_rating(user_id: int, limit: int = 50, offset: int = 0) ->
     - 단일 쿼리로 단순화
     - CTE 제거
     - 평가한 애니의 캐릭터 중 미평가만
-    - 가중치 랜덤 정렬: 인기도 기반 + 랜덤 변동 (대체로 인기 캐릭터가 앞에)
+    - 가중치 랜덤 정렬: 인기도 기반, Python에서 랜덤 섞기
     - 인덱스 활용
 
     목표: 0.1초 이내
     """
+
+    # Fetch more items than needed (3x) for randomization
+    fetch_limit = limit * 3
 
     rows = db.execute_query(
         """
@@ -85,13 +120,35 @@ def get_characters_for_rating(user_id: int, limit: int = 50, offset: int = 0) ->
             AND c.name_full NOT LIKE '%Extra%'
             AND c.name_full NOT LIKE '%Background%'
         GROUP BY c.id
-        ORDER BY (c.favourites * 1.0 / 1000 + RANDOM() * 0.2) DESC
-        LIMIT ? OFFSET ?
+        ORDER BY COALESCE(c.favourites, 0) DESC
+        LIMIT ?
         """,
-        (user_id, user_id, limit, offset)
+        (user_id, user_id, fetch_limit)
     )
 
-    return [dict_from_row(row) for row in rows]
+    items = [dict_from_row(row) for row in rows]
+
+    # Weighted random: shuffle within popularity tiers
+    if len(items) > limit:
+        tier_size = len(items) // 3
+        top_tier = items[:tier_size]
+        mid_tier = items[tier_size:tier_size*2]
+        low_tier = items[tier_size*2:]
+
+        random.shuffle(top_tier)
+        random.shuffle(mid_tier)
+        random.shuffle(low_tier)
+
+        top_count = int(limit * 0.5)
+        mid_count = int(limit * 0.3)
+        low_count = limit - top_count - mid_count
+
+        result = top_tier[:top_count] + mid_tier[:mid_count] + low_tier[:low_count]
+        random.shuffle(result)
+        return result
+    else:
+        random.shuffle(items)
+        return items
 
 
 def get_anime_for_rating_stats(user_id: int) -> Dict:
@@ -186,58 +243,55 @@ def get_items_for_review_writing(user_id: int, limit: int = 50) -> List[Dict]:
     - activities 테이블 사용 (이미 denormalized)
     - UNION으로 애니+캐릭터 한번에
     - 리뷰 없는 항목만 (review_content IS NULL OR = '')
-    - popularity 기반 정렬 + 랜덤성 내장
+    - Python에서 랜덤 섞기
     - 단일 쿼리로 2개 API 호출 제거
     """
 
     rows = db.execute_query(
         """
-        WITH combined AS (
-            SELECT
-                'anime' as type,
-                item_id,
-                user_id,
-                rating,
-                activity_time as updated_at,
-                item_title,
-                item_title_korean,
-                item_image,
-                item_year,
-                NULL as anime_id,
-                NULL as anime_title,
-                NULL as anime_title_korean
-            FROM activities
-            WHERE user_id = ? AND activity_type = 'anime_rating'
-            AND (review_content IS NULL OR review_content = '')
+        SELECT
+            'anime' as type,
+            item_id,
+            user_id,
+            rating,
+            activity_time as updated_at,
+            item_title,
+            item_title_korean,
+            item_image,
+            item_year,
+            NULL as anime_id,
+            NULL as anime_title,
+            NULL as anime_title_korean
+        FROM activities
+        WHERE user_id = ? AND activity_type = 'anime_rating'
+        AND (review_content IS NULL OR review_content = '')
 
-            UNION ALL
+        UNION ALL
 
-            SELECT
-                'character' as type,
-                item_id,
-                user_id,
-                rating,
-                activity_time as updated_at,
-                item_title,
-                item_title_korean,
-                item_image,
-                NULL as item_year,
-                anime_id,
-                anime_title,
-                anime_title_korean
-            FROM activities
-            WHERE user_id = ? AND activity_type = 'character_rating'
-            AND (review_content IS NULL OR review_content = '')
-        )
-        SELECT *
-        FROM combined
-        ORDER BY RANDOM() DESC, updated_at DESC
-        LIMIT ?
+        SELECT
+            'character' as type,
+            item_id,
+            user_id,
+            rating,
+            activity_time as updated_at,
+            item_title,
+            item_title_korean,
+            item_image,
+            NULL as item_year,
+            anime_id,
+            anime_title,
+            anime_title_korean
+        FROM activities
+        WHERE user_id = ? AND activity_type = 'character_rating'
+        AND (review_content IS NULL OR review_content = '')
+        ORDER BY updated_at DESC
         """,
-        (user_id, user_id, limit)
+        (user_id, user_id)
     )
 
-    return [dict_from_row(row) for row in rows]
+    items = [dict_from_row(row) for row in rows]
+    random.shuffle(items)
+    return items[:limit]
 
 
 def get_review_writing_stats(user_id: int) -> Dict:
