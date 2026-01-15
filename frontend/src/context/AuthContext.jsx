@@ -93,14 +93,30 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await authService.register(userData);
 
-      // User is automatically verified and logged in
-      // Set user's preferred language
-      if (data.user.preferred_language) {
-        localStorage.setItem('language', data.user.preferred_language);
-        window.location.reload(); // Reload to apply language change
+      // New registration flow: Email verification required
+      // Backend returns { message, email, username } instead of { access_token, user }
+      if (data.message && data.email) {
+        // Registration successful, but email verification needed
+        return {
+          success: true,
+          requiresVerification: true,
+          email: data.email,
+          username: data.username,
+          message: data.message
+        };
       }
-      setUser(data.user);
-      return { success: true, user: data.user };
+
+      // Legacy: User is automatically verified and logged in (shouldn't happen anymore)
+      if (data.user) {
+        if (data.user.preferred_language) {
+          localStorage.setItem('language', data.user.preferred_language);
+          window.location.reload();
+        }
+        setUser(data.user);
+        return { success: true, user: data.user };
+      }
+
+      return { success: false, error: 'Unknown registration response' };
     } catch (error) {
       console.error('Register error:', error);
       return {
