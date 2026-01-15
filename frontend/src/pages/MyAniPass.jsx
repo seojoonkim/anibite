@@ -157,7 +157,7 @@ export default function MyAniPass() {
       }
     });
     if (node) observer.current.observe(node);
-  }, [loadingMoreFeed, hasMoreFeed]);
+  }, [loadingMoreFeed, hasMoreFeed, loadMoreFeed]);
 
   // Update URL when activeTab changes
   const changeTab = useCallback((newTab) => {
@@ -756,7 +756,7 @@ export default function MyAniPass() {
     }
   };
 
-  const loadMoreFeed = async () => {
+  const loadMoreFeed = useCallback(async () => {
     if (loadingMoreFeed || !hasMoreFeed) return;
 
     try {
@@ -790,7 +790,7 @@ export default function MyAniPass() {
     } finally {
       setLoadingMoreFeed(false);
     }
-  };
+  }, [loadingMoreFeed, hasMoreFeed, userId, user?.id, feedOffset]);
 
   const loadComments = async (activity) => {
     try {
