@@ -40,15 +40,66 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500">
-      <div className="bg-white p-8 rounded-2xl shadow-2xl w-96">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            AniPass
-          </h1>
-          <p className="text-gray-600">당신의 애니메이션 여정</p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="bg-white p-8 rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 w-full max-w-md mx-4">
+        {/* Logo */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            {/* AniPass Logo Icon */}
+            <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="instagramGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{ stopColor: '#833AB4' }} />
+                  <stop offset="40%" style={{ stopColor: '#E1306C' }} />
+                  <stop offset="70%" style={{ stopColor: '#F77737' }} />
+                  <stop offset="100%" style={{ stopColor: '#FCAF45' }} />
+                </linearGradient>
+              </defs>
+              {/* Card Background with gradient */}
+              <rect x="2" y="6" width="40" height="32" rx="4" fill="url(#instagramGradient)" />
+
+              {/* Border */}
+              <rect x="2" y="6" width="40" height="32" rx="4" stroke="white" strokeWidth="1.5" opacity="0.4" />
+
+              {/* Letter A - Bubble/Rounded Style */}
+              {/* Left side - very rounded */}
+              <path
+                d="M 10 35 Q 12 34 14 31 Q 16 27 17 24 Q 18 20 19 17 Q 20 14 22 12"
+                stroke="white"
+                strokeWidth="5"
+                strokeLinecap="round"
+                fill="none"
+              />
+              {/* Right side - very rounded */}
+              <path
+                d="M 22 12 Q 24 14 25 17 Q 26 20 27 24 Q 28 27 30 31 Q 32 34 34 35"
+                stroke="white"
+                strokeWidth="5"
+                strokeLinecap="round"
+                fill="none"
+              />
+              {/* Cross bar - bubble style */}
+              <ellipse
+                cx="22" cy="26"
+                rx="8" ry="3"
+                fill="white"
+              />
+
+              {/* Star Icon - Simple & Cute */}
+              <path
+                d="M 22 4.5 L 24.5 10 L 30 11 L 26 15 L 27 20.5 L 22 17.5 L 17 20.5 L 18 15 L 14 11 L 19.5 10 Z"
+                fill="#FCAF45"
+                stroke="white"
+                strokeWidth="1.2"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <h1 className="text-3xl font-bold text-gray-900">AniPass</h1>
+          </div>
+          <p className="text-gray-600 text-center">당신의 애니메이션 여정</p>
         </div>
-        <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">로그인</h2>
+
+        <h2 className="text-xl font-semibold text-center mb-6 text-gray-800">로그인</h2>
 
         {error && (
           <div className={`px-4 py-3 rounded mb-4 ${
@@ -69,8 +120,8 @@ export default function Login() {
         )}
 
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+          <div className="mb-5">
+            <label className="block text-gray-700 text-sm font-semibold mb-2">
               {language === 'ko' ? '아이디 또는 이메일' : 'ID or Email'}
             </label>
             <input
@@ -78,16 +129,16 @@ export default function Login() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder={language === 'ko' ? '아이디 또는 이메일을 입력하세요' : 'Enter your ID or email'}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
               required
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1.5">
               {language === 'ko' ? '회원가입 시 입력한 아이디 또는 이메일로 로그인할 수 있습니다' : 'You can login with your ID or email'}
             </p>
           </div>
 
           <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-gray-700 text-sm font-semibold mb-2">
               {language === 'ko' ? '비밀번호' : 'Password'}
             </label>
             <input
@@ -95,7 +146,7 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={language === 'ko' ? '비밀번호를 입력하세요' : 'Enter your password'}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
               required
             />
           </div>
@@ -103,15 +154,22 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none disabled:opacity-50"
+            className="w-full text-white font-semibold py-3 px-4 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+            style={{ backgroundColor: '#3797F0' }}
+            onMouseEnter={(e) => {
+              if (!loading) e.target.style.backgroundColor = '#2378D5';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#3797F0';
+            }}
           >
             {loading ? (language === 'ko' ? '로그인 중...' : 'Logging in...') : (language === 'ko' ? '로그인' : 'Login')}
           </button>
         </form>
 
-        <p className="text-center mt-4 text-gray-600">
+        <p className="text-center mt-6 text-gray-600 text-sm">
           {language === 'ko' ? '계정이 없으신가요?' : "Don't have an account?"}{' '}
-          <Link to="/register" className="text-blue-500 hover:text-[#364F6B]">
+          <Link to="/register" className="font-semibold hover:underline" style={{ color: '#3797F0' }}>
             {language === 'ko' ? '회원가입' : 'Register'}
           </Link>
         </p>
