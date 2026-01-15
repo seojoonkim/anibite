@@ -792,7 +792,7 @@ export default function MyAniPass() {
       }
     });
     if (node) observer.current.observe(node);
-  }, [loadingMoreFeed, hasMoreFeed, loadMoreFeed]);
+  }, [loadingMoreFeed, hasMoreFeed]);
 
   const loadComments = async (activity) => {
     try {
