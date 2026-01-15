@@ -201,42 +201,10 @@ export default function RateCharacters() {
     return character.my_rating || 0;
   };
 
-  // Filter and sort characters with useMemo for performance
+  // Don't filter - keep all characters including rated ones (they'll show with visual feedback)
   const filteredCharacters = useMemo(() => {
-    return characters.filter(character => {
-      const status = characterStatuses[character.id];
-
-      // Exclude rated characters
-      if (character.my_rating && character.my_rating > 0) {
-        return false;
-      }
-
-      // Always exclude NOT_INTERESTED
-      if (status === 'NOT_INTERESTED') {
-        return false;
-      }
-
-      // Show WANT_TO_KNOW with 5% probability
-      if (status === 'WANT_TO_KNOW') {
-        // Use character ID as seed for consistent randomness
-        const seed = character.id % 20;
-        return seed === 0; // 5% chance
-      }
-
-      // Show all other characters
-      return true;
-    }).sort((a, b) => {
-      // Sort by popularity (favorites) with some randomness
-      const popularityA = (a.favorites || 0) * 0.7;
-      const popularityB = (b.favorites || 0) * 0.7;
-
-      // Add deterministic random factor based on character ID
-      const randomA = (a.id % 1000) * 0.3;
-      const randomB = (b.id % 1000) * 0.3;
-
-      return (popularityB + randomB) - (popularityA + randomA);
-    });
-  }, [characters, characterStatuses]);
+    return characters;
+  }, [characters]);
 
   return (
     <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
@@ -294,13 +262,18 @@ export default function RateCharacters() {
           </div>
         ) : filteredCharacters.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {filteredCharacters.map((character) => (
+            {filteredCharacters.map((character) => {
+              const hasRated = character.my_rating && character.my_rating > 0;
+              const status = characterStatuses[character.id];
+              const isCompleted = hasRated || status === 'WANT_TO_KNOW' || status === 'NOT_INTERESTED';
+
+              return (
               <div
                 key={character.id}
                 ref={(el) => {
                   if (el) cardRefs.current[character.id] = el;
                 }}
-                className={`${getCardBackgroundColor(character.id)} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-300`}
+                className={`${getCardBackgroundColor(character.id)} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-300 ${isCompleted ? 'opacity-60' : 'opacity-100'}`}
                 onMouseEnter={() => setHoveredCharacter(character.id)}
                 onMouseLeave={() => setHoveredCharacter(null)}
               >
@@ -337,13 +310,17 @@ export default function RateCharacters() {
                   )}
 
                   {/* Status Badge */}
-                  {characterStatuses[character.id] && (
-                    <div className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold text-white ${
-                      characterStatuses[character.id] === 'WANT_TO_KNOW'
-                        ? 'bg-blue-600'
-                        : 'bg-gray-600'
+                  {(hasRated || characterStatuses[character.id]) && (
+                    <div className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold text-white shadow-lg ${
+                      hasRated
+                        ? 'bg-green-500'
+                        : characterStatuses[character.id] === 'WANT_TO_KNOW'
+                        ? 'bg-blue-500'
+                        : 'bg-gray-500'
                     }`}>
-                      {characterStatuses[character.id] === 'WANT_TO_KNOW'
+                      {hasRated
+                        ? (language === 'ko' ? '평가완료' : 'Rated')
+                        : characterStatuses[character.id] === 'WANT_TO_KNOW'
                         ? (language === 'ko' ? '알고싶어요' : 'Want to Know')
                         : (language === 'ko' ? '관심없어요' : 'Not Interested')}
                     </div>
@@ -482,7 +459,8 @@ export default function RateCharacters() {
 
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
         ) : (
           <div className="text-center py-12">
