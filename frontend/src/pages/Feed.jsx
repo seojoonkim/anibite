@@ -430,7 +430,7 @@ export default function Feed() {
 
       if (isUserPost) {
         // 일반 포스트 삭제
-        await userPostService.deletePost(activity.id);
+        await userPostService.deletePost(activity.review_id);
       } else if (deleteType === 'review_only' && hasReview) {
         // 리뷰만 삭제 (별점은 유지)
         if (isAnime) {
