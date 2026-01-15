@@ -185,7 +185,7 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
                 u.display_name,
                 u.avatar_url,
                 COALESCE(us.otaku_score, 0) as otaku_score,
-                up.id as item_id,
+                NULL as item_id,
                 NULL as item_title,
                 NULL as item_title_korean,
                 NULL as item_image,
@@ -195,8 +195,8 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
                 NULL as anime_title,
                 NULL as anime_title_korean,
                 NULL as anime_id,
-                NULL as review_id,
-                NULL as review_content,
+                up.id as review_id,
+                up.content as review_content,
                 up.content as post_content,
                 0 as comments_count
             FROM user_posts up
@@ -226,7 +226,7 @@ def get_global_feed(limit: int = 50, offset: int = 0) -> List[Dict]:
     """
 
     # activities 테이블에서 직접 조회
-    # Note: activities 테이블에는 review_id, post_content 컬럼이 없음
+    # Note: For user_post, item_id contains the post ID
     rows = db.execute_query(
         """
         SELECT
@@ -246,9 +246,12 @@ def get_global_feed(limit: int = 50, offset: int = 0) -> List[Dict]:
             anime_title,
             anime_title_korean,
             anime_id,
-            NULL as review_id,
+            CASE
+                WHEN activity_type = 'user_post' THEN item_id
+                ELSE NULL
+            END as review_id,
             review_content,
-            NULL as post_content,
+            review_content as post_content,
             0 as comments_count
         FROM activities
         ORDER BY activity_time DESC
@@ -338,7 +341,7 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
     """
 
     # activities 테이블에서 user_id로 필터링
-    # Note: activities 테이블에는 review_id, post_content 컬럼이 없음
+    # Note: For user_post, item_id contains the post ID
     rows = db.execute_query(
         """
         SELECT
@@ -358,9 +361,12 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
             anime_title,
             anime_title_korean,
             anime_id,
-            NULL as review_id,
+            CASE
+                WHEN activity_type = 'user_post' THEN item_id
+                ELSE NULL
+            END as review_id,
             review_content,
-            NULL as post_content,
+            review_content as post_content,
             0 as comments_count
         FROM activities
         WHERE user_id = ?
