@@ -37,7 +37,7 @@ export default function Leaderboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
+      <div className="min-h-screen pt-16 bg-transparent">
         <div className="flex justify-center items-center h-screen">
           <div className="text-xl text-gray-600">{language === 'ko' ? '로딩 중...' : 'Loading...'}</div>
         </div>
@@ -46,7 +46,7 @@ export default function Leaderboard() {
   }
 
   return (
-    <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
+    <div className="min-h-screen pt-16 bg-transparent">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden">

@@ -45,7 +45,7 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
+      <div className="min-h-screen pt-16 bg-transparent">
         <Navbar />
         <div className="flex justify-center items-center h-screen">
           <div className="text-xl text-gray-600">로딩 중...</div>
@@ -64,7 +64,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
+    <div className="min-h-screen pt-16 bg-transparent">
       <Navbar />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
