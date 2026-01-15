@@ -18,25 +18,22 @@ export default function OtakuMeter({ score }) {
 
   return (
     <>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 w-full h-full flex flex-col">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">애니패스 등급</h3>
+      <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-6 w-full h-full flex flex-col">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-base font-semibold text-gray-900">애니패스 등급</h3>
           <button
             onClick={() => setShowRoadmap(true)}
-            className="text-xs font-medium"
-            style={{ color: '#8EC5FC' }}
-            onMouseEnter={(e) => e.target.style.color = '#638CCC'}
-            onMouseLeave={(e) => e.target.style.color = '#8EC5FC'}
+            className="text-sm font-medium text-[#3797F0] hover:text-[#2a7dc4] transition-colors"
           >
             자세히 보기
           </button>
         </div>
 
         {/* Current Level Info */}
-        <div className="mb-4">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="mb-5">
+          <div className="flex items-center gap-3">
             <span
-              className="text-4xl font-bold"
+              className="text-3xl"
               style={{
                 background: levelInfo.gradient,
                 WebkitBackgroundClip: 'text',
@@ -46,10 +43,10 @@ export default function OtakuMeter({ score }) {
             >
               {levelInfo.icon}
             </span>
-            <div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold" style={{ color: levelInfo.color }}>{levelInfo.level}</span>
-                <span className="text-sm text-gray-500">
+            <div className="flex-1">
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-xl font-bold" style={{ color: levelInfo.color }}>{levelInfo.level}</span>
+                <span className="text-xs text-gray-500">
                   ({levelInfo.rank}/{levelInfo.total} 등급)
                 </span>
               </div>
@@ -62,12 +59,12 @@ export default function OtakuMeter({ score }) {
 
         {/* Progress to Next Level */}
         {levelInfo.nextLevel && (
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-2 text-sm">
-              <span className="text-gray-600 flex items-center gap-1">
+          <div className="mb-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-600 flex items-center gap-1.5">
                 다음 등급:
                 <span
-                  className="font-bold"
+                  className="text-base font-bold"
                   style={{
                     background: levels[levelInfo.rank]?.gradient || levelInfo.gradient,
                     WebkitBackgroundClip: 'text',
@@ -77,31 +74,31 @@ export default function OtakuMeter({ score }) {
                 >
                   {levelInfo.nextIcon}
                 </span>
-                {levelInfo.nextLevel}
+                <span className="font-medium text-gray-900">{levelInfo.nextLevel}</span>
               </span>
-              <span className="font-medium text-gray-900">
+              <span className="text-sm font-semibold text-gray-900">
                 {Math.max(0, levelInfo.nextThreshold - score).toFixed(0)}점 남음
               </span>
             </div>
-            <div className="w-full bg-gray-100 rounded-full h-2">
+            <div className="w-full bg-gray-100 rounded-full h-2.5">
               <div
-                className="h-2 rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(progressToNext, 100)}%`, backgroundColor: '#8EC5FC' }}
+                className="h-2.5 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(progressToNext, 100)}%`, backgroundColor: '#3797F0' }}
               />
             </div>
           </div>
         )}
 
         {levelInfo.nextLevel === null && (
-          <div className="mb-4 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg">
+          <div className="mb-5 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg">
             <p className="text-sm font-medium text-yellow-900">🎉 최고 등급 달성!</p>
           </div>
         )}
 
         {/* Calculation info */}
-        <div className="pt-4 border-t border-gray-100">
-          <p className="text-xs font-medium text-gray-700 mb-2">점수 계산</p>
-          <div className="text-xs text-gray-500 space-y-1">
+        <div className="pt-4 border-t border-gray-200 mt-auto">
+          <p className="text-xs font-semibold text-gray-700 mb-2">점수 계산</p>
+          <div className="text-xs text-gray-600 space-y-1">
             <p>• 애니 평가 1개 = 2점</p>
             <p>• 캐릭터 평가 1개 = 1점</p>
             <p>• 리뷰 1개 = 5점</p>
