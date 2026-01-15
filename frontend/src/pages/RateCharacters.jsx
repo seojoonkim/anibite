@@ -280,7 +280,7 @@ export default function RateCharacters() {
 
         {/* Character Grid */}
         {loading && characters.length === 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
             {/* Skeleton cards during initial load */}
             {Array.from({ length: 10 }).map((_, index) => (
               <div key={`skeleton-${index}`} className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden animate-pulse">
@@ -296,7 +296,7 @@ export default function RateCharacters() {
             ))}
           </div>
         ) : filteredCharacters.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
             {filteredCharacters.map((character) => {
               const hasRated = character.my_rating && character.my_rating > 0;
               const status = characterStatuses[character.id];
