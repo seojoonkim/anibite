@@ -19,6 +19,12 @@ export const userService = {
     return response.data;
   },
 
+  // Get other user's statistics
+  async getUserStats(userId) {
+    const response = await api.get(`/api/users/${userId}/stats`);
+    return response.data;
+  },
+
   // Get genre preferences
   async getGenrePreferences() {
     const response = await api.get('/api/users/me/genre-preferences');
@@ -37,15 +43,33 @@ export const userService = {
     return response.data;
   },
 
+  // Get other user's watch time
+  async getUserWatchTime(userId) {
+    const response = await api.get(`/api/users/${userId}/watch-time`);
+    return response.data;
+  },
+
   // Get rating distribution
   async getRatingDistribution() {
     const response = await api.get('/api/users/me/rating-distribution');
     return response.data;
   },
 
+  // Get other user's rating distribution
+  async getUserRatingDistribution(userId) {
+    const response = await api.get(`/api/users/${userId}/rating-distribution`);
+    return response.data;
+  },
+
   // Get year distribution
   async getYearDistribution() {
     const response = await api.get('/api/users/me/year-distribution');
+    return response.data;
+  },
+
+  // Get other user's year distribution
+  async getUserYearDistribution(userId) {
+    const response = await api.get(`/api/users/${userId}/year-distribution`);
     return response.data;
   },
 
@@ -67,9 +91,21 @@ export const userService = {
     return response.data;
   },
 
+  // Get other user's format distribution
+  async getUserFormatDistribution(userId) {
+    const response = await api.get(`/api/users/${userId}/format-distribution`);
+    return response.data;
+  },
+
   // Get episode length distribution (Phase 1)
   async getEpisodeLengthDistribution() {
     const response = await api.get('/api/users/me/episode-length-distribution');
+    return response.data;
+  },
+
+  // Get other user's episode length distribution
+  async getUserEpisodeLengthDistribution(userId) {
+    const response = await api.get(`/api/users/${userId}/episode-length-distribution`);
     return response.data;
   },
 
@@ -79,9 +115,21 @@ export const userService = {
     return response.data;
   },
 
+  // Get other user's rating stats
+  async getUserRatingStats(userId) {
+    const response = await api.get(`/api/users/${userId}/rating-stats`);
+    return response.data;
+  },
+
   // Get studio stats (Phase 1)
   async getStudioStats(limit = 10) {
     const response = await api.get('/api/users/me/studio-stats', { params: { limit } });
+    return response.data;
+  },
+
+  // Get other user's studio stats
+  async getUserStudioStats(userId, limit = 10) {
+    const response = await api.get(`/api/users/${userId}/studio-stats`, { params: { limit } });
     return response.data;
   },
 
@@ -91,9 +139,21 @@ export const userService = {
     return response.data;
   },
 
+  // Get other user's season stats
+  async getUserSeasonStats(userId) {
+    const response = await api.get(`/api/users/${userId}/season-stats`);
+    return response.data;
+  },
+
   // Get genre combinations (Phase 2)
   async getGenreCombinations(limit = 10) {
     const response = await api.get('/api/users/me/genre-combinations', { params: { limit } });
+    return response.data;
+  },
+
+  // Get other user's genre combinations
+  async getUserGenreCombinations(userId, limit = 10) {
+    const response = await api.get(`/api/users/${userId}/genre-combinations`, { params: { limit } });
     return response.data;
   },
 

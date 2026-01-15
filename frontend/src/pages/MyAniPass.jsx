@@ -567,17 +567,17 @@ export default function MyAniPass() {
           seasonDist,
           genreCombo
         ] = await Promise.all([
-          userService.getStats(),
-          userService.getGenrePreferences().catch(() => []),
-          userService.getWatchTime().catch(() => ({ total_minutes: 0 })),
-          userService.getRatingDistribution().catch(() => []),
-          userService.getYearDistribution().catch(() => []),
-          userService.getFormatDistribution().catch(() => []),
-          userService.getEpisodeLengthDistribution().catch(() => []),
-          userService.getRatingStats().catch(() => null),
-          userService.getStudioStats().catch(() => []),
-          userService.getSeasonStats().catch(() => []),
-          userService.getGenreCombinations().catch(() => []),
+          isOwnProfile ? userService.getStats() : userService.getUserStats(userId),
+          isOwnProfile ? userService.getGenrePreferences().catch(() => []) : userService.getUserGenrePreferences(userId).catch(() => []),
+          isOwnProfile ? userService.getWatchTime().catch(() => ({ total_minutes: 0 })) : userService.getUserWatchTime(userId).catch(() => ({ total_minutes: 0 })),
+          isOwnProfile ? userService.getRatingDistribution().catch(() => []) : userService.getUserRatingDistribution(userId).catch(() => []),
+          isOwnProfile ? userService.getYearDistribution().catch(() => []) : userService.getUserYearDistribution(userId).catch(() => []),
+          isOwnProfile ? userService.getFormatDistribution().catch(() => []) : userService.getUserFormatDistribution(userId).catch(() => []),
+          isOwnProfile ? userService.getEpisodeLengthDistribution().catch(() => []) : userService.getUserEpisodeLengthDistribution(userId).catch(() => []),
+          isOwnProfile ? userService.getRatingStats().catch(() => null) : userService.getUserRatingStats(userId).catch(() => null),
+          isOwnProfile ? userService.getStudioStats().catch(() => []) : userService.getUserStudioStats(userId).catch(() => []),
+          isOwnProfile ? userService.getSeasonStats().catch(() => []) : userService.getUserSeasonStats(userId).catch(() => []),
+          isOwnProfile ? userService.getGenreCombinations().catch(() => []) : userService.getUserGenreCombinations(userId).catch(() => []),
         ]);
 
         // Ensure average_rating is always available from the start
