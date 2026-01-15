@@ -19,9 +19,17 @@ export default function Navbar() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [lastCheckTime, setLastCheckTime] = useState(null);
   const notificationRef = useRef(null);
+  const userMenuRef = useRef(null);
 
   // Use otaku_score from AuthContext (global state) to prevent flickering
   const otakuScore = user?.otaku_score || 0;
+
+  // Debug: log otakuScore
+  useEffect(() => {
+    if (user) {
+      console.log('[Navbar] User otaku_score:', user.otaku_score, 'Final score:', otakuScore);
+    }
+  }, [user, otakuScore]);
 
   const toRoman = (num) => {
     const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
@@ -34,16 +42,19 @@ export default function Navbar() {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setShowNotificationDropdown(false);
       }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
     };
 
-    if (showNotificationDropdown) {
+    if (showNotificationDropdown || showUserMenu) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showNotificationDropdown]);
+  }, [showNotificationDropdown, showUserMenu]);
 
   useEffect(() => {
     const fetchUnreadCount = async () => {
@@ -335,7 +346,7 @@ export default function Navbar() {
               )}
 
               {user && (
-                <div className="relative">
+                <div className="relative" ref={userMenuRef}>
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
                     className="text-[#262626] hover:text-black hover:bg-gray-100 text-sm font-medium px-3 py-2 rounded-md transition-colors flex items-center gap-2"
