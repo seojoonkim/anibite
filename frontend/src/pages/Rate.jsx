@@ -176,7 +176,7 @@ function RatingCard({ anime, onRate }) {
       <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out ${
         animating ? 'scale-110' : 'scale-100'
       }`} style={{
-        borderWidth: status ? '2px' : '0px',
+        borderWidth: (status === 'RATED' || status === 'PASS') ? '2px' : '0px',
         borderStyle: 'solid',
         borderImage: status === 'RATED'
           ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%) 1'
