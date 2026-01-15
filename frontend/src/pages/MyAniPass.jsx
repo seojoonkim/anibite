@@ -42,9 +42,10 @@ export default function MyAniPass() {
   const displayUser = isOwnProfile ? user : profileUser;
 
   // Initialize activeTab from URL query parameter, default to 'feed'
-  const tabFromUrl = searchParams.get('tab');
-  const initialTab = ['feed', 'anipass', 'anime', 'character'].includes(tabFromUrl) ? tabFromUrl : 'feed';
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const [activeTab, setActiveTab] = useState(() => {
+    const tabFromUrl = searchParams.get('tab');
+    return ['feed', 'anipass', 'anime', 'character'].includes(tabFromUrl) ? tabFromUrl : 'feed';
+  });
 
   const [animeSubMenu, setAnimeSubMenu] = useState('all'); // 애니 서브메뉴: all, 5, 4, 3, 2, 1, 0, watchlist, pass
   const [characterSubMenu, setCharacterSubMenu] = useState('all'); // 캐릭터 서브메뉴: all, 5, 4, 3, 2, 1, 0, want, pass
@@ -158,20 +159,20 @@ export default function MyAniPass() {
     if (node) observer.current.observe(node);
   }, [loadingMoreFeed, hasMoreFeed]);
 
-  // Sync activeTab with URL query parameter
+  // Update URL when activeTab changes
+  const changeTab = useCallback((newTab) => {
+    setActiveTab(newTab);
+    setSearchParams({ tab: newTab });
+  }, [setSearchParams]);
+
+  // Sync activeTab with URL query parameter (for browser back/forward)
   useEffect(() => {
     const tabFromUrl = searchParams.get('tab');
     const validTab = ['feed', 'anipass', 'anime', 'character'].includes(tabFromUrl) ? tabFromUrl : 'feed';
     if (validTab !== activeTab) {
       setActiveTab(validTab);
     }
-  }, [searchParams]);
-
-  // Update URL when activeTab changes
-  const changeTab = useCallback((newTab) => {
-    setActiveTab(newTab);
-    setSearchParams({ tab: newTab });
-  }, [setSearchParams]);
+  }, [searchParams, activeTab]);
 
   useEffect(() => {
     // Reset states when userId changes (switching between profiles)
