@@ -465,7 +465,7 @@ export default function Feed() {
   };
 
   return (
-    <div className="min-h-screen pt-16 bg-transparent">
+    <div className="min-h-screen pt-12 md:pt-16 bg-transparent">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
