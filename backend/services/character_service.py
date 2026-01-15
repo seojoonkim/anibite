@@ -178,6 +178,17 @@ def create_or_update_character_rating(user_id: int, character_id: int, rating: f
     """
     캐릭터 평가 생성 또는 수정 + activities 테이블 동기화
     """
+    # Delete from activities first (트리거가 동작하지 않을 경우를 대비)
+    db.execute_update(
+        """
+        DELETE FROM activities
+        WHERE activity_type = 'character_rating'
+          AND user_id = ?
+          AND item_id = ?
+        """,
+        (user_id, character_id)
+    )
+
     # Check if rating exists
     existing = get_character_rating(user_id, character_id)
 
@@ -219,8 +230,10 @@ def create_or_update_character_rating(user_id: int, character_id: int, rating: f
             (user_id, character_id, rating, status or 'RATED')
         )
 
-    # Sync to activities table (replaces trigger logic - more efficient with single query)
-    _sync_character_rating_to_activities(user_id, character_id)
+    # Sync to activities table only if rating exists
+    # (WANT_TO_KNOW, NOT_INTERESTED should not appear in feed)
+    if rating is not None and rating > 0:
+        _sync_character_rating_to_activities(user_id, character_id)
 
     # Update user stats (otaku score)
     from services.rating_service import _update_user_stats

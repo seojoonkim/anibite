@@ -139,6 +139,16 @@ export default function RateCharacters() {
     if (!rating || rating === 0) return;
 
     try {
+      // Add animation effect
+      setCharacters(characters.map(char =>
+        char.id === characterId ? { ...char, _animating: true } : char
+      ));
+      setTimeout(() => {
+        setCharacters(characters.map(char =>
+          char.id === characterId ? { ...char, _animating: false } : char
+        ));
+      }, 600);
+
       await characterService.rateCharacter(characterId, rating);
 
       // Update the character in both lists for immediate UI update
@@ -165,6 +175,16 @@ export default function RateCharacters() {
 
   const handleStatusChange = async (characterId, status) => {
     try {
+      // Add animation effect
+      setCharacters(characters.map(char =>
+        char.id === characterId ? { ...char, _animating: true } : char
+      ));
+      setTimeout(() => {
+        setCharacters(characters.map(char =>
+          char.id === characterId ? { ...char, _animating: false } : char
+        ));
+      }, 600);
+
       // Check if status is already set
       const currentStatus = characterStatuses[characterId];
       const newStatus = currentStatus === status ? null : status;
@@ -177,12 +197,12 @@ export default function RateCharacters() {
         [characterId]: newStatus
       }));
 
-      // Update my_status in both character lists
+      // Update my_status and clear rating in both character lists
       setCharacters(characters.map(char =>
-        char.id === characterId ? { ...char, my_status: newStatus } : char
+        char.id === characterId ? { ...char, my_status: newStatus, my_rating: 0 } : char
       ));
       setAllCharacters(allCharacters.map(char =>
-        char.id === characterId ? { ...char, my_status: newStatus } : char
+        char.id === characterId ? { ...char, my_status: newStatus, my_rating: 0 } : char
       ));
 
       // Reload stats
@@ -290,11 +310,22 @@ export default function RateCharacters() {
                 ref={(el) => {
                   if (el) cardRefs.current[character.id] = el;
                 }}
-                className={`${getCardBackgroundColor(character.id)} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-300 ${
-                  hasRated ? 'ring-2 ring-green-400 shadow-[0_4px_20px_rgba(34,197,94,0.2)]' :
-                  status === 'WANT_TO_KNOW' ? 'ring-2 ring-blue-400 shadow-[0_4px_20px_rgba(59,130,246,0.2)]' :
-                  status === 'NOT_INTERESTED' ? 'ring-2 ring-gray-400 shadow-[0_4px_20px_rgba(156,163,175,0.2)]' : ''
+                className={`${getCardBackgroundColor(character.id)} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out ${
+                  character._animating ? 'scale-110' : 'scale-100'
                 }`}
+                style={{
+                  borderWidth: (hasRated || status === 'NOT_INTERESTED') ? '2px' : '0px',
+                  borderStyle: 'solid',
+                  borderImage: hasRated
+                    ? 'linear-gradient(135deg, #FF6B35, #FF8C42, #FFA458) 1'
+                    : 'none',
+                  borderColor: status === 'NOT_INTERESTED' ? '#9CA3AF' : 'transparent',
+                  boxShadow: hasRated
+                    ? '0 4px 20px rgba(255, 107, 53, 0.3)'
+                    : status === 'NOT_INTERESTED'
+                    ? '0 4px 20px rgba(156, 163, 175, 0.2)'
+                    : undefined
+                }}
                 onMouseEnter={() => setHoveredCharacter(character.id)}
                 onMouseLeave={() => setHoveredCharacter(null)}
               >
