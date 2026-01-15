@@ -649,7 +649,7 @@ export default function AnimeDetail() {
           </div>
           <button
             onClick={() => navigate('/')}
-            className="mt-4 text-blue-500 hover:text-[#A8E6CF]"
+            className="mt-4 text-blue-500 hover:text-[#3797F0]"
           >
             ← 홈으로 돌아가기
           </button>
@@ -1040,7 +1040,7 @@ export default function AnimeDetail() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-sm truncate hover:text-[#A8E6CF] transition-colors">{char.character_name}</h4>
+                          <h4 className="font-medium text-sm truncate hover:text-[#3797F0] transition-colors">{char.character_name}</h4>
                           <p className="text-xs text-gray-400">{language === 'ko' ? '캐릭터' : 'Character'}</p>
                         </div>
                       </div>
@@ -1110,7 +1110,7 @@ export default function AnimeDetail() {
                           }}
                         />
                       </div>
-                      <h4 className="font-medium text-sm line-clamp-2 group-hover:text-[#A8E6CF] transition-colors">
+                      <h4 className="font-medium text-sm line-clamp-2 group-hover:text-[#3797F0] transition-colors">
                         {getAnimeTitle(rec)}
                       </h4>
                       {rec.site_rating_count > 0 && (

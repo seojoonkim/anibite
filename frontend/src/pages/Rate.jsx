@@ -264,7 +264,7 @@ function RatingCard({ anime, onRate }) {
                     e.stopPropagation();
                     handleStatusClick('WANT_TO_WATCH');
                   }}
-                  className="hover:text-[#A8E6CF] transition-colors underline-offset-2 hover:underline"
+                  className="hover:text-[#3797F0] transition-colors underline-offset-2 hover:underline"
                 >
                   {t('watchLater')}
                 </button>
