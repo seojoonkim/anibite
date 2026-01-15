@@ -1,8 +1,9 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import ScrollToTop from './components/common/ScrollToTop';
+import Navbar from './components/common/Navbar';
 
 // Lazy load all pages for code splitting (reduces initial bundle size)
 const Login = lazy(() => import('./pages/Login'));
@@ -34,22 +35,30 @@ const ProtectedRoute = ({ children }) => {
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
-// Loading component for Suspense fallback
+// Loading component for Suspense fallback - only shows below navbar
 const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-screen">
+  <div className="pt-16 flex items-center justify-center" style={{ minHeight: 'calc(100vh - 4rem)' }}>
     <div className="text-xl text-gray-600">Loading...</div>
   </div>
 );
 
 function AppRoutes() {
+  const location = useLocation();
+  const publicPaths = ['/login', '/register', '/verify-email', '/email-sent', '/resend-verification'];
+  const isPublicPage = publicPaths.includes(location.pathname);
+
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/email-sent" element={<EmailSent />} />
-        <Route path="/resend-verification" element={<ResendVerification />} />
+    <>
+      {/* Show Navbar on all authenticated pages */}
+      {!isPublicPage && <Navbar />}
+
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/email-sent" element={<EmailSent />} />
+          <Route path="/resend-verification" element={<ResendVerification />} />
         <Route
           path="/"
           element={

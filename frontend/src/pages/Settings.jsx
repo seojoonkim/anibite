@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { userService } from '../services/userService';
 import { authService } from '../services/authService';
-import Navbar from '../components/common/Navbar';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 export default function Settings() {
@@ -262,7 +261,6 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
-      <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
 

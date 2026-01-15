@@ -8,7 +8,6 @@ import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
 import * as ActivityUtils from '../utils/activityUtils';
-import Navbar from '../components/common/Navbar';
 import StarRating from '../components/common/StarRating';
 import CharacterRatingWidget from '../components/character/CharacterRatingWidget';
 import ActivityCard from '../components/activity/ActivityCard';
@@ -751,7 +750,6 @@ export default function CharacterDetail() {
   if (loading) {
     return (
       <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
-        <Navbar />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           <div className="flex flex-col lg:flex-row gap-8 animate-pulse">
             {/* Character Image Skeleton */}
@@ -794,7 +792,6 @@ export default function CharacterDetail() {
   if (error || !character) {
     return (
       <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
-        <Navbar />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="text-xl text-red-600 mb-4">{error || (language === 'ko' ? '캐릭터를 찾을 수 없습니다.' : 'Character not found.')}</div>
@@ -812,7 +809,6 @@ export default function CharacterDetail() {
 
   return (
     <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
-      <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Mobile Title - Show first on mobile */}

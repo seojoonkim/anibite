@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { characterService } from '../services/characterService';
 import { useLanguage } from '../context/LanguageContext';
-import Navbar from '../components/common/Navbar';
 import StarRating from '../components/common/StarRating';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
@@ -245,7 +244,6 @@ export default function RateCharacters() {
 
   return (
     <div className="min-h-screen pt-0 md:pt-16 bg-transparent">
-      <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header with Stats - Always show 4 boxes from first render */}
