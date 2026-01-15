@@ -20,19 +20,41 @@ export default function Navbar() {
   const [lastCheckTime, setLastCheckTime] = useState(null);
   const notificationRef = useRef(null);
   const userMenuRef = useRef(null);
-  const [otakuScore, setOtakuScore] = useState(0);
 
-  // Fetch otaku_score directly from server (don't trust localStorage)
+  // Initialize from localStorage cache to prevent flickering
+  const [otakuScore, setOtakuScore] = useState(() => {
+    const cached = localStorage.getItem('cached_otaku_score');
+    return cached ? (parseFloat(cached) || 0) : 0;
+  });
+
+  // Update otakuScore immediately when user changes (from cache or user object)
+  useEffect(() => {
+    if (user) {
+      const cached = localStorage.getItem('cached_otaku_score');
+      if (cached) {
+        setOtakuScore(parseFloat(cached) || 0);
+      } else if (user.otaku_score !== undefined) {
+        setOtakuScore(user.otaku_score || 0);
+      }
+    }
+  }, [user]);
+
+  // Fetch otaku_score from server in background and update cache
   useEffect(() => {
     const fetchOtakuScore = async () => {
       if (user) {
         try {
           const stats = await userService.getStats();
-          setOtakuScore(stats.otaku_score || 0);
+          const score = stats.otaku_score || 0;
+          setOtakuScore(score);
+          // Update cache for next time
+          localStorage.setItem('cached_otaku_score', score.toString());
         } catch (err) {
           console.error('[Navbar] Failed to fetch otaku_score:', err);
           // Fallback to user.otaku_score if API fails
-          setOtakuScore(user.otaku_score || 0);
+          const fallbackScore = user.otaku_score || 0;
+          setOtakuScore(fallbackScore);
+          localStorage.setItem('cached_otaku_score', fallbackScore.toString());
         }
       }
     };

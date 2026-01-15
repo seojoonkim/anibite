@@ -98,6 +98,8 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     authService.logout();
     setUser(null);
+    // Clear otaku_score cache
+    localStorage.removeItem('cached_otaku_score');
   };
 
   const updateUser = (updatedUser) => {
