@@ -310,7 +310,7 @@ export default function RateCharacters() {
                 ref={(el) => {
                   if (el) cardRefs.current[character.id] = el;
                 }}
-                className={`rounded-lg transition-all duration-500 ease-out ${
+                className={`rounded-lg overflow-hidden transition-all duration-500 ease-out ${
                   character._animating ? 'scale-110' : 'scale-100'
                 }`}
                 style={{

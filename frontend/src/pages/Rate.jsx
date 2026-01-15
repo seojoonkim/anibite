@@ -175,7 +175,7 @@ function RatingCard({ anime, onRate }) {
     <div className="group relative" ref={cardRef}>
       {/* Gradient border wrapper for RATED cards */}
       <div
-        className={`rounded-lg transition-all duration-500 ease-out ${
+        className={`rounded-lg overflow-hidden transition-all duration-500 ease-out ${
           animating ? 'scale-110' : 'scale-100'
         }`}
         style={{
