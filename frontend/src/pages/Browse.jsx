@@ -202,14 +202,14 @@ export default function Browse() {
           </form>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+            <div className="flex items-center gap-2 md:block">
+              <label className="text-xs font-medium text-gray-700 md:block md:mb-1 whitespace-nowrap">
                 {t('sort')}
               </label>
               <select
                 value={filters.sort}
                 onChange={(e) => handleFilterChange('sort', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+                className="flex-1 md:w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
               >
                 <option value="popularity_desc">{t('sortPopularity')}</option>
                 <option value="rating_desc">{t('sortRatingDesc')}</option>
@@ -220,14 +220,14 @@ export default function Browse() {
               </select>
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+            <div className="flex items-center gap-2 md:block">
+              <label className="text-xs font-medium text-gray-700 md:block md:mb-1 whitespace-nowrap">
                 {t('status')}
               </label>
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+                className="flex-1 md:w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
               >
                 <option value="">{t('statusAll')}</option>
                 <option value="Currently Airing">{t('statusAiring')}</option>
@@ -236,8 +236,8 @@ export default function Browse() {
               </select>
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+            <div className="flex items-center gap-2 md:block">
+              <label className="text-xs font-medium text-gray-700 md:block md:mb-1 whitespace-nowrap">
                 {t('year')}
               </label>
               <input
@@ -245,12 +245,12 @@ export default function Browse() {
                 value={filters.year}
                 onChange={(e) => handleFilterChange('year', e.target.value)}
                 placeholder={t('yearPlaceholder')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+                className="flex-1 md:w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+            <div className="flex items-center gap-2 md:block">
+              <label className="text-xs font-medium text-gray-700 md:block md:mb-1 whitespace-nowrap">
                 {t('genre')}
               </label>
               <input
@@ -258,7 +258,7 @@ export default function Browse() {
                 value={filters.genre}
                 onChange={(e) => handleFilterChange('genre', e.target.value)}
                 placeholder={t('genrePlaceholder')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+                className="flex-1 md:w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
               />
             </div>
           </div>
