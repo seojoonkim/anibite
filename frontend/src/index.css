@@ -31,7 +31,6 @@ body {
   min-height: 100vh;
   position: relative;
   /* 스크롤 성능 최적화 */
-  overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -118,16 +117,11 @@ img {
   will-change: transform;
 }
 
-/* 스크롤 시 hover 효과 비활성화 (성능 향상) */
+/* 스크롤 시 hover 효과 비활성화 (성능 향상) - 카드에만 적용 */
 @media (hover: hover) {
-  body.scrolling * {
-    pointer-events: none !important;
+  body.scrolling .card-optimized {
+    pointer-events: none;
   }
-}
-
-/* 부드러운 스크롤 */
-* {
-  scroll-behavior: smooth;
 }
 
 /* 그림자 최적화 - GPU 가속 */
