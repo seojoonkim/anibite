@@ -650,7 +650,8 @@ export default function Feed() {
                           activity={activity}
                           context="notification"
                           onUpdate={resetActivities}
-                          onEditContent={handleEditContent}
+                          // user_post는 자체 edit modal 사용, 나머지는 EditReviewModal 사용
+                          onEditContent={activity.activity_type === 'user_post' ? null : handleEditContent}
                           onDeleteContent={handleOpenDeleteModal}
                         />
                       </NotificationCard>
@@ -664,7 +665,8 @@ export default function Feed() {
                         activity={activity}
                         context="feed"
                         onUpdate={resetActivities}
-                        onEditContent={handleEditContent}
+                        // user_post는 자체 edit modal 사용, 나머지는 EditReviewModal 사용
+                        onEditContent={activity.activity_type === 'user_post' ? null : handleEditContent}
                         onDeleteContent={handleOpenDeleteModal}
                       />
                     </div>
