@@ -86,6 +86,16 @@ def create_review(user_id: int, review_data: ReviewCreate) -> ReviewResponse:
     from services.rating_service import _update_user_stats
     _update_user_stats(user_id)
 
+    # Update activity_time to current time (move to recent feed)
+    db.execute_update("""
+        UPDATE activities
+        SET activity_time = CURRENT_TIMESTAMP,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE activity_type = 'anime_rating'
+          AND user_id = ?
+          AND item_id = ?
+    """, (user_id, review_data.anime_id))
+
     return get_review_by_id(review_id)
 
 
@@ -148,6 +158,16 @@ def update_review(review_id: int, user_id: int, review_data: ReviewUpdate) -> Re
             f"UPDATE user_reviews SET {', '.join(update_fields)} WHERE id = ?",
             tuple(params)
         )
+
+    # Update activity_time to current time (move to recent feed)
+    db.execute_update("""
+        UPDATE activities
+        SET activity_time = CURRENT_TIMESTAMP,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE activity_type = 'anime_rating'
+          AND user_id = ?
+          AND item_id = ?
+    """, (user_id, anime_id))
 
     return get_review_by_id(review_id)
 

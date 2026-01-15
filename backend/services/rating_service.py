@@ -89,6 +89,16 @@ def create_or_update_rating(user_id: int, rating_data: RatingCreate) -> RatingRe
         if not activity_exists:
             _sync_to_activities(user_id, rating_data.anime_id)
 
+        # Update activity_time to current time (move to recent feed)
+        db.execute_update("""
+            UPDATE activities
+            SET activity_time = CURRENT_TIMESTAMP,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE activity_type = 'anime_rating'
+              AND user_id = ?
+              AND item_id = ?
+        """, (user_id, rating_data.anime_id))
+
     # 사용자 통계 업데이트
     _update_user_stats(user_id)
 

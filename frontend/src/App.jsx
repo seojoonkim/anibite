@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -47,6 +47,29 @@ function AppRoutes() {
   const location = useLocation();
   const publicPaths = ['/login', '/register', '/verify-email', '/email-sent', '/resend-verification'];
   const isPublicPage = publicPaths.includes(location.pathname);
+
+  // 스크롤 성능 최적화 - 스크롤 시 hover 효과 비활성화
+  useEffect(() => {
+    let scrollTimeout;
+
+    const handleScroll = () => {
+      // 스크롤 중임을 표시
+      document.body.classList.add('scrolling');
+
+      // 스크롤 멈춘 후 100ms 뒤에 클래스 제거
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        document.body.classList.remove('scrolling');
+      }, 100);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
+    };
+  }, []);
 
   return (
     <>

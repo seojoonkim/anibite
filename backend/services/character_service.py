@@ -235,6 +235,16 @@ def create_or_update_character_rating(user_id: int, character_id: int, rating: f
     if rating is not None and rating > 0:
         _sync_character_rating_to_activities(user_id, character_id)
 
+        # Update activity_time to current time (move to recent feed)
+        db.execute_update("""
+            UPDATE activities
+            SET activity_time = CURRENT_TIMESTAMP,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE activity_type = 'character_rating'
+              AND user_id = ?
+              AND item_id = ?
+        """, (user_id, character_id))
+
     # Update user stats (otaku score)
     from services.rating_service import _update_user_stats
     _update_user_stats(user_id)
