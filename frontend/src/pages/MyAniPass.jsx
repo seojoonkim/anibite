@@ -1181,48 +1181,40 @@ export default function MyAniPass() {
             {activeTab === 'anipass' && (
               <div className="space-y-6">
                 {/* 상단 그리드: 오타쿠 미터, 통계, 장르 선호도 */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-stretch">
                   {/* 오타쿠 미터 */}
-                  <div className="lg:col-span-1">
+                  <div className="lg:col-span-1 flex">
                     {stats && <OtakuMeter score={stats.otaku_score || 0} />}
                   </div>
 
                   {/* 통계 */}
-                  <div className="lg:col-span-1">
+                  <div className="lg:col-span-1 flex">
                     {stats && (
-                      <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 h-full">
-                        <h3 className="text-lg font-bold mb-4 text-gray-800">{language === 'ko' ? '통계' : 'Statistics'}</h3>
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between py-3 px-4 rounded-lg" style={{ background: 'linear-gradient(to bottom right, #F7F7F7, #EFEFEF)' }}>
-                            <div className="flex-1">
-                              <div className="text-xs text-gray-600 mb-0.5">{language === 'ko' ? '평가한 애니' : 'Rated Anime'}</div>
-                              <div className="text-xl font-bold" style={{ color: '#000000' }}>
-                                {stats.total_rated || 0}
-                              </div>
+                      <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 w-full flex flex-col">
+                        <h3 className="text-lg font-bold mb-6 text-gray-900">{language === 'ko' ? '통계' : 'Statistics'}</h3>
+                        <div className="space-y-4 flex-1">
+                          <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200">
+                            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">{language === 'ko' ? '평가한 애니' : 'Rated Anime'}</div>
+                            <div className="text-2xl font-bold text-gray-900">
+                              {stats.total_rated || 0}
                             </div>
                           </div>
-                          <div className="flex items-center justify-between py-3 px-4 rounded-lg" style={{ background: 'linear-gradient(to bottom right, #FAFAFA, #F5F5F5)' }}>
-                            <div className="flex-1">
-                              <div className="text-xs text-gray-600 mb-0.5">{language === 'ko' ? '보고싶어요' : 'Watchlist'}</div>
-                              <div className="text-xl font-bold" style={{ color: '#737373' }}>
-                                {stats.total_want_to_watch || 0}
-                              </div>
+                          <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200">
+                            <div className="text-xs font-medium text-blue-600 uppercase tracking-wide mb-1.5">{language === 'ko' ? '보고싶어요' : 'Watchlist'}</div>
+                            <div className="text-2xl font-bold text-blue-900">
+                              {stats.total_want_to_watch || 0}
                             </div>
                           </div>
-                          <div className="flex items-center justify-between py-3 px-4 rounded-lg" style={{ background: 'linear-gradient(to bottom right, #F7F7F7, #EFEFEF)' }}>
-                            <div className="flex-1">
-                              <div className="text-xs text-gray-600 mb-0.5">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</div>
-                              <div className="text-xl font-bold" style={{ color: '#000000' }}>
-                                {stats.average_rating ? `★ ${stats.average_rating.toFixed(1)}` : '-'}
-                              </div>
+                          <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200">
+                            <div className="text-xs font-medium text-amber-600 uppercase tracking-wide mb-1.5">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</div>
+                            <div className="text-2xl font-bold text-amber-900">
+                              {stats.average_rating ? `★ ${stats.average_rating.toFixed(1)}` : '-'}
                             </div>
                           </div>
-                          <div className="flex items-center justify-between py-3 px-4 rounded-lg" style={{ background: 'linear-gradient(to bottom right, #FAFAFA, #F5F5F5)' }}>
-                            <div className="flex-1">
-                              <div className="text-xs text-gray-600 mb-0.5">{language === 'ko' ? '시청 시간' : 'Watch Time'}</div>
-                              <div className="text-xl font-bold" style={{ color: '#737373' }}>
-                                {formatWatchTime(watchTime?.total_minutes)}
-                              </div>
+                          <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200">
+                            <div className="text-xs font-medium text-purple-600 uppercase tracking-wide mb-1.5">{language === 'ko' ? '시청 시간' : 'Watch Time'}</div>
+                            <div className="text-2xl font-bold text-purple-900">
+                              {formatWatchTime(watchTime?.total_minutes)}
                             </div>
                           </div>
                         </div>
@@ -1231,29 +1223,45 @@ export default function MyAniPass() {
                   </div>
 
                   {/* 장르 선호도 */}
-                  <div className="lg:col-span-1">
+                  <div className="lg:col-span-1 flex">
                     <GenrePreferences preferences={genrePreferences} />
                   </div>
                 </div>
 
                 {/* Phase 1 통계 그리드: 포맷, 에피소드 길이, 평가 성향 */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <FormatDistribution distribution={formatDistribution} />
-                  <EpisodeLengthChart distribution={episodeLengthDistribution} />
-                  <RatingStatsCard stats={ratingStats} />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-stretch">
+                  <div className="flex">
+                    <FormatDistribution distribution={formatDistribution} />
+                  </div>
+                  <div className="flex">
+                    <EpisodeLengthChart distribution={episodeLengthDistribution} />
+                  </div>
+                  <div className="flex">
+                    <RatingStatsCard stats={ratingStats} />
+                  </div>
                 </div>
 
                 {/* 차트 그리드: 평점 분포, 연도별 분포 */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <RatingDistributionChart distribution={ratingDistribution} />
-                  <YearDistributionChart distribution={yearDistribution} />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:items-stretch">
+                  <div className="flex">
+                    <RatingDistributionChart distribution={ratingDistribution} />
+                  </div>
+                  <div className="flex">
+                    <YearDistributionChart distribution={yearDistribution} />
+                  </div>
                 </div>
 
                 {/* Phase 1 & 2 추가 통계: 스튜디오, 장르 조합, 시즌 */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <StudioStats studios={studioStats} />
-                  <GenreCombinationChart combinations={genreCombinations} />
-                  <SeasonStats seasons={seasonStats} />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-stretch">
+                  <div className="flex">
+                    <StudioStats studios={studioStats} />
+                  </div>
+                  <div className="flex">
+                    <GenreCombinationChart combinations={genreCombinations} />
+                  </div>
+                  <div className="flex">
+                    <SeasonStats seasons={seasonStats} />
+                  </div>
                 </div>
               </div>
             )}
