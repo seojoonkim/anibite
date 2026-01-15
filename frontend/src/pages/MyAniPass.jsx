@@ -850,24 +850,11 @@ export default function MyAniPass() {
 
   // Infinite scroll callback - uses ref to access latest loadMoreFeed
   const lastActivityElementRef = useCallback(node => {
-    console.log('[InfiniteScroll] lastActivityElementRef called', {
-      node: !!node,
-      loadingMoreFeed,
-      hasMoreFeed,
-      loadMoreFeedRef: !!loadMoreFeedRef.current
-    });
-
     if (loadingMoreFeed) return;
     if (observer.current) observer.current.disconnect();
 
     observer.current = new IntersectionObserver(entries => {
-      console.log('[InfiniteScroll] IntersectionObserver triggered', {
-        isIntersecting: entries[0].isIntersecting,
-        hasMoreFeed
-      });
-
       if (entries[0].isIntersecting && hasMoreFeed) {
-        console.log('[InfiniteScroll] Calling loadMoreFeed');
         if (loadMoreFeedRef.current) {
           loadMoreFeedRef.current();
         }
@@ -875,7 +862,6 @@ export default function MyAniPass() {
     });
 
     if (node) {
-      console.log('[InfiniteScroll] Observing node');
       observer.current.observe(node);
     }
   }, [loadingMoreFeed, hasMoreFeed]);
@@ -1775,15 +1761,6 @@ export default function MyAniPass() {
                     const displayName = displayUser?.display_name || displayUser?.username;
                     const currentOtakuScore = stats?.otaku_score || 0;
                     const isLastActivity = userActivities.length === index + 1;
-
-                    if (isLastActivity) {
-                      console.log('[InfiniteScroll] Rendering last activity', {
-                        index,
-                        total: userActivities.length,
-                        hasMoreFeed,
-                        loadingMoreFeed
-                      });
-                    }
 
                     return (
                       <ActivityCard
