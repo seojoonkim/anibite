@@ -377,6 +377,35 @@ export default function RateCharacters() {
                     </div>
                   )}
 
+                  {/* Show rating stars on rated characters */}
+                  {hasRated && character.my_rating > 0 && hoveredCharacter !== character.id && starSizes[character.id] && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="flex gap-1" style={{ fontSize: starSizes[character.id] }}>
+                        {[1, 2, 3, 4, 5].map((position) => {
+                          const rating = character.my_rating;
+                          const gradientStyle = {
+                            background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text'
+                          };
+
+                          if (rating >= position) {
+                            return <span key={position} style={gradientStyle}>★</span>;
+                          } else if (rating >= position - 0.5) {
+                            return (
+                              <span key={position} className="relative inline-block">
+                                <span className="text-gray-300">★</span>
+                                <span className="absolute top-0 left-0 overflow-hidden w-1/2" style={gradientStyle}>★</span>
+                              </span>
+                            );
+                          }
+                          return <span key={position} className="text-gray-300">★</span>;
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Rating Overlay */}
                   {starSizes[character.id] && (
                     <div
