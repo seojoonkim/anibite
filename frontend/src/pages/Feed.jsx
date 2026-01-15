@@ -230,10 +230,8 @@ export default function Feed() {
     if (!newPostContent || !newPostContent.trim()) return;
 
     try {
-      await activityService.createActivity({
-        activity_type: 'user_post',
-        content: newPostContent.trim()
-      });
+      // Use userPostService instead of activityService for proper content handling
+      await userPostService.createPost(newPostContent.trim());
       setNewPostContent('');
 
       // Clear cache on new post
