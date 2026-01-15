@@ -1581,9 +1581,7 @@ export default function MyAniPass() {
                   {/* 통계 */}
                   <div className="w-full">
                     {stats && (
-                      <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 w-full h-full flex flex-col border border-blue-100/50">
-                        <h3 className="text-lg font-bold mb-6 text-[#638CCC]">{language === 'ko' ? '통계' : 'Statistics'}</h3>
-                        <div className="space-y-3 flex-1">
+                      <div className="space-y-3 flex-1">
                           <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-[#8EC5FC]/10 to-[#638CCC]/10 border border-[#8EC5FC]/30 hover:shadow-md transition-all duration-300">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#8EC5FC] to-[#638CCC] flex items-center justify-center text-white text-xl">
@@ -1637,7 +1635,6 @@ export default function MyAniPass() {
                             </div>
                           </div>
                         </div>
-                      </div>
                     )}
                   </div>
 
