@@ -524,7 +524,7 @@ export default function WriteReviews() {
                       <h3 className="font-semibold text-lg">
                         <Link
                           to={item.type === 'anime' ? `/anime/${item.itemId}` : `/character/${item.itemId}`}
-                          className="text-gray-900 hover:text-[#737373] transition-colors hover:underline cursor-pointer"
+                          className="text-gray-900 hover:text-[#3797F0] transition-colors hover:underline cursor-pointer"
                         >
                           {item.type === 'anime' ? getAnimeTitle(item) : item.character_name}
                         </Link>
@@ -552,7 +552,7 @@ export default function WriteReviews() {
                             {item.anime_id ? (
                               <Link
                                 to={`/anime/${item.anime_id}`}
-                                className="hover:text-[#737373] hover:underline transition-colors"
+                                className="hover:text-[#3797F0] hover:underline transition-colors"
                               >
                                 {item.anime_title}
                               </Link>
