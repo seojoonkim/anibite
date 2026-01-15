@@ -287,7 +287,7 @@ export default function MyAniPass() {
     }
   }, [characterSubMenu, allCharacters, activeTab, filterCharactersBySubMenu]);
 
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (forceRefresh = false) => {
     try {
       // 다른 사용자의 프로필을 볼 때는 anipass 탭은 표시 안함
       if (!isOwnProfile && activeTab === 'anipass') {
@@ -295,26 +295,29 @@ export default function MyAniPass() {
       }
 
       // 이미 로드한 탭이면 스킵 (anime, character, anipass 캐싱)
-      if (loadedTabs[activeTab] && (activeTab === 'anime' || activeTab === 'character' || activeTab === 'anipass')) {
+      // forceRefresh가 true면 캐시 무시
+      if (!forceRefresh && loadedTabs[activeTab] && (activeTab === 'anime' || activeTab === 'character' || activeTab === 'anipass')) {
         return;
       }
 
       const targetUserId = isOwnProfile ? user?.id : userId;
       const cacheKey = `profile_${targetUserId}_${activeTab}`;
 
-      // Try loading from cache first
+      // Try loading from cache first (unless forceRefresh)
       let cachedData = null;
-      try {
-        const cached = sessionStorage.getItem(cacheKey);
-        if (cached) {
-          const { data, timestamp } = JSON.parse(cached);
-          // Use cache if less than 2 minutes old
-          if (Date.now() - timestamp < 120000) {
-            cachedData = data;
+      if (!forceRefresh) {
+        try {
+          const cached = sessionStorage.getItem(cacheKey);
+          if (cached) {
+            const { data, timestamp } = JSON.parse(cached);
+            // Use cache if less than 2 minutes old
+            if (Date.now() - timestamp < 120000) {
+              cachedData = data;
+            }
           }
+        } catch (err) {
+          console.error('Failed to load cache:', err);
         }
-      } catch (err) {
-        console.error('Failed to load cache:', err);
       }
 
       // If we have cached data, use it immediately
@@ -1769,8 +1772,8 @@ export default function MyAniPass() {
                         activity={activity}
                         context="feed"
                         onUpdate={() => {
-                          // Reload feed after deletion
-                          loadData();
+                          // Reload feed after deletion/update - force refresh to bypass cache
+                          loadData(true);
                         }}
                       />
                     );
