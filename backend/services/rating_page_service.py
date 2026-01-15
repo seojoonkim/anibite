@@ -17,6 +17,7 @@ def get_anime_for_rating(user_id: int, limit: int = 50) -> List[Dict]:
     - site stats 제거 (불필요)
     - 가중치 랜덤 정렬: 인기도 기반, Python에서 랜덤 섞기
     - 인덱스 활용
+    - WANT_TO_WATCH는 소수만 포함 (10-15%)
 
     목표: 0.1초 이내
     """
@@ -24,7 +25,37 @@ def get_anime_for_rating(user_id: int, limit: int = 50) -> List[Dict]:
     # Fetch more items than needed (3x) for randomization
     fetch_limit = limit * 3
 
-    rows = db.execute_query(
+    # Calculate how many WANT_TO_WATCH items to include (15% of limit)
+    want_to_watch_limit = max(int(limit * 0.15), 5)  # At least 5 items
+    unrated_limit = fetch_limit - want_to_watch_limit
+
+    # Fetch unrated anime (majority)
+    unrated_rows = db.execute_query(
+        """
+        SELECT
+            a.id,
+            a.title_romaji,
+            a.title_english,
+            a.title_korean,
+            COALESCE('/' || a.cover_image_local, a.cover_image_url) as cover_image_url,
+            a.format,
+            a.episodes,
+            a.season,
+            a.season_year,
+            a.average_score,
+            a.popularity,
+            NULL as user_rating_status
+        FROM anime a
+        LEFT JOIN user_ratings ur ON a.id = ur.anime_id AND ur.user_id = ?
+        WHERE ur.id IS NULL
+        ORDER BY COALESCE(a.popularity, 0) DESC
+        LIMIT ?
+        """,
+        (user_id, unrated_limit)
+    )
+
+    # Fetch WANT_TO_WATCH anime (small portion)
+    want_to_watch_rows = db.execute_query(
         """
         SELECT
             a.id,
@@ -40,15 +71,16 @@ def get_anime_for_rating(user_id: int, limit: int = 50) -> List[Dict]:
             a.popularity,
             ur.status as user_rating_status
         FROM anime a
-        LEFT JOIN user_ratings ur ON a.id = ur.anime_id AND ur.user_id = ?
-        WHERE ur.id IS NULL OR ur.status = 'WANT_TO_WATCH'
+        INNER JOIN user_ratings ur ON a.id = ur.anime_id AND ur.user_id = ?
+        WHERE ur.status = 'WANT_TO_WATCH'
         ORDER BY COALESCE(a.popularity, 0) DESC
         LIMIT ?
         """,
-        (user_id, fetch_limit)
+        (user_id, want_to_watch_limit)
     )
 
-    items = [dict_from_row(row) for row in rows]
+    # Combine results
+    items = [dict_from_row(row) for row in unrated_rows] + [dict_from_row(row) for row in want_to_watch_rows]
 
     # Weighted random: shuffle within popularity tiers
     # Top 30%: high popularity items
