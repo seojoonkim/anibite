@@ -241,7 +241,7 @@ export default function Navbar() {
         marginLeft: '-5.555%'
       }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 items-center h-9 md:h-16 md:gap-6 py-1.5 md:py-0">
+          <div className="grid grid-cols-1 md:grid-cols-4 items-end md:items-center h-8 md:h-16 md:gap-6 pb-1 md:pb-0">
             {/* Logo and Mobile User Menu */}
             <div className="flex items-center justify-between md:col-span-1">
               <Link to="/feed" className="flex items-center gap-1.5 md:gap-2 text-xl md:text-2xl font-bold text-black hover:opacity-60 transition-opacity group">
