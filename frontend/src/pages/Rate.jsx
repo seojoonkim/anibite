@@ -172,9 +172,29 @@ function RatingCard({ anime, onRate }) {
 
   return (
     <div className="group relative" ref={cardRef}>
-      <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-300 ${animating ? 'scale-105' : 'scale-100'}`}>
+      <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-300 ${animating ? 'scale-105' : 'scale-100'} ${status ? 'opacity-60' : 'opacity-100'}`}>
         {/* Cover Image */}
         <Link to={`/anime/${anime.id}`} className="block relative aspect-[3/4] bg-gray-200 group/image overflow-hidden">
+          {/* Status Badge */}
+          {status && (
+            <div className="absolute top-2 right-2 z-10">
+              {status === 'RATED' && (
+                <span className="px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full shadow-lg">
+                  평가완료
+                </span>
+              )}
+              {status === 'WANT_TO_WATCH' && (
+                <span className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full shadow-lg">
+                  나중에 보기
+                </span>
+              )}
+              {status === 'PASS' && (
+                <span className="px-3 py-1 bg-gray-500 text-white text-xs font-bold rounded-full shadow-lg">
+                  패스
+                </span>
+              )}
+            </div>
+          )}
           <img
             src={getImageUrl(anime.cover_image_url)}
             alt={getAnimeTitle(anime)}
@@ -542,28 +562,9 @@ export default function Rate() {
     }
   };
 
-  // Filter anime list - show WANT_TO_WATCH with only 5% probability
+  // Don't filter - keep all anime including rated ones (they'll show with visual feedback)
   const filteredAnimeList = useMemo(() => {
-    return animeList.filter(anime => {
-      // Exclude already rated anime
-      if (anime.user_rating && anime.user_rating > 0) {
-        return false;
-      }
-
-      // Always exclude PASS
-      if (anime.user_rating_status === 'PASS') {
-        return false;
-      }
-
-      // Show WANT_TO_WATCH with 5% probability
-      if (anime.user_rating_status === 'WANT_TO_WATCH') {
-        const seed = anime.id % 20; // 1 in 20 = 5%
-        return seed === 0;
-      }
-
-      // Show all other anime
-      return true;
-    });
+    return animeList;
   }, [animeList]);
 
   return (
