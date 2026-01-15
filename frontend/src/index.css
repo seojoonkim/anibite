@@ -25,21 +25,29 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #F5F5F7 0%, #EEEEF0 100%);
+  background: #F5F5F7; /* 단색으로 변경 - 그라디언트는 성능 저하 */
   color: #2D3748;
   overflow-x: hidden;
   min-height: 100vh;
   position: relative;
+  /* 스크롤 성능 최적화 */
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  transform: scale(0.9);
-  transform-origin: top center;
-  width: 111.11%;
-  margin-left: -5.555%; /* (111.11% - 100%) / 2 = 5.555% */
+  /* transform: scale(0.9) 제거 - GPU 부하 감소 */
+  /* zoom으로 대체하여 렌더링 성능 개선 */
+  zoom: 0.9;
+  -moz-transform: scale(0.9);
+  -moz-transform-origin: top center;
+  width: 100%; /* 111.11%에서 100%로 변경 */
+  margin-left: 0; /* 중앙 정렬 제거 */
+  /* 렌더링 최적화 */
+  contain: layout style;
 }
 
 /* English text - 세련되고 모던한 Inter */
@@ -83,4 +91,53 @@ body {
 
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-in-out;
+}
+
+/* 스크롤 성능 최적화 유틸리티 */
+.gpu-accelerated {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* 이미지 카드 최적화 */
+img {
+  /* 이미지 로딩 시 레이아웃 시프트 방지 */
+  content-visibility: auto;
+  contain-intrinsic-size: 300px 400px;
+  /* GPU 가속 */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* 카드 컴포넌트 최적화 */
+.card-optimized {
+  contain: layout style paint;
+  content-visibility: auto;
+  will-change: transform;
+}
+
+/* 스크롤 시 hover 효과 비활성화 (성능 향상) */
+@media (hover: hover) {
+  body.scrolling * {
+    pointer-events: none !important;
+  }
+}
+
+/* 부드러운 스크롤 */
+* {
+  scroll-behavior: smooth;
+}
+
+/* 그림자 최적화 - GPU 가속 */
+.pastel-shadow {
+  box-shadow: 0 4px 20px rgba(142, 197, 252, 0.15);
+  will-change: box-shadow;
+  transform: translateZ(0);
+}
+
+.pastel-shadow-hover:hover {
+  box-shadow: 0 8px 30px rgba(142, 197, 252, 0.25);
+  transform: translateZ(0);
 }

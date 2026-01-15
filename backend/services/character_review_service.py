@@ -74,6 +74,16 @@ def create_character_review(user_id: int, review_data: CharacterReviewCreate) ->
     from services.character_service import _sync_character_rating_to_activities
     _sync_character_rating_to_activities(user_id, review_data.character_id)
 
+    # Update activity_time to current time (move to recent feed)
+    db.execute_update("""
+        UPDATE activities
+        SET activity_time = CURRENT_TIMESTAMP,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE activity_type = 'character_rating'
+          AND user_id = ?
+          AND item_id = ?
+    """, (user_id, review_data.character_id))
+
     return get_character_review_by_id(review_id)
 
 
@@ -135,6 +145,16 @@ def update_character_review(review_id: int, user_id: int, review_data: Character
     # Note: 별점 업데이트 시 이미 sync가 호출되었지만, 리뷰 내용도 반영하기 위해 다시 호출
     from services.character_service import _sync_character_rating_to_activities
     _sync_character_rating_to_activities(user_id, character_id)
+
+    # Update activity_time to current time (move to recent feed)
+    db.execute_update("""
+        UPDATE activities
+        SET activity_time = CURRENT_TIMESTAMP,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE activity_type = 'character_rating'
+          AND user_id = ?
+          AND item_id = ?
+    """, (user_id, character_id))
 
     return get_character_review_by_id(review_id)
 
