@@ -2315,9 +2315,14 @@ export default function MyAniPass() {
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-gray-900 mb-1">
-                    {activityToDelete.activity_type === 'character_rating'
-                      ? activityToDelete.item_title
-                      : (activityToDelete.item_title_korean || activityToDelete.item_title)}
+                    {activityToDelete.activity_type === 'character_rating' ? (
+                      <>
+                        {activityToDelete.item_title}{' '}
+                        <span className="text-gray-600">({activityToDelete.item_title_korean})</span>
+                      </>
+                    ) : (
+                      activityToDelete.item_title_korean || activityToDelete.item_title
+                    )}
                   </p>
                   {activityToDelete.activity_type === 'character_rating' && activityToDelete.anime_title && (
                     <p className="text-xs text-gray-600 mb-1">
