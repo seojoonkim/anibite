@@ -304,8 +304,8 @@ export default function MyAniPass() {
         return;
       }
 
-      // 이미 로드한 탭이면 스킵 (anime, character만 캐싱)
-      if (loadedTabs[activeTab] && (activeTab === 'anime' || activeTab === 'character')) {
+      // 이미 로드한 탭이면 스킵 (anime, character, anipass 캐싱)
+      if (loadedTabs[activeTab] && (activeTab === 'anime' || activeTab === 'character' || activeTab === 'anipass')) {
         return;
       }
 
@@ -384,6 +384,7 @@ export default function MyAniPass() {
         setStudioStats(studioDist);
         setSeasonStats(seasonDist);
         setGenreCombinations(genreCombo);
+        setLoadedTabs(prev => ({ ...prev, anipass: true }));
       } else if (activeTab === 'anime') {
         // Load all anime (rated, watchlist, pass) - Single API call for 3x speed!
         const targetUserId = isOwnProfile ? null : parseInt(userId);
