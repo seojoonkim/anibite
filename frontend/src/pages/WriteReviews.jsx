@@ -507,7 +507,7 @@ export default function WriteReviews() {
                     : undefined
                 }}
               >
-                <div className={`bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out overflow-hidden relative ${
+                <div className={`bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out overflow-hidden relative group ${
                   !isJustCompleted ? 'border border-gray-200' : ''
                 }`}>
                   <div className="flex items-start relative">
@@ -524,12 +524,12 @@ export default function WriteReviews() {
 
                   <Link
                     to={item.type === 'anime' ? `/anime/${item.itemId}` : `/character/${item.itemId}`}
-                    className="flex-shrink-0 cursor-pointer overflow-hidden group"
+                    className="flex-shrink-0 cursor-pointer overflow-hidden"
                   >
                     <img
                       src={getImageUrl(item.type === 'anime' ? item.image_url : item.character_image)}
                       alt={item.type === 'anime' ? getAnimeTitle(item) : item.character_name}
-                      className="w-32 h-48 object-cover object-top group-hover:scale-110 transition-transform duration-900"
+                      className="w-32 h-48 object-cover object-top group-hover:scale-110 transition-transform duration-[1500ms]"
                       onError={(e) => {
                         e.target.src = '/placeholder-anime.svg';
                       }}

@@ -325,18 +325,18 @@ export default function RateCharacters() {
                 onMouseEnter={() => setHoveredCharacter(character.id)}
                 onMouseLeave={() => setHoveredCharacter(null)}
               >
-                <div className={`${getCardBackgroundColor(character.id)} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out ${
+                <div className={`${getCardBackgroundColor(character.id)} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out group ${
                   status === 'NOT_INTERESTED' ? 'opacity-50' : 'opacity-100'
                 } ${!hasRated ? 'border border-gray-200' : ''}`}>
                 {/* Character Image */}
                 <Link to={`/character/${character.id}`} className="block">
-                  <div className="aspect-[3/4] bg-gray-200 relative overflow-hidden group cursor-pointer">
+                  <div className="aspect-[3/4] bg-gray-200 relative overflow-hidden cursor-pointer">
                     <img
                       src={getImageUrl(character.image_url)}
                       alt={character.name_full}
                       loading="lazy"
                       decoding="async"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-900"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms]"
                       onError={(e) => {
                         e.target.src = '/placeholder-anime.svg';
                       }}
