@@ -1566,13 +1566,24 @@ export default function MyAniPass() {
                                             alt={name}
                                             className="w-full h-full object-cover"
                                             onError={(e) => {
-                                              // R2 실패 시 외부 URL로 fallback
-                                              if (!e.target.dataset.fallbackAttempted) {
-                                                e.target.dataset.fallbackAttempted = 'true';
-                                                const fallbackUrl = getCharacterImageFallback(character.image_url);
+                                              const step = e.target.dataset.fallbackStep || '0';
+
+                                              if (step === '0') {
+                                                // Step 1: Try alternate extension (.jpg ↔ .png)
+                                                e.target.dataset.fallbackStep = '1';
+                                                const fallbackUrl = getCharacterImageFallback(character.image_url, e.target.src);
                                                 e.target.src = fallbackUrl;
+                                              } else if (step === '1') {
+                                                // Step 2: Try original external URL
+                                                e.target.dataset.fallbackStep = '2';
+                                                if (character.image_url && character.image_url.startsWith('http')) {
+                                                  e.target.src = character.image_url;
+                                                } else {
+                                                  e.target.src = '/placeholder-anime.svg';
+                                                }
                                               } else {
-                                                e.target.src = '/placeholder-character.png';
+                                                // Step 3: Give up, use placeholder
+                                                e.target.src = '/placeholder-anime.svg';
                                               }
                                             }}
                                           />
@@ -1624,13 +1635,24 @@ export default function MyAniPass() {
                                   alt={name}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
-                                    // R2 실패 시 외부 URL로 fallback
-                                    if (!e.target.dataset.fallbackAttempted) {
-                                      e.target.dataset.fallbackAttempted = 'true';
-                                      const fallbackUrl = getCharacterImageFallback(character.image_url);
+                                    const step = e.target.dataset.fallbackStep || '0';
+
+                                    if (step === '0') {
+                                      // Step 1: Try alternate extension (.jpg ↔ .png)
+                                      e.target.dataset.fallbackStep = '1';
+                                      const fallbackUrl = getCharacterImageFallback(character.image_url, e.target.src);
                                       e.target.src = fallbackUrl;
+                                    } else if (step === '1') {
+                                      // Step 2: Try original external URL
+                                      e.target.dataset.fallbackStep = '2';
+                                      if (character.image_url && character.image_url.startsWith('http')) {
+                                        e.target.src = character.image_url;
+                                      } else {
+                                        e.target.src = '/placeholder-anime.svg';
+                                      }
                                     } else {
-                                      e.target.src = '/placeholder-character.png';
+                                      // Step 3: Give up, use placeholder
+                                      e.target.src = '/placeholder-anime.svg';
                                     }
                                   }}
                                 />
