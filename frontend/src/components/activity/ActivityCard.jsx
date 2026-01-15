@@ -327,7 +327,7 @@ export default function ActivityCard({
     try {
       // Delete based on activity type
       if (activity.activity_type === 'user_post') {
-        await userPostService.deletePost(activity.item_id);
+        await userPostService.deletePost(activity.review_id);
       } else if (activity.activity_type === 'anime_rating') {
         await ratingService.deleteRating(activity.item_id);
       } else if (activity.activity_type === 'character_rating') {
@@ -381,13 +381,7 @@ export default function ActivityCard({
     }
 
     try {
-      console.log('Activity object:', activity);
-      console.log('Activity ID:', activity.id);
-      console.log('Activity item_id:', activity.item_id);
-      console.log('Activity post_id:', activity.post_id);
-      console.log('Activity user_post_id:', activity.user_post_id);
-      console.log('All activity keys:', Object.keys(activity));
-      await userPostService.updatePost(activity.item_id, editPostContent);
+      await userPostService.updatePost(activity.review_id, editPostContent);
       setShowEditModal(false);
 
       // Refresh the feed to show updated content
