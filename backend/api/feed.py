@@ -235,9 +235,12 @@ def get_user_activity_feed(
             anime_title,
             anime_title_korean,
             anime_id,
-            NULL as review_id,
+            CASE
+                WHEN activity_type = 'user_post' THEN item_id
+                ELSE NULL
+            END as review_id,
             review_content,
-            NULL as post_content,
+            review_content as post_content,
             0 as comments_count
         FROM activities
         WHERE user_id = ?
