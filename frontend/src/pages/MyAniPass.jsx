@@ -348,6 +348,28 @@ export default function MyAniPass() {
           setPassCharacters(cachedData.passCharacters || []);
           filterCharactersBySubMenu(cachedData.allCharacters || [], characterSubMenu);
           setLoadedTabs(prev => ({ ...prev, character: true }));
+
+          // Load stats if not loaded yet (cache doesn't include stats)
+          if (!statsLoaded) {
+            const targetUserId = userId || user?.id;
+            try {
+              if (isOwnProfile) {
+                const statsData = await userService.getStats();
+                setStats(statsData);
+                setStatsLoaded(true);
+              } else {
+                const profileData = await userService.getUserProfile(targetUserId);
+                if (profileData) {
+                  setProfileUser(profileData.user);
+                  setStats(profileData.stats);
+                  setStatsLoaded(true);
+                }
+              }
+            } catch (error) {
+              console.error('Failed to load stats:', error);
+            }
+          }
+
           setLoading(false);
           setTabLoading(false);
           return;
@@ -368,6 +390,7 @@ export default function MyAniPass() {
           setTabLoading(false);
           return;
         } else if (activeTab === 'feed') {
+          // Restore cached feed activities
           setUserActivities(cachedData.userActivities || []);
           setFeedOffset(10);
           setHasMoreFeed(cachedData.userActivities && cachedData.userActivities.length === 10);
@@ -379,6 +402,28 @@ export default function MyAniPass() {
           });
           setActivityLikes(likesState);
           setComments(commentsState);
+
+          // Load stats if not loaded yet (cache doesn't include stats)
+          if (!statsLoaded) {
+            const targetUserId = userId || user?.id;
+            try {
+              if (isOwnProfile) {
+                const statsData = await userService.getStats();
+                setStats(statsData);
+                setStatsLoaded(true);
+              } else {
+                const profileData = await userService.getUserProfile(targetUserId);
+                if (profileData) {
+                  setProfileUser(profileData.user);
+                  setStats(profileData.stats);
+                  setStatsLoaded(true);
+                }
+              }
+            } catch (error) {
+              console.error('Failed to load stats:', error);
+            }
+          }
+
           setLoading(false);
           setTabLoading(false);
           return;
