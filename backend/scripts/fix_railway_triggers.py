@@ -21,7 +21,10 @@ def fix_triggers():
         'trg_anime_rating_delete',
         'trg_character_rating_insert',
         'trg_character_rating_update',
-        'trg_character_rating_delete'
+        'trg_character_rating_delete',
+        'trg_user_post_insert',
+        'trg_user_post_update',
+        'trg_user_post_delete'
     ]
 
     for trigger_name in triggers_to_drop:
@@ -248,6 +251,81 @@ def fix_triggers():
         END
     """)
     print("✓ Created trg_character_rating_delete")
+
+    # ===== User Post Triggers =====
+
+    # INSERT trigger
+    db.execute_update("""
+        CREATE TRIGGER trg_user_post_insert
+        AFTER INSERT ON user_posts
+        BEGIN
+            INSERT OR REPLACE INTO activities (
+                activity_type, user_id, item_id, activity_time,
+                username, display_name, avatar_url, otaku_score,
+                review_content,
+                created_at, updated_at
+            )
+            SELECT
+                'user_post',
+                NEW.user_id,
+                NEW.id,
+                NEW.created_at,
+                u.username,
+                u.display_name,
+                u.avatar_url,
+                COALESCE(us.otaku_score, 0),
+                NEW.content,
+                NEW.created_at,
+                NEW.updated_at
+            FROM users u
+            LEFT JOIN user_stats us ON u.id = NEW.user_id
+            WHERE u.id = NEW.user_id;
+        END
+    """)
+    print("✓ Created trg_user_post_insert")
+
+    # UPDATE trigger
+    db.execute_update("""
+        CREATE TRIGGER trg_user_post_update
+        AFTER UPDATE ON user_posts
+        BEGIN
+            INSERT OR REPLACE INTO activities (
+                activity_type, user_id, item_id, activity_time,
+                username, display_name, avatar_url, otaku_score,
+                review_content,
+                created_at, updated_at
+            )
+            SELECT
+                'user_post',
+                NEW.user_id,
+                NEW.id,
+                OLD.created_at,
+                u.username,
+                u.display_name,
+                u.avatar_url,
+                COALESCE(us.otaku_score, 0),
+                NEW.content,
+                OLD.created_at,
+                NEW.updated_at
+            FROM users u
+            LEFT JOIN user_stats us ON u.id = NEW.user_id
+            WHERE u.id = NEW.user_id;
+        END
+    """)
+    print("✓ Created trg_user_post_update")
+
+    # DELETE trigger
+    db.execute_update("""
+        CREATE TRIGGER trg_user_post_delete
+        AFTER DELETE ON user_posts
+        BEGIN
+            DELETE FROM activities
+            WHERE activity_type = 'user_post'
+              AND user_id = OLD.user_id
+              AND item_id = OLD.id;
+        END
+    """)
+    print("✓ Created trg_user_post_delete")
 
     print("\n=== Trigger fix complete ===")
     print("All triggers now use INSERT OR REPLACE to avoid UNIQUE constraint errors")
