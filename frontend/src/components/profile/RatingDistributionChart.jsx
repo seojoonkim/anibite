@@ -3,8 +3,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 export default function RatingDistributionChart({ distribution }) {
   if (!distribution || distribution.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6 w-full h-full flex flex-col">
-        <h3 className="text-xl font-bold mb-4">평점 분포</h3>
+      <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md p-6 w-full h-full flex flex-col border border-sky-100/50">
+        <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-[#638CCC] to-sky-500 bg-clip-text text-transparent">평점 분포</h3>
         <p className="text-gray-600">아직 평가한 애니메이션이 없습니다.</p>
       </div>
     );
@@ -20,13 +20,13 @@ export default function RatingDistributionChart({ distribution }) {
     });
   }
 
-  // 색상 그라데이션 (메인 테마 색상)
+  // 색상 그라데이션 (메인 테마 색상) - 평점이 높을수록 진한 색
   const getColor = (rating) => {
-    if (rating >= 4.5) return '#8EC5FC'; // 진한 파랑
-    if (rating >= 4.0) return '#638CCC'; // 중간 파랑
+    if (rating >= 4.5) return '#638CCC'; // 가장 진한 파랑
+    if (rating >= 4.0) return '#8EC5FC'; // 진한 파랑
     if (rating >= 3.5) return '#90B2E4'; // 밝은 파랑
-    if (rating >= 3.0) return '#638CCC'; // 중간 파랑
-    if (rating >= 2.5) return '#8EC5FC'; // 진한 파랑
+    if (rating >= 3.0) return '#8EC5FC'; // 진한 파랑
+    if (rating >= 2.5) return '#90B2E4'; // 밝은 파랑
     return '#638CCC'; // 중간 파랑
   };
 
@@ -43,8 +43,8 @@ export default function RatingDistributionChart({ distribution }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 w-full h-full flex flex-col">
-      <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">평점 분포</h3>
+    <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 w-full h-full flex flex-col border border-sky-100/50">
+      <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-[#638CCC] to-sky-500 bg-clip-text text-transparent">평점 분포</h3>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={allRatings} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
