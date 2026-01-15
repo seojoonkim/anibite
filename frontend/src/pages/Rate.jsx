@@ -188,17 +188,17 @@ function RatingCard({ anime, onRate }) {
             : undefined
         }}
       >
-        <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out ${
+        <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out group ${
           status === 'PASS' ? 'opacity-50' : 'opacity-100'
         } ${status !== 'RATED' ? 'border border-gray-200' : ''}`}>
         {/* Cover Image */}
-        <Link to={`/anime/${anime.id}`} className="block relative aspect-[3/4] bg-gray-200 group/image overflow-hidden">
+        <Link to={`/anime/${anime.id}`} className="block relative aspect-[3/4] bg-gray-200 overflow-hidden">
           <img
             src={getImageUrl(anime.cover_image_url)}
             alt={getAnimeTitle(anime)}
             loading="lazy"
             decoding="async"
-            className="w-full h-full object-cover group-hover/image:scale-110 transition-transform duration-900"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms]"
             onError={(e) => {
               e.target.src = '/placeholder-anime.svg';
             }}
