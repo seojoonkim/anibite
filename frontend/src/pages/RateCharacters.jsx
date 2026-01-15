@@ -411,12 +411,12 @@ export default function RateCharacters() {
                             } else if (displayRating >= position - 0.5) {
                               starContent = (
                                 <span className="relative inline-block">
-                                  <span className="text-gray-400">★</span>
+                                  <span className="text-gray-300">★</span>
                                   <span className="absolute top-0 left-0 overflow-hidden w-1/2" style={gradientStyle}>★</span>
                                 </span>
                               );
                             } else {
-                              starContent = <span className="text-gray-400">★</span>;
+                              starContent = <span className="text-gray-300">★</span>;
                             }
 
                             return (

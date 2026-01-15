@@ -154,14 +154,14 @@ function RatingCard({ anime, onRate }) {
     } else if (displayRating >= position - 0.5) {
       return (
         <span className="relative inline-block">
-          <span className="text-gray-600">★</span>
+          <span className="text-gray-300">★</span>
           <span className="absolute top-0 left-0 overflow-hidden w-1/2" style={gradientStyle}>
             ★
           </span>
         </span>
       );
     }
-    return <span className="text-gray-600">★</span>;
+    return <span className="text-gray-300">★</span>;
   };
 
   const getCardBackgroundColor = () => {
