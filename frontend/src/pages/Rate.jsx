@@ -55,7 +55,7 @@ function RatingCard({ anime, onRate }) {
     setCurrentRating(rating);
     setStatus('RATED');
     setAnimating(true);
-    setTimeout(() => setAnimating(false), 500);
+    setTimeout(() => setAnimating(false), 600);
 
     try {
       await onRate(anime.id, rating, 'RATED');
@@ -83,8 +83,9 @@ function RatingCard({ anime, onRate }) {
 
     // 시리즈가 없으면 바로 처리
     setStatus(statusType);
+    setCurrentRating(0); // Clear rating when changing status
     setAnimating(true);
-    setTimeout(() => setAnimating(false), 500);
+    setTimeout(() => setAnimating(false), 600);
     try {
       await onRate(anime.id, null, statusType);
     } catch (err) {
@@ -172,11 +173,21 @@ function RatingCard({ anime, onRate }) {
 
   return (
     <div className="group relative" ref={cardRef}>
-      <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-300 ${animating ? 'scale-105' : 'scale-100'} ${
-        status === 'RATED' ? 'ring-2 ring-green-400 shadow-[0_4px_20px_rgba(34,197,94,0.2)]' :
-        status === 'WANT_TO_WATCH' ? 'ring-2 ring-blue-400 shadow-[0_4px_20px_rgba(59,130,246,0.2)]' :
-        status === 'PASS' ? 'ring-2 ring-gray-400 shadow-[0_4px_20px_rgba(156,163,175,0.2)]' : ''
-      }`}>
+      <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out ${
+        animating ? 'scale-110' : 'scale-100'
+      }`} style={{
+        borderWidth: status ? '2px' : '0px',
+        borderStyle: 'solid',
+        borderImage: status === 'RATED'
+          ? 'linear-gradient(135deg, #FF6B35, #FF8C42, #FFA458) 1'
+          : 'none',
+        borderColor: status === 'PASS' ? '#9CA3AF' : 'transparent',
+        boxShadow: status === 'RATED'
+          ? '0 4px 20px rgba(255, 107, 53, 0.3)'
+          : status === 'PASS'
+          ? '0 4px 20px rgba(156, 163, 175, 0.2)'
+          : undefined
+      }}>
         {/* Cover Image */}
         <Link to={`/anime/${anime.id}`} className="block relative aspect-[3/4] bg-gray-200 group/image overflow-hidden">
           <img
@@ -542,7 +553,18 @@ export default function Rate() {
           ? {
               ...anime,
               user_rating_status: status,
-              user_rating: status === 'RATED' ? rating : null
+              user_rating: status === 'RATED' ? rating : 0
+            }
+          : anime
+      ));
+
+      // Also update allAnimeItems to keep data in sync
+      setAllAnimeItems(prev => prev.map(anime =>
+        anime.id === animeId
+          ? {
+              ...anime,
+              user_rating_status: status,
+              user_rating: status === 'RATED' ? rating : 0
             }
           : anime
       ));
