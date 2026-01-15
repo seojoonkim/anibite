@@ -187,6 +187,99 @@ def get_user_genre_preferences(
     return get_genre_preferences(user_id, limit)
 
 
+@router.get("/{user_id}/stats", response_model=Dict)
+def get_user_stats_by_id(user_id: int):
+    """
+    다른 사용자의 통계 (공개)
+    """
+    from services.profile_service import get_user_stats
+    return get_user_stats(user_id)
+
+
+@router.get("/{user_id}/rating-distribution", response_model=List[Dict])
+def get_user_rating_distribution_by_id(user_id: int):
+    """
+    다른 사용자의 평점 분포 (공개)
+    """
+    return get_rating_distribution(user_id)
+
+
+@router.get("/{user_id}/year-distribution", response_model=List[Dict])
+def get_user_year_distribution_by_id(user_id: int):
+    """
+    다른 사용자의 연도별 시청 분포 (공개)
+    """
+    return get_year_distribution(user_id)
+
+
+@router.get("/{user_id}/watch-time", response_model=Dict)
+def get_user_watch_time_by_id(user_id: int):
+    """
+    다른 사용자의 시청 시간 (공개)
+    """
+    return get_watch_time(user_id)
+
+
+@router.get("/{user_id}/format-distribution", response_model=List[Dict])
+def get_user_format_distribution_by_id(user_id: int):
+    """
+    다른 사용자의 포맷별 분포 (공개)
+    """
+    from services.profile_service import get_format_distribution
+    return get_format_distribution(user_id)
+
+
+@router.get("/{user_id}/episode-length-distribution", response_model=List[Dict])
+def get_user_episode_length_distribution_by_id(user_id: int):
+    """
+    다른 사용자의 에피소드 길이 분포 (공개)
+    """
+    from services.profile_service import get_episode_length_distribution
+    return get_episode_length_distribution(user_id)
+
+
+@router.get("/{user_id}/rating-stats", response_model=Dict)
+def get_user_rating_stats_by_id(user_id: int):
+    """
+    다른 사용자의 평점 통계 (공개)
+    """
+    from services.profile_service import get_rating_stats
+    return get_rating_stats(user_id)
+
+
+@router.get("/{user_id}/studio-stats", response_model=List[Dict])
+def get_user_studio_stats_by_id(
+    user_id: int,
+    limit: int = Query(10, ge=1, le=50)
+):
+    """
+    다른 사용자의 스튜디오 통계 (공개)
+    """
+    from services.profile_service import get_studio_stats
+    return get_studio_stats(user_id, limit)
+
+
+@router.get("/{user_id}/season-stats", response_model=List[Dict])
+def get_user_season_stats_by_id(user_id: int):
+    """
+    다른 사용자의 시즌별 통계 (공개)
+    """
+    from services.profile_service import get_season_stats
+    return get_season_stats(user_id)
+
+
+@router.get("/{user_id}/genre-combinations", response_model=List[Dict])
+def get_user_genre_combinations_by_id(
+    user_id: int,
+    limit: int = Query(10, ge=1, le=50)
+):
+    """
+    다른 사용자의 장르 조합 통계 (공개)
+    """
+    from services.profile_service import get_genre_combinations
+    return get_genre_combinations(user_id, limit)
+
+
 @router.get("/me/format-distribution", response_model=List[Dict])
 def get_my_format_distribution(current_user: UserResponse = Depends(get_current_user)):
     """
