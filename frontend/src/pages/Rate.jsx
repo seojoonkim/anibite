@@ -198,7 +198,7 @@ function RatingCard({ anime, onRate }) {
             alt={getAnimeTitle(anime)}
             loading="lazy"
             decoding="async"
-            className="w-full h-full object-cover group-hover/image:scale-110 transition-transform duration-300"
+            className="w-full h-full object-cover group-hover/image:scale-110 transition-transform duration-900"
             onError={(e) => {
               e.target.src = '/placeholder-anime.svg';
             }}
