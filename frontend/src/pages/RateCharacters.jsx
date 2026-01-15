@@ -149,20 +149,20 @@ export default function RateCharacters() {
         ));
       }, 600);
 
-      await characterService.rateCharacter(characterId, rating);
+      await characterService.rateCharacter(characterId, { rating, status: 'RATED' });
 
       // Update the character in both lists for immediate UI update
       setCharacters(characters.map(char =>
-        char.id === characterId ? { ...char, my_rating: rating } : char
+        char.id === characterId ? { ...char, my_rating: rating, my_status: 'RATED' } : char
       ));
       setAllCharacters(allCharacters.map(char =>
-        char.id === characterId ? { ...char, my_rating: rating } : char
+        char.id === characterId ? { ...char, my_rating: rating, my_status: 'RATED' } : char
       ));
 
       // Clear any previous status when rated
       setCharacterStatuses(prev => ({
         ...prev,
-        [characterId]: null
+        [characterId]: 'RATED'
       }));
 
       // Reload stats
@@ -189,7 +189,7 @@ export default function RateCharacters() {
       const currentStatus = characterStatuses[characterId];
       const newStatus = currentStatus === status ? null : status;
 
-      await characterService.rateCharacter(characterId, null, newStatus);
+      await characterService.rateCharacter(characterId, { status: newStatus });
 
       // Update the status in state for immediate UI update
       setCharacterStatuses(prev => ({
