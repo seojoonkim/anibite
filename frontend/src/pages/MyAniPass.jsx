@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { userService } from '../services/userService';
@@ -36,10 +36,16 @@ export default function MyAniPass() {
   const { user } = useAuth();
   const { t, language } = useLanguage();
   const { userId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isOwnProfile = !userId || parseInt(userId) === user?.id;
   const [profileUser, setProfileUser] = useState(null);
   const displayUser = isOwnProfile ? user : profileUser;
-  const [activeTab, setActiveTab] = useState('feed');
+
+  // Initialize activeTab from URL query parameter, default to 'feed'
+  const tabFromUrl = searchParams.get('tab');
+  const initialTab = ['feed', 'anipass', 'anime', 'character'].includes(tabFromUrl) ? tabFromUrl : 'feed';
+  const [activeTab, setActiveTab] = useState(initialTab);
+
   const [animeSubMenu, setAnimeSubMenu] = useState('all'); // 애니 서브메뉴: all, 5, 4, 3, 2, 1, 0, watchlist, pass
   const [characterSubMenu, setCharacterSubMenu] = useState('all'); // 캐릭터 서브메뉴: all, 5, 4, 3, 2, 1, 0, want, pass
 
@@ -151,6 +157,21 @@ export default function MyAniPass() {
     });
     if (node) observer.current.observe(node);
   }, [loadingMoreFeed, hasMoreFeed]);
+
+  // Sync activeTab with URL query parameter
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    const validTab = ['feed', 'anipass', 'anime', 'character'].includes(tabFromUrl) ? tabFromUrl : 'feed';
+    if (validTab !== activeTab) {
+      setActiveTab(validTab);
+    }
+  }, [searchParams]);
+
+  // Update URL when activeTab changes
+  const changeTab = useCallback((newTab) => {
+    setActiveTab(newTab);
+    setSearchParams({ tab: newTab });
+  }, [setSearchParams]);
 
   useEffect(() => {
     // Reset states when userId changes (switching between profiles)
@@ -992,7 +1013,7 @@ export default function MyAniPass() {
             {/* Tabs - Real and Clickable */}
             <div className="flex border-b border-gray-200">
               <button
-                onClick={() => setActiveTab('feed')}
+                onClick={() => changeTab('feed')}
                 className={`px-6 py-3 font-medium transition-colors ${
                   activeTab === 'feed'
                     ? 'border-b-2'
@@ -1003,7 +1024,7 @@ export default function MyAniPass() {
                 {language === 'ko' ? '피드' : 'Feed'}
               </button>
               <button
-                onClick={() => setActiveTab('anipass')}
+                onClick={() => changeTab('anipass')}
                 className={`px-6 py-3 font-medium transition-colors ${
                   activeTab === 'anipass'
                     ? 'border-b-2'
@@ -1014,7 +1035,7 @@ export default function MyAniPass() {
                 {language === 'ko' ? '애니패스' : 'AniPass'}
               </button>
               <button
-                onClick={() => setActiveTab('anime')}
+                onClick={() => changeTab('anime')}
                 className={`px-6 py-3 font-medium transition-colors ${
                   activeTab === 'anime'
                     ? 'border-b-2'
@@ -1025,7 +1046,7 @@ export default function MyAniPass() {
                 {language === 'ko' ? '애니' : 'Anime'}
               </button>
               <button
-                onClick={() => setActiveTab('character')}
+                onClick={() => changeTab('character')}
                 className={`px-6 py-3 font-medium transition-colors ${
                   activeTab === 'character'
                     ? 'border-b-2'
@@ -1125,7 +1146,7 @@ export default function MyAniPass() {
           {/* Tabs */}
           <div className="flex border-b border-gray-200">
             <button
-              onClick={() => setActiveTab('feed')}
+              onClick={() => changeTab('feed')}
               className={`px-6 py-3 font-medium transition-colors ${
                 activeTab === 'feed'
                   ? 'border-b-2'
@@ -1136,7 +1157,7 @@ export default function MyAniPass() {
               {language === 'ko' ? '피드' : 'Feed'}
             </button>
             <button
-              onClick={() => setActiveTab('anipass')}
+              onClick={() => changeTab('anipass')}
               className={`px-6 py-3 font-medium transition-colors ${
                 activeTab === 'anipass'
                   ? 'border-b-2'
@@ -1147,7 +1168,7 @@ export default function MyAniPass() {
               {language === 'ko' ? '애니패스' : 'AniPass'}
             </button>
             <button
-              onClick={() => setActiveTab('anime')}
+              onClick={() => changeTab('anime')}
               className={`px-6 py-3 font-medium transition-colors ${
                 activeTab === 'anime'
                   ? 'border-b-2'
@@ -1158,7 +1179,7 @@ export default function MyAniPass() {
               {language === 'ko' ? '애니' : 'Anime'} {stats && <span className="text-sm">({(stats.total_rated || 0) + (stats.total_want_to_watch || 0) + (stats.total_pass || 0)})</span>}
             </button>
             <button
-              onClick={() => setActiveTab('character')}
+              onClick={() => changeTab('character')}
               className={`px-6 py-3 font-medium transition-colors ${
                 activeTab === 'character'
                   ? 'border-b-2'
