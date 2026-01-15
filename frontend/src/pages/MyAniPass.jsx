@@ -174,24 +174,7 @@ export default function MyAniPass() {
     }
   }, [searchParams, activeTab]);
 
-  useEffect(() => {
-    // Reset states when userId changes (switching between profiles)
-    if (userId !== undefined) {
-      setUserActivities([]);
-      setFeedOffset(0);
-      setHasMoreFeed(true);
-      setLoadedTabs({
-        anipass: false,
-        anime: false,
-        character: false,
-        feed: false
-      });
-    }
-    loadData();
-    loadFollowData();
-  }, [activeTab, userId, loadData]);
-
-  const loadFollowData = async () => {
+  const loadFollowData = useCallback(async () => {
     try {
       const targetUserId = userId || user?.id;
       if (!targetUserId) return;
@@ -208,7 +191,7 @@ export default function MyAniPass() {
     } catch (err) {
       console.error('Failed to load follow data:', err);
     }
-  };
+  }, [userId, user, isOwnProfile]);
 
   const handleFollowToggle = async () => {
     try {
@@ -496,6 +479,24 @@ export default function MyAniPass() {
       setTabLoading(false);
     }
   }, [isOwnProfile, activeTab, loadedTabs, statsLoaded, profileUser, userId, user, filterAnimeBySubMenu, animeSubMenu, filterCharactersBySubMenu, characterSubMenu]);
+
+  // Load data when tab or userId changes
+  useEffect(() => {
+    // Reset states when userId changes (switching between profiles)
+    if (userId !== undefined) {
+      setUserActivities([]);
+      setFeedOffset(0);
+      setHasMoreFeed(true);
+      setLoadedTabs({
+        anipass: false,
+        anime: false,
+        character: false,
+        feed: false
+      });
+    }
+    loadData();
+    loadFollowData();
+  }, [activeTab, userId, loadData, loadFollowData]);
 
   const formatWatchTime = (minutes) => {
     if (!minutes) return '0시간';
