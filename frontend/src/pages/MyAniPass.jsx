@@ -157,7 +157,7 @@ export default function MyAniPass() {
       }
     });
     if (node) observer.current.observe(node);
-  }, [loadingMoreFeed, hasMoreFeed, loadMoreFeed]);
+  }, [loadingMoreFeed, hasMoreFeed]);
 
   // Update URL when activeTab changes
   const changeTab = useCallback((newTab) => {
