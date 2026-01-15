@@ -1546,12 +1546,11 @@ export default function MyAniPass() {
                       >
                         <ActivityCard
                           activity={activity}
-                          displayAvatar={displayAvatar}
-                          displayName={displayName}
-                          currentOtakuScore={currentOtakuScore}
-                          isOwnProfile={isOwnProfile}
-                          language={language}
-                          handleDeletePost={handleDeletePost}
+                          context="feed"
+                          onUpdate={() => {
+                            // Reload feed after deletion
+                            loadData();
+                          }}
                         />
                       </div>
                     );
