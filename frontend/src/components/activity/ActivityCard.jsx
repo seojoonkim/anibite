@@ -327,7 +327,7 @@ export default function ActivityCard({
     try {
       // Delete based on activity type
       if (activity.activity_type === 'user_post') {
-        await userPostService.deletePost(activity.item_id);
+        await userPostService.deletePost(activity.id);
       } else if (activity.activity_type === 'anime_rating') {
         await ratingService.deleteRating(activity.item_id);
       } else if (activity.activity_type === 'character_rating') {
@@ -381,7 +381,7 @@ export default function ActivityCard({
     }
 
     try {
-      await userPostService.updatePost(activity.item_id, editPostContent);
+      await userPostService.updatePost(activity.id, editPostContent);
       setShowEditModal(false);
 
       // Refresh the feed to show updated content
