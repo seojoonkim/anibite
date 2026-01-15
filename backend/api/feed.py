@@ -201,6 +201,14 @@ def get_feed(
         print(f"[DEBUG] Calling enrich_activities_with_engagement with {len(activities)} activities")
         enriched = enrich_activities_with_engagement(activities, current_user.id, db)
         print(f"[DEBUG] Returning {len(enriched)} enriched activities")
+
+        # Debug: Check user_post data before returning
+        for activity in enriched:
+            if activity.get('activity_type') == 'user_post':
+                print(f"[DEBUG] user_post in response: review_id={activity.get('review_id')}, item_id={activity.get('item_id')}, has review_id key={('review_id' in activity)}")
+                import json
+                print(f"[DEBUG] Full user_post: {json.dumps(activity, default=str, ensure_ascii=False)}")
+
         return enriched
     except Exception as e:
         print(f"[ERROR] get_feed failed: {type(e).__name__}: {e}")
