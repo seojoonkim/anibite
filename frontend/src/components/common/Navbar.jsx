@@ -232,7 +232,11 @@ export default function Navbar() {
         right: 0,
         zIndex: 9999,
         backgroundColor: '#FFFFFF',
-        borderBottom: '1px solid #DBDBDB'
+        borderBottom: '1px solid #DBDBDB',
+        transform: 'scale(0.9)',
+        transformOrigin: 'top center',
+        width: '111.11%',
+        marginLeft: '-5.555%'
       }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 items-center h-16 md:gap-6">
