@@ -30,6 +30,10 @@ export default function Feed() {
   const [editingActivity, setEditingActivity] = useState(null);
   const [editMode, setEditMode] = useState('edit'); // 'edit' | 'add_review' | 'edit_rating'
 
+  // Delete modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [activityToDelete, setActivityToDelete] = useState(null);
+
   // Scroll observer ref
   const observerRef = useRef(null);
   const loadMoreTriggerRef = useRef(null);
@@ -323,32 +327,37 @@ export default function Feed() {
     }
   };
 
-  const handleDeleteContent = async (activity) => {
-    const isAnime = activity.activity_type === 'anime_rating';
-    const hasReview = activity.review_content && activity.review_content.trim();
+  const handleOpenDeleteModal = (activity) => {
+    setActivityToDelete(activity);
+    setShowDeleteModal(true);
+  };
 
-    const confirmMessage = language === 'ko'
-      ? (hasReview ? '리뷰를 삭제하시겠습니까?' : '평가를 삭제하시겠습니까?')
-      : (hasReview ? 'Delete this review?' : 'Delete this rating?');
-
-    if (!confirm(confirmMessage)) return;
+  const handleDeleteContent = async (deleteType) => {
+    if (!activityToDelete) return;
 
     try {
-      if (hasReview) {
-        // 리뷰 삭제
+      const activity = activityToDelete;
+      const isAnime = activity.activity_type === 'anime_rating';
+      const hasReview = activity.review_content && activity.review_content.trim();
+
+      if (deleteType === 'review_only' && hasReview) {
+        // 리뷰만 삭제 (별점은 유지)
         if (isAnime) {
           await reviewService.deleteReview(activity.id);
         } else {
           await characterReviewService.deleteReview(activity.id);
         }
       } else {
-        // 평가만 삭제
+        // 별점까지 모두 삭제
         if (isAnime) {
           await ratingService.deleteRating(activity.item_id);
         } else {
           await characterService.deleteCharacterRating(activity.item_id);
         }
       }
+
+      setShowDeleteModal(false);
+      setActivityToDelete(null);
 
       // Refresh activities: reset and reload
       resetActivities();
@@ -544,7 +553,7 @@ export default function Feed() {
                           context="notification"
                           onUpdate={resetActivities}
                           onEditContent={handleEditContent}
-                          onDeleteContent={handleDeleteContent}
+                          onDeleteContent={handleOpenDeleteModal}
                         />
                       </NotificationCard>
                     );
@@ -558,7 +567,7 @@ export default function Feed() {
                         context="feed"
                         onUpdate={resetActivities}
                         onEditContent={handleEditContent}
-                        onDeleteContent={handleDeleteContent}
+                        onDeleteContent={handleOpenDeleteModal}
                       />
                     </div>
                   );
@@ -615,6 +624,69 @@ export default function Feed() {
         onSave={handleSaveEdit}
         mode={editMode}
       />
+
+      {/* Delete Modal */}
+      {showDeleteModal && activityToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowDeleteModal(false)}>
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold mb-4 text-gray-900">
+              {language === 'ko' ? '삭제 옵션' : 'Delete Options'}
+            </h3>
+
+            {activityToDelete.review_content && activityToDelete.review_content.trim() ? (
+              <>
+                <p className="text-sm text-gray-700 mb-6">
+                  {language === 'ko'
+                    ? '이 평가에는 리뷰가 포함되어 있습니다. 어떻게 삭제하시겠습니까?'
+                    : 'This rating includes a review. How would you like to delete it?'}
+                </p>
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={() => handleDeleteContent('review_only')}
+                    className="w-full px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+                  >
+                    {language === 'ko' ? '리뷰만 삭제 (별점 유지)' : 'Delete review only (Keep rating)'}
+                  </button>
+                  <button
+                    onClick={() => handleDeleteContent('all')}
+                    className="w-full px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
+                  >
+                    {language === 'ko' ? '별점까지 모두 삭제' : 'Delete rating and review'}
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteModal(false)}
+                    className="w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
+                  >
+                    {language === 'ko' ? '취소' : 'Cancel'}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-gray-700 mb-6">
+                  {language === 'ko'
+                    ? '이 평가를 삭제하시겠습니까?'
+                    : 'Are you sure you want to delete this rating?'}
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleDeleteContent('all')}
+                    className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
+                  >
+                    {language === 'ko' ? '삭제' : 'Delete'}
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteModal(false)}
+                    className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
+                  >
+                    {language === 'ko' ? '취소' : 'Cancel'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
