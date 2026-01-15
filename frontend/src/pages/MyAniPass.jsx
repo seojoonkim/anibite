@@ -489,10 +489,21 @@ export default function MyAniPass() {
     return getAvatarUrlHelper(avatarUrl) || '/placeholder-avatar.png';
   };
 
-  // Helper for anime cover images
+  // Helper for anime cover images and character images
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.svg';
+
+    // If it's an AniList character image, try R2 first
+    if (imageUrl.includes('anilist.co') && imageUrl.includes('/character/')) {
+      const match = imageUrl.match(/\/b(\d+)-/);
+      if (match && match[1]) {
+        const characterId = match[1];
+        return `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
+      }
+    }
+
     if (imageUrl.startsWith('http')) return imageUrl;
+
     const processedUrl = imageUrl.includes('/covers/')
       ? imageUrl.replace('/covers/', '/covers_large/')
       : imageUrl;
@@ -2305,11 +2316,11 @@ export default function MyAniPass() {
               <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 flex gap-3">
                 {activityToDelete.item_image && (
                   <img
-                    src={activityToDelete.item_image}
+                    src={getImageUrl(activityToDelete.item_image)}
                     alt={activityToDelete.item_title_korean || activityToDelete.item_title}
                     className="w-16 h-24 object-cover rounded flex-shrink-0"
                     onError={(e) => {
-                      e.target.style.display = 'none';
+                      e.target.src = '/placeholder-anime.svg';
                     }}
                   />
                 )}

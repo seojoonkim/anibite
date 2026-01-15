@@ -363,13 +363,13 @@ export default function RateCharacters() {
                   {/* Status Badge */}
                   {(hasRated || characterStatuses[character.id]) && (
                     <div className="absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold text-white shadow-lg" style={{
-                      background: hasRated
+                      background: (hasRated || characterStatuses[character.id] === 'RATED')
                         ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
                         : characterStatuses[character.id] === 'WANT_TO_KNOW'
                         ? '#3B82F6'
                         : '#6B7280'
                     }}>
-                      {hasRated
+                      {(hasRated || characterStatuses[character.id] === 'RATED')
                         ? (language === 'ko' ? '평가완료' : 'Rated')
                         : characterStatuses[character.id] === 'WANT_TO_KNOW'
                         ? (language === 'ko' ? '알고싶어요' : 'Want to Know')
