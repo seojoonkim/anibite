@@ -478,13 +478,29 @@ export default function WriteReviews() {
             return (
               <div
                 key={item.id}
-                className={`bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-300 ease-in-out overflow-hidden self-start ${
-                  isJustCompleted
-                    ? 'border-2 border-green-400 bg-green-50'
-                    : 'border border-gray-200'
-                }`}
+                className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out overflow-hidden self-start border"
+                style={{
+                  borderWidth: isJustCompleted ? '2px' : '1px',
+                  borderStyle: 'solid',
+                  borderImage: isJustCompleted
+                    ? 'linear-gradient(135deg, #FF6B35, #FF8C42, #FFA458) 1'
+                    : 'none',
+                  borderColor: isJustCompleted ? 'transparent' : '#E5E7EB',
+                  boxShadow: isJustCompleted
+                    ? '0 4px 20px rgba(255, 107, 53, 0.3)'
+                    : undefined
+                }}
               >
-                <div className="flex items-start">
+                <div className="flex items-start relative">
+                  {/* 작성완료 뱃지 */}
+                  {isJustCompleted && (
+                    <div className="absolute top-2 right-2 z-10">
+                      <span className="px-3 py-1 bg-gradient-to-r from-[#FF6B35] to-[#FFA458] text-white text-xs font-bold rounded-full shadow-lg">
+                        작성완료
+                      </span>
+                    </div>
+                  )}
+
                   <Link
                     to={item.type === 'anime' ? `/anime/${item.itemId}` : `/character/${item.itemId}`}
                     className="flex-shrink-0 hover:opacity-90 transition-opacity cursor-pointer"
