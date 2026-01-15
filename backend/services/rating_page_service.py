@@ -17,7 +17,7 @@ def get_anime_for_rating(user_id: int, limit: int = 50) -> List[Dict]:
     - site stats 제거 (불필요)
     - 가중치 랜덤 정렬: 인기도 기반, Python에서 랜덤 섞기
     - 인덱스 활용
-    - WANT_TO_WATCH는 소수만 포함 (10-15%)
+    - WANT_TO_WATCH는 소수만 포함 (10%)
 
     목표: 0.1초 이내
     """
@@ -25,8 +25,8 @@ def get_anime_for_rating(user_id: int, limit: int = 50) -> List[Dict]:
     # Fetch more items than needed (3x) for randomization
     fetch_limit = limit * 3
 
-    # Calculate how many WANT_TO_WATCH items to include (15% of limit)
-    want_to_watch_limit = max(int(limit * 0.15), 5)  # At least 5 items
+    # Calculate how many WANT_TO_WATCH items to include (10% of limit)
+    want_to_watch_limit = max(int(limit * 0.10), 5)  # At least 5 items
     unrated_limit = fetch_limit - want_to_watch_limit
 
     # Fetch unrated anime (majority)
