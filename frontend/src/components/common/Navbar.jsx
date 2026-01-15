@@ -494,7 +494,7 @@ export default function Navbar() {
                       return (
                         <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor} hidden sm:inline-flex`}>
                           <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span>
-                          <span className="text-gray-700">{toRoman(levelInfo.rank)}</span>
+                          <span className="text-gray-700">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
                         </span>
                       );
                     })()}
