@@ -165,6 +165,15 @@ async def startup_event():
     except Exception as e:
         print(f"⚠️ Failed to update schema: {e}\n")
 
+    # Verify existing users (one-time migration for email verification feature)
+    print("👤 Verifying existing users...")
+    try:
+        from scripts.verify_existing_users import verify_existing_users
+        verify_existing_users()
+        print("✅ Existing users verified!\n")
+    except Exception as e:
+        print(f"⚠️ Failed to verify existing users: {e}\n")
+
     # Fix triggers
     print("🔧 Checking and fixing database triggers...")
     try:
