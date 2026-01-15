@@ -12,6 +12,7 @@
  * />
  */
 import { useState, useEffect, useMemo, forwardRef, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
@@ -694,9 +695,10 @@ const ActivityCard = forwardRef(({
       )}
 
       {/* Simple Edit Post Modal */}
-      {showEditModal && (
+      {showEditModal && createPortal(
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          style={{ zIndex: 9999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
           onClick={() => setShowEditModal(false)}
         >
           <div
@@ -729,7 +731,8 @@ const ActivityCard = forwardRef(({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
