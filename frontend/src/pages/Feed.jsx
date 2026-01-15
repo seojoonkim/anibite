@@ -10,6 +10,7 @@ import { ratingService } from '../services/ratingService';
 import { reviewService } from '../services/reviewService';
 import { characterService } from '../services/characterService';
 import { characterReviewService } from '../services/characterReviewService';
+import { userPostService } from '../services/userPostService';
 import ActivityCard from '../components/activity/ActivityCard';
 import NotificationCard from '../components/feed/NotificationCard';
 import EditReviewModal from '../components/common/EditReviewModal';
@@ -424,9 +425,13 @@ export default function Feed() {
     try {
       const activity = activityToDelete;
       const isAnime = activity.activity_type === 'anime_rating';
+      const isUserPost = activity.activity_type === 'user_post';
       const hasReview = activity.review_content && activity.review_content.trim();
 
-      if (deleteType === 'review_only' && hasReview) {
+      if (isUserPost) {
+        // 일반 포스트 삭제
+        await userPostService.deletePost(activity.id);
+      } else if (deleteType === 'review_only' && hasReview) {
         // 리뷰만 삭제 (별점은 유지)
         if (isAnime) {
           await reviewService.deleteReview(activity.id);
@@ -727,46 +732,72 @@ export default function Feed() {
         >
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold mb-2 text-gray-900">
-              {language === 'ko' ? '삭제 옵션' : 'Delete Options'}
+              {activityToDelete.activity_type === 'user_post'
+                ? (language === 'ko' ? '포스트 삭제' : 'Delete Post')
+                : (language === 'ko' ? '삭제 옵션' : 'Delete Options')}
             </h3>
 
-            {/* Show what's being deleted */}
-            <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 flex gap-3">
-              {activityToDelete.item_image && (
-                <img
-                  src={getItemImageUrl(activityToDelete.item_image)}
-                  alt={activityToDelete.item_title_korean || activityToDelete.item_title}
-                  className="w-16 h-24 object-cover rounded flex-shrink-0"
-                  onError={(e) => {
-                    e.target.src = '/placeholder-anime.svg';
-                  }}
-                />
-              )}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 mb-1">
-                  {activityToDelete.activity_type === 'character_rating' ? (
-                    <>
-                      {activityToDelete.item_title}{' '}
-                      <span className="text-gray-600">({activityToDelete.item_title_korean})</span>
-                    </>
-                  ) : (
-                    activityToDelete.item_title_korean || activityToDelete.item_title
+            {activityToDelete.activity_type === 'user_post' ? (
+              <>
+                <p className="text-sm text-gray-700 mb-6">
+                  {language === 'ko'
+                    ? '이 포스트를 삭제하시겠습니까?'
+                    : 'Are you sure you want to delete this post?'}
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleDeleteContent('all')}
+                    className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
+                  >
+                    {language === 'ko' ? '삭제' : 'Delete'}
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteModal(false)}
+                    className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
+                  >
+                    {language === 'ko' ? '취소' : 'Cancel'}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Show what's being deleted */}
+                <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 flex gap-3">
+                  {activityToDelete.item_image && (
+                    <img
+                      src={getItemImageUrl(activityToDelete.item_image)}
+                      alt={activityToDelete.item_title_korean || activityToDelete.item_title}
+                      className="w-16 h-24 object-cover rounded flex-shrink-0"
+                      onError={(e) => {
+                        e.target.src = '/placeholder-anime.svg';
+                      }}
+                    />
                   )}
-                </p>
-                {activityToDelete.activity_type === 'character_rating' && activityToDelete.anime_title && (
-                  <p className="text-xs text-gray-600 mb-1">
-                    from: {activityToDelete.anime_title_korean || activityToDelete.anime_title}
-                  </p>
-                )}
-                <p className="text-xs text-gray-500">
-                  {activityToDelete.activity_type === 'character_rating'
-                    ? (language === 'ko' ? '캐릭터' : 'Character')
-                    : (language === 'ko' ? '애니메이션' : 'Anime')}
-                </p>
-              </div>
-            </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 mb-1">
+                      {activityToDelete.activity_type === 'character_rating' ? (
+                        <>
+                          {activityToDelete.item_title}{' '}
+                          <span className="text-gray-600">({activityToDelete.item_title_korean})</span>
+                        </>
+                      ) : (
+                        activityToDelete.item_title_korean || activityToDelete.item_title
+                      )}
+                    </p>
+                    {activityToDelete.activity_type === 'character_rating' && activityToDelete.anime_title && (
+                      <p className="text-xs text-gray-600 mb-1">
+                        from: {activityToDelete.anime_title_korean || activityToDelete.anime_title}
+                      </p>
+                    )}
+                    <p className="text-xs text-gray-500">
+                      {activityToDelete.activity_type === 'character_rating'
+                        ? (language === 'ko' ? '캐릭터' : 'Character')
+                        : (language === 'ko' ? '애니메이션' : 'Anime')}
+                    </p>
+                  </div>
+                </div>
 
-            {activityToDelete.review_content && activityToDelete.review_content.trim() ? (
+                {activityToDelete.review_content && activityToDelete.review_content.trim() ? (
               <>
                 <p className="text-sm text-gray-700 mb-6">
                   {language === 'ko'
@@ -792,30 +823,32 @@ export default function Feed() {
                   >
                     {language === 'ko' ? '취소' : 'Cancel'}
                   </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="text-sm text-gray-700 mb-6">
-                  {language === 'ko'
-                    ? '이 평가를 삭제하시겠습니까?'
-                    : 'Are you sure you want to delete this rating?'}
-                </p>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => handleDeleteContent('all')}
-                    className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
-                  >
-                    {language === 'ko' ? '삭제' : 'Delete'}
-                  </button>
-                  <button
-                    onClick={() => setShowDeleteModal(false)}
-                    className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
-                  >
-                    {language === 'ko' ? '취소' : 'Cancel'}
-                  </button>
-                </div>
-              </>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-gray-700 mb-6">
+                    {language === 'ko'
+                      ? '이 평가를 삭제하시겠습니까?'
+                      : 'Are you sure you want to delete this rating?'}
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => handleDeleteContent('all')}
+                      className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
+                    >
+                      {language === 'ko' ? '삭제' : 'Delete'}
+                    </button>
+                    <button
+                      onClick={() => setShowDeleteModal(false)}
+                      className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
+                    >
+                      {language === 'ko' ? '취소' : 'Cancel'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </>
             )}
           </div>
         </div>,
