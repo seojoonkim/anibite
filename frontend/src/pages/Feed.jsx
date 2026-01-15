@@ -338,7 +338,9 @@ export default function Feed() {
             status: 'RATED'
           });
         } else {
-          await characterService.rateCharacter(editingActivity.item_id, formData.rating);
+          await characterService.rateCharacter(editingActivity.item_id, {
+            rating: formData.rating
+          });
         }
       } else if (editMode === 'add_review') {
         // 리뷰 추가
@@ -388,7 +390,9 @@ export default function Feed() {
               status: 'RATED'
             });
           } else {
-            await characterService.rateCharacter(editingActivity.item_id, formData.rating);
+            await characterService.rateCharacter(editingActivity.item_id, {
+              rating: formData.rating
+            });
           }
         }
       }
