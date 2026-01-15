@@ -1190,31 +1190,59 @@ export default function MyAniPass() {
                   {/* 통계 */}
                   <div className="w-full">
                     {stats && (
-                      <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 w-full h-full flex flex-col">
-                        <h3 className="text-lg font-bold mb-6 text-gray-900">{language === 'ko' ? '통계' : 'Statistics'}</h3>
-                        <div className="space-y-4 flex-1">
-                          <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200">
-                            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">{language === 'ko' ? '평가한 애니' : 'Rated Anime'}</div>
-                            <div className="text-2xl font-bold text-gray-900">
-                              {stats.total_rated || 0}
+                      <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 w-full h-full flex flex-col border border-blue-100/50">
+                        <h3 className="text-lg font-bold mb-6 bg-gradient-to-r from-[#638CCC] to-[#8EC5FC] bg-clip-text text-transparent">{language === 'ko' ? '통계' : 'Statistics'}</h3>
+                        <div className="space-y-3 flex-1">
+                          <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-[#8EC5FC]/10 to-[#638CCC]/10 border border-[#8EC5FC]/30 hover:shadow-md transition-all duration-300">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#8EC5FC] to-[#638CCC] flex items-center justify-center text-white text-xl">
+                                📺
+                              </div>
+                              <div className="flex-1">
+                                <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '평가한 애니' : 'Rated Anime'}</div>
+                                <div className="text-2xl font-bold bg-gradient-to-r from-[#638CCC] to-[#8EC5FC] bg-clip-text text-transparent">
+                                  {stats.total_rated || 0}
+                                </div>
+                              </div>
                             </div>
                           </div>
-                          <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200">
-                            <div className="text-xs font-medium text-blue-600 uppercase tracking-wide mb-1.5">{language === 'ko' ? '보고싶어요' : 'Watchlist'}</div>
-                            <div className="text-2xl font-bold text-blue-900">
-                              {stats.total_want_to_watch || 0}
+                          <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-[#90B2E4]/10 to-[#8EC5FC]/10 border border-[#90B2E4]/30 hover:shadow-md transition-all duration-300">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#90B2E4] to-[#8EC5FC] flex items-center justify-center text-white text-xl">
+                                ⭐
+                              </div>
+                              <div className="flex-1">
+                                <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '보고싶어요' : 'Watchlist'}</div>
+                                <div className="text-2xl font-bold bg-gradient-to-r from-[#638CCC] to-[#90B2E4] bg-clip-text text-transparent">
+                                  {stats.total_want_to_watch || 0}
+                                </div>
+                              </div>
                             </div>
                           </div>
-                          <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200">
-                            <div className="text-xs font-medium text-amber-600 uppercase tracking-wide mb-1.5">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</div>
-                            <div className="text-2xl font-bold text-amber-900">
-                              {stats.average_rating ? `★ ${stats.average_rating.toFixed(1)}` : '-'}
+                          <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-amber-400/10 to-yellow-400/10 border border-amber-300/30 hover:shadow-md transition-all duration-300">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-yellow-400 flex items-center justify-center text-white text-xl">
+                                ✨
+                              </div>
+                              <div className="flex-1">
+                                <div className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-0.5">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</div>
+                                <div className="text-2xl font-bold bg-gradient-to-r from-amber-600 to-yellow-500 bg-clip-text text-transparent">
+                                  {stats.average_rating ? `★ ${stats.average_rating.toFixed(1)}` : '-'}
+                                </div>
+                              </div>
                             </div>
                           </div>
-                          <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200">
-                            <div className="text-xs font-medium text-purple-600 uppercase tracking-wide mb-1.5">{language === 'ko' ? '시청 시간' : 'Watch Time'}</div>
-                            <div className="text-2xl font-bold text-purple-900">
-                              {formatWatchTime(watchTime?.total_minutes)}
+                          <div className="py-4 px-5 rounded-xl bg-gradient-to-br from-[#638CCC]/10 to-purple-400/10 border border-[#638CCC]/30 hover:shadow-md transition-all duration-300">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#638CCC] to-purple-400 flex items-center justify-center text-white text-xl">
+                                ⏱️
+                              </div>
+                              <div className="flex-1">
+                                <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '시청 시간' : 'Watch Time'}</div>
+                                <div className="text-2xl font-bold bg-gradient-to-r from-[#638CCC] to-purple-500 bg-clip-text text-transparent">
+                                  {formatWatchTime(watchTime?.total_minutes)}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
