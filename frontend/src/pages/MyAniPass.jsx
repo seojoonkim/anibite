@@ -1120,7 +1120,7 @@ export default function MyAniPass() {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-16 bg-transparent">
+      <div className="min-h-screen pt-12 md:pt-16 bg-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           {/* Header with Real User Data */}
           <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 mb-8">
@@ -1166,10 +1166,10 @@ export default function MyAniPass() {
             </div>
 
             {/* Tabs - Real and Clickable */}
-            <div className="flex border-b border-gray-200">
+            <div className="flex border-b border-gray-200 overflow-x-auto">
               <button
                 onClick={() => changeTab('feed')}
-                className={`px-6 py-3 font-medium transition-colors ${
+                className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
                   activeTab === 'feed'
                     ? 'border-b-2'
                     : 'text-gray-600 hover:text-gray-800'
@@ -1180,7 +1180,7 @@ export default function MyAniPass() {
               </button>
               <button
                 onClick={() => changeTab('anipass')}
-                className={`px-6 py-3 font-medium transition-colors ${
+                className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
                   activeTab === 'anipass'
                     ? 'border-b-2'
                     : 'text-gray-600 hover:text-gray-800'
@@ -1191,7 +1191,7 @@ export default function MyAniPass() {
               </button>
               <button
                 onClick={() => changeTab('anime')}
-                className={`px-6 py-3 font-medium transition-colors ${
+                className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
                   activeTab === 'anime'
                     ? 'border-b-2'
                     : 'text-gray-600 hover:text-gray-800'
@@ -1202,7 +1202,7 @@ export default function MyAniPass() {
               </button>
               <button
                 onClick={() => changeTab('character')}
-                className={`px-6 py-3 font-medium transition-colors ${
+                className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
                   activeTab === 'character'
                     ? 'border-b-2'
                     : 'text-gray-600 hover:text-gray-800'
@@ -1229,7 +1229,7 @@ export default function MyAniPass() {
   }
 
   return (
-    <div className="min-h-screen pt-16 bg-transparent">
+    <div className="min-h-screen pt-12 md:pt-16 bg-transparent">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
@@ -1298,10 +1298,10 @@ export default function MyAniPass() {
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-gray-200">
+          <div className="flex border-b border-gray-200 overflow-x-auto">
             <button
               onClick={() => changeTab('feed')}
-              className={`px-6 py-3 font-medium transition-colors ${
+              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
                 activeTab === 'feed'
                   ? 'border-b-2'
                   : 'text-gray-600 hover:text-gray-800'
@@ -1312,7 +1312,7 @@ export default function MyAniPass() {
             </button>
             <button
               onClick={() => changeTab('anipass')}
-              className={`px-6 py-3 font-medium transition-colors ${
+              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
                 activeTab === 'anipass'
                   ? 'border-b-2'
                   : 'text-gray-600 hover:text-gray-800'
@@ -1323,25 +1323,25 @@ export default function MyAniPass() {
             </button>
             <button
               onClick={() => changeTab('anime')}
-              className={`px-6 py-3 font-medium transition-colors ${
+              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
                 activeTab === 'anime'
                   ? 'border-b-2'
                   : 'text-gray-600 hover:text-gray-800'
               }`}
               style={activeTab === 'anime' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
             >
-              {language === 'ko' ? '애니' : 'Anime'} {stats && <span className="text-sm">({(stats.total_rated || 0) + (stats.total_want_to_watch || 0) + (stats.total_pass || 0)})</span>}
+              {language === 'ko' ? '애니' : 'Anime'} {stats && <span className="text-xs sm:text-sm">({(stats.total_rated || 0) + (stats.total_want_to_watch || 0) + (stats.total_pass || 0)})</span>}
             </button>
             <button
               onClick={() => changeTab('character')}
-              className={`px-6 py-3 font-medium transition-colors ${
+              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
                 activeTab === 'character'
                   ? 'border-b-2'
                   : 'text-gray-600 hover:text-gray-800'
               }`}
               style={activeTab === 'character' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
             >
-              {language === 'ko' ? '캐릭터' : 'Character'} {stats && <span className="text-sm">({stats.total_character_ratings || 0})</span>}
+              {language === 'ko' ? '캐릭터' : 'Character'} {stats && <span className="text-xs sm:text-sm">({stats.total_character_ratings || 0})</span>}
             </button>
           </div>
         </div>
