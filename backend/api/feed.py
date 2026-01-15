@@ -29,6 +29,13 @@ def enrich_activities_with_engagement(activities: List[Dict], current_user_id: O
             item_id = activity['item_id']
             user_id = activity['user_id']
 
+            # user_post의 경우 간단하게 처리 (activity_likes 테이블 호환성 문제 회피)
+            if activity_type == 'user_post':
+                activity['likes_count'] = 0
+                activity['user_liked'] = False
+                activity['user_has_liked'] = False
+                continue
+
             # 로그인하지 않은 경우 user_liked는 항상 False
             if current_user_id is None:
                 activity['user_liked'] = False
