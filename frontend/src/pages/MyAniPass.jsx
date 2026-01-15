@@ -2284,9 +2284,21 @@ export default function MyAniPass() {
             onClick={() => setShowDeleteModal(false)}
           >
             <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-              <h3 className="text-xl font-bold mb-4 text-gray-900">
+              <h3 className="text-xl font-bold mb-2 text-gray-900">
                 {language === 'ko' ? '삭제 옵션' : 'Delete Options'}
               </h3>
+
+              {/* Show what's being deleted */}
+              <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-sm font-semibold text-gray-900 mb-1">
+                  {activityToDelete.item_title_korean || activityToDelete.item_title}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {activityToDelete.activity_type === 'character_rating'
+                    ? (language === 'ko' ? '캐릭터' : 'Character')
+                    : (language === 'ko' ? '애니메이션' : 'Anime')}
+                </p>
+              </div>
 
               {activityToDelete.review_content && activityToDelete.review_content.trim() ? (
                 <>
