@@ -375,10 +375,10 @@ export default function Feed() {
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Left Sidebar - Filter Menu */}
-          <aside className="hidden lg:block">
-            <div className="fixed top-24 w-[280px] z-40">
+          <aside className="hidden lg:block lg:col-span-1">
+            <div className="sticky top-24 z-40">
               <nav>
                 <div className="flex flex-col gap-2">
                   <button
@@ -449,7 +449,7 @@ export default function Feed() {
           </aside>
 
           {/* Right Content - Feed */}
-          <div>
+          <div className="lg:col-span-3">
             {/* Post Composer */}
             {user && (
               <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 mb-6">
