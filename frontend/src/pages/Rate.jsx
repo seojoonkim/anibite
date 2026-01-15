@@ -315,7 +315,7 @@ function RatingCard({ anime, onRate }) {
               const titles = getAnimeTitle(anime, true);
               return (
                 <>
-                  <h3 className="font-semibold text-base line-clamp-2 text-gray-900 leading-snug mb-1 group-hover/title:text-[#3498DB] transition-colors cursor-pointer">
+                  <h3 className="font-semibold text-lg line-clamp-2 text-gray-900 leading-snug mb-1 group-hover/title:text-[#3498DB] transition-colors cursor-pointer">
                     {titles.primary}
                   </h3>
                   {titles.secondary && (
