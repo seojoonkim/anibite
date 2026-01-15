@@ -173,18 +173,24 @@ function RatingCard({ anime, onRate }) {
 
   return (
     <div className="group relative" ref={cardRef}>
-      <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out ${
-        animating ? 'scale-110' : 'scale-100'
-      } ${status === 'PASS' ? 'opacity-50' : 'opacity-100'}`} style={{
-        borderWidth: status === 'RATED' ? '2px' : '0px',
-        borderStyle: 'solid',
-        borderImage: status === 'RATED'
-          ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%) 1'
-          : 'none',
-        boxShadow: status === 'RATED'
-          ? '0 4px 20px rgba(225, 48, 108, 0.3)'
-          : undefined
-      }}>
+      {/* Gradient border wrapper for RATED cards */}
+      <div
+        className={`rounded-lg transition-all duration-500 ease-out ${
+          animating ? 'scale-110' : 'scale-100'
+        }`}
+        style={{
+          background: status === 'RATED'
+            ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+            : 'transparent',
+          padding: status === 'RATED' ? '2px' : '0',
+          boxShadow: status === 'RATED'
+            ? '0 4px 20px rgba(225, 48, 108, 0.3)'
+            : undefined
+        }}
+      >
+        <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out ${
+          status === 'PASS' ? 'opacity-50' : 'opacity-100'
+        } ${status !== 'RATED' ? 'border border-gray-200' : ''}`}>
         {/* Cover Image */}
         <Link to={`/anime/${anime.id}`} className="block relative aspect-[3/4] bg-gray-200 group/image overflow-hidden">
           <img
@@ -198,10 +204,10 @@ function RatingCard({ anime, onRate }) {
             }}
           />
 
-          {/* Show faded rating on already rated anime */}
+          {/* Show clear rating on already rated anime */}
           {status === 'RATED' && currentRating > 0 && (
             <div className="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity">
-              <div className="flex justify-center gap-1 opacity-40" style={{ fontSize: starSize }}>
+              <div className="flex justify-center gap-1 opacity-90" style={{ fontSize: starSize }}>
                 {[1, 2, 3, 4, 5].map((star) => (
                   <span key={star}>
                     {renderStar(star)}
@@ -327,6 +333,7 @@ function RatingCard({ anime, onRate }) {
             {anime.episodes && <span>{anime.episodes}{t('episodes')}</span>}
           </div>
         </div>
+      </div>
       </div>
 
       {/* 시리즈 일괄 처리 모달 */}
