@@ -4,6 +4,7 @@
  */
 import { createContext, useState, useContext, useEffect } from 'react';
 import { authService } from '../services/authService';
+import { API_BASE_URL } from '../config/api';
 
 const AuthContext = createContext(null);
 
@@ -12,12 +13,36 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Initialize auth state from localStorage
-    const storedUser = authService.getStoredUser();
-    if (storedUser) {
-      setUser(storedUser);
-    }
-    setLoading(false);
+    // Initialize auth state from localStorage and refresh from API
+    const initAuth = async () => {
+      const storedUser = authService.getStoredUser();
+      const token = localStorage.getItem('token');
+
+      if (storedUser && token) {
+        // Set stored user first to avoid flicker
+        setUser(storedUser);
+
+        // Then fetch latest user data from API (includes otaku_score)
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          if (response.ok) {
+            const freshUserData = await response.json();
+            setUser(freshUserData);
+            localStorage.setItem('user', JSON.stringify(freshUserData));
+          }
+        } catch (err) {
+          console.error('Failed to refresh user data:', err);
+        }
+      }
+      setLoading(false);
+    };
+
+    initAuth();
   }, []);
 
   const login = async (credentials, token = null, userData = null) => {

@@ -21,7 +21,7 @@ const translations = {
     characterRateDescription: '내가 본 애니메이션의 캐릭터들을 평가하세요',
     ratedBadge: '평가완료',
     loading: '로딩 중...',
-    allLoaded: '모든 애니메이션을 불러왔습니다',
+    allLoaded: '모든 캐릭터를 불러왔습니다',
 
     // Browse page
     browseTitle: '애니 검색',
@@ -97,7 +97,7 @@ const translations = {
     characterRateDescription: 'Rate characters from anime you\'ve watched',
     ratedBadge: 'Rated',
     loading: 'Loading...',
-    allLoaded: 'All anime loaded',
+    allLoaded: 'All characters loaded',
 
     // Browse page
     browseTitle: 'Search',
