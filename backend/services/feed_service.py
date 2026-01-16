@@ -455,7 +455,7 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
     results = [dict_from_row(row) for row in rows]
     promotions = [dict_from_row(row) for row in recent_promotions]
 
-    # 승급을 결과 맨 앞에 추가 (중복 제거)
+    # 승급을 결과에서 제외 (중복 방지)
     promotion_times = {p['activity_time'] for p in promotions}
     filtered_results = [r for r in results if not (r['activity_type'] == 'rank_promotion' and r['activity_time'] in promotion_times)]
 
