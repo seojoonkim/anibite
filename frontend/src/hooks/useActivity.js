@@ -326,11 +326,13 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
     setPage(0);
     setAllActivities([]);
     setHasMore(true);
+    // CRITICAL: Set initialLoading to true to prevent flicker
+    // This shows loading spinner immediately while new data loads
+    setInitialLoading(true);
     setLoadingMore(false);
     // Reset refs to allow new load
     firstLoadRef.current = false;
     secondLoadRef.current = 0;
-    // Don't set initialLoading here - let the auto-load effect handle it
   }, []);
 
   // Reset when any filter value actually changes
