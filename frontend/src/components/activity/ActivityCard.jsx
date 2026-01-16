@@ -576,12 +576,23 @@ const ActivityCard = forwardRef(({
                 className="block text-base font-semibold text-gray-800 hover:text-[#3797F0] transition-colors"
               >
                 {language === 'ko' ? (
-                  <>
-                    {activity.item_title_korean || activity.item_title}
-                    {activity.item_title_korean && activity.item_title && (
-                      <span className="text-gray-500"> ({activity.item_title})</span>
-                    )}
-                  </>
+                  activity.activity_type === 'character_rating' ? (
+                    // 캐릭터: 한국어 이름 + 줄바꿈 + 영어 이름 작게
+                    <span className="flex flex-col">
+                      <span>{activity.item_title_korean || activity.item_title}</span>
+                      {activity.item_title_korean && activity.item_title && (
+                        <span className="text-xs text-gray-400 font-normal">{activity.item_title}</span>
+                      )}
+                    </span>
+                  ) : (
+                    // 애니메이션: 기존 방식
+                    <>
+                      {activity.item_title_korean || activity.item_title}
+                      {activity.item_title_korean && activity.item_title && (
+                        <span className="text-gray-500"> ({activity.item_title})</span>
+                      )}
+                    </>
+                  )
                 ) : (
                   <>
                     {activity.item_title || activity.item_title_korean}
