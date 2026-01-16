@@ -168,6 +168,8 @@ const ActivityCard = forwardRef(({
       return language === 'ko' ? '캐릭터를 평가했어요' : 'rated a character';
     } else if (activity.activity_type === 'user_post') {
       return language === 'ko' ? '포스트를 작성했어요' : 'created a post';
+    } else if (activity.activity_type === 'rank_promotion') {
+      return language === 'ko' ? '승급했어요!' : 'ranked up!';
     }
     return '';
   };
@@ -559,6 +561,30 @@ const ActivityCard = forwardRef(({
             </div>
           )}
 
+          {/* Rank Promotion Content */}
+          {activity.activity_type === 'rank_promotion' && activity.metadata && (
+            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-lg p-4 mb-3">
+              <div className="flex items-center justify-center gap-3">
+                <div className="text-center">
+                  <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '이전 등급' : 'Previous Rank'}</div>
+                  <div className="text-lg font-bold text-gray-700">
+                    {JSON.parse(activity.metadata).old_rank} - {toRoman(JSON.parse(activity.metadata).old_level)}
+                  </div>
+                </div>
+                <div className="text-3xl">🎉</div>
+                <div className="text-center">
+                  <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '새로운 등급' : 'New Rank'}</div>
+                  <div className="text-xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                    {JSON.parse(activity.metadata).new_rank} - {toRoman(JSON.parse(activity.metadata).new_level)}
+                  </div>
+                </div>
+              </div>
+              <div className="text-center mt-3 text-sm text-gray-600">
+                {language === 'ko' ? '오타쿠 점수:' : 'Otaku Score:'} <span className="font-bold text-gray-800">{Math.floor(JSON.parse(activity.metadata).otaku_score)}</span>
+              </div>
+            </div>
+          )}
+
           {/* Rating */}
           {activity.rating && (
             <div className="flex items-center gap-px mb-2">
@@ -633,6 +659,7 @@ const ActivityCard = forwardRef(({
       </div>
 
       {/* Actions: Like, Comment, Bookmark */}
+      {activity.activity_type !== 'rank_promotion' && (
       <div className="mt-4 flex items-center justify-between">
             <div className="flex items-center gap-5">
               {/* Like Button */}
@@ -695,6 +722,7 @@ const ActivityCard = forwardRef(({
               )}
             </button>
       </div>
+      )}
 
       {/* Comments Section */}
       {showComments && (

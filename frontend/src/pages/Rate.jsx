@@ -550,7 +550,14 @@ export default function Rate() {
         ? { rating, status: 'RATED' }
         : { status };
 
-      await ratingService.rateAnime(animeId, payload);
+      const response = await ratingService.rateAnime(animeId, payload);
+
+      // Update cached otaku_score if provided
+      if (response && response.otaku_score !== undefined) {
+        localStorage.setItem('cached_otaku_score', response.otaku_score.toString());
+        // Trigger a storage event to update Navbar
+        window.dispatchEvent(new Event('storage'));
+      }
 
       // Update the anime's status in the list (keep it visible with color change)
       setAnimeList(prev => prev.map(anime =>

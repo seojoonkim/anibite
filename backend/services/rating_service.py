@@ -103,7 +103,19 @@ def create_or_update_rating(user_id: int, rating_data: RatingCreate) -> RatingRe
     _update_user_stats(user_id)
 
     # 생성/수정된 평점 조회
-    return get_rating_by_id(rating_id)
+    rating_response = get_rating_by_id(rating_id)
+
+    # 업데이트된 otaku_score 조회하여 함께 반환
+    updated_stats = db.execute_query(
+        "SELECT otaku_score FROM user_stats WHERE user_id = ?",
+        (user_id,),
+        fetch_one=True
+    )
+    if updated_stats and rating_response:
+        # otaku_score를 rating_response에 추가
+        rating_response.otaku_score = updated_stats['otaku_score']
+
+    return rating_response
 
 
 def get_rating_by_id(rating_id: int) -> Optional[RatingResponse]:
@@ -487,8 +499,80 @@ def _sync_to_activities(user_id: int, anime_id: int):
         )
 
 
+def _get_rank_info(otaku_score: float) -> tuple[str, int]:
+    """Get rank name and level from otaku score"""
+    if otaku_score < 10:
+        return "캐주얼", 1
+    elif otaku_score < 25:
+        return "캐주얼", 2
+    elif otaku_score < 50:
+        return "초보", 1
+    elif otaku_score < 100:
+        return "초보", 2
+    elif otaku_score < 150:
+        return "초보", 3
+    elif otaku_score < 200:
+        return "입문", 1
+    elif otaku_score < 250:
+        return "입문", 2
+    elif otaku_score < 300:
+        return "입문", 3
+    elif otaku_score < 400:
+        return "중급", 1
+    elif otaku_score < 500:
+        return "중급", 2
+    elif otaku_score < 600:
+        return "중급", 3
+    elif otaku_score < 700:
+        return "마스터", 1
+    elif otaku_score < 800:
+        return "마스터", 2
+    elif otaku_score < 900:
+        return "마스터", 3
+    elif otaku_score < 1000:
+        return "마스터", 4
+    elif otaku_score < 1100:
+        return "마스터", 5
+    elif otaku_score < 1300:
+        return "하이마스터", 1
+    elif otaku_score < 1500:
+        return "하이마스터", 2
+    elif otaku_score < 1700:
+        return "하이마스터", 3
+    elif otaku_score < 1900:
+        return "하이마스터", 4
+    elif otaku_score < 2100:
+        return "하이마스터", 5
+    elif otaku_score < 2300:
+        return "하이마스터", 6
+    elif otaku_score < 2600:
+        return "그랜드마스터", 1
+    elif otaku_score < 2900:
+        return "그랜드마스터", 2
+    elif otaku_score < 3200:
+        return "그랜드마스터", 3
+    elif otaku_score < 3500:
+        return "그랜드마스터", 4
+    elif otaku_score < 3800:
+        return "그랜드마스터", 5
+    elif otaku_score < 4100:
+        return "그랜드마스터", 6
+    elif otaku_score < 4400:
+        return "그랜드마스터", 7
+    else:
+        return "레전드", 1
+
+
 def _update_user_stats(user_id: int):
-    """사용자 통계 업데이트"""
+    """사용자 통계 업데이트 및 승급 감지"""
+
+    # 현재 otaku_score 조회 (승급 감지용)
+    current_stats = db.execute_query(
+        "SELECT otaku_score FROM user_stats WHERE user_id = ?",
+        (user_id,),
+        fetch_one=True
+    )
+    old_otaku_score = current_stats['otaku_score'] if current_stats else 0
 
     # 평점 통계 계산
     stats = db.execute_query(
@@ -533,7 +617,7 @@ def _update_user_stats(user_id: int):
 
     # Otaku 점수 계산
     # 공식: (애니메이션 평가수 × 2) + (캐릭터 평가수 × 1) + (리뷰수 × 5)
-    otaku_score = (stats['total_rated'] * 2) + (character_rating_count * 1) + (review_count * 5)
+    new_otaku_score = (stats['total_rated'] * 2) + (character_rating_count * 1) + (review_count * 5)
 
     # 선호 장르 찾기 (가장 많이 평가한 장르)
     favorite_genre_row = db.execute_query(
@@ -570,7 +654,40 @@ def _update_user_stats(user_id: int):
             review_count,
             character_rating_count,
             watch_time,
-            otaku_score,
+            new_otaku_score,
             favorite_genre
         )
     )
+
+    # 승급 감지
+    old_rank, old_level = _get_rank_info(old_otaku_score)
+    new_rank, new_level = _get_rank_info(new_otaku_score)
+
+    # 등급이 변경되었으면 activities에 기록
+    if (old_rank != new_rank) or (old_rank == new_rank and old_level < new_level):
+        # 사용자 정보 조회
+        user_info = db.execute_query(
+            "SELECT username, display_name, avatar_url FROM users WHERE id = ?",
+            (user_id,),
+            fetch_one=True
+        )
+
+        if user_info:
+            # activities에 승급 기록 추가
+            db.execute_insert(
+                """
+                INSERT INTO activities (
+                    activity_type, user_id, username, display_name, avatar_url,
+                    item_id, metadata, activity_time, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                """,
+                (
+                    'rank_promotion',
+                    user_id,
+                    user_info['username'],
+                    user_info['display_name'],
+                    user_info['avatar_url'],
+                    None,  # item_id not needed for rank promotion
+                    f'{{"old_rank": "{old_rank}", "old_level": {old_level}, "new_rank": "{new_rank}", "new_level": {new_level}, "otaku_score": {new_otaku_score}}}'
+                )
+            )

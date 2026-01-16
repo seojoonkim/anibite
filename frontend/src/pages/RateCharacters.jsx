@@ -148,7 +148,14 @@ export default function RateCharacters() {
         ));
       }, 600);
 
-      await characterService.rateCharacter(characterId, { rating, status: 'RATED' });
+      const response = await characterService.rateCharacter(characterId, { rating, status: 'RATED' });
+
+      // Update cached otaku_score if provided
+      if (response && response.otaku_score !== undefined) {
+        localStorage.setItem('cached_otaku_score', response.otaku_score.toString());
+        // Trigger a storage event to update Navbar
+        window.dispatchEvent(new Event('storage'));
+      }
 
       // Update the character in both lists for immediate UI update
       setCharacters(characters.map(char =>
@@ -188,7 +195,14 @@ export default function RateCharacters() {
       const currentStatus = characterStatuses[characterId];
       const newStatus = currentStatus === status ? null : status;
 
-      await characterService.rateCharacter(characterId, { status: newStatus });
+      const response = await characterService.rateCharacter(characterId, { status: newStatus });
+
+      // Update cached otaku_score if provided
+      if (response && response.otaku_score !== undefined) {
+        localStorage.setItem('cached_otaku_score', response.otaku_score.toString());
+        // Trigger a storage event to update Navbar
+        window.dispatchEvent(new Event('storage'));
+      }
 
       // Update the status in state for immediate UI update
       setCharacterStatuses(prev => ({
