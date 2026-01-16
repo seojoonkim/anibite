@@ -227,51 +227,10 @@ def get_user_activity_feed(
 ):
     """
     특정 사용자의 활동 피드
-    Direct query from activities table for efficiency
+    Uses feed_service to include recent rank promotions
     """
-    from database import dict_from_row
-    from services.feed_service import _enrich_comments_count
-
-    # Direct query from activities table with user_id filter
-    rows = db.execute_query(
-        """
-        SELECT
-            activity_type,
-            user_id,
-            username,
-            display_name,
-            avatar_url,
-            otaku_score,
-            item_id,
-            item_title,
-            item_title_korean,
-            item_image,
-            rating,
-            NULL as status,
-            activity_time,
-            anime_title,
-            anime_title_korean,
-            anime_id,
-            CASE
-                WHEN activity_type = 'user_post' THEN item_id
-                ELSE NULL
-            END as review_id,
-            review_content,
-            review_content as post_content,
-            0 as comments_count,
-            metadata
-        FROM activities
-        WHERE user_id = ?
-        ORDER BY activity_time DESC
-        LIMIT ? OFFSET ?
-        """,
-        (user_id, limit, offset)
-    )
-
-    activities = [dict_from_row(row) for row in rows]
-
-    # Enrich with comments count
-    _enrich_comments_count(activities)
+    # Use feed_service which includes recent 30-day rank promotions
+    activities = get_user_feed(user_id, current_user_id=current_user.id, limit=limit, offset=offset)
 
     # Enrich with likes and user engagement
     return enrich_activities_with_engagement(activities, current_user.id, db)
