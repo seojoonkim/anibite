@@ -235,6 +235,20 @@ def check_user_activities(user_id: int):
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 
+@router.post("/delete-all-rank-promotions")
+def delete_all_rank_promotions():
+    """Delete all rank_promotion activities"""
+    try:
+        deleted = db.execute_update("DELETE FROM activities WHERE activity_type = 'rank_promotion'")
+        return {
+            "success": True,
+            "deleted": deleted,
+            "message": f"Deleted {deleted} rank promotion activities"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+
 @router.post("/backfill-rank-promotions")
 def backfill_rank_promotions():
     """Backfill past rank promotion activities"""
@@ -317,13 +331,32 @@ def backfill_rank_promotions():
             display_name = user['display_name']
             avatar_url = user['avatar_url']
 
-            # Get all activities for this user in chronological order
+            # Get all activities from source tables in chronological order
             activities = db.execute_query("""
-                SELECT activity_time, activity_type
-                FROM activities
-                WHERE user_id = ? AND activity_type IN ('anime_rating', 'anime_review', 'character_rating', 'character_review')
+                SELECT 'anime_rating' as activity_type, updated_at as activity_time
+                FROM user_ratings
+                WHERE user_id = ? AND status = 'RATED' AND rating IS NOT NULL
+
+                UNION ALL
+
+                SELECT 'anime_review' as activity_type, created_at as activity_time
+                FROM user_reviews
+                WHERE user_id = ?
+
+                UNION ALL
+
+                SELECT 'character_rating' as activity_type, updated_at as activity_time
+                FROM character_ratings
+                WHERE user_id = ? AND rating IS NOT NULL
+
+                UNION ALL
+
+                SELECT 'character_review' as activity_type, created_at as activity_time
+                FROM character_reviews
+                WHERE user_id = ?
+
                 ORDER BY activity_time ASC
-            """, (user_id,))
+            """, (user_id, user_id, user_id, user_id))
 
             # Calculate otaku_score at each point in time
             anime_ratings_count = 0
