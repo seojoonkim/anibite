@@ -89,14 +89,26 @@ def get_activities(
         SELECT
             a.*,
             COALESCE(us.otaku_score, a.otaku_score, 0) as otaku_score,
-            (SELECT COUNT(*) FROM activity_likes al WHERE al.activity_id = a.id) as likes_count,
-            (SELECT COUNT(*) FROM activity_comments ac WHERE ac.activity_id = a.id) as comments_count,
-            CASE WHEN ? IS NOT NULL THEN
-                (SELECT COUNT(*) FROM activity_likes al2
-                 WHERE al2.activity_id = a.id AND al2.user_id = ?) > 0
-            ELSE 0 END as user_liked
+            COALESCE(likes.count, 0) as likes_count,
+            COALESCE(comments.count, 0) as comments_count,
+            CASE WHEN ? IS NOT NULL AND user_like.activity_id IS NOT NULL THEN 1 ELSE 0 END as user_liked
         FROM activities a
         LEFT JOIN user_stats us ON a.user_id = us.user_id
+        LEFT JOIN (
+            SELECT activity_id, COUNT(*) as count
+            FROM activity_likes
+            GROUP BY activity_id
+        ) likes ON likes.activity_id = a.id
+        LEFT JOIN (
+            SELECT activity_id, COUNT(*) as count
+            FROM activity_comments
+            GROUP BY activity_id
+        ) comments ON comments.activity_id = a.id
+        LEFT JOIN (
+            SELECT activity_id
+            FROM activity_likes
+            WHERE user_id = ?
+        ) user_like ON user_like.activity_id = a.id
         WHERE {where_sql}
         ORDER BY a.activity_time DESC
         LIMIT ? OFFSET ?
@@ -136,14 +148,26 @@ def get_activity_by_id(activity_id: int, current_user_id: Optional[int] = None, 
         SELECT
             a.*,
             COALESCE(us.otaku_score, a.otaku_score, 0) as otaku_score,
-            (SELECT COUNT(*) FROM activity_likes al WHERE al.activity_id = a.id) as likes_count,
-            (SELECT COUNT(*) FROM activity_comments ac WHERE ac.activity_id = a.id) as comments_count,
-            CASE WHEN ? IS NOT NULL THEN
-                (SELECT COUNT(*) FROM activity_likes al2
-                 WHERE al2.activity_id = a.id AND al2.user_id = ?) > 0
-            ELSE 0 END as user_liked
+            COALESCE(likes.count, 0) as likes_count,
+            COALESCE(comments.count, 0) as comments_count,
+            CASE WHEN ? IS NOT NULL AND user_like.activity_id IS NOT NULL THEN 1 ELSE 0 END as user_liked
         FROM activities a
         LEFT JOIN user_stats us ON a.user_id = us.user_id
+        LEFT JOIN (
+            SELECT activity_id, COUNT(*) as count
+            FROM activity_likes
+            GROUP BY activity_id
+        ) likes ON likes.activity_id = a.id
+        LEFT JOIN (
+            SELECT activity_id, COUNT(*) as count
+            FROM activity_comments
+            GROUP BY activity_id
+        ) comments ON comments.activity_id = a.id
+        LEFT JOIN (
+            SELECT activity_id
+            FROM activity_likes
+            WHERE user_id = ?
+        ) user_like ON user_like.activity_id = a.id
         WHERE a.id = ?
         """,
         tuple(query_params),
