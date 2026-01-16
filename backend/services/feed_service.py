@@ -373,7 +373,46 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
     """
     특정 사용자의 활동 피드 (activities 테이블 사용)
     - 단일 테이블 조회로 극도로 빠른 성능
+    - 최근 30일 이내의 rank_promotion은 항상 포함
     """
+
+    # 먼저 최근 30일 이내의 rank_promotion 가져오기
+    recent_promotions = db.execute_query(
+        """
+        SELECT
+            a.activity_type,
+            a.user_id,
+            a.username,
+            a.display_name,
+            a.avatar_url,
+            COALESCE(us.otaku_score, a.otaku_score, 0) as otaku_score,
+            a.item_id,
+            a.item_title,
+            a.item_title_korean,
+            a.item_image,
+            a.rating,
+            NULL as status,
+            a.activity_time,
+            a.anime_title,
+            a.anime_title_korean,
+            a.anime_id,
+            CASE
+                WHEN a.activity_type = 'user_post' THEN a.item_id
+                ELSE NULL
+            END as review_id,
+            a.review_content,
+            a.review_content as post_content,
+            0 as comments_count,
+            a.metadata
+        FROM activities a
+        LEFT JOIN user_stats us ON a.user_id = us.user_id
+        WHERE a.user_id = ?
+          AND a.activity_type = 'rank_promotion'
+          AND a.activity_time >= datetime('now', '-30 days')
+        ORDER BY a.activity_time DESC
+        """,
+        (user_id,)
+    )
 
     # activities 테이블에서 user_id로 필터링
     # Note: For user_post, item_id contains the post ID
@@ -414,13 +453,20 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
     )
 
     results = [dict_from_row(row) for row in rows]
+    promotions = [dict_from_row(row) for row in recent_promotions]
 
-    # Debug: Log raw data from SELECT
-    for result in results:
-        if result.get('activity_type') == 'user_post':
-            print(f"[DEBUG get_user_feed SELECT] user_post from DB: item_id={result.get('item_id')}, review_id={result.get('review_id')}, activity_time={result.get('activity_time')}")
+    # 승급을 결과 맨 앞에 추가 (중복 제거)
+    promotion_times = {p['activity_time'] for p in promotions}
+    filtered_results = [r for r in results if not (r['activity_type'] == 'rank_promotion' and r['activity_time'] in promotion_times)]
+
+    # 승급 + 다른 활동을 합치고 시간순 정렬
+    combined = promotions + filtered_results
+    combined.sort(key=lambda x: x['activity_time'], reverse=True)
+
+    # limit 적용
+    final_results = combined[:limit]
 
     # Batch load comments_count for performance
-    _enrich_comments_count(results)
+    _enrich_comments_count(final_results)
 
-    return results
+    return final_results
