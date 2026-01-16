@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import StarRating from '../common/StarRating';
 import { IMAGE_BASE_URL } from '../../config/api';
@@ -6,8 +6,11 @@ import { IMAGE_BASE_URL } from '../../config/api';
 /**
  * Memoized character card component for profile page
  * Optimized with React.memo to prevent unnecessary re-renders
+ * Shows skeleton with name first, then loads image progressively
  */
 function MyCharacterCard({ character, language = 'ko' }) {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   const getCharacterImageUrl = (characterId, imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.svg';
     if (imageUrl.startsWith('http')) return imageUrl;
@@ -38,11 +41,19 @@ function MyCharacterCard({ character, language = 'ko' }) {
     >
       <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300">
         <div className="relative aspect-[3/4] bg-gray-200">
+          {!imageLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 animate-pulse">
+              <div className="text-gray-400 text-4xl">👤</div>
+            </div>
+          )}
           <img
             src={getCharacterImageUrl(character.character_id, character.image_url)}
             alt={name}
-            className="w-full h-full object-cover"
+            className={`w-full h-full object-cover transition-opacity duration-300 ${
+              imageLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
             loading="lazy"
+            onLoad={() => setImageLoaded(true)}
             onError={(e) => {
               const step = e.target.dataset.fallbackStep || '0';
 
@@ -58,10 +69,12 @@ function MyCharacterCard({ character, language = 'ko' }) {
                   e.target.src = character.image_url;
                 } else {
                   e.target.src = '/placeholder-anime.svg';
+                  setImageLoaded(true);
                 }
               } else {
                 // Step 3: Give up, use placeholder
                 e.target.src = '/placeholder-anime.svg';
+                setImageLoaded(true);
               }
             }}
           />
