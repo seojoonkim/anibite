@@ -80,9 +80,9 @@ async def get_notifications(
             au.display_name as activity_display_name,
             au.avatar_url as activity_avatar_url,
             COALESCE(aus.otaku_score, 0) as activity_otaku_score,
-            (SELECT COUNT(*) FROM activity_likes WHERE activity_type = al.activity_type AND activity_user_id = al.activity_user_id AND item_id = al.item_id) as activity_likes_count,
-            (SELECT COUNT(*) FROM activity_comments WHERE activity_type = al.activity_type AND activity_user_id = al.activity_user_id AND item_id = al.item_id) as activity_comments_count,
-            (SELECT COUNT(*) FROM activity_likes WHERE user_id = ? AND activity_type = al.activity_type AND activity_user_id = al.activity_user_id AND item_id = al.item_id) > 0 as user_has_liked
+            0 as activity_likes_count,
+            0 as activity_comments_count,
+            0 as user_has_liked
         FROM activity_likes al
         JOIN users u ON al.user_id = u.id
         JOIN users au ON al.activity_user_id = au.id
@@ -157,9 +157,9 @@ async def get_notifications(
             au.display_name as activity_display_name,
             au.avatar_url as activity_avatar_url,
             COALESCE(aus2.otaku_score, 0) as activity_otaku_score,
-            (SELECT COUNT(*) FROM activity_likes WHERE activity_type = ac.activity_type AND activity_user_id = ac.activity_user_id AND item_id = ac.item_id) as activity_likes_count,
-            (SELECT COUNT(*) FROM activity_comments WHERE activity_type = ac.activity_type AND activity_user_id = ac.activity_user_id AND item_id = ac.item_id) as activity_comments_count,
-            (SELECT COUNT(*) FROM activity_likes WHERE user_id = ? AND activity_type = ac.activity_type AND activity_user_id = ac.activity_user_id AND item_id = ac.item_id) > 0 as user_has_liked
+            0 as activity_likes_count,
+            0 as activity_comments_count,
+            0 as user_has_liked
         FROM activity_comments ac
         JOIN users u ON ac.user_id = u.id
         JOIN users au ON ac.activity_user_id = au.id
@@ -245,7 +245,7 @@ async def get_notifications(
             au.avatar_url as activity_avatar_url,
             COALESCE(aus3.otaku_score, 0) as activity_otaku_score,
             0 as activity_likes_count,
-            (SELECT COUNT(*) FROM review_comments WHERE review_id = rc.review_id AND review_type = rc.review_type) as activity_comments_count,
+            0 as activity_comments_count,
             0 as user_has_liked
         FROM review_comments rc
         JOIN users u ON rc.user_id = u.id
@@ -265,7 +265,7 @@ async def get_notifications(
         """
 
         # 좋아요 알림
-        like_results = db.execute_query(like_query, (current_user.id, current_user.id, current_user.id))
+        like_results = db.execute_query(like_query, (current_user.id, current_user.id))
         print(f"[Notifications API] Found {len(like_results)} like notifications")
         for row in like_results:
             notifications.append({
@@ -298,7 +298,7 @@ async def get_notifications(
             })
 
         # activity_comments 댓글 알림
-        comment_results = db.execute_query(comment_query, (current_user.id, current_user.id, current_user.id))
+        comment_results = db.execute_query(comment_query, (current_user.id, current_user.id))
         print(f"[Notifications API] Found {len(comment_results)} activity comment notifications")
         for row in comment_results:
             notifications.append({
