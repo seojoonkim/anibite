@@ -17,7 +17,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useActivityLike, useActivityComments } from '../../hooks/useActivity';
-import { getCurrentLevelInfo } from '../../utils/otakuLevels';
+import { getCurrentLevelInfo, levels } from '../../utils/otakuLevels';
 import ActivityComments from './ActivityComments';
 import ContentMenu from '../common/ContentMenu';
 import { ratingService } from '../../services/ratingService';
@@ -177,6 +177,12 @@ const ActivityCard = forwardRef(({
   const toRoman = (num) => {
     const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
     return romanNumerals[num - 1] || num;
+  };
+
+  const getRankName = (rankName) => {
+    const level = levels.find(l => l.name === rankName);
+    if (!level) return rankName;
+    return language === 'ko' ? level.name : level.nameEn;
   };
 
   const getRelativeTime = (dateString) => {
@@ -498,17 +504,19 @@ const ActivityCard = forwardRef(({
             {getRelativeTime(activity.activity_time)}
           </span>
 
-          {/* ContentMenu - Aligned with header */}
-          <div className="flex-shrink-0">
-            <ContentMenu
-              type={activity.activity_type}
-              item={activity}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onEditRating={handleEditRating}
-              onAddReview={handleAddReview}
-            />
-          </div>
+          {/* ContentMenu - Aligned with header (hidden for rank_promotion) */}
+          {activity.activity_type !== 'rank_promotion' && (
+            <div className="flex-shrink-0">
+              <ContentMenu
+                type={activity.activity_type}
+                item={activity}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onEditRating={handleEditRating}
+                onAddReview={handleAddReview}
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -563,19 +571,19 @@ const ActivityCard = forwardRef(({
 
           {/* Rank Promotion Content */}
           {activity.activity_type === 'rank_promotion' && activity.metadata && (
-            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-lg p-4 mb-3">
+            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4 mb-3">
               <div className="flex items-center justify-center gap-3">
                 <div className="text-center">
                   <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '이전 등급' : 'Previous Rank'}</div>
                   <div className="text-lg font-bold text-gray-700">
-                    {JSON.parse(activity.metadata).old_rank} - {toRoman(JSON.parse(activity.metadata).old_level)}
+                    {getRankName(JSON.parse(activity.metadata).old_rank)} - {toRoman(JSON.parse(activity.metadata).old_level)}
                   </div>
                 </div>
                 <div className="text-3xl">🎉</div>
                 <div className="text-center">
                   <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '새로운 등급' : 'New Rank'}</div>
                   <div className="text-xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
-                    {JSON.parse(activity.metadata).new_rank} - {toRoman(JSON.parse(activity.metadata).new_level)}
+                    {getRankName(JSON.parse(activity.metadata).new_rank)} - {toRoman(JSON.parse(activity.metadata).new_level)}
                   </div>
                 </div>
               </div>
