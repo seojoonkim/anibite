@@ -49,7 +49,8 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
                 r.id as review_id,
                 r.content as review_content,
                 NULL as post_content,
-                0 as comments_count
+                0 as comments_count,
+                NULL as metadata
             FROM user_ratings ur
             JOIN users u ON ur.user_id = u.id
             JOIN anime a ON ur.anime_id = a.id
@@ -81,7 +82,8 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
                 rev.id as review_id,
                 rev.content as review_content,
                 NULL as post_content,
-                0 as comments_count
+                0 as comments_count,
+                NULL as metadata
             FROM character_ratings cr
             JOIN users u ON cr.user_id = u.id
             JOIN character c ON cr.character_id = c.id
@@ -119,7 +121,8 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
                 cr.id as review_id,
                 cr.content as review_content,
                 NULL as post_content,
-                0 as comments_count
+                0 as comments_count,
+                NULL as metadata
             FROM character_reviews cr
             JOIN users u ON cr.user_id = u.id
             JOIN character c ON cr.character_id = c.id
@@ -161,7 +164,8 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
                 r.id as review_id,
                 r.content as review_content,
                 NULL as post_content,
-                0 as comments_count
+                0 as comments_count,
+                NULL as metadata
             FROM user_reviews r
             JOIN users u ON r.user_id = u.id
             JOIN anime a ON r.anime_id = a.id
@@ -198,16 +202,46 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
                 up.id as review_id,
                 up.content as review_content,
                 up.content as post_content,
-                0 as comments_count
+                0 as comments_count,
+                NULL as metadata
             FROM user_posts up
             JOIN users u ON up.user_id = u.id
             LEFT JOIN user_stats us ON u.id = us.user_id
             WHERE up.user_id IN ({placeholders})
+
+            UNION ALL
+
+            -- 랭크 프로모션
+            SELECT
+                a.activity_type,
+                a.user_id,
+                a.username,
+                a.display_name,
+                a.avatar_url,
+                COALESCE(us.otaku_score, a.otaku_score, 0) as otaku_score,
+                a.item_id,
+                a.item_title,
+                a.item_title_korean,
+                a.item_image,
+                a.rating,
+                NULL as status,
+                a.activity_time,
+                a.anime_title,
+                a.anime_title_korean,
+                a.anime_id,
+                NULL as review_id,
+                a.review_content,
+                NULL as post_content,
+                0 as comments_count,
+                a.metadata
+            FROM activities a
+            LEFT JOIN user_stats us ON a.user_id = us.user_id
+            WHERE a.activity_type = 'rank_promotion' AND a.user_id IN ({placeholders})
         )
         ORDER BY activity_time DESC
         LIMIT ? OFFSET ?
         """,
-        (*following_id_list, *following_id_list, *following_id_list, *following_id_list, *following_id_list, limit, offset)
+        (*following_id_list, *following_id_list, *following_id_list, *following_id_list, *following_id_list, *following_id_list, limit, offset)
     )
 
     results = [dict_from_row(row) for row in rows]
@@ -252,7 +286,8 @@ def get_global_feed(limit: int = 50, offset: int = 0) -> List[Dict]:
             END as review_id,
             review_content,
             review_content as post_content,
-            0 as comments_count
+            0 as comments_count,
+            metadata
         FROM activities
         ORDER BY activity_time DESC
         LIMIT ? OFFSET ?
