@@ -129,3 +129,97 @@ def trace_promotion(user_id: int, target_score: int):
             break
 
     return result
+
+
+@router.get("/check-status/{user_id}")
+def check_user_status(user_id: int):
+    """
+    Check current user stats, recent activities, and all promotions
+    현재 사용자 통계, 최근 활동, 모든 승급 확인
+    """
+    # Get database time
+    db_time = db.execute_query("SELECT datetime('now') as current_time", fetch_one=True)
+
+    # Get current stats
+    anime_count = db.execute_query(
+        "SELECT COUNT(*) as total FROM user_ratings WHERE user_id = ? AND status = 'RATED'",
+        (user_id,),
+        fetch_one=True
+    )['total']
+
+    char_count = db.execute_query(
+        "SELECT COUNT(*) as total FROM character_ratings WHERE user_id = ?",
+        (user_id,),
+        fetch_one=True
+    )['total']
+
+    anime_review_count = db.execute_query(
+        "SELECT COUNT(*) as total FROM user_reviews WHERE user_id = ?",
+        (user_id,),
+        fetch_one=True
+    )['total']
+
+    char_review_count = db.execute_query(
+        "SELECT COUNT(*) as total FROM character_reviews WHERE user_id = ?",
+        (user_id,),
+        fetch_one=True
+    )['total']
+
+    total_reviews = anime_review_count + char_review_count
+    score = anime_count * 2 + char_count * 1 + total_reviews * 5
+
+    # Get last 30 activities
+    recent_activities = db.execute_query(
+        """
+        SELECT activity_time, activity_type,
+               CASE
+                   WHEN activity_type = 'anime_rating' THEN (SELECT title_romaji FROM anime WHERE id = anime_id)
+                   WHEN activity_type = 'character_rating' THEN (SELECT name_full FROM character WHERE id = character_id)
+                   WHEN activity_type = 'rank_promotion' THEN metadata
+                   ELSE NULL
+               END as title
+        FROM activities
+        WHERE user_id = ?
+        ORDER BY activity_time DESC
+        LIMIT 30
+        """,
+        (user_id,)
+    )
+
+    # Get all promotions
+    promotions = db.execute_query(
+        """
+        SELECT activity_time, metadata
+        FROM activities
+        WHERE user_id = ? AND activity_type = 'rank_promotion'
+        ORDER BY activity_time ASC
+        """,
+        (user_id,)
+    )
+
+    return {
+        'db_time': db_time['current_time'],
+        'stats': {
+            'anime_count': anime_count,
+            'char_count': char_count,
+            'anime_review_count': anime_review_count,
+            'char_review_count': char_review_count,
+            'total_reviews': total_reviews,
+            'score': score
+        },
+        'recent_activities': [
+            {
+                'time': act[0],
+                'type': act[1],
+                'title': act[2] if act[2] else ''
+            }
+            for act in recent_activities
+        ],
+        'all_promotions': [
+            {
+                'time': promo[0],
+                'rank': promo[1]
+            }
+            for promo in promotions
+        ]
+    }
