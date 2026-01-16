@@ -40,6 +40,21 @@ export default function Navbar() {
     }
   }, [user]);
 
+  // Listen for storage changes to update otaku_score in real-time
+  useEffect(() => {
+    const handleStorageChange = () => {
+      if (user) {
+        const cached = localStorage.getItem('cached_otaku_score');
+        if (cached) {
+          setOtakuScore(parseFloat(cached) || 0);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [user]);
+
   // Fetch otaku_score from server in background and update cache
   useEffect(() => {
     const fetchOtakuScore = async () => {

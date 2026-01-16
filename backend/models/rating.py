@@ -64,6 +64,7 @@ class RatingResponse(BaseModel):
     image_url: Optional[str] = None
     season_year: Optional[int] = None
     episodes: Optional[int] = None
+    otaku_score: Optional[float] = None  # 업데이트된 오타쿠 점수
 
 
 class UserRatingListResponse(BaseModel):

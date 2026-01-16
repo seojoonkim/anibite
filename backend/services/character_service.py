@@ -249,7 +249,19 @@ def create_or_update_character_rating(user_id: int, character_id: int, rating: f
     from services.rating_service import _update_user_stats
     _update_user_stats(user_id)
 
-    return get_character_rating(user_id, character_id)
+    # Get updated rating
+    result = get_character_rating(user_id, character_id)
+
+    # Add updated otaku_score to response
+    updated_stats = db.execute_query(
+        "SELECT otaku_score FROM user_stats WHERE user_id = ?",
+        (user_id,),
+        fetch_one=True
+    )
+    if updated_stats and result:
+        result['otaku_score'] = updated_stats['otaku_score']
+
+    return result
 
 
 def _sync_character_rating_to_activities(user_id: int, character_id: int):
