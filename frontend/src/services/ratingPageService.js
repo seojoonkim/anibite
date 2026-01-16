@@ -7,9 +7,9 @@ export const ratingPageService = {
   /**
    * 리뷰 작성 페이지 - 초고속 로딩 (0.1초 목표)
    */
-  async getItemsForReviews(limit = 50) {
+  async getItemsForReviews(limit = 50, offset = 0) {
     const response = await api.get('/api/rating-pages/write-reviews', {
-      params: { limit }
+      params: { limit, offset }
     });
     return response.data;
   },
