@@ -85,7 +85,8 @@ export default function WriteReviews() {
             character_name_native: item.item_title_korean,
             character_image: item.item_image,
             anime_id: item.anime_id,
-            anime_title: item.anime_title_korean || item.anime_title
+            anime_title_korean: item.anime_title_korean,
+            anime_title: item.anime_title
           } : {})
         };
         return processed;
@@ -146,7 +147,8 @@ export default function WriteReviews() {
             character_name_native: item.item_title_korean, // Native name
             character_image: item.item_image,
             anime_id: item.anime_id,
-            anime_title: item.anime_title_korean || item.anime_title
+            anime_title_korean: item.anime_title_korean,
+            anime_title: item.anime_title
           } : {})
         };
 
@@ -583,7 +585,29 @@ export default function WriteReviews() {
                           to={item.type === 'anime' ? `/anime/${item.itemId}` : `/character/${item.itemId}`}
                           className="text-gray-900 hover:text-[#3797F0] transition-colors hover:underline cursor-pointer"
                         >
-                          {item.type === 'anime' ? getAnimeTitle(item) : (language === 'ko' && item.character_name_native ? item.character_name_native : item.character_name)}
+                          {item.type === 'anime' ? (
+                            language === 'ko' ? (
+                              <>
+                                {item.title_korean || item.title_romaji || item.title_english}
+                                {item.title_korean && (item.title_romaji || item.title_english) && (
+                                  <span className="text-gray-500"> ({item.title_romaji || item.title_english})</span>
+                                )}
+                              </>
+                            ) : (
+                              item.title_romaji || item.title_english || item.title_korean
+                            )
+                          ) : (
+                            language === 'ko' ? (
+                              <>
+                                {item.character_name_native || item.character_name}
+                                {item.character_name_native && item.character_name && (
+                                  <span className="text-gray-500"> ({item.character_name})</span>
+                                )}
+                              </>
+                            ) : (
+                              item.character_name || item.character_name_native
+                            )
+                          )}
                         </Link>
                       </h3>
                       <span className={`px-2 py-0.5 rounded text-xs font-medium flex-shrink-0 ${
@@ -595,30 +619,37 @@ export default function WriteReviews() {
                       </span>
                     </div>
 
-                    {/* Subtitle */}
-                    {item.type === 'anime' && language === 'ko' && (item.title_romaji || item.title_english) && (
+                    {/* Character's Anime */}
+                    {item.type === 'character' && (item.anime_title_korean || item.anime_title) && (
                       <p className="text-xs text-gray-500 mb-1">
-                        {item.title_romaji || item.title_english}
-                      </p>
-                    )}
-                    {item.type === 'character' && (
-                      <p className="text-xs text-gray-500 mb-1">
-                        {item.anime_title ? (
-                          <>
-                            from:{' '}
-                            {item.anime_id ? (
-                              <Link
-                                to={`/anime/${item.anime_id}`}
-                                className="hover:text-[#3797F0] hover:underline transition-colors"
-                              >
-                                {item.anime_title}
-                              </Link>
+                        from:{' '}
+                        {item.anime_id ? (
+                          <Link
+                            to={`/anime/${item.anime_id}`}
+                            className="hover:text-[#3797F0] hover:underline transition-colors"
+                          >
+                            {language === 'ko' ? (
+                              <>
+                                {item.anime_title_korean || item.anime_title}
+                                {item.anime_title_korean && item.anime_title && (
+                                  <span> ({item.anime_title})</span>
+                                )}
+                              </>
                             ) : (
-                              item.anime_title
+                              item.anime_title || item.anime_title_korean
                             )}
-                          </>
+                          </Link>
                         ) : (
-                          <span style={{ color: '#ff0000' }}>[anime_title missing]</span>
+                          language === 'ko' ? (
+                            <>
+                              {item.anime_title_korean || item.anime_title}
+                              {item.anime_title_korean && item.anime_title && (
+                                <span> ({item.anime_title})</span>
+                              )}
+                            </>
+                          ) : (
+                            item.anime_title || item.anime_title_korean
+                          )
                         )}
                       </p>
                     )}
