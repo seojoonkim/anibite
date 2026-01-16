@@ -318,15 +318,15 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
 
   const reset = useCallback(() => {
     console.log('[useActivityPagination] Resetting pagination');
-    // Set loading FIRST to show spinner immediately
-    setInitialLoading(true);
-    setLoadingMore(false);
-    // Then clear other states
+    // Clear states
     setPage(0);
     setAllActivities([]);
     setHasMore(true);
+    setLoadingMore(false);
+    // Reset refs to allow new load
     firstLoadRef.current = false;
     secondLoadRef.current = 0;
+    // Don't set initialLoading here - let the auto-load effect handle it
   }, []);
 
   // Reset when any filter value actually changes
