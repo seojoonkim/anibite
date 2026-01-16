@@ -9,6 +9,24 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from database import db
 
+def ensure_name_korean_column():
+    """Ensure name_korean column exists in character table"""
+    try:
+        columns = db.execute_query("PRAGMA table_info(character)")
+        col_names = [col['name'] for col in columns]
+
+        if 'name_korean' not in col_names:
+            print("Adding name_korean column to character table...")
+            db.execute_query("ALTER TABLE character ADD COLUMN name_korean TEXT")
+            print("✓ Added name_korean column")
+        else:
+            print("✓ name_korean column already exists")
+    except Exception as e:
+        print(f"Error ensuring name_korean column: {e}")
+        import traceback
+        traceback.print_exc()
+        raise
+
 def ensure_item_year_column():
     """Ensure item_year column exists in activities table"""
     try:
@@ -45,6 +63,7 @@ def ensure_item_year_column():
 def main():
     """Run all schema updates"""
     print("Ensuring database schema is up to date...")
+    ensure_name_korean_column()
     ensure_item_year_column()
     print("✓ Schema check complete")
 
