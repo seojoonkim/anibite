@@ -402,9 +402,9 @@ def get_all_user_ratings(user_id: int) -> Dict:
     average_rating = avg_row['avg_rating'] if avg_row and avg_row['avg_rating'] else None
 
     return {
-        'rated': [RatingResponse(**dict_from_row(row)) for row in rated_rows],
-        'watchlist': [RatingResponse(**dict_from_row(row)) for row in watchlist_rows],
-        'pass': [RatingResponse(**dict_from_row(row)) for row in pass_rows],
+        'rated': [dict_from_row(row) for row in rated_rows],
+        'watchlist': [dict_from_row(row) for row in watchlist_rows],
+        'pass': [dict_from_row(row) for row in pass_rows],
         'total_rated': len(rated_rows),
         'total_watchlist': len(watchlist_rows),
         'total_pass': len(pass_rows),
