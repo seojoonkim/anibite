@@ -155,6 +155,42 @@ def check_rank_promotions():
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 
+@router.get("/debug-user-feed/{user_id}")
+def debug_user_feed(user_id: int):
+    """Debug user feed data - check what's being returned"""
+    try:
+        from services.feed_service import get_user_feed
+
+        # Get feed
+        feed_data = get_user_feed(user_id, current_user_id=user_id, limit=10, offset=0)
+
+        # Count activity types
+        activity_types = {}
+        rank_promotions = []
+
+        for activity in feed_data:
+            act_type = activity.get('activity_type')
+            activity_types[act_type] = activity_types.get(act_type, 0) + 1
+
+            if act_type == 'rank_promotion':
+                rank_promotions.append({
+                    'activity_time': activity.get('activity_time'),
+                    'metadata': activity.get('metadata'),
+                    'has_metadata': activity.get('metadata') is not None
+                })
+
+        return {
+            "user_id": user_id,
+            "total_activities": len(feed_data),
+            "activity_types": activity_types,
+            "rank_promotions": rank_promotions,
+            "first_activity": feed_data[0] if feed_data else None
+        }
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
+
+
 @router.get("/check-user-followers/{user_id}")
 def check_user_followers(user_id: int):
     """Check user's follower and following counts"""
