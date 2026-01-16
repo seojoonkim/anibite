@@ -659,7 +659,6 @@ const ActivityCard = forwardRef(({
       </div>
 
       {/* Actions: Like, Comment, Bookmark */}
-      {activity.activity_type !== 'rank_promotion' && (
       <div className="mt-4 flex items-center justify-between">
             <div className="flex items-center gap-5">
               {/* Like Button */}
@@ -722,7 +721,6 @@ const ActivityCard = forwardRef(({
               )}
             </button>
       </div>
-      )}
 
       {/* Comments Section */}
       {showComments && (
