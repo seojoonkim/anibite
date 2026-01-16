@@ -2006,7 +2006,11 @@ export default function MyAniPass() {
             {activeTab === 'anime' && (
               <div>
                 {/* Anime Grid */}
-                {displayedAnime.length > 0 ? (
+                {!loadedTabs.anime ? (
+                  <div className="flex justify-center items-center py-20">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+                  </div>
+                ) : displayedAnime.length > 0 ? (
                   ['all', '4', '3', '2', '1'].includes(animeSubMenu) ? (
                     // 모두 또는 범위 필터 선택 시 평점별로 그룹화 + Virtual Scrolling
                     <div className="space-y-8">
@@ -2083,7 +2087,11 @@ export default function MyAniPass() {
             {activeTab === 'character' && (
               <div>
                 {/* Character Grid */}
-                {displayedCharacters.length > 0 ? (
+                {!loadedTabs.character ? (
+                  <div className="flex justify-center items-center py-20">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+                  </div>
+                ) : displayedCharacters.length > 0 ? (
                   ['all', '4', '3', '2', '1'].includes(characterSubMenu) ? (
                     // 모두 선택 시 평점별로 그룹화 + Virtual Scrolling
                     <div className="space-y-8">
