@@ -367,7 +367,8 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
             END as review_id,
             a.review_content,
             a.review_content as post_content,
-            0 as comments_count
+            0 as comments_count,
+            a.metadata
         FROM activities a
         LEFT JOIN user_stats us ON a.user_id = us.user_id
         WHERE a.user_id = ?
