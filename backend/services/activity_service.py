@@ -33,9 +33,15 @@ def get_activities(
         Dict with 'items' (list of activities) and 'total' (count)
     """
 
-    # Build WHERE clauses
+    # Build WHERE clauses and JOIN clauses
     where_clauses = []
     params = []
+
+    # Build JOIN clause for following_only filter (more efficient than subquery)
+    join_clause = ""
+    if following_only and current_user_id:
+        join_clause = "INNER JOIN user_follows uf ON uf.following_id = a.user_id AND uf.follower_id = ?"
+        params.append(current_user_id)
 
     if activity_type:
         where_clauses.append("a.activity_type = ?")
@@ -49,22 +55,12 @@ def get_activities(
         where_clauses.append("a.item_id = ?")
         params.append(item_id)
 
-    if following_only and current_user_id:
-        where_clauses.append("""
-            a.user_id IN (
-                SELECT following_id FROM user_follows
-                WHERE follower_id = ? AND following_id != ?
-            )
-        """)
-        params.append(current_user_id)
-        params.append(current_user_id)
-
     where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
 
     # Get total count
     count_params = params.copy()
     total_row = db.execute_query(
-        f"SELECT COUNT(*) as total FROM activities a WHERE {where_sql}",
+        f"SELECT COUNT(*) as total FROM activities a {join_clause} WHERE {where_sql}",
         tuple(count_params),
         fetch_one=True
     )
@@ -93,6 +89,7 @@ def get_activities(
             COALESCE(comments.count, 0) as comments_count,
             CASE WHEN ? IS NOT NULL AND user_like.activity_id IS NOT NULL THEN 1 ELSE 0 END as user_liked
         FROM activities a
+        {join_clause}
         LEFT JOIN user_stats us ON a.user_id = us.user_id
         LEFT JOIN (
             SELECT activity_id, COUNT(*) as count
