@@ -553,18 +553,16 @@ def get_all_user_character_ratings(user_id: int) -> Dict:
     rated_rows = db.execute_query(
         """
         SELECT
-            id,
             item_id as character_id,
             user_id,
             rating,
             'RATED' as status,
-            activity_time as updated_at,
-            created_at,
             item_title as name_full,
             item_title_korean as name_native,
             item_image as image_url,
             anime_id,
-            anime_title
+            anime_title,
+            anime_title_korean
         FROM activities
         WHERE user_id = ? AND activity_type = 'character_rating'
         ORDER BY activity_time DESC
@@ -576,7 +574,9 @@ def get_all_user_character_ratings(user_id: int) -> Dict:
     want_rows = db.execute_query(
         """
         SELECT
-            cr.*,
+            cr.character_id,
+            cr.user_id,
+            cr.status,
             c.name_full,
             c.name_native,
             COALESCE('/' || c.image_local, c.image_url) as image_url,
@@ -602,7 +602,9 @@ def get_all_user_character_ratings(user_id: int) -> Dict:
     pass_rows = db.execute_query(
         """
         SELECT
-            cr.*,
+            cr.character_id,
+            cr.user_id,
+            cr.status,
             c.name_full,
             c.name_native,
             COALESCE('/' || c.image_local, c.image_url) as image_url,

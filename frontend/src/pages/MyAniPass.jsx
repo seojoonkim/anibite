@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useVirtualGrid } from '../hooks/useVirtualGrid';
 import { userService } from '../services/userService';
 import { ratingService } from '../services/ratingService';
 import { followService } from '../services/followService';
@@ -28,6 +29,8 @@ import SeasonStats from '../components/profile/SeasonStats';
 import GenreCombinationChart from '../components/profile/GenreCombinationChart';
 import ActivityCard from '../components/activity/ActivityCard';
 import EditReviewModal from '../components/common/EditReviewModal';
+import MyAnimeCard from '../components/profile/MyAnimeCard';
+import MyCharacterCard from '../components/profile/MyCharacterCard';
 import api from '../services/api';
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
@@ -1220,40 +1223,6 @@ export default function MyAniPass() {
     }
   };
 
-  const renderAnimeCard = (anime) => {
-    const title = anime.title_korean || anime.title_romaji || anime.title_english || 'Unknown';
-    const imageUrl = anime.image_url;
-
-    return (
-      <Link
-        key={anime.anime_id}
-        to={`/anime/${anime.anime_id}`}
-        className="group"
-      >
-        <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300">
-          <div className="relative aspect-[3/4] bg-gray-200">
-            <img
-              src={getImageUrl(imageUrl)}
-              alt={title}
-              className="w-full h-full object-cover"
-              loading="lazy"
-              onError={(e) => {
-                e.target.src = '/placeholder-anime.svg';
-              }}
-            />
-          </div>
-          <div className="p-3">
-            <h3 className="font-medium text-sm mb-1 line-clamp-2">
-              {title}
-            </h3>
-            {anime.rating && (
-              <StarRating rating={anime.rating} readonly size="sm" />
-            )}
-          </div>
-        </div>
-      </Link>
-    );
-  };
 
   // 평점별로 그룹화 (애니용)
   const groupAnimeByCategory = (items) => {
@@ -1292,6 +1261,42 @@ export default function MyAniPass() {
     };
     return groups;
   };
+
+  // Prepare sections for virtual scrolling (anime)
+  const animeSections = useMemo(() => {
+    if (!['all', '4', '3', '2', '1'].includes(animeSubMenu) || displayedAnime.length === 0) {
+      return [];
+    }
+    const groups = groupAnimeByCategory(displayedAnime);
+    const categoryOrder = ['5', '4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5', 'watchlist', 'pass'];
+    return categoryOrder
+      .map((category) => ({
+        id: `anime-${category}`,
+        category,
+        items: groups[category]
+      }))
+      .filter((section) => section.items.length > 0);
+  }, [displayedAnime, animeSubMenu]);
+
+  // Prepare sections for virtual scrolling (character)
+  const characterSections = useMemo(() => {
+    if (!['all', '4', '3', '2', '1'].includes(characterSubMenu) || displayedCharacters.length === 0) {
+      return [];
+    }
+    const groups = groupCharactersByCategory(displayedCharacters);
+    const categoryOrder = ['5', '4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5', 'want', 'pass'];
+    return categoryOrder
+      .map((category) => ({
+        id: `character-${category}`,
+        category,
+        items: groups[category]
+      }))
+      .filter((section) => section.items.length > 0);
+  }, [displayedCharacters, characterSubMenu]);
+
+  // Virtual scrolling hooks
+  const { getSectionRef: getAnimeSectionRef, isSectionVisible: isAnimeSectionVisible } = useVirtualGrid(animeSections);
+  const { getSectionRef: getCharacterSectionRef, isSectionVisible: isCharacterSectionVisible } = useVirtualGrid(characterSections);
 
   if (loading) {
     return (
@@ -1389,14 +1394,9 @@ export default function MyAniPass() {
             </div>
           </div>
 
-          {/* Content Area Skeleton */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 animate-pulse">
-                <div className="h-6 w-32 bg-gray-200 rounded mb-4"></div>
-                <div className="h-32 bg-gray-200 rounded"></div>
-              </div>
-            ))}
+          {/* Loading Indicator */}
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
           </div>
         </div>
       </div>
@@ -2008,11 +2008,9 @@ export default function MyAniPass() {
                 {/* Anime Grid */}
                 {displayedAnime.length > 0 ? (
                   ['all', '4', '3', '2', '1'].includes(animeSubMenu) ? (
-                    // 모두 또는 범위 필터 선택 시 평점별로 그룹화
+                    // 모두 또는 범위 필터 선택 시 평점별로 그룹화 + Virtual Scrolling
                     <div className="space-y-8">
-                      {(() => {
-                        const groups = groupAnimeByCategory(displayedAnime);
-                        const categoryOrder = ['5', '4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5', 'watchlist', 'pass'];
+                      {animeSections.map((section, sectionIndex) => {
                         const categoryLabels = {
                           '5': language === 'ko' ? '⭐ 5점' : '⭐ 5.0',
                           '4.5': language === 'ko' ? '⭐ 4.5점' : '⭐ 4.5',
@@ -2028,25 +2026,36 @@ export default function MyAniPass() {
                           'pass': language === 'ko' ? '🚫 관심없어요' : '🚫 Pass'
                         };
 
-                        let sectionIndex = 0;
-                        return categoryOrder.map((category) => {
-                          if (groups[category].length === 0) return null;
+                        const isVisible = isAnimeSectionVisible(section.id);
+                        const itemsPerRow = 6; // lg:grid-cols-6
+                        const rows = Math.ceil(section.items.length / itemsPerRow);
+                        const estimatedHeight = rows * 250; // Approximate card height
 
-                          const section = (
-                            <div key={category}>
-                              {sectionIndex > 0 && <div className="border-t-2 border-gray-300 my-6"></div>}
-                              <h3 className="text-lg font-bold mb-4 text-gray-800">
-                                {categoryLabels[category]} ({groups[category].length})
-                              </h3>
+                        return (
+                          <div
+                            key={section.id}
+                            ref={getAnimeSectionRef(section.id)}
+                            data-section-id={section.id}
+                          >
+                            {sectionIndex > 0 && <div className="border-t-2 border-gray-300 my-6"></div>}
+                            <h3 className="text-lg font-bold mb-4 text-gray-800">
+                              {categoryLabels[section.category]} ({section.items.length})
+                            </h3>
+                            {isVisible ? (
                               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                                {groups[category].map(renderAnimeCard)}
+                                {section.items.map((anime) => (
+                                  <MyAnimeCard key={anime.anime_id} anime={anime} />
+                                ))}
                               </div>
-                            </div>
-                          );
-                          sectionIndex++;
-                          return section;
-                        }).filter(Boolean);
-                      })()}
+                            ) : (
+                              <div
+                                className="w-full bg-gray-100 rounded-lg animate-pulse"
+                                style={{ height: `${estimatedHeight}px` }}
+                              />
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   ) : (
                     // 5점, 보고싶어요, 관심없어요는 섹션 헤더와 함께 표시
@@ -2057,7 +2066,9 @@ export default function MyAniPass() {
                         {animeSubMenu === 'pass' && (language === 'ko' ? `🚫 관심없어요 (${displayedAnime.length})` : `🚫 Pass (${displayedAnime.length})`)}
                       </h3>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                        {displayedAnime.map(renderAnimeCard)}
+                        {displayedAnime.map((anime) => (
+                          <MyAnimeCard key={anime.anime_id} anime={anime} />
+                        ))}
                       </div>
                     </div>
                   )
@@ -2074,11 +2085,9 @@ export default function MyAniPass() {
                 {/* Character Grid */}
                 {displayedCharacters.length > 0 ? (
                   ['all', '4', '3', '2', '1'].includes(characterSubMenu) ? (
-                    // 모두 선택 시 평점별로 그룹화
+                    // 모두 선택 시 평점별로 그룹화 + Virtual Scrolling
                     <div className="space-y-8">
-                      {(() => {
-                        const groups = groupCharactersByCategory(displayedCharacters);
-                        const categoryOrder = ['5', '4.5', '4', '3.5', '3', '2.5', '2', '1.5', '1', '0.5', 'want', 'pass'];
+                      {characterSections.map((section, sectionIndex) => {
                         const categoryLabels = {
                           '5': language === 'ko' ? '⭐ 5점' : '⭐ 5.0',
                           '4.5': language === 'ko' ? '⭐ 4.5점' : '⭐ 4.5',
@@ -2094,82 +2103,40 @@ export default function MyAniPass() {
                           'pass': language === 'ko' ? '🚫 관심없어요' : '🚫 Pass'
                         };
 
-                        let sectionIndex = 0;
-                        return categoryOrder.map((category) => {
-                          if (groups[category].length === 0) return null;
+                        const isVisible = isCharacterSectionVisible(section.id);
+                        const itemsPerRow = 6; // lg:grid-cols-6
+                        const rows = Math.ceil(section.items.length / itemsPerRow);
+                        const estimatedHeight = rows * 300; // Character cards are taller
 
-                          const section = (
-                            <div key={category}>
-                              {sectionIndex > 0 && <div className="border-t-2 border-gray-300 my-6"></div>}
-                              <h3 className="text-lg font-bold mb-4 text-gray-800">
-                                {categoryLabels[category]} ({groups[category].length})
-                              </h3>
+                        return (
+                          <div
+                            key={section.id}
+                            ref={getCharacterSectionRef(section.id)}
+                            data-section-id={section.id}
+                          >
+                            {sectionIndex > 0 && <div className="border-t-2 border-gray-300 my-6"></div>}
+                            <h3 className="text-lg font-bold mb-4 text-gray-800">
+                              {categoryLabels[section.category]} ({section.items.length})
+                            </h3>
+                            {isVisible ? (
                               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                                {groups[category].map((character) => {
-                                  // 영어 이름 우선
-                                  const name = character.character_name || character.character_name_native || '';
-
-                                  return (
-                                    <Link
-                                      key={character.character_id}
-                                      to={`/character/${character.character_id}`}
-                                      className="group"
-                                    >
-                                      <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300">
-                                        <div className="relative aspect-[3/4] bg-gray-200">
-                                          <img
-                                            src={getCharacterImageUrl(character.character_id, character.image_url)}
-                                            alt={name}
-                                            className="w-full h-full object-cover"
-                                            onError={(e) => {
-                                              const step = e.target.dataset.fallbackStep || '0';
-
-                                              if (step === '0') {
-                                                // Step 1: Try alternate extension (.jpg ↔ .png)
-                                                e.target.dataset.fallbackStep = '1';
-                                                const fallbackUrl = getCharacterImageFallback(character.image_url, e.target.src);
-                                                e.target.src = fallbackUrl;
-                                              } else if (step === '1') {
-                                                // Step 2: Try original external URL
-                                                e.target.dataset.fallbackStep = '2';
-                                                if (character.image_url && character.image_url.startsWith('http')) {
-                                                  e.target.src = character.image_url;
-                                                } else {
-                                                  e.target.src = '/placeholder-anime.svg';
-                                                }
-                                              } else {
-                                                // Step 3: Give up, use placeholder
-                                                e.target.src = '/placeholder-anime.svg';
-                                              }
-                                            }}
-                                          />
-                                        </div>
-                                        <div className="p-3">
-                                          <h3 className="font-medium text-sm mb-1 line-clamp-2">
-                                            {name}
-                                          </h3>
-                                          {character.rating && (
-                                            <StarRating rating={character.rating} readonly size="sm" />
-                                          )}
-                                          {character.anime_title && (
-                                            <p className="text-xs text-gray-500 mt-1 line-clamp-1">
-                                              {language === 'ko' && character.anime_title_korean
-                                                ? character.anime_title_korean
-                                                : character.anime_title}
-                                            </p>
-                                          )}
-                                        </div>
-                                      </div>
-                                    </Link>
-                                  );
-                                })}
+                                {section.items.map((character) => (
+                                  <MyCharacterCard
+                                    key={character.character_id}
+                                    character={character}
+                                    language={language}
+                                  />
+                                ))}
                               </div>
-                            </div>
-                          );
-                          sectionIndex++;
-                          return section;
-                        }).filter(Boolean);
-                      })()}
+                            ) : (
+                              <div
+                                className="w-full bg-gray-100 rounded-lg animate-pulse"
+                                style={{ height: `${estimatedHeight}px` }}
+                              />
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   ) : (
                     // 5점, 알고싶어요, 관심없어요는 섹션 헤더와 함께 표시
@@ -2180,65 +2147,13 @@ export default function MyAniPass() {
                         {characterSubMenu === 'pass' && (language === 'ko' ? `🚫 관심없어요 (${displayedCharacters.length})` : `🚫 Pass (${displayedCharacters.length})`)}
                       </h3>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                        {displayedCharacters.map((character) => {
-                        // 영어 이름 우선
-                        const name = character.character_name || character.character_name_native || '';
-
-                        return (
-                          <Link
+                        {displayedCharacters.map((character) => (
+                          <MyCharacterCard
                             key={character.character_id}
-                            to={`/character/${character.character_id}`}
-                            className="group"
-                          >
-                            <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300">
-                              <div className="relative aspect-[3/4] bg-gray-200">
-                                <img
-                                  src={getCharacterImageUrl(character.character_id, character.image_url)}
-                                  alt={name}
-                                  className="w-full h-full object-cover"
-                                  loading="lazy"
-                                  onError={(e) => {
-                                    const step = e.target.dataset.fallbackStep || '0';
-
-                                    if (step === '0') {
-                                      // Step 1: Try alternate extension (.jpg ↔ .png)
-                                      e.target.dataset.fallbackStep = '1';
-                                      const fallbackUrl = getCharacterImageFallback(character.image_url, e.target.src);
-                                      e.target.src = fallbackUrl;
-                                    } else if (step === '1') {
-                                      // Step 2: Try original external URL
-                                      e.target.dataset.fallbackStep = '2';
-                                      if (character.image_url && character.image_url.startsWith('http')) {
-                                        e.target.src = character.image_url;
-                                      } else {
-                                        e.target.src = '/placeholder-anime.svg';
-                                      }
-                                    } else {
-                                      // Step 3: Give up, use placeholder
-                                      e.target.src = '/placeholder-anime.svg';
-                                    }
-                                  }}
-                                />
-                              </div>
-                              <div className="p-3">
-                                <h3 className="font-medium text-sm mb-1 line-clamp-2">
-                                  {name}
-                                </h3>
-                                {character.rating && (
-                                  <StarRating rating={character.rating} readonly size="sm" />
-                                )}
-                                {character.anime_title && (
-                                  <p className="text-xs text-gray-500 mt-1 line-clamp-1">
-                                    {language === 'ko' && character.anime_title_korean
-                                      ? character.anime_title_korean
-                                      : character.anime_title}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          </Link>
-                        );
-                      })}
+                            character={character}
+                            language={language}
+                          />
+                        ))}
                       </div>
                     </div>
                   )

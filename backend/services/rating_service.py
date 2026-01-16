@@ -335,23 +335,17 @@ def get_all_user_ratings(user_id: int) -> Dict:
     사용자의 모든 평점을 한 번에 조회 (RATED, WANT_TO_WATCH, PASS)
     3개의 API 호출을 1개로 줄여 성능 향상
     """
-    # Part 1: RATED - activities 테이블에서 빠르게 조회
+    # Part 1: RATED - activities 테이블에서 빠르게 조회 (필요한 필드만)
     rated_rows = db.execute_query(
         """
         SELECT
-            id,
             item_id as anime_id,
             user_id,
             rating,
             'RATED' as status,
-            activity_time as updated_at,
-            created_at,
             item_title as title_romaji,
-            item_title as title_english,
             item_title_korean as title_korean,
-            item_image as image_url,
-            NULL as season_year,
-            NULL as episodes
+            item_image as image_url
         FROM activities
         WHERE user_id = ? AND activity_type = 'anime_rating'
         ORDER BY activity_time DESC
@@ -359,17 +353,16 @@ def get_all_user_ratings(user_id: int) -> Dict:
         (user_id,)
     )
 
-    # Part 2: WANT_TO_WATCH - user_ratings 테이블에서 조회
+    # Part 2: WANT_TO_WATCH - user_ratings 테이블에서 조회 (필요한 필드만)
     watchlist_rows = db.execute_query(
         """
         SELECT
-            ur.*,
+            ur.anime_id,
+            ur.user_id,
+            ur.status,
             a.title_romaji,
-            a.title_english,
             a.title_korean,
-            a.cover_image_url as image_url,
-            a.season_year,
-            a.episodes
+            a.cover_image_url as image_url
         FROM user_ratings ur
         JOIN anime a ON ur.anime_id = a.id
         WHERE ur.user_id = ? AND ur.status = 'WANT_TO_WATCH'
@@ -378,17 +371,16 @@ def get_all_user_ratings(user_id: int) -> Dict:
         (user_id,)
     )
 
-    # Part 3: PASS - user_ratings 테이블에서 조회
+    # Part 3: PASS - user_ratings 테이블에서 조회 (필요한 필드만)
     pass_rows = db.execute_query(
         """
         SELECT
-            ur.*,
+            ur.anime_id,
+            ur.user_id,
+            ur.status,
             a.title_romaji,
-            a.title_english,
             a.title_korean,
-            a.cover_image_url as image_url,
-            a.season_year,
-            a.episodes
+            a.cover_image_url as image_url
         FROM user_ratings ur
         JOIN anime a ON ur.anime_id = a.id
         WHERE ur.user_id = ? AND ur.status = 'PASS'
