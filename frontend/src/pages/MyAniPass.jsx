@@ -28,8 +28,6 @@ import SeasonStats from '../components/profile/SeasonStats';
 import GenreCombinationChart from '../components/profile/GenreCombinationChart';
 import ActivityCard from '../components/activity/ActivityCard';
 import EditReviewModal from '../components/common/EditReviewModal';
-import AnimeCardSkeleton from '../components/common/AnimeCardSkeleton';
-import CharacterCardSkeleton from '../components/common/CharacterCardSkeleton';
 import api from '../services/api';
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
@@ -101,13 +99,9 @@ export default function MyAniPass() {
   const [ratingDistribution, setRatingDistribution] = useState([]);
   const [yearDistribution, setYearDistribution] = useState([]);
   const [allAnime, setAllAnime] = useState([]); // 모든 애니 (평가, 보고싶어요, 관심없어요 포함)
-  const [filteredAnime, setFilteredAnime] = useState([]); // 필터링된 애니 (전체)
-  const [displayedAnime, setDisplayedAnime] = useState([]); // 현재 표시되는 애니 (레이지 로딩)
-  const [animeLoadCount, setAnimeLoadCount] = useState(30); // 로드된 애니 개수
+  const [displayedAnime, setDisplayedAnime] = useState([]); // 현재 표시되는 애니
   const [allCharacters, setAllCharacters] = useState([]); // 모든 캐릭터 (평가, 알고싶어요, 관심없어요 포함)
-  const [filteredCharacters, setFilteredCharacters] = useState([]); // 필터링된 캐릭터 (전체)
-  const [displayedCharacters, setDisplayedCharacters] = useState([]); // 현재 표시되는 캐릭터 (레이지 로딩)
-  const [characterLoadCount, setCharacterLoadCount] = useState(30); // 로드된 캐릭터 개수
+  const [displayedCharacters, setDisplayedCharacters] = useState([]); // 현재 표시되는 캐릭터
   const [allRatedCharacters, setAllRatedCharacters] = useState([]); // 평가한 캐릭터만
   const [wantCharacters, setWantCharacters] = useState([]); // 알고싶어요 캐릭터
   const [passCharacters, setPassCharacters] = useState([]); // 관심없어요 캐릭터
@@ -231,7 +225,7 @@ export default function MyAniPass() {
     }
   };
 
-  // 애니 서브메뉴 필터링 (메모이제이션으로 성능 최적화 + 레이지 로딩)
+  // 애니 서브메뉴 필터링
   const filterAnimeBySubMenu = useCallback((animeData, submenu) => {
     let filtered = [];
 
@@ -255,12 +249,10 @@ export default function MyAniPass() {
       filtered = animeData.filter(a => a.category === 'pass');
     }
 
-    setFilteredAnime(filtered);
-    setDisplayedAnime(filtered.slice(0, 30)); // 초기 30개만 표시
-    setAnimeLoadCount(30);
+    setDisplayedAnime(filtered); // 전체 표시 (이미지는 lazy loading)
   }, []);
 
-  // 캐릭터 서브메뉴 필터링 (메모이제이션으로 성능 최적화 + 레이지 로딩)
+  // 캐릭터 서브메뉴 필터링
   const filterCharactersBySubMenu = useCallback((charactersData, submenu) => {
     let filtered = [];
 
@@ -285,58 +277,9 @@ export default function MyAniPass() {
       filtered = charactersData.filter(c => c.status === 'PASS');
     }
 
-    setFilteredCharacters(filtered);
-    setDisplayedCharacters(filtered.slice(0, 30)); // 초기 30개만 표시
-    setCharacterLoadCount(30);
+    setDisplayedCharacters(filtered); // 전체 표시 (이미지는 lazy loading)
   }, []);
 
-  // 애니 추가 로드 (무한 스크롤)
-  const loadMoreAnime = useCallback(() => {
-    if (animeLoadCount >= filteredAnime.length) return; // 더 이상 로드할 항목 없음
-
-    const nextCount = Math.min(animeLoadCount + 30, filteredAnime.length);
-    setDisplayedAnime(filteredAnime.slice(0, nextCount));
-    setAnimeLoadCount(nextCount);
-  }, [filteredAnime, animeLoadCount]);
-
-  // 캐릭터 추가 로드 (무한 스크롤)
-  const loadMoreCharacters = useCallback(() => {
-    if (characterLoadCount >= filteredCharacters.length) return; // 더 이상 로드할 항목 없음
-
-    const nextCount = Math.min(characterLoadCount + 30, filteredCharacters.length);
-    setDisplayedCharacters(filteredCharacters.slice(0, nextCount));
-    setCharacterLoadCount(nextCount);
-  }, [filteredCharacters, characterLoadCount]);
-
-  // Intersection Observer for infinite scroll (anime)
-  const animeObserver = useRef();
-  const animeLoadMoreRef = useCallback((node) => {
-    if (tabLoading) return;
-    if (animeObserver.current) animeObserver.current.disconnect();
-
-    animeObserver.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && animeLoadCount < filteredAnime.length) {
-        loadMoreAnime();
-      }
-    });
-
-    if (node) animeObserver.current.observe(node);
-  }, [tabLoading, animeLoadCount, filteredAnime.length, loadMoreAnime]);
-
-  // Intersection Observer for infinite scroll (characters)
-  const characterObserver = useRef();
-  const characterLoadMoreRef = useCallback((node) => {
-    if (tabLoading) return;
-    if (characterObserver.current) characterObserver.current.disconnect();
-
-    characterObserver.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && characterLoadCount < filteredCharacters.length) {
-        loadMoreCharacters();
-      }
-    });
-
-    if (node) characterObserver.current.observe(node);
-  }, [tabLoading, characterLoadCount, filteredCharacters.length, loadMoreCharacters]);
 
   // 서브메뉴 변경 시 필터링
   useEffect(() => {
@@ -1293,6 +1236,7 @@ export default function MyAniPass() {
               src={getImageUrl(imageUrl)}
               alt={title}
               className="w-full h-full object-cover"
+              loading="lazy"
               onError={(e) => {
                 e.target.src = '/placeholder-anime.svg';
               }}
@@ -2103,41 +2047,17 @@ export default function MyAniPass() {
                           return section;
                         }).filter(Boolean);
                       })()}
-
-                      {/* 더 로드할 항목이 있으면 스켈레톤 표시 (무한 스크롤 트리거) */}
-                      {animeLoadCount < filteredAnime.length && (
-                        <div className="mt-8">
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                            {Array.from({ length: Math.min(6, filteredAnime.length - animeLoadCount) }).map((_, idx) => (
-                              <div key={`skeleton-${idx}`} ref={idx === 0 ? animeLoadMoreRef : null}>
-                                <AnimeCardSkeleton />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   ) : (
                     // 5점, 보고싶어요, 관심없어요는 섹션 헤더와 함께 표시
                     <div>
                       <h3 className="text-lg font-bold mb-4 text-gray-800">
-                        {animeSubMenu === '5' && (language === 'ko' ? `⭐ 5점 (${filteredAnime.length})` : `⭐ 5.0 (${filteredAnime.length})`)}
-                        {animeSubMenu === 'watchlist' && (language === 'ko' ? `📋 보고싶어요 (${filteredAnime.length})` : `📋 Watchlist (${filteredAnime.length})`)}
-                        {animeSubMenu === 'pass' && (language === 'ko' ? `🚫 관심없어요 (${filteredAnime.length})` : `🚫 Pass (${filteredAnime.length})`)}
+                        {animeSubMenu === '5' && (language === 'ko' ? `⭐ 5점 (${displayedAnime.length})` : `⭐ 5.0 (${displayedAnime.length})`)}
+                        {animeSubMenu === 'watchlist' && (language === 'ko' ? `📋 보고싶어요 (${displayedAnime.length})` : `📋 Watchlist (${displayedAnime.length})`)}
+                        {animeSubMenu === 'pass' && (language === 'ko' ? `🚫 관심없어요 (${displayedAnime.length})` : `🚫 Pass (${displayedAnime.length})`)}
                       </h3>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
                         {displayedAnime.map(renderAnimeCard)}
-
-                        {/* 더 로드할 항목이 있으면 스켈레톤 표시 (무한 스크롤 트리거) */}
-                        {animeLoadCount < filteredAnime.length && (
-                          <>
-                            {Array.from({ length: Math.min(6, filteredAnime.length - animeLoadCount) }).map((_, idx) => (
-                              <div key={`skeleton-${idx}`} ref={idx === 0 ? animeLoadMoreRef : null}>
-                                <AnimeCardSkeleton />
-                              </div>
-                            ))}
-                          </>
-                        )}
                       </div>
                     </div>
                   )
@@ -2250,27 +2170,14 @@ export default function MyAniPass() {
                           return section;
                         }).filter(Boolean);
                       })()}
-
-                      {/* 더 로드할 항목이 있으면 스켈레톤 표시 (무한 스크롤 트리거) */}
-                      {characterLoadCount < filteredCharacters.length && (
-                        <div className="mt-8">
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                            {Array.from({ length: Math.min(6, filteredCharacters.length - characterLoadCount) }).map((_, idx) => (
-                              <div key={`skeleton-${idx}`} ref={idx === 0 ? characterLoadMoreRef : null}>
-                                <CharacterCardSkeleton />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   ) : (
                     // 5점, 알고싶어요, 관심없어요는 섹션 헤더와 함께 표시
                     <div>
                       <h3 className="text-lg font-bold mb-4 text-gray-800">
-                        {characterSubMenu === '5' && (language === 'ko' ? `⭐ 5점 (${filteredCharacters.length})` : `⭐ 5.0 (${filteredCharacters.length})`)}
-                        {characterSubMenu === 'want' && (language === 'ko' ? `💭 알고싶어요 (${filteredCharacters.length})` : `💭 Want to Know (${filteredCharacters.length})`)}
-                        {characterSubMenu === 'pass' && (language === 'ko' ? `🚫 관심없어요 (${filteredCharacters.length})` : `🚫 Pass (${filteredCharacters.length})`)}
+                        {characterSubMenu === '5' && (language === 'ko' ? `⭐ 5점 (${displayedCharacters.length})` : `⭐ 5.0 (${displayedCharacters.length})`)}
+                        {characterSubMenu === 'want' && (language === 'ko' ? `💭 알고싶어요 (${displayedCharacters.length})` : `💭 Want to Know (${displayedCharacters.length})`)}
+                        {characterSubMenu === 'pass' && (language === 'ko' ? `🚫 관심없어요 (${displayedCharacters.length})` : `🚫 Pass (${displayedCharacters.length})`)}
                       </h3>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
                         {displayedCharacters.map((character) => {
@@ -2289,6 +2196,7 @@ export default function MyAniPass() {
                                   src={getCharacterImageUrl(character.character_id, character.image_url)}
                                   alt={name}
                                   className="w-full h-full object-cover"
+                                  loading="lazy"
                                   onError={(e) => {
                                     const step = e.target.dataset.fallbackStep || '0';
 
@@ -2331,17 +2239,6 @@ export default function MyAniPass() {
                           </Link>
                         );
                       })}
-
-                        {/* 더 로드할 항목이 있으면 스켈레톤 표시 (무한 스크롤 트리거) */}
-                        {characterLoadCount < filteredCharacters.length && (
-                          <>
-                            {Array.from({ length: Math.min(6, filteredCharacters.length - characterLoadCount) }).map((_, idx) => (
-                              <div key={`skeleton-${idx}`} ref={idx === 0 ? characterLoadMoreRef : null}>
-                                <CharacterCardSkeleton />
-                              </div>
-                            ))}
-                          </>
-                        )}
                       </div>
                     </div>
                   )
