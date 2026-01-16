@@ -510,11 +510,11 @@ export default function Rate() {
       });
 
       const allItems = data.items || [];
-      // Show first 40 items immediately
-      setAnimeList(allItems.slice(0, 40));
+      // Show first 20 items immediately
+      setAnimeList(allItems.slice(0, 20));
       setAllAnimeItems(allItems);
-      setDisplayedCount(40);
-      setHasMore(allItems.length > 40);
+      setDisplayedCount(20);
+      setHasMore(allItems.length > 20);
       setPage(1);
       setLoading(false);
     } catch (err) {

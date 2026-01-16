@@ -89,11 +89,11 @@ export default function RateCharacters() {
       });
 
       const items = data.items || [];
-      // Show first 40 items immediately
-      setCharacters(items.slice(0, 40));
+      // Show first 20 items immediately
+      setCharacters(items.slice(0, 20));
       setAllCharacters(items);
-      setDisplayedCount(40);
-      setHasMore(items.length > 40);
+      setDisplayedCount(20);
+      setHasMore(items.length > 20);
       setPage(1);
 
       // Initialize character statuses
