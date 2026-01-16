@@ -610,6 +610,20 @@ export default function Feed() {
                         : 'When someone likes or comments on your ratings, you\'ll see it here'}
                     </p>
                   </>
+                ) : feedFilter === 'saved' ? (
+                  <>
+                    <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                    </svg>
+                    <p className="text-gray-600 text-lg font-medium mb-2">
+                      {language === 'ko' ? '저장한 활동이 없습니다' : 'No saved activities yet'}
+                    </p>
+                    <p className="text-gray-500 text-sm">
+                      {language === 'ko'
+                        ? '활동 카드의 북마크 아이콘을 클릭하여 나중에 보고 싶은 활동을 저장하세요'
+                        : 'Click the bookmark icon on activity cards to save them for later'}
+                    </p>
+                  </>
                 ) : (
                   <p className="text-gray-600">
                     {language === 'ko' ? '아직 활동이 없습니다.' : 'No activities yet.'}

@@ -260,7 +260,7 @@ export function useActivityPagination(filters = {}, pageSize = 50, skip = false)
     skipRef.current = skip;
   }, [skip]);
 
-  // 초기 로드 (첫 2페이지를 동시에)
+  // 초기 로드 (한 번에 2페이지 분량)
   const loadInitial = useCallback(async (currentFilters) => {
     if (loadingRef.current || skipRef.current) return;
 
@@ -271,20 +271,20 @@ export function useActivityPagination(filters = {}, pageSize = 50, skip = false)
     setAllActivities([]);
 
     try {
-      // 첫 2페이지를 동시에 로드 (속도 향상)
-      const [page1, page2] = await Promise.all([
-        activityService.getActivities({ ...currentFilters, limit: pageSize, offset: 0 }),
-        activityService.getActivities({ ...currentFilters, limit: pageSize, offset: pageSize })
-      ]);
-
-      console.log('[useActivityPagination] Initial load complete:', {
-        page1Count: page1.items.length,
-        page2Count: page2.items.length
+      // 한 번의 요청으로 2페이지 분량 로드 (더 빠름)
+      const data = await activityService.getActivities({
+        ...currentFilters,
+        limit: pageSize * 2,
+        offset: 0
       });
 
-      const allItems = [...page1.items, ...page2.items];
-      setAllActivities(allItems);
-      setHasMore(page2.items.length === pageSize);
+      console.log('[useActivityPagination] Initial load complete:', {
+        count: data.items.length,
+        total: data.total
+      });
+
+      setAllActivities(data.items);
+      setHasMore(data.items.length === pageSize * 2);
       setNextPage(2);
       isResettingRef.current = false;
     } catch (err) {
