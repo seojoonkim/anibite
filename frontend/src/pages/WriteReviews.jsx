@@ -592,7 +592,7 @@ export default function WriteReviews() {
                               <>
                                 {item.title_korean || item.title_romaji || item.title_english}
                                 {item.title_korean && (item.title_romaji || item.title_english) && (
-                                  <span className="text-gray-500"> ({item.title_romaji || item.title_english})</span>
+                                  <span className="text-xs text-gray-400 font-normal ml-1">{item.title_romaji || item.title_english}</span>
                                 )}
                               </>
                             ) : (
@@ -600,12 +600,12 @@ export default function WriteReviews() {
                             )
                           ) : (
                             language === 'ko' ? (
-                              <span className="flex flex-col">
-                                <span>{item.character_name_korean || item.character_name_native || item.character_name}</span>
+                              <>
+                                {item.character_name_korean || item.character_name_native || item.character_name}
                                 {(item.character_name_korean || item.character_name_native) && item.character_name && (
-                                  <span className="text-xs text-gray-400 font-normal">{item.character_name}</span>
+                                  <span className="text-xs text-gray-400 font-normal ml-1">{item.character_name}</span>
                                 )}
-                              </span>
+                              </>
                             ) : (
                               item.character_name || item.character_name_native
                             )
@@ -634,7 +634,7 @@ export default function WriteReviews() {
                               <>
                                 {item.anime_title_korean || item.anime_title}
                                 {item.anime_title_korean && item.anime_title && (
-                                  <span> ({item.anime_title})</span>
+                                  <span className="text-[10px] text-gray-400 font-normal ml-1">{item.anime_title}</span>
                                 )}
                               </>
                             ) : (
@@ -646,7 +646,7 @@ export default function WriteReviews() {
                             <>
                               {item.anime_title_korean || item.anime_title}
                               {item.anime_title_korean && item.anime_title && (
-                                <span> ({item.anime_title})</span>
+                                <span className="text-[10px] text-gray-400 font-normal ml-1">{item.anime_title}</span>
                               )}
                             </>
                           ) : (
