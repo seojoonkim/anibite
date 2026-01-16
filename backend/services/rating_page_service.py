@@ -133,6 +133,7 @@ def get_characters_for_rating(user_id: int, limit: int = 50) -> List[Dict]:
             c.id,
             c.name_full,
             c.name_native,
+            c.name_korean,
             COALESCE('/' || c.image_local, c.image_url) as image_url,
             c.gender,
             c.favourites,

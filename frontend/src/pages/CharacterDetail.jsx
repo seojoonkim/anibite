@@ -909,10 +909,14 @@ export default function CharacterDetail() {
             {/* Character Info - Desktop only */}
             <div className="hidden lg:block bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {character.name_full}
+                {language === 'ko' && character.name_korean ? character.name_korean : character.name_full}
               </h1>
-              {character.name_native && character.name_native !== character.name_full && (
-                <p className="text-xl text-gray-600 mb-4">{character.name_native}</p>
+              {language === 'ko' && character.name_korean ? (
+                <p className="text-xl text-gray-600 mb-4">{character.name_full}</p>
+              ) : (
+                character.name_native && character.name_native !== character.name_full && (
+                  <p className="text-xl text-gray-600 mb-4">{character.name_native}</p>
+                )
               )}
 
               {/* Community Rating */}

@@ -1048,7 +1048,7 @@ export default function AnimeDetail() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-sm truncate hover:text-[#3797F0] transition-colors">{char.character_name}</h4>
+                          <h4 className="font-medium text-sm truncate hover:text-[#3797F0] transition-colors">{language === 'ko' && char.character_name_korean ? char.character_name_korean : char.character_name}</h4>
                           <p className="text-xs text-gray-400">{language === 'ko' ? '캐릭터' : 'Character'}</p>
                         </div>
                       </div>

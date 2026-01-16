@@ -285,7 +285,7 @@ def _sync_character_rating_to_activities(user_id: int, character_id: int):
             u.avatar_url,
             COALESCE(us.otaku_score, 0) as otaku_score,
             c.name_full as item_title,
-            c.name_native as item_title_korean,
+            COALESCE(c.name_korean, c.name_native) as item_title_korean,
             COALESCE('/' || c.image_local, c.image_url) as item_image,
             r.title as review_title,
             r.content as review_content,

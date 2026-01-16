@@ -93,7 +93,16 @@ def get_all_my_ratings(
             "average_rating": 0.0
         }
     """
-    return get_all_user_character_ratings(current_user.id, rating_filter=rating, status_filter=status)
+    try:
+        return get_all_user_character_ratings(current_user.id, rating_filter=rating, status_filter=status)
+    except Exception as e:
+        import traceback
+        print(f"ERROR in get_all_my_ratings: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get character ratings: {str(e)}"
+        )
 
 
 @router.get("/me")
