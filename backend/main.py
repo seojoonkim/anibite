@@ -11,7 +11,7 @@ from config import ALLOWED_ORIGINS, COVER_IMAGES_DIR
 import os
 
 # Import API routers
-from api import auth, anime, ratings, reviews, comments, users, series, characters, character_ratings, feed, follows, activity_comments, activity_likes, comment_likes, user_posts, character_reviews, notifications, activities, rating_pages, admin, admin_fix, debug_promotion
+from api import auth, anime, ratings, reviews, comments, users, series, characters, character_ratings, feed, follows, activity_comments, activity_likes, comment_likes, user_posts, character_reviews, notifications, activities, rating_pages, admin, admin_fix, debug_promotion, bookmarks
 
 app = FastAPI(
     title="AniPass API",
@@ -34,6 +34,27 @@ async def startup_event():
         # Don't fail startup, just log the error
         import traceback
         traceback.print_exc()
+
+    # Create bookmarks table
+    print("[Startup] Creating bookmarks table...")
+    try:
+        from database import get_db
+        db = get_db()
+        db.execute_update("""
+            CREATE TABLE IF NOT EXISTS activity_bookmarks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                activity_id INTEGER NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                UNIQUE(user_id, activity_id)
+            )
+        """)
+        db.execute_update("CREATE INDEX IF NOT EXISTS idx_bookmarks_user_id ON activity_bookmarks(user_id)")
+        db.execute_update("CREATE INDEX IF NOT EXISTS idx_bookmarks_activity_id ON activity_bookmarks(activity_id)")
+        print("[Startup] ✓ Bookmarks table ready")
+    except Exception as e:
+        print(f"[Startup] ⚠️  Failed to create bookmarks table: {e}")
 
     # Debug: Log database info
     try:
@@ -221,6 +242,7 @@ app.include_router(activity_likes.router, prefix="/api/activity-likes", tags=["A
 app.include_router(comment_likes.router, prefix="/api/comment-likes", tags=["Comment Likes"])
 app.include_router(user_posts.router, prefix="/api/user-posts", tags=["User Posts"])
 app.include_router(notifications.router, prefix="/api/notifications", tags=["Notifications"])
+app.include_router(bookmarks.router, prefix="/api/bookmarks", tags=["Bookmarks"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(admin_fix.router, prefix="/api/admin-fix", tags=["Admin Fix"])
 app.include_router(debug_promotion.router, prefix="/api/debug", tags=["Debug"])
