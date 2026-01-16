@@ -2,6 +2,7 @@
 Feed Service
 사용자 활동 피드 - 최적화 버전
 """
+import json
 from typing import List, Dict
 from database import db, dict_from_row
 
@@ -257,6 +258,14 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
 
     results = [dict_from_row(row) for row in rows]
 
+    # Parse metadata JSON strings
+    for activity in results:
+        if activity.get('metadata') and isinstance(activity['metadata'], str):
+            try:
+                activity['metadata'] = json.loads(activity['metadata'])
+            except (json.JSONDecodeError, TypeError):
+                activity['metadata'] = None
+
     # Batch load comments_count for performance
     _enrich_comments_count(results)
 
@@ -312,6 +321,14 @@ def get_global_feed(limit: int = 50, offset: int = 0) -> List[Dict]:
     )
 
     results = [dict_from_row(row) for row in rows]
+
+    # Parse metadata JSON strings
+    for activity in results:
+        if activity.get('metadata') and isinstance(activity['metadata'], str):
+            try:
+                activity['metadata'] = json.loads(activity['metadata'])
+            except (json.JSONDecodeError, TypeError):
+                activity['metadata'] = None
 
     # Batch load comments_count for performance
     _enrich_comments_count(results)
@@ -487,6 +504,14 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
 
     # limit 적용
     final_results = combined[:limit]
+
+    # Parse metadata JSON strings
+    for activity in final_results:
+        if activity.get('metadata') and isinstance(activity['metadata'], str):
+            try:
+                activity['metadata'] = json.loads(activity['metadata'])
+            except (json.JSONDecodeError, TypeError):
+                activity['metadata'] = None
 
     # Batch load comments_count for performance
     _enrich_comments_count(final_results)
