@@ -12,15 +12,13 @@ from database import db
 
 def sync_korean_names():
     """Sync Korean names from JSON file to database"""
-    # Try backend/data first (for Railway deployment), then data/ (for local)
-    base_dir = os.path.dirname(os.path.dirname(__file__))
-    json_path = os.path.join(base_dir, 'data', 'korean_names.json')
-    if not os.path.exists(json_path):
-        # Fallback to project root data/
-        json_path = os.path.join(os.path.dirname(base_dir), 'data', 'korean_names.json')
+    # JSON file is in the same directory as this script (scripts/)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    json_path = os.path.join(script_dir, 'korean_names.json')
 
+    print(f"Looking for Korean names at: {json_path}")
     if not os.path.exists(json_path):
-        print(f"Korean names JSON not found at {json_path}")
+        print(f"Korean names JSON not found")
         return 0
 
     # Check if we already have Korean names in DB
