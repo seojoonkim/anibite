@@ -72,6 +72,7 @@ def create_or_update_rating(user_id: int, rating_data: RatingCreate) -> RatingRe
 
     # RATED 상태일 때 activities 동기화 확인
     # 트리거가 동작했는지 확인하고, 동작하지 않았으면 수동 동기화
+    rating_activity_time = None
     if rating_data.status == RatingStatus.RATED and rating_data.rating:
         # Check if trigger worked
         activity_exists = db.execute_query(
@@ -99,8 +100,23 @@ def create_or_update_rating(user_id: int, rating_data: RatingCreate) -> RatingRe
               AND item_id = ?
         """, (user_id, rating_data.anime_id))
 
-    # 사용자 통계 업데이트
-    _update_user_stats(user_id)
+        # 업데이트된 activity_time을 조회 (승급 메시지에 사용)
+        activity_time_result = db.execute_query(
+            """
+            SELECT activity_time
+            FROM activities
+            WHERE activity_type = 'anime_rating'
+              AND user_id = ?
+              AND item_id = ?
+            """,
+            (user_id, rating_data.anime_id),
+            fetch_one=True
+        )
+        if activity_time_result:
+            rating_activity_time = activity_time_result['activity_time']
+
+    # 사용자 통계 업데이트 (승급 시 사용할 activity_time 전달)
+    _update_user_stats(user_id, rating_activity_time)
 
     # 생성/수정된 평점 조회
     rating_response = get_rating_by_id(rating_id)
@@ -536,8 +552,14 @@ def _get_rank_info(otaku_score: float) -> tuple[str, int]:
         return "오타쿠 갓", 10
 
 
-def _update_user_stats(user_id: int):
-    """사용자 통계 업데이트 및 승급 감지"""
+def _update_user_stats(user_id: int, promotion_activity_time: Optional[str] = None):
+    """
+    사용자 통계 업데이트 및 승급 감지
+
+    Args:
+        user_id: 사용자 ID
+        promotion_activity_time: 승급 메시지에 사용할 activity_time (평점이 매겨진 시각)
+    """
 
     # 현재 otaku_score 조회 (승급 감지용)
     current_stats = db.execute_query(
@@ -562,12 +584,20 @@ def _update_user_stats(user_id: int):
         fetch_one=True
     )
 
-    # 리뷰 수
-    review_count = db.execute_query(
+    # 리뷰 수 (애니메이션 리뷰 + 캐릭터 리뷰)
+    anime_review_count = db.execute_query(
         "SELECT COUNT(*) as total FROM user_reviews WHERE user_id = ?",
         (user_id,),
         fetch_one=True
     )['total']
+
+    character_review_count = db.execute_query(
+        "SELECT COUNT(*) as total FROM character_reviews WHERE user_id = ?",
+        (user_id,),
+        fetch_one=True
+    )['total']
+
+    review_count = anime_review_count + character_review_count
 
     # 시청 시간 계산 (평가한 애니메이션의 에피소드 * 평균 길이)
     watch_time = db.execute_query(
@@ -647,20 +677,42 @@ def _update_user_stats(user_id: int):
 
         if user_info:
             # activities에 승급 기록 추가
-            db.execute_insert(
-                """
-                INSERT INTO activities (
-                    activity_type, user_id, username, display_name, avatar_url,
-                    item_id, metadata, activity_time, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                """,
-                (
-                    'rank_promotion',
-                    user_id,
-                    user_info['username'],
-                    user_info['display_name'],
-                    user_info['avatar_url'],
-                    None,  # item_id not needed for rank promotion
-                    f'{{"old_rank": "{old_rank}", "old_level": {old_level}, "new_rank": "{new_rank}", "new_level": {new_level}, "otaku_score": {new_otaku_score}}}'
+            # promotion_activity_time이 제공되면 해당 시간 사용, 아니면 CURRENT_TIMESTAMP
+            if promotion_activity_time:
+                db.execute_insert(
+                    """
+                    INSERT INTO activities (
+                        activity_type, user_id, username, display_name, avatar_url,
+                        item_id, metadata, activity_time, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                    """,
+                    (
+                        'rank_promotion',
+                        user_id,
+                        user_info['username'],
+                        user_info['display_name'],
+                        user_info['avatar_url'],
+                        None,  # item_id not needed for rank promotion
+                        f'{{"old_rank": "{old_rank}", "old_level": {old_level}, "new_rank": "{new_rank}", "new_level": {new_level}, "otaku_score": {new_otaku_score}}}',
+                        promotion_activity_time
+                    )
                 )
-            )
+            else:
+                # Fallback: CURRENT_TIMESTAMP 사용 (평점이 아닌 다른 활동으로 승급한 경우)
+                db.execute_insert(
+                    """
+                    INSERT INTO activities (
+                        activity_type, user_id, username, display_name, avatar_url,
+                        item_id, metadata, activity_time, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                    """,
+                    (
+                        'rank_promotion',
+                        user_id,
+                        user_info['username'],
+                        user_info['display_name'],
+                        user_info['avatar_url'],
+                        None,  # item_id not needed for rank promotion
+                        f'{{"old_rank": "{old_rank}", "old_level": {old_level}, "new_rank": "{new_rank}", "new_level": {new_level}, "otaku_score": {new_otaku_score}}}'
+                    )
+                )
