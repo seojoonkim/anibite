@@ -160,6 +160,164 @@ def get_my_year_distribution(current_user: UserResponse = Depends(get_current_us
     return get_year_distribution(current_user.id)
 
 
+@router.get("/me/format-distribution", response_model=List[Dict])
+def get_my_format_distribution(current_user: UserResponse = Depends(get_current_user)):
+    """
+    포맷별 분포 (TV, MOVIE, OVA 등)
+
+    평가한 애니메이션의 포맷별 개수와 평균 평점
+    """
+    return get_format_distribution(current_user.id)
+
+
+@router.get("/me/episode-length-distribution", response_model=List[Dict])
+def get_my_episode_length_distribution(current_user: UserResponse = Depends(get_current_user)):
+    """
+    에피소드 길이별 분포 (단편/중편/장편)
+
+    - SHORT: 1-12화
+    - MEDIUM: 13-26화
+    - LONG: 27화 이상
+    """
+    return get_episode_length_distribution(current_user.id)
+
+
+@router.get("/me/rating-stats", response_model=Dict)
+def get_my_rating_stats(current_user: UserResponse = Depends(get_current_user)):
+    """
+    평점 통계
+
+    평균, 표준편차, 최소값, 최대값
+    """
+    return get_rating_stats(current_user.id)
+
+
+@router.get("/me/studio-stats", response_model=List[Dict])
+def get_my_studio_stats(
+    limit: int = Query(10, ge=1, le=50),
+    current_user: UserResponse = Depends(get_current_user)
+):
+    """
+    스튜디오별 통계
+
+    가장 많이 본 스튜디오와 평균 평점
+    최소 2개 이상 평가한 스튜디오만 포함
+    """
+    return get_studio_stats(current_user.id, limit)
+
+
+@router.get("/me/season-stats", response_model=List[Dict])
+def get_my_season_stats(current_user: UserResponse = Depends(get_current_user)):
+    """
+    시즌별 통계 (봄/여름/가을/겨울)
+
+    각 시즌에 방영된 애니메이션 개수와 평균 평점
+    """
+    return get_season_stats(current_user.id)
+
+
+@router.get("/me/genre-combinations", response_model=List[Dict])
+def get_my_genre_combinations(
+    limit: int = Query(10, ge=1, le=20),
+    current_user: UserResponse = Depends(get_current_user)
+):
+    """
+    장르 조합 분석
+
+    가장 많이 본 2개 장르 조합
+    최소 2개 이상 평가한 조합만 포함
+    """
+    return get_genre_combination_stats(current_user.id, limit)
+
+
+@router.get("/me/five-star-characters", response_model=List[Dict])
+def get_my_five_star_characters(current_user: UserResponse = Depends(get_current_user)):
+    """
+    5점 평가한 캐릭터 목록
+
+    프로필 사진 선택에 사용
+    """
+    return get_five_star_characters(current_user.id)
+
+
+@router.get("/me/character-ratings", response_model=List[Dict])
+def get_my_character_ratings(
+    limit: int = Query(500, ge=1, le=1000),
+    current_user: UserResponse = Depends(get_current_user)
+):
+    """
+    내가 평가한 캐릭터 목록
+
+    rating, status와 함께 반환
+    """
+    from services.profile_service import get_character_ratings
+    return get_character_ratings(current_user.id, limit)
+
+
+@router.get("/me/studio-preferences", response_model=Dict)
+def get_my_studio_preferences(
+    limit: int = Query(10, ge=1, le=50),
+    current_user: UserResponse = Depends(get_current_user)
+):
+    """
+    제작사 선호도 분석
+
+    좋아하는 제작사 Top N과 평균 평점
+    """
+    return get_studio_preferences(current_user.id, limit)
+
+
+@router.get("/me/director-preferences", response_model=List[Dict])
+def get_my_director_preferences(
+    limit: int = Query(10, ge=1, le=50),
+    current_user: UserResponse = Depends(get_current_user)
+):
+    """
+    감독 선호도 분석
+
+    좋아하는 감독 Top N과 평균 평점
+    """
+    return get_director_preferences(current_user.id, limit)
+
+
+@router.get("/me/hidden-gems", response_model=List[Dict])
+def get_my_hidden_gems(
+    limit: int = Query(10, ge=1, le=50),
+    current_user: UserResponse = Depends(get_current_user)
+):
+    """
+    숨겨진 보석 발견
+
+    대중 평점은 낮지만 내가 높게 평가한 작품
+    또는 과대평가라고 생각하는 작품
+    """
+    return get_hidden_gems(current_user.id, limit)
+
+
+@router.get("/me/source-preferences", response_model=Dict)
+def get_my_source_preferences(
+    current_user: UserResponse = Depends(get_current_user)
+):
+    """
+    원작 매체별 선호도
+
+    만화, 라노벨, 오리지널 등 원작 매체별 통계
+    """
+    return get_source_preferences(current_user.id)
+
+
+@router.get("/me/genre-radar", response_model=Dict)
+def get_my_genre_radar(
+    current_user: UserResponse = Depends(get_current_user)
+):
+    """
+    장르 레이더 차트 데이터
+
+    주요 장르별 평균 평점과 개수 (레이더 차트용)
+    """
+    return get_genre_radar_data(current_user.id)
+
+
 @router.get("/{user_id}/profile", response_model=UserProfileResponse)
 def get_user_profile_by_id(user_id: int):
     """
@@ -280,100 +438,6 @@ def get_user_genre_combinations_by_id(
     return get_genre_combinations(user_id, limit)
 
 
-@router.get("/me/format-distribution", response_model=List[Dict])
-def get_my_format_distribution(current_user: UserResponse = Depends(get_current_user)):
-    """
-    포맷별 분포 (TV, MOVIE, OVA 등)
-
-    평가한 애니메이션의 포맷별 개수와 평균 평점
-    """
-    return get_format_distribution(current_user.id)
-
-
-@router.get("/me/episode-length-distribution", response_model=List[Dict])
-def get_my_episode_length_distribution(current_user: UserResponse = Depends(get_current_user)):
-    """
-    에피소드 길이별 분포 (단편/중편/장편)
-
-    - SHORT: 1-12화
-    - MEDIUM: 13-26화
-    - LONG: 27화 이상
-    """
-    return get_episode_length_distribution(current_user.id)
-
-
-@router.get("/me/rating-stats", response_model=Dict)
-def get_my_rating_stats(current_user: UserResponse = Depends(get_current_user)):
-    """
-    평점 통계
-
-    평균, 표준편차, 최소값, 최대값
-    """
-    return get_rating_stats(current_user.id)
-
-
-@router.get("/me/studio-stats", response_model=List[Dict])
-def get_my_studio_stats(
-    limit: int = Query(10, ge=1, le=50),
-    current_user: UserResponse = Depends(get_current_user)
-):
-    """
-    스튜디오별 통계
-
-    가장 많이 본 스튜디오와 평균 평점
-    최소 2개 이상 평가한 스튜디오만 포함
-    """
-    return get_studio_stats(current_user.id, limit)
-
-
-@router.get("/me/season-stats", response_model=List[Dict])
-def get_my_season_stats(current_user: UserResponse = Depends(get_current_user)):
-    """
-    시즌별 통계 (봄/여름/가을/겨울)
-
-    각 시즌에 방영된 애니메이션 개수와 평균 평점
-    """
-    return get_season_stats(current_user.id)
-
-
-@router.get("/me/genre-combinations", response_model=List[Dict])
-def get_my_genre_combinations(
-    limit: int = Query(10, ge=1, le=20),
-    current_user: UserResponse = Depends(get_current_user)
-):
-    """
-    장르 조합 분석
-
-    가장 많이 본 2개 장르 조합
-    최소 2개 이상 평가한 조합만 포함
-    """
-    return get_genre_combination_stats(current_user.id, limit)
-
-
-@router.get("/me/five-star-characters", response_model=List[Dict])
-def get_my_five_star_characters(current_user: UserResponse = Depends(get_current_user)):
-    """
-    5점 평가한 캐릭터 목록
-
-    프로필 사진 선택에 사용
-    """
-    return get_five_star_characters(current_user.id)
-
-
-@router.get("/me/character-ratings", response_model=List[Dict])
-def get_my_character_ratings(
-    limit: int = Query(500, ge=1, le=1000),
-    current_user: UserResponse = Depends(get_current_user)
-):
-    """
-    내가 평가한 캐릭터 목록
-
-    rating, status와 함께 반환
-    """
-    from services.profile_service import get_character_ratings
-    return get_character_ratings(current_user.id, limit)
-
-
 @router.post("/me/avatar/upload")
 async def upload_avatar(
     file: UploadFile = File(...),
@@ -475,70 +539,6 @@ def get_users_leaderboard(
     오타쿠 점수 높은 순으로 정렬된 사용자 목록
     """
     return get_leaderboard(limit)
-
-
-@router.get("/me/studio-preferences", response_model=Dict)
-def get_my_studio_preferences(
-    limit: int = Query(10, ge=1, le=50),
-    current_user: UserResponse = Depends(get_current_user)
-):
-    """
-    제작사 선호도 분석
-
-    좋아하는 제작사 Top N과 평균 평점
-    """
-    return get_studio_preferences(current_user.id, limit)
-
-
-@router.get("/me/director-preferences", response_model=List[Dict])
-def get_my_director_preferences(
-    limit: int = Query(10, ge=1, le=50),
-    current_user: UserResponse = Depends(get_current_user)
-):
-    """
-    감독 선호도 분석
-
-    좋아하는 감독 Top N과 평균 평점
-    """
-    return get_director_preferences(current_user.id, limit)
-
-
-@router.get("/me/hidden-gems", response_model=List[Dict])
-def get_my_hidden_gems(
-    limit: int = Query(10, ge=1, le=50),
-    current_user: UserResponse = Depends(get_current_user)
-):
-    """
-    숨겨진 보석 발견
-
-    대중 평점은 낮지만 내가 높게 평가한 작품
-    또는 과대평가라고 생각하는 작품
-    """
-    return get_hidden_gems(current_user.id, limit)
-
-
-@router.get("/me/source-preferences", response_model=Dict)
-def get_my_source_preferences(
-    current_user: UserResponse = Depends(get_current_user)
-):
-    """
-    원작 매체별 선호도
-
-    만화, 라노벨, 오리지널 등 원작 매체별 통계
-    """
-    return get_source_preferences(current_user.id)
-
-
-@router.get("/me/genre-radar", response_model=Dict)
-def get_my_genre_radar(
-    current_user: UserResponse = Depends(get_current_user)
-):
-    """
-    장르 레이더 차트 데이터
-
-    주요 장르별 평균 평점과 개수 (레이더 차트용)
-    """
-    return get_genre_radar_data(current_user.id)
 
 
 @router.get("/{user_id}/character-ratings", response_model=List[Dict])
