@@ -60,6 +60,8 @@ def get_bookmarks(
         (current_user.id,)
     )
 
+    print(f"[Bookmarks] User {current_user.id} has {len(bookmarked_ids)} bookmarks")
+
     if not bookmarked_ids:
         return {
             'items': [],
@@ -143,7 +145,9 @@ def get_bookmarks(
                 }
                 activities.append(activity)
         except Exception as e:
-            print(f"Error loading bookmarked activity {activity_id}: {e}")
+            print(f"[Bookmarks] Error loading bookmarked activity {activity_id}: {e}")
+            import traceback
+            traceback.print_exc()
             continue
 
     return {
