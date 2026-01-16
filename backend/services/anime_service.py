@@ -176,7 +176,7 @@ def get_anime_list(
         total=total,
         page=page,
         page_size=page_size,
-        has_next=(offset + page_size) < total
+        has_more=(offset + page_size) < total
     )
 
 
@@ -433,7 +433,7 @@ def search_anime(
         total=total,
         page=page,
         page_size=page_size,
-        has_next=(offset + page_size) < total
+        has_more=(offset + page_size) < total
     )
 
 

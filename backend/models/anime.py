@@ -61,4 +61,4 @@ class AnimeListResponse(BaseModel):
     total: int
     page: int
     page_size: int
-    has_next: bool
+    has_more: bool
