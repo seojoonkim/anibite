@@ -276,7 +276,11 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
       setInitialLoading(false);
       setLoadingMore(false);
     }
-  }, [filters, page, pageSize, initialLoading, loadingMore, hasMore]);
+  }, [page, pageSize, initialLoading, loadingMore, hasMore, JSON.stringify(filters)]);
+
+  // Refs for preventing duplicate loads
+  const firstLoadRef = useRef(false);
+  const secondLoadRef = useRef(0);
 
   const reset = useCallback(() => {
     console.log('[useActivityPagination] Resetting pagination');
@@ -285,6 +289,8 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
     setHasMore(true);
     setInitialLoading(false);
     setLoadingMore(false);
+    firstLoadRef.current = false;
+    secondLoadRef.current = 0;
   }, []);
 
   useEffect(() => {
@@ -294,21 +300,23 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
 
   // Auto-load first page when page is reset to 0
   useEffect(() => {
-    if (page === 0 && allActivities.length === 0 && hasMore && !initialLoading && !loadingMore) {
+    if (page === 0 && allActivities.length === 0 && hasMore && !initialLoading && !loadingMore && !firstLoadRef.current) {
       console.log('[useActivityPagination] Auto-loading first page');
+      firstLoadRef.current = true;
       loadMore(false);
     }
-  }, [page, allActivities.length, hasMore, initialLoading, loadingMore]);
+  }, [page, allActivities.length, hasMore, initialLoading, loadingMore, loadMore]);
 
   // Auto-load second batch silently after first batch loads
   useEffect(() => {
-    if (page === 1 && hasMore && !initialLoading && !loadingMore) {
+    if (page === 1 && hasMore && !initialLoading && !loadingMore && secondLoadRef.current !== page) {
       console.log('[useActivityPagination] Auto-loading second page silently');
+      secondLoadRef.current = page;
       setTimeout(() => {
         loadMore(true); // Silent load
       }, 100);
     }
-  }, [page, hasMore, initialLoading, loadingMore]);
+  }, [page, hasMore, initialLoading, loadingMore, loadMore]);
 
   return {
     activities: allActivities,
