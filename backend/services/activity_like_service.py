@@ -5,6 +5,42 @@ Activity Like Service
 from typing import Dict, List
 from database import db, dict_from_row
 
+def _get_activity_id(activity_type: str, activity_user_id: int, item_id: int) -> int:
+    """activities 테이블에서 activity_id 찾기"""
+    try:
+        activity = db.execute_query(
+            "SELECT id FROM activities WHERE activity_type = ? AND user_id = ? AND item_id = ?",
+            (activity_type, activity_user_id, item_id),
+            fetch_one=True
+        )
+        return activity['id'] if activity else None
+    except:
+        return None
+
+def _create_like_notification(user_id: int, activity_user_id: int, activity_type: str, item_id: int):
+    """좋아요 알림 생성"""
+    if user_id == activity_user_id:
+        return
+
+    activity_id = _get_activity_id(activity_type, activity_user_id, item_id)
+    if not activity_id:
+        return
+
+    from api.notifications import create_notification
+    create_notification(db, activity_user_id, user_id, 'like', activity_id)
+
+def _delete_like_notification(user_id: int, activity_user_id: int, activity_type: str, item_id: int):
+    """좋아요 알림 삭제"""
+    if user_id == activity_user_id:
+        return
+
+    activity_id = _get_activity_id(activity_type, activity_user_id, item_id)
+    if not activity_id:
+        return
+
+    from api.notifications import delete_notification_by_action
+    delete_notification_by_action(db, activity_user_id, user_id, 'like', activity_id)
+
 
 def like_activity(user_id: int, activity_type: str, activity_user_id: int, item_id: int) -> bool:
     """
@@ -32,6 +68,7 @@ def like_activity(user_id: int, activity_type: str, activity_user_id: int, item_
                     "UPDATE user_reviews SET likes_count = likes_count + 1 WHERE id = ?",
                     (review_id,)
                 )
+                _create_like_notification(user_id, activity_user_id, activity_type, item_id)
                 return True
             else:
                 # 리뷰가 없으면 평점이 있는지 확인하고 activity_likes에 저장
@@ -45,6 +82,7 @@ def like_activity(user_id: int, activity_type: str, activity_user_id: int, item_
                         "INSERT INTO activity_likes (user_id, activity_type, activity_user_id, item_id) VALUES (?, ?, ?, ?)",
                         (user_id, activity_type, activity_user_id, item_id)
                     )
+                    _create_like_notification(user_id, activity_user_id, activity_type, item_id)
                     return True
                 return False
         except Exception:
@@ -71,6 +109,7 @@ def like_activity(user_id: int, activity_type: str, activity_user_id: int, item_
                     "UPDATE character_reviews SET likes_count = likes_count + 1 WHERE id = ?",
                     (review_id,)
                 )
+                _create_like_notification(user_id, activity_user_id, activity_type, item_id)
                 return True
             else:
                 # 리뷰가 없으면 평점이 있는지 확인하고 activity_likes에 저장
@@ -84,6 +123,7 @@ def like_activity(user_id: int, activity_type: str, activity_user_id: int, item_
                         "INSERT INTO activity_likes (user_id, activity_type, activity_user_id, item_id) VALUES (?, ?, ?, ?)",
                         (user_id, activity_type, activity_user_id, item_id)
                     )
+                    _create_like_notification(user_id, activity_user_id, activity_type, item_id)
                     return True
                 return False
         except Exception:
@@ -98,6 +138,7 @@ def like_activity(user_id: int, activity_type: str, activity_user_id: int, item_
             """,
             (user_id, activity_type, activity_user_id, item_id)
         )
+        _create_like_notification(user_id, activity_user_id, activity_type, item_id)
         return True
     except Exception:
         return False
@@ -130,6 +171,7 @@ def unlike_activity(user_id: int, activity_type: str, activity_user_id: int, ite
                         "UPDATE user_reviews SET likes_count = CASE WHEN likes_count > 0 THEN likes_count - 1 ELSE 0 END WHERE id = ?",
                         (review_id,)
                     )
+                    _delete_like_notification(user_id, activity_user_id, activity_type, item_id)
                     return True
                 return False
             else:
@@ -138,6 +180,8 @@ def unlike_activity(user_id: int, activity_type: str, activity_user_id: int, ite
                     "DELETE FROM activity_likes WHERE user_id = ? AND activity_type = ? AND activity_user_id = ? AND item_id = ?",
                     (user_id, activity_type, activity_user_id, item_id)
                 )
+                if result > 0:
+                    _delete_like_notification(user_id, activity_user_id, activity_type, item_id)
                 return result > 0
         except Exception:
             return False
@@ -164,6 +208,7 @@ def unlike_activity(user_id: int, activity_type: str, activity_user_id: int, ite
                         "UPDATE character_reviews SET likes_count = CASE WHEN likes_count > 0 THEN likes_count - 1 ELSE 0 END WHERE id = ?",
                         (review_id,)
                     )
+                    _delete_like_notification(user_id, activity_user_id, activity_type, item_id)
                     return True
                 return False
             else:
@@ -172,6 +217,8 @@ def unlike_activity(user_id: int, activity_type: str, activity_user_id: int, ite
                     "DELETE FROM activity_likes WHERE user_id = ? AND activity_type = ? AND activity_user_id = ? AND item_id = ?",
                     (user_id, activity_type, activity_user_id, item_id)
                 )
+                if result > 0:
+                    _delete_like_notification(user_id, activity_user_id, activity_type, item_id)
                 return result > 0
         except Exception:
             return False
@@ -185,6 +232,8 @@ def unlike_activity(user_id: int, activity_type: str, activity_user_id: int, ite
             """,
             (user_id, activity_type, activity_user_id, item_id)
         )
+        if result > 0:
+            _delete_like_notification(user_id, activity_user_id, activity_type, item_id)
         return result > 0
     except Exception:
         return False
