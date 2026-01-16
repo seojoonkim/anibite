@@ -434,8 +434,7 @@ def get_user_genre_combinations_by_id(
     """
     다른 사용자의 장르 조합 통계 (공개)
     """
-    from services.profile_service import get_genre_combinations
-    return get_genre_combinations(user_id, limit)
+    return get_genre_combination_stats(user_id, limit)
 
 
 @router.post("/me/avatar/upload")
