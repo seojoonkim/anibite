@@ -11,6 +11,7 @@ import { reviewService } from '../services/reviewService';
 import { characterService } from '../services/characterService';
 import { characterReviewService } from '../services/characterReviewService';
 import { userPostService } from '../services/userPostService';
+import { bookmarkService } from '../services/bookmarkService';
 import ActivityCard from '../components/activity/ActivityCard';
 import NotificationCard from '../components/feed/NotificationCard';
 import EditReviewModal from '../components/common/EditReviewModal';
@@ -26,6 +27,8 @@ export default function Feed() {
   const [newPostContent, setNewPostContent] = useState('');
   const [notifications, setNotifications] = useState([]);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [savedActivities, setSavedActivities] = useState([]);
+  const [savedLoading, setSavedLoading] = useState(false);
 
   // Edit modal state
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -71,16 +74,7 @@ export default function Feed() {
   // Don't auto-reset on filter change - let the hook handle it naturally
   // This prevents flickering when switching tabs
 
-  // Auto-load more activities for 'saved' filter to ensure bookmarked items are loaded
-  useEffect(() => {
-    if (feedFilter === 'saved' && !loading && !loadingMore && hasMore && activities.length < 100) {
-      // Keep loading until we have at least 100 activities or no more to load
-      const timer = setTimeout(() => {
-        loadMore();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [feedFilter, loading, loadingMore, hasMore, activities.length, loadMore]);
+  // No auto-load for 'saved' filter - we fetch bookmarked activities from server
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
@@ -138,6 +132,8 @@ export default function Feed() {
   useEffect(() => {
     if (feedFilter === 'notifications') {
       loadNotifications();
+    } else if (feedFilter === 'saved') {
+      loadSavedActivities();
     }
   }, [feedFilter]);
 
@@ -203,6 +199,19 @@ export default function Feed() {
       console.error('Failed to load notifications:', err);
       setNotifications([]);
       setNotificationsLoading(false);
+    }
+  };
+
+  const loadSavedActivities = async () => {
+    try {
+      setSavedLoading(true);
+      const data = await bookmarkService.getBookmarks(true);
+      setSavedActivities(data.items || []);
+      setSavedLoading(false);
+    } catch (err) {
+      console.error('Failed to load saved activities:', err);
+      setSavedActivities([]);
+      setSavedLoading(false);
     }
   };
 
@@ -274,9 +283,7 @@ export default function Feed() {
     if (feedFilter === 'notifications') {
       return notifications;
     } else if (feedFilter === 'saved') {
-      // Use same localStorage key as ActivityCard
-      const bookmarks = JSON.parse(localStorage.getItem('anipass_bookmarks') || '[]');
-      return activities.filter(activity => bookmarks.includes(activity.id));
+      return savedActivities;
     }
 
     // No more cache - just return activities directly
@@ -292,7 +299,8 @@ export default function Feed() {
   };
 
   const filteredActivities = getFilteredActivities();
-  const isLoading = feedFilter === 'notifications' ? notificationsLoading : loading;
+  const isLoading = feedFilter === 'notifications' ? notificationsLoading :
+                   feedFilter === 'saved' ? savedLoading : loading;
 
   // Edit modal handlers
   const handleEditContent = (activity, mode = 'edit') => {
@@ -645,7 +653,7 @@ export default function Feed() {
                 })}
 
                 {/* Infinite scroll trigger */}
-                {feedFilter !== 'notifications' && (
+                {feedFilter !== 'notifications' && feedFilter !== 'saved' && (
                   <div ref={loadMoreTriggerRef} className="h-20 flex items-center justify-center">
                     {loadingMore && (
                       <div className="text-gray-500 text-sm">
@@ -656,14 +664,6 @@ export default function Feed() {
                       <div className="text-gray-400 text-sm">
                         {language === 'ko' ? '모든 활동을 불러왔습니다' : 'All activities loaded'}
                       </div>
-                    )}
-                    {feedFilter === 'saved' && !loading && !loadingMore && hasMore && (
-                      <button
-                        onClick={() => loadMore()}
-                        className="px-4 py-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
-                      >
-                        {language === 'ko' ? '더 불러오기' : 'Load more'}
-                      </button>
                     )}
                   </div>
                 )}
