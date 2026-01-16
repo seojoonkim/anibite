@@ -17,6 +17,7 @@ def get_user_rated_characters(user_id: int, limit: int = 100, offset: int = 0) -
             c.id as character_id,
             c.name_full as character_name,
             c.name_native,
+            c.name_korean,
             COALESCE('/' || c.image_local, c.image_url) as character_image,
             cr.rating,
             cr.status,
@@ -63,6 +64,7 @@ def get_characters_from_rated_anime(user_id: int, limit: int = 100) -> List[Dict
                 c.id,
                 c.name_full,
                 c.name_native,
+                c.name_korean,
                 COALESCE('/' || c.image_local, c.image_url) as image_url,
                 c.gender,
                 c.favourites,
@@ -410,6 +412,7 @@ def get_user_character_ratings(
                 cr.*,
                 c.name_full,
                 c.name_native,
+                c.name_korean,
                 COALESCE('/' || c.image_local, c.image_url) as image_url,
                 (SELECT a.id FROM anime a
                  JOIN anime_character ac ON a.id = ac.anime_id
@@ -469,21 +472,23 @@ def get_user_character_ratings(
         rows = db.execute_query(
             f"""
             SELECT
-                id,
-                item_id as character_id,
-                user_id,
-                rating,
+                a.id,
+                a.item_id as character_id,
+                a.user_id,
+                a.rating,
                 'RATED' as status,
-                activity_time as updated_at,
-                created_at,
-                item_title as name_full,
-                item_title_korean as name_native,
-                item_image as image_url,
+                a.activity_time as updated_at,
+                a.created_at,
+                a.item_title as name_full,
+                a.item_title_korean as name_native,
+                c.name_korean,
+                a.item_image as image_url,
                 NULL as anime_id,
                 NULL as anime_title
-            FROM activities
-            WHERE user_id = ? AND activity_type = 'character_rating'
-            AND (review_content IS NULL OR review_content = '')
+            FROM activities a
+            LEFT JOIN character c ON a.item_id = c.id
+            WHERE a.user_id = ? AND a.activity_type = 'character_rating'
+            AND (a.review_content IS NULL OR a.review_content = '')
             ORDER BY activity_time DESC
             {limit_clause}
             """,
@@ -515,21 +520,23 @@ def get_user_character_ratings(
         rows = db.execute_query(
             f"""
             SELECT
-                id,
-                item_id as character_id,
-                user_id,
-                rating,
+                a.id,
+                a.item_id as character_id,
+                a.user_id,
+                a.rating,
                 'RATED' as status,
-                activity_time as updated_at,
-                created_at,
-                item_title as name_full,
-                item_title_korean as name_native,
-                item_image as image_url,
+                a.activity_time as updated_at,
+                a.created_at,
+                a.item_title as name_full,
+                a.item_title_korean as name_native,
+                c.name_korean,
+                a.item_image as image_url,
                 NULL as anime_id,
                 NULL as anime_title
-            FROM activities
-            WHERE user_id = ? AND activity_type = 'character_rating'
-            ORDER BY activity_time DESC
+            FROM activities a
+            LEFT JOIN character c ON a.item_id = c.id
+            WHERE a.user_id = ? AND a.activity_type = 'character_rating'
+            ORDER BY a.activity_time DESC
             {limit_clause}
             """,
             (user_id,)
@@ -544,87 +551,112 @@ def get_user_character_ratings(
     }
 
 
-def get_all_user_character_ratings(user_id: int) -> Dict:
+def get_all_user_character_ratings(user_id: int, rating_filter: float = None, status_filter: str = None) -> Dict:
     """
     사용자의 모든 캐릭터 평점을 한 번에 조회 (RATED, WANT_TO_KNOW, NOT_INTERESTED)
     3개의 API 호출을 1개로 줄여 성능 향상
+
+    Args:
+        user_id: 사용자 ID
+        rating_filter: 특정 평점만 필터링 (예: 5.0, 4.5)
+        status_filter: 특정 상태만 필터링 (RATED, WANT_TO_KNOW, NOT_INTERESTED)
     """
     # Part 1: RATED - activities 테이블에서 빠르게 조회
-    rated_rows = db.execute_query(
-        """
-        SELECT
-            item_id as character_id,
-            user_id,
-            rating,
-            'RATED' as status,
-            item_title as name_full,
-            item_title_korean as name_native,
-            item_image as image_url,
-            anime_id,
-            anime_title,
-            anime_title_korean
-        FROM activities
-        WHERE user_id = ? AND activity_type = 'character_rating'
-        ORDER BY activity_time DESC
-        """,
-        (user_id,)
-    )
+    if status_filter is None or status_filter == 'RATED':
+        rating_condition = ""
+        params = [user_id]
+
+        if rating_filter is not None:
+            rating_condition = " AND rating = ?"
+            params.append(rating_filter)
+
+        rated_rows = db.execute_query(
+            f"""
+            SELECT
+                a.item_id as character_id,
+                a.user_id,
+                a.rating,
+                'RATED' as status,
+                a.item_title as name_full,
+                a.item_title_korean as name_native,
+                c.name_korean,
+                a.item_image as image_url,
+                a.anime_id,
+                a.anime_title,
+                a.anime_title_korean
+            FROM activities a
+            LEFT JOIN character c ON a.item_id = c.id
+            WHERE a.user_id = ? AND a.activity_type = 'character_rating'{rating_condition}
+            ORDER BY a.activity_time DESC
+            """,
+            tuple(params)
+        )
+    else:
+        rated_rows = []
 
     # Part 2: WANT_TO_KNOW - character_ratings 테이블에서 조회
-    want_rows = db.execute_query(
-        """
-        SELECT
-            cr.character_id,
-            cr.user_id,
-            cr.status,
-            c.name_full,
-            c.name_native,
-            COALESCE('/' || c.image_local, c.image_url) as image_url,
-            (SELECT a.id FROM anime a
-             JOIN anime_character ac ON a.id = ac.anime_id
-             WHERE ac.character_id = c.id
-             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
-             LIMIT 1) as anime_id,
-            (SELECT COALESCE(a.title_korean, a.title_romaji) FROM anime a
-             JOIN anime_character ac ON a.id = ac.anime_id
-             WHERE ac.character_id = c.id
-             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
-             LIMIT 1) as anime_title
-        FROM character_ratings cr
-        JOIN character c ON cr.character_id = c.id
-        WHERE cr.user_id = ? AND cr.status = 'WANT_TO_KNOW'
-        ORDER BY cr.updated_at DESC
-        """,
-        (user_id,)
-    )
+    if status_filter is None or status_filter == 'WANT_TO_KNOW':
+        want_rows = db.execute_query(
+            """
+            SELECT
+                cr.character_id,
+                cr.user_id,
+                cr.status,
+                c.name_full,
+                c.name_native,
+                c.name_korean,
+                COALESCE('/' || c.image_local, c.image_url) as image_url,
+                (SELECT a.id FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = c.id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
+                 LIMIT 1) as anime_id,
+                (SELECT COALESCE(a.title_korean, a.title_romaji) FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = c.id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
+                 LIMIT 1) as anime_title
+            FROM character_ratings cr
+            JOIN character c ON cr.character_id = c.id
+            WHERE cr.user_id = ? AND cr.status = 'WANT_TO_KNOW'
+            ORDER BY cr.updated_at DESC
+            """,
+            (user_id,)
+        )
+    else:
+        want_rows = []
 
     # Part 3: NOT_INTERESTED - character_ratings 테이블에서 조회
-    pass_rows = db.execute_query(
-        """
-        SELECT
-            cr.character_id,
-            cr.user_id,
-            cr.status,
-            c.name_full,
-            c.name_native,
-            COALESCE('/' || c.image_local, c.image_url) as image_url,
-            (SELECT a.id FROM anime a
-             JOIN anime_character ac ON a.id = ac.anime_id
-             WHERE ac.character_id = c.id
-             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
-             LIMIT 1) as anime_id,
-            (SELECT COALESCE(a.title_korean, a.title_romaji) FROM anime a
-             JOIN anime_character ac ON a.id = ac.anime_id
-             WHERE ac.character_id = c.id
-             ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
-             LIMIT 1) as anime_title
-        FROM character_ratings cr
-        JOIN character c ON cr.character_id = c.id
-        WHERE cr.user_id = ? AND cr.status = 'NOT_INTERESTED'
-        ORDER BY cr.updated_at DESC
-        """,
-        (user_id,)
-    )
+    if status_filter is None or status_filter == 'NOT_INTERESTED':
+        pass_rows = db.execute_query(
+            """
+            SELECT
+                cr.character_id,
+                cr.user_id,
+                cr.status,
+                c.name_full,
+                c.name_native,
+                c.name_korean,
+                COALESCE('/' || c.image_local, c.image_url) as image_url,
+                (SELECT a.id FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = c.id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
+                 LIMIT 1) as anime_id,
+                (SELECT COALESCE(a.title_korean, a.title_romaji) FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = c.id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
+                 LIMIT 1) as anime_title
+            FROM character_ratings cr
+            JOIN character c ON cr.character_id = c.id
+            WHERE cr.user_id = ? AND cr.status = 'NOT_INTERESTED'
+            ORDER BY cr.updated_at DESC
+            """,
+            (user_id,)
+        )
+    else:
+        pass_rows = []
 
     # 평균 평점 계산 (RATED만)
     avg_row = db.execute_query(
@@ -690,6 +722,7 @@ def get_character_detail(character_id: int, user_id: int) -> Optional[Dict]:
             c.id,
             c.name_full,
             c.name_native,
+            c.name_korean,
             COALESCE('/' || c.image_local, c.image_url) as image_url,
             c.gender,
             c.date_of_birth,

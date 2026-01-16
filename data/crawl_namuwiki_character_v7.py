@@ -25,7 +25,7 @@ except ImportError:
 
 # Configuration
 MAX_WORKERS = 5
-MAX_CHARACTERS = None  # None = 전체
+MAX_CHARACTERS = 50  # None = 전체, 테스트용
 REQUEST_DELAY = 0.5
 
 
