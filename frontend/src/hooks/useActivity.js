@@ -319,9 +319,11 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
   const reset = useCallback(() => {
     console.log('[useActivityPagination] Resetting pagination');
     setPage(0);
+    // Clear activities immediately to prevent showing stale data
     setAllActivities([]);
     setHasMore(true);
-    setInitialLoading(false);
+    // Set loading to show spinner during transition
+    setInitialLoading(true);
     setLoadingMore(false);
     firstLoadRef.current = false;
     secondLoadRef.current = 0;
