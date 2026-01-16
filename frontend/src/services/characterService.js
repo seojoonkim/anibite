@@ -36,8 +36,16 @@ export const characterService = {
   },
 
   // Get ALL my character ratings at once (RATED, WANT_TO_KNOW, NOT_INTERESTED) - 3x faster! (NEW)
-  async getAllMyRatings() {
-    const response = await api.get('/api/character-ratings/me/all');
+  async getAllMyRatings(params = {}) {
+    const response = await api.get('/api/character-ratings/me/all', { params });
+    return response.data;
+  },
+
+  // Get ratings by specific rating value (for progressive loading)
+  async getMyCharacterRatingsByRating(rating, status = 'RATED') {
+    const response = await api.get('/api/character-ratings/me/all', {
+      params: { rating, status }
+    });
     return response.data;
   },
 

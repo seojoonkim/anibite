@@ -625,31 +625,97 @@ export default function MyAniPass() {
           console.error('Failed to save cache:', err);
         }
       } else if (activeTab === 'anime') {
-        // Load all anime (rated, watchlist, pass) - Single API call for 3x speed!
+        // Progressive loading by rating category (5.0, 4.5, 4.0, ... , WANT_TO_WATCH, PASS)
         const targetUserId = isOwnProfile ? null : parseInt(userId);
-        const allRatingsData = isOwnProfile
-          ? await ratingService.getAllMyRatings()
-          : await ratingService.getAllUserRatings(targetUserId);
 
+        // Rating categories to load sequentially
+        const ratingCategories = [5.0, 4.5, 4.0, 3.5, 3.0, 2.5, 2.0, 1.5, 1.0, 0.5];
+
+        let allRatedItems = [];
+        let watchlistItems = [];
+        let passItems = [];
+        let totalStats = null;
+
+        // Load rated anime by rating category
+        for (const rating of ratingCategories) {
+          const ratingData = isOwnProfile
+            ? await ratingService.getMyRatingsByRating(rating, 'RATED')
+            : await ratingService.getAllUserRatings(targetUserId);
+
+          if (ratingData.rated && ratingData.rated.length > 0) {
+            allRatedItems = [...allRatedItems, ...ratingData.rated];
+
+            // Save stats from first response
+            if (!totalStats) {
+              totalStats = {
+                average_rating: ratingData.average_rating,
+                total_rated: ratingData.total_rated || 0,
+                total_watchlist: ratingData.total_watchlist || 0,
+                total_pass: ratingData.total_pass || 0
+              };
+            }
+
+            // Update displayed anime progressively
+            const currentAnimeData = [
+              ...allRatedItems.map(item => ({ ...item, category: 'rated' })),
+              ...watchlistItems.map(item => ({ ...item, category: 'watchlist' })),
+              ...passItems.map(item => ({ ...item, category: 'pass' }))
+            ];
+
+            setAllAnime(currentAnimeData);
+            setAllRatedAnime(allRatedItems);
+            filterAnimeBySubMenu(currentAnimeData, animeSubMenu);
+          }
+
+          // Break if this is not own profile (load all at once for other users)
+          if (!isOwnProfile) {
+            allRatedItems = ratingData.rated || [];
+            watchlistItems = ratingData.watchlist || [];
+            passItems = ratingData.pass || [];
+            totalStats = {
+              average_rating: ratingData.average_rating,
+              total_rated: ratingData.total_rated || 0,
+              total_watchlist: ratingData.total_watchlist || 0,
+              total_pass: ratingData.total_pass || 0
+            };
+            break;
+          }
+        }
+
+        // Load WANT_TO_WATCH status
+        if (isOwnProfile) {
+          const watchlistData = await ratingService.getAllMyRatings({ status: 'WANT_TO_WATCH' });
+          watchlistItems = watchlistData.watchlist || [];
+        }
+
+        // Load PASS status
+        if (isOwnProfile) {
+          const passData = await ratingService.getAllMyRatings({ status: 'PASS' });
+          passItems = passData.pass || [];
+        }
+
+        // Final update with all data
         const allAnimeData = [
-          ...(allRatingsData.rated || []).map(item => ({ ...item, category: 'rated' })),
-          ...(allRatingsData.watchlist || []).map(item => ({ ...item, category: 'watchlist' })),
-          ...(allRatingsData.pass || []).map(item => ({ ...item, category: 'pass' }))
+          ...allRatedItems.map(item => ({ ...item, category: 'rated' })),
+          ...watchlistItems.map(item => ({ ...item, category: 'watchlist' })),
+          ...passItems.map(item => ({ ...item, category: 'pass' }))
         ];
 
         setAllAnime(allAnimeData);
-        setAllRatedAnime(allRatingsData.rated || []);
-        setWatchlistAnime(allRatingsData.watchlist || []);
-        setPassAnime(allRatingsData.pass || []);
+        setAllRatedAnime(allRatedItems);
+        setWatchlistAnime(watchlistItems);
+        setPassAnime(passItems);
 
         // Update stats with average rating and counts for immediate display
-        setStats(prev => ({
-          ...prev,
-          average_rating: allRatingsData.average_rating,
-          total_rated: allRatingsData.total_rated || 0,
-          total_want_to_watch: allRatingsData.total_watchlist || 0,
-          total_pass: allRatingsData.total_pass || 0
-        }));
+        if (totalStats) {
+          setStats(prev => ({
+            ...prev,
+            average_rating: totalStats.average_rating,
+            total_rated: totalStats.total_rated,
+            total_want_to_watch: totalStats.total_watchlist,
+            total_pass: totalStats.total_pass
+          }));
+        }
 
         // Apply initial filter
         filterAnimeBySubMenu(allAnimeData, animeSubMenu);
@@ -660,15 +726,10 @@ export default function MyAniPass() {
           sessionStorage.setItem(cacheKey, JSON.stringify({
             data: {
               allAnime: allAnimeData,
-              allRatedAnime: allRatingsData.rated || [],
-              watchlistAnime: allRatingsData.watchlist || [],
-              passAnime: allRatingsData.pass || [],
-              stats: {
-                average_rating: allRatingsData.average_rating,
-                total_rated: allRatingsData.total_rated || 0,
-                total_want_to_watch: allRatingsData.total_watchlist || 0,
-                total_pass: allRatingsData.total_pass || 0
-              }
+              allRatedAnime: allRatedItems,
+              watchlistAnime: watchlistItems,
+              passAnime: passItems,
+              stats: totalStats || {}
             },
             timestamp: Date.now()
           }));
@@ -676,34 +737,82 @@ export default function MyAniPass() {
           console.error('Failed to save cache:', err);
         }
       } else if (activeTab === 'character') {
-        // Load all character ratings (rated, want to know, pass)
+        // Progressive loading by rating category (5.0, 4.5, 4.0, ... , WANT_TO_KNOW, NOT_INTERESTED)
         const targetUserId = isOwnProfile ? null : parseInt(userId);
-        const allCharactersData = isOwnProfile
-          ? await userService.getCharacterRatings({ limit: 500 })
-          : await userService.getUserCharacterRatings(targetUserId, { limit: 500 });
 
-        // Separate by status - similar to anime logic
-        const ratedChars = (allCharactersData || []).filter(c => c.status === 'RATED' && c.rating);
-        const wantChars = (allCharactersData || []).filter(c => c.status === 'WANT_TO_KNOW');
-        const passChars = (allCharactersData || []).filter(c => c.status === 'PASS');
+        // Rating categories to load sequentially
+        const ratingCategories = [5.0, 4.5, 4.0, 3.5, 3.0, 2.5, 2.0, 1.5, 1.0, 0.5];
 
-        setAllCharacters(allCharactersData || []);
-        setAllRatedCharacters(ratedChars);
+        let allRatedChars = [];
+        let wantChars = [];
+        let notInterestedChars = [];
+
+        // Load rated characters by rating category
+        for (const rating of ratingCategories) {
+          const ratingData = isOwnProfile
+            ? await characterService.getMyCharacterRatingsByRating(rating, 'RATED')
+            : await characterService.getAllUserRatings(targetUserId);
+
+          if (ratingData.rated && ratingData.rated.length > 0) {
+            allRatedChars = [...allRatedChars, ...ratingData.rated];
+
+            // Update displayed characters progressively
+            const currentCharData = [
+              ...allRatedChars.map(c => ({ ...c, category: 'rated' })),
+              ...wantChars.map(c => ({ ...c, category: 'want' })),
+              ...notInterestedChars.map(c => ({ ...c, category: 'pass' }))
+            ];
+
+            setAllCharacters(currentCharData);
+            setAllRatedCharacters(allRatedChars);
+            filterCharactersBySubMenu(currentCharData, characterSubMenu);
+          }
+
+          // Break if this is not own profile (load all at once for other users)
+          if (!isOwnProfile) {
+            allRatedChars = ratingData.rated || [];
+            wantChars = ratingData.want_to_know || [];
+            notInterestedChars = ratingData.not_interested || [];
+            break;
+          }
+        }
+
+        // Load WANT_TO_KNOW status
+        if (isOwnProfile) {
+          const wantData = await characterService.getAllMyRatings({ status: 'WANT_TO_KNOW' });
+          wantChars = wantData.want_to_know || [];
+        }
+
+        // Load NOT_INTERESTED status
+        if (isOwnProfile) {
+          const passData = await characterService.getAllMyRatings({ status: 'NOT_INTERESTED' });
+          notInterestedChars = passData.not_interested || [];
+        }
+
+        // Final update with all data
+        const allCharactersData = [
+          ...allRatedChars.map(c => ({ ...c, category: 'rated' })),
+          ...wantChars.map(c => ({ ...c, category: 'want' })),
+          ...notInterestedChars.map(c => ({ ...c, category: 'pass' }))
+        ];
+
+        setAllCharacters(allCharactersData);
+        setAllRatedCharacters(allRatedChars);
         setWantCharacters(wantChars);
-        setPassCharacters(passChars);
+        setPassCharacters(notInterestedChars);
 
         // Apply initial filter
-        filterCharactersBySubMenu(allCharactersData || [], characterSubMenu);
+        filterCharactersBySubMenu(allCharactersData, characterSubMenu);
         setLoadedTabs(prev => ({ ...prev, character: true }));
 
         // Save to cache
         try {
           sessionStorage.setItem(cacheKey, JSON.stringify({
             data: {
-              allCharacters: allCharactersData || [],
-              allRatedCharacters: ratedChars,
+              allCharacters: allCharactersData,
+              allRatedCharacters: allRatedChars,
               wantCharacters: wantChars,
-              passCharacters: passChars
+              passCharacters: notInterestedChars
             },
             timestamp: Date.now()
           }));
