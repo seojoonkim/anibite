@@ -524,10 +524,10 @@ export default function MyAniPass() {
       }
 
       // 내 프로필일 때는 stats와 follow data를 병렬로 로드
-      if (!statsLoaded && isOwnProfile) {
+      if (!statsLoaded && isOwnProfile && user?.id) {
         const [statsData, followCounts] = await Promise.all([
           userService.getStats(),
-          followService.getFollowCounts(user?.id).catch(() => ({ followers_count: 0, following_count: 0 }))
+          followService.getFollowCounts(user.id).catch(() => ({ followers_count: 0, following_count: 0 }))
         ]);
         setStats(statsData);
         setStatsLoaded(true);
