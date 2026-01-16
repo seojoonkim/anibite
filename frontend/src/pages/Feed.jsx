@@ -96,9 +96,26 @@ export default function Feed() {
 
   // Reset activities when filter changes
   useEffect(() => {
+    // Clear cached activities immediately to prevent showing wrong data
     setCachedActivities(null);
     cacheLoadedRef.current = false;
+
+    // Reset activities hook
     resetActivities();
+
+    // Clear any old cache entries from different filters
+    try {
+      if (feedFilter !== 'notifications' && feedFilter !== 'saved') {
+        const allFilters = ['all', 'following'];
+        allFilters.forEach(filter => {
+          if (filter !== feedFilter) {
+            sessionStorage.removeItem(`feed_cache_${filter}`);
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Failed to clear old cache:', err);
+    }
   }, [feedFilter, resetActivities]);
 
   // Intersection Observer for infinite scroll
