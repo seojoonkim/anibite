@@ -10,12 +10,13 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
     """
     팔로잉하는 사용자들의 활동 피드 (UNION ALL로 최적화)
     """
-    # 팔로잉 사용자 ID 목록 조회
+    # 팔로잉 사용자 ID 목록 조회 (자기 자신 제외)
     following_ids = db.execute_query(
         """
-        SELECT following_id FROM user_follows WHERE follower_id = ?
+        SELECT following_id FROM user_follows
+        WHERE follower_id = ? AND following_id != ?
         """,
-        (user_id,)
+        (user_id, user_id)
     )
 
     if not following_ids:
