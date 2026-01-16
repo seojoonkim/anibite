@@ -190,6 +190,51 @@ def check_user_followers(user_id: int):
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 
+@router.get("/check-user-activities/{user_id}")
+def check_user_activities(user_id: int):
+    """Check user's activities and calculate otaku score"""
+    try:
+        # Get user's current otaku score
+        user_stats = db.execute_query("SELECT otaku_score FROM user_stats WHERE user_id = ?", (user_id,))
+        current_score = user_stats[0][0] if user_stats else 0
+
+        # Count activities
+        anime_ratings = db.execute_query("SELECT COUNT(*) FROM activities WHERE user_id = ? AND activity_type = 'anime_rating'", (user_id,))
+        anime_reviews = db.execute_query("SELECT COUNT(*) FROM activities WHERE user_id = ? AND activity_type = 'anime_review'", (user_id,))
+        character_ratings = db.execute_query("SELECT COUNT(*) FROM activities WHERE user_id = ? AND activity_type = 'character_rating'", (user_id,))
+        character_reviews = db.execute_query("SELECT COUNT(*) FROM activities WHERE user_id = ? AND activity_type = 'character_review'", (user_id,))
+
+        anime_rating_count = anime_ratings[0][0] if anime_ratings else 0
+        anime_review_count = anime_reviews[0][0] if anime_reviews else 0
+        character_rating_count = character_ratings[0][0] if character_ratings else 0
+        character_review_count = character_reviews[0][0] if character_reviews else 0
+
+        calculated_score = (anime_rating_count * 2) + (character_rating_count * 1) + ((anime_review_count + character_review_count) * 5)
+
+        # Get all activities chronologically
+        activities = db.execute_query("""
+            SELECT activity_type, activity_time
+            FROM activities
+            WHERE user_id = ? AND activity_type IN ('anime_rating', 'anime_review', 'character_rating', 'character_review')
+            ORDER BY activity_time ASC
+            LIMIT 20
+        """, (user_id,))
+
+        return {
+            "user_id": user_id,
+            "current_otaku_score": current_score,
+            "calculated_score": calculated_score,
+            "anime_ratings": anime_rating_count,
+            "anime_reviews": anime_review_count,
+            "character_ratings": character_rating_count,
+            "character_reviews": character_review_count,
+            "first_20_activities": [{"type": row[0], "time": row[1]} for row in activities]
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+
 @router.post("/backfill-rank-promotions")
 def backfill_rank_promotions():
     """Backfill past rank promotion activities"""
