@@ -205,6 +205,16 @@ async def startup_event():
         print(f"⚠️ Failed to fix triggers: {e}")
         print("Server will continue, but rating save may fail.\n")
 
+    # Add activity indexes for performance
+    print("📊 Adding database indexes for performance...")
+    try:
+        from scripts.add_activity_indexes import add_indexes
+        add_indexes()
+        print("✅ Indexes created successfully!\n")
+    except Exception as e:
+        print(f"⚠️ Failed to add indexes: {e}")
+        print("Server will continue, but queries may be slow.\n")
+
 
 # Root endpoint
 @app.get("/")
