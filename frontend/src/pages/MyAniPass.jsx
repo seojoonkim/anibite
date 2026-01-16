@@ -797,8 +797,12 @@ export default function MyAniPass() {
       });
     }
     loadData();
-    // loadFollowData(); // Now batched in loadData
   }, [activeTab, userId, loadData]);
+
+  // 팔로우 카운트는 항상 로드 (페이지 진입 시, userId 변경 시)
+  useEffect(() => {
+    loadFollowData();
+  }, [loadFollowData]);
 
   const formatWatchTime = (minutes) => {
     if (!minutes) return '0시간';

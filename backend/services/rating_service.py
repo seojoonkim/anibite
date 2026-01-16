@@ -500,67 +500,40 @@ def _sync_to_activities(user_id: int, anime_id: int):
 
 
 def _get_rank_info(otaku_score: float) -> tuple[str, int]:
-    """Get rank name and level from otaku score"""
-    if otaku_score < 10:
-        return "캐주얼", 1
-    elif otaku_score < 25:
-        return "캐주얼", 2
-    elif otaku_score < 50:
-        return "초보", 1
-    elif otaku_score < 100:
-        return "초보", 2
-    elif otaku_score < 150:
-        return "초보", 3
-    elif otaku_score < 200:
-        return "입문", 1
-    elif otaku_score < 250:
-        return "입문", 2
-    elif otaku_score < 300:
-        return "입문", 3
-    elif otaku_score < 400:
-        return "중급", 1
-    elif otaku_score < 500:
-        return "중급", 2
-    elif otaku_score < 600:
-        return "중급", 3
-    elif otaku_score < 700:
-        return "마스터", 1
-    elif otaku_score < 800:
-        return "마스터", 2
-    elif otaku_score < 900:
-        return "마스터", 3
-    elif otaku_score < 1000:
-        return "마스터", 4
-    elif otaku_score < 1100:
+    """
+    Get rank name and level from otaku score
+    프론트엔드 등급 로드맵과 일치하는 10단계 시스템:
+    - Lv.1 루키 (0~49점)
+    - Lv.2 헌터 (50~119점)
+    - Lv.3 워리어 (120~219점)
+    - Lv.4 나이트 (220~349점)
+    - Lv.5 마스터 (350~549점)
+    - Lv.6 하이마스터 (550~799점)
+    - Lv.7 그랜드마스터 (800~1099점)
+    - Lv.8 오타쿠 (1100~1449점)
+    - Lv.9 오타쿠 킹 (1450~1799점)
+    - Lv.10 오타쿠 갓 (1800+점)
+    """
+    if otaku_score < 50:
+        return "루키", 1
+    elif otaku_score < 120:
+        return "헌터", 2
+    elif otaku_score < 220:
+        return "워리어", 3
+    elif otaku_score < 350:
+        return "나이트", 4
+    elif otaku_score < 550:
         return "마스터", 5
-    elif otaku_score < 1300:
-        return "하이마스터", 1
-    elif otaku_score < 1500:
-        return "하이마스터", 2
-    elif otaku_score < 1700:
-        return "하이마스터", 3
-    elif otaku_score < 1900:
-        return "하이마스터", 4
-    elif otaku_score < 2100:
-        return "하이마스터", 5
-    elif otaku_score < 2300:
+    elif otaku_score < 800:
         return "하이마스터", 6
-    elif otaku_score < 2600:
-        return "그랜드마스터", 1
-    elif otaku_score < 2900:
-        return "그랜드마스터", 2
-    elif otaku_score < 3200:
-        return "그랜드마스터", 3
-    elif otaku_score < 3500:
-        return "그랜드마스터", 4
-    elif otaku_score < 3800:
-        return "그랜드마스터", 5
-    elif otaku_score < 4100:
-        return "그랜드마스터", 6
-    elif otaku_score < 4400:
+    elif otaku_score < 1100:
         return "그랜드마스터", 7
+    elif otaku_score < 1450:
+        return "오타쿠", 8
+    elif otaku_score < 1800:
+        return "오타쿠 킹", 9
     else:
-        return "레전드", 1
+        return "오타쿠 갓", 10
 
 
 def _update_user_stats(user_id: int):
