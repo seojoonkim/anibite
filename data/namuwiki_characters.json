@@ -1,0 +1,2381 @@
+{
+  "characters": [
+    {
+      "korean": "선데이오피서 에이전트",
+      "english": "Officer Agent",
+      "anime": "원피스"
+    },
+    {
+      "korean": "밀리언즈",
+      "english": "Millions",
+      "anime": "원피스"
+    },
+    {
+      "korean": "카와즈 야스히코",
+      "english": "TVA",
+      "anime": "원피스"
+    },
+    {
+      "korean": "코야마 리키야",
+      "english": "ROMANCE DAWN STORY",
+      "anime": "원피스"
+    },
+    {
+      "korean": "김태웅",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "김태웅",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "김승준",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "윤세웅",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "정미숙",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "이윤선",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "안종국",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "펫 푸드",
+      "english": "PET FOOD",
+      "anime": "원피스"
+    },
+    {
+      "korean": "윤세웅",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "서문석",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "김지혜",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "전용 바",
+      "english": "Bar",
+      "anime": "원피스"
+    },
+    {
+      "korean": "김은아",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "정기항",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "문관일",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "이장원",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "정미숙",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "오치아이 코지",
+      "english": "TVA",
+      "anime": "원피스"
+    },
+    {
+      "korean": "이장원",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "양석정",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "전인배",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "김정호",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "전숙경",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "이장원",
+      "english": "KBS",
+      "anime": "원피스"
+    },
+    {
+      "korean": "앗치노 패밀리",
+      "english": "Accino Family",
+      "anime": "원피스"
+    },
+    {
+      "korean": "러브 스로우",
+      "english": "Love Throw",
+      "anime": "원피스"
+    },
+    {
+      "korean": "코비 프록터",
+      "english": "Corby Proctor",
+      "anime": "헌터X헌터"
+    },
+    {
+      "korean": "로리 버힌스키",
+      "english": "Lori Bachynski",
+      "anime": "헌터X헌터"
+    },
+    {
+      "korean": "도트 픽시스",
+      "english": "Dot Pixis",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "안카 라인베르거",
+      "english": "Anka Rheinberger",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "구스타프",
+      "english": "Gustav",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "킷츠 벨만",
+      "english": "Kitz Weilman",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "리코 브레첸스카",
+      "english": "Rico Brzenska",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "이안 디트리히",
+      "english": "Ian Dietrich",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "미타비 야르나흐",
+      "english": "Mitabi Jarnach",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "발츠",
+      "english": "Waltz",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "데니스 아이브링거",
+      "english": "Dennis Eibringer",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "히치 도리스",
+      "english": "Hitch Dreyse",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "마를로 프로이덴베르크",
+      "english": "Marlow Freudenberg",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "보리스 호이르나",
+      "english": "Boris Feulner",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "앙헬 알토넨",
+      "english": "Angel Aaltonen",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "리사 브라우스",
+      "english": "Lisa Blouse",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "아르투르 브라우스",
+      "english": "Artur Blouse",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "엘런 크루거",
+      "english": "Eren Kruger",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "그로스",
+      "english": "Gross",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "마가트 대장",
+      "english": "Commander Theo Magath",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "옐레나",
+      "english": "Yelena",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "오니안코폰",
+      "english": "Onyankopon",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "니콜로",
+      "english": "Nicolo",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "모습에렌 예거",
+      "english": "Eren Yeager",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "미카사 아커만",
+      "english": "Mikasa Ackerman",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "아르민 알레르토",
+      "english": "Armin Arlert",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "다리스 작클레",
+      "english": "Darius Zackly",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "엘빈 스미스",
+      "english": "Erwin Smith",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "미케 자카리아스",
+      "english": "Mike Zacharias",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "리바이 아커만",
+      "english": "Levi Ackerman",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "나나바",
+      "english": "Nanaba",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "디타 네스",
+      "english": "Dita Ness",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "한네스",
+      "english": "Hannes",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "제르 사네스",
+      "english": "Djel Sannes",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "랄프",
+      "english": "Ralph",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "케니 아커만",
+      "english": "Kenny Ackerman",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "듀란",
+      "english": "Duran",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "로저",
+      "english": "Roger",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "키스 샤디스",
+      "english": "Keith Shadis",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "미카사 아커만",
+      "english": "Mikasa Ackerman",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "라이너 브라운",
+      "english": "Reiner Braun",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "베르톨트 후버",
+      "english": "Bertolt Hoover",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "애니 레온하트",
+      "english": "Annie Leonhart",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "엘런 예거",
+      "english": "Eren Yeager",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "장 키르슈타인",
+      "english": "Jean Kirstein",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "마르코 보트",
+      "english": "Marco Bott",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "코니 스프링거",
+      "english": "Conny Springer",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "사샤 브라우스",
+      "english": "Sasha Blouse",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "크리스타 렌즈",
+      "english": "Krista Lenz",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "유미르",
+      "english": "Ymir",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "아르민 알레르토",
+      "english": "Armin Arlert",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "카야",
+      "english": "Kaya",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "모습라이너 브라운",
+      "english": "Reiner Braun",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "애니 레온하트",
+      "english": "Annie Leonhart",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "베르톨트 후버",
+      "english": "Bertolt Hoover",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "마르셀 갤리어드",
+      "english": "Marcel Galliard",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "타이버칼비 원수",
+      "english": "General Calvi",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "그리즈",
+      "english": "Griez",
+      "anime": "진격의 거인"
+    },
+    {
+      "korean": "미국 합동특수작전사령부",
+      "english": "JSOC",
+      "anime": "주술회전"
+    },
+    {
+      "korean": "애니메이션",
+      "english": "TVA",
+      "anime": "데스노트"
+    },
+    {
+      "korean": "네일론잭 이리우스",
+      "english": "Zakk Irius",
+      "anime": "데스노트"
+    },
+    {
+      "korean": "앤드류 밀러",
+      "english": "Andrew Millar",
+      "anime": "데스노트"
+    },
+    {
+      "korean": "글렌 험프리즈",
+      "english": "Glen Humphreys",
+      "anime": "데스노트"
+    },
+    {
+      "korean": "라슈얼 비드",
+      "english": "Rashual Bid",
+      "anime": "데스노트"
+    },
+    {
+      "korean": "스티브 메이슨",
+      "english": "Steve Mason",
+      "anime": "데스노트"
+    },
+    {
+      "korean": "명사화할 경우",
+      "english": "das Gehen",
+      "anime": "장송의 프리렌"
+    },
+    {
+      "korean": "박주광",
+      "english": "TVA",
+      "anime": "귀멸의 칼날"
+    },
+    {
+      "korean": "김단",
+      "english": "TVA",
+      "anime": "귀멸의 칼날"
+    },
+    {
+      "korean": "박이서",
+      "english": "TVA",
+      "anime": "귀멸의 칼날"
+    },
+    {
+      "korean": "채림",
+      "english": "TVA",
+      "anime": "귀멸의 칼날"
+    },
+    {
+      "korean": "유혜지",
+      "english": "TVA",
+      "anime": "귀멸의 칼날"
+    },
+    {
+      "korean": "이은조",
+      "english": "TVA",
+      "anime": "귀멸의 칼날"
+    },
+    {
+      "korean": "이규창",
+      "english": "TVA",
+      "anime": "귀멸의 칼날"
+    },
+    {
+      "korean": "김병현",
+      "english": "TVA",
+      "anime": "귀멸의 칼날"
+    },
+    {
+      "korean": "성예원",
+      "english": "TVA",
+      "anime": "귀멸의 칼날"
+    },
+    {
+      "korean": "박기욱",
+      "english": "TVA",
+      "anime": "귀멸의 칼날"
+    },
+    {
+      "korean": "황해준",
+      "english": "TVA",
+      "anime": "귀멸의 칼날"
+    },
+    {
+      "korean": "이다은",
+      "english": "TVA",
+      "anime": "귀멸의 칼날"
+    },
+    {
+      "korean": "야마가 히로유키",
+      "english": "GAINAX",
+      "anime": "신세기 에반게리온"
+    },
+    {
+      "korean": "한국 정식발매챔프영상",
+      "english": "VHS",
+      "anime": "신세기 에반게리온"
+    },
+    {
+      "korean": "미라지 엔터테인먼트",
+      "english": "BD",
+      "anime": "신세기 에반게리온"
+    },
+    {
+      "korean": "에바",
+      "english": "EVA",
+      "anime": "신세기 에반게리온"
+    },
+    {
+      "korean": "국제 연합",
+      "english": "UN",
+      "anime": "신세기 에반게리온"
+    },
+    {
+      "korean": "도쿄 계열",
+      "english": "TXN",
+      "anime": "신세기 에반게리온"
+    },
+    {
+      "korean": "요약하면 온에어",
+      "english": "On Air",
+      "anime": "신세기 에반게리온"
+    },
+    {
+      "korean": "리마스터링 버전",
+      "english": "OA Format",
+      "anime": "신세기 에반게리온"
+    },
+    {
+      "korean": "구 극장판",
+      "english": "EOE",
+      "anime": "신세기 에반게리온"
+    },
+    {
+      "korean": "의미의 이밴절리스트",
+      "english": "evangelist",
+      "anime": "신세기 에반게리온"
+    },
+    {
+      "korean": "화면도 원화",
+      "english": "TVA",
+      "anime": "신세기 에반게리온"
+    },
+    {
+      "korean": "이름 바이올렛",
+      "english": "Violet",
+      "anime": "바이올렛 에버가든"
+    },
+    {
+      "korean": "성씨인 에버가든",
+      "english": "Evergarden",
+      "anime": "바이올렛 에버가든"
+    },
+    {
+      "korean": "가든",
+      "english": "garden",
+      "anime": "바이올렛 에버가든"
+    },
+    {
+      "korean": "안젤라 웹스터",
+      "english": "Angela Webster",
+      "anime": "바이올렛 에버가든"
+    },
+    {
+      "korean": "주디 애벗",
+      "english": "Judy Abbott",
+      "anime": "바이올렛 에버가든"
+    },
+    {
+      "korean": "이시도르",
+      "english": "Isidor",
+      "anime": "바이올렛 에버가든"
+    },
+    {
+      "korean": "스칼렛 윈터",
+      "english": "Scarlet Winter",
+      "anime": "바이올렛 에버가든"
+    },
+    {
+      "korean": "바이올렛 에버가든",
+      "english": "TVA",
+      "anime": "바이올렛 에버가든"
+    },
+    {
+      "korean": "바이올렛",
+      "english": "Violet",
+      "anime": "바이올렛 에버가든"
+    },
+    {
+      "korean": "줄리아",
+      "english": "Julia",
+      "anime": "바이올렛 에버가든"
+    },
+    {
+      "korean": "엘리자베스 에버레스트",
+      "english": "Elizabeth Everest",
+      "anime": "바이올렛 에버가든"
+    },
+    {
+      "korean": "웨폰즈",
+      "english": "Weapons",
+      "anime": "체인소 맨"
+    },
+    {
+      "korean": "트레이닝 센터",
+      "english": "NTC",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "우시지마 와카토시",
+      "english": "OP",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "키류 와카츠",
+      "english": "OH",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "보쿠토 코타로",
+      "english": "OH",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "호시우미 코라이",
+      "english": "OH",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "하쿠바 가오",
+      "english": "MB",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "히나타 쇼요",
+      "english": "OP",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "오지로 아란",
+      "english": "OH",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "사쿠사 키요오미",
+      "english": "OH",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "스나 린타로",
+      "english": "MB",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "햐쿠자와 유다이",
+      "english": "MB",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "헤이와지마 토시로",
+      "english": "Li",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "니콜라스 로메로",
+      "english": "OH",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "소콜로프 타츠토",
+      "english": "MB",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "우시지마 와카토시",
+      "english": "OP",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "호시우미 코라이",
+      "english": "OH",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "이누나키 시온",
+      "english": "Li",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "아드리아 토마스",
+      "english": "MB",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "오리버 번즈",
+      "english": "OP",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "보쿠토 코타로",
+      "english": "OH",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "사쿠사 키요오미",
+      "english": "OH",
+      "anime": "하이큐!!"
+    },
+    {
+      "korean": "히나타 쇼요",
+      "english": "OP",
+      "anime": "하이큐!!"
+    }
+  ],
+  "matched": [
+    {
+      "id": 1599,
+      "name_full": "Knives Millions",
+      "current_korean": "미리온즈・나이부즈",
+      "new_korean": "밀리언즈",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "카와즈 야스히코",
+      "source": "namuwiki"
+    },
+    {
+      "id": 41,
+      "name_full": "Subaru",
+      "current_korean": "스바루",
+      "new_korean": "전용 바",
+      "source": "namuwiki"
+    },
+    {
+      "id": 76,
+      "name_full": "Kai Suwabara",
+      "current_korean": "스와바라 카이",
+      "new_korean": "전용 바",
+      "source": "namuwiki"
+    },
+    {
+      "id": 105,
+      "name_full": "Trowa Barton",
+      "current_korean": "토로와・바톤",
+      "new_korean": "전용 바",
+      "source": "namuwiki"
+    },
+    {
+      "id": 439,
+      "name_full": "Subaru Sumeragi",
+      "current_korean": "스메라기 스바루",
+      "new_korean": "전용 바",
+      "source": "namuwiki"
+    },
+    {
+      "id": 730,
+      "name_full": "Kazuma Kuwabara",
+      "current_korean": "쿠와바라 카즈마",
+      "new_korean": "전용 바",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "오치아이 코지",
+      "source": "namuwiki"
+    },
+    {
+      "id": 62485,
+      "name_full": "Dot Pixis",
+      "current_korean": "도토・피쿠시스",
+      "new_korean": "도트 픽시스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 84331,
+      "name_full": "Anka Rheinberger",
+      "current_korean": "안카・라인베루가",
+      "new_korean": "안카 라인베르거",
+      "source": "namuwiki"
+    },
+    {
+      "id": 4169,
+      "name_full": "Gustav St. Germain",
+      "current_korean": "규스타부・산지에루만",
+      "new_korean": "구스타프",
+      "source": "namuwiki"
+    },
+    {
+      "id": 11240,
+      "name_full": "Gustav",
+      "current_korean": "구스타브",
+      "new_korean": "구스타프",
+      "source": "namuwiki"
+    },
+    {
+      "id": 65961,
+      "name_full": "Gustave",
+      "current_korean": "규스타부",
+      "new_korean": "구스타프",
+      "source": "namuwiki"
+    },
+    {
+      "id": 84329,
+      "name_full": "Gustav",
+      "current_korean": "구스타후",
+      "new_korean": "구스타프",
+      "source": "namuwiki"
+    },
+    {
+      "id": 84953,
+      "name_full": "Joseph Gustav Newton",
+      "current_korean": "조세후・구스타후・뉴톤",
+      "new_korean": "구스타프",
+      "source": "namuwiki"
+    },
+    {
+      "id": 84325,
+      "name_full": "Kitz Weilman",
+      "current_korean": "키츠・베루만",
+      "new_korean": "킷츠 벨만",
+      "source": "namuwiki"
+    },
+    {
+      "id": 84707,
+      "name_full": "Rico Brzenska",
+      "current_korean": "리코・부레츠엔스카",
+      "new_korean": "리코 브레첸스카",
+      "source": "namuwiki"
+    },
+    {
+      "id": 50709,
+      "name_full": "Makoto Waltz Segai",
+      "current_korean": "바루츠",
+      "new_korean": "발츠",
+      "source": "namuwiki"
+    },
+    {
+      "id": 86017,
+      "name_full": "Hitch Dreyse",
+      "current_korean": "히치・도리스",
+      "new_korean": "히치 도리스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 127568,
+      "name_full": "Boris Feulner",
+      "current_korean": "보리스・포이루나",
+      "new_korean": "보리스 호이르나",
+      "source": "namuwiki"
+    },
+    {
+      "id": 134952,
+      "name_full": "Lisa Blouse",
+      "current_korean": "리사・부라우스",
+      "new_korean": "리사 브라우스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 120807,
+      "name_full": "Grossular",
+      "current_korean": "구로슈라",
+      "new_korean": "그로스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 166947,
+      "name_full": "Gross",
+      "current_korean": "구로스",
+      "new_korean": "그로스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 133216,
+      "name_full": "Yelena",
+      "current_korean": "이에레나",
+      "new_korean": "옐레나",
+      "source": "namuwiki"
+    },
+    {
+      "id": 192909,
+      "name_full": "Onyankopon",
+      "current_korean": "오냔코폰",
+      "new_korean": "오니안코폰",
+      "source": "namuwiki"
+    },
+    {
+      "id": 40882,
+      "name_full": "Eren Yeager",
+      "current_korean": "에렌・이에가",
+      "new_korean": "모습에렌 예거",
+      "source": "namuwiki"
+    },
+    {
+      "id": 40881,
+      "name_full": "Mikasa Ackerman",
+      "current_korean": "미카사・아카만",
+      "new_korean": "미카사 아커만",
+      "source": "namuwiki"
+    },
+    {
+      "id": 46494,
+      "name_full": "Armin Arlert",
+      "current_korean": "아루민・아루레루토",
+      "new_korean": "아르민 알레르토",
+      "source": "namuwiki"
+    },
+    {
+      "id": 71125,
+      "name_full": "Darius Zackly",
+      "current_korean": "다리스・자쿠레",
+      "new_korean": "다리스 작클레",
+      "source": "namuwiki"
+    },
+    {
+      "id": 46496,
+      "name_full": "Erwin Smith",
+      "current_korean": "에루빈・스미스",
+      "new_korean": "엘빈 스미스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 71119,
+      "name_full": "Mike Zacharias",
+      "current_korean": "마이쿠・자카리아스",
+      "new_korean": "미케 자카리아스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 71481,
+      "name_full": "Nanaba",
+      "current_korean": "나나바",
+      "new_korean": "나나바",
+      "source": "namuwiki"
+    },
+    {
+      "id": 14503,
+      "name_full": "Johannes Krauser II",
+      "current_korean": "요하네쿠라우자",
+      "new_korean": "한네스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 46492,
+      "name_full": "Hannes",
+      "current_korean": "한네스",
+      "new_korean": "한네스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 125057,
+      "name_full": "Johannes Kleeman",
+      "current_korean": "크레에만 조한에스",
+      "new_korean": "한네스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 230131,
+      "name_full": "Johannes Faustus",
+      "current_korean": "요하네스・미미루・파우스토우스",
+      "new_korean": "한네스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 342341,
+      "name_full": "Johannes Vlad",
+      "current_korean": "요하네스・부라도",
+      "new_korean": "한네스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 47745,
+      "name_full": "Ralph Wednesday",
+      "current_korean": "라루후・우엔즈디",
+      "new_korean": "랄프",
+      "source": "namuwiki"
+    },
+    {
+      "id": 126530,
+      "name_full": "Ralph",
+      "current_korean": "라루후",
+      "new_korean": "랄프",
+      "source": "namuwiki"
+    },
+    {
+      "id": 258844,
+      "name_full": "Ralph Anderson",
+      "current_korean": "라루후・안다손",
+      "new_korean": "랄프",
+      "source": "namuwiki"
+    },
+    {
+      "id": 127443,
+      "name_full": "Kenny Ackerman",
+      "current_korean": "케니・아카만",
+      "new_korean": "케니 아커만",
+      "source": "namuwiki"
+    },
+    {
+      "id": 1267,
+      "name_full": "Gilbert Durandal",
+      "current_korean": "기루바토 데유란다루",
+      "new_korean": "듀란",
+      "source": "namuwiki"
+    },
+    {
+      "id": 2784,
+      "name_full": "Durand",
+      "current_korean": "지유란",
+      "new_korean": "듀란",
+      "source": "namuwiki"
+    },
+    {
+      "id": 9441,
+      "name_full": "Thobari Durandal Kumohira",
+      "current_korean": "쿠모히라 두란다르 스오바리",
+      "new_korean": "듀란",
+      "source": "namuwiki"
+    },
+    {
+      "id": 87720,
+      "name_full": "Jarl Duran",
+      "current_korean": "야루・도우란",
+      "new_korean": "듀란",
+      "source": "namuwiki"
+    },
+    {
+      "id": 190581,
+      "name_full": "Duran Hakase",
+      "current_korean": "하카세 두란",
+      "new_korean": "듀란",
+      "source": "namuwiki"
+    },
+    {
+      "id": 2015,
+      "name_full": "Roger Smith",
+      "current_korean": "로자・스미스",
+      "new_korean": "로저",
+      "source": "namuwiki"
+    },
+    {
+      "id": 4883,
+      "name_full": "Roger Gold",
+      "current_korean": "고루도・로자",
+      "new_korean": "로저",
+      "source": "namuwiki"
+    },
+    {
+      "id": 130628,
+      "name_full": "Roger",
+      "current_korean": "로게루",
+      "new_korean": "로저",
+      "source": "namuwiki"
+    },
+    {
+      "id": 143633,
+      "name_full": "Roger Alpheus",
+      "current_korean": "로저 알피어스",
+      "new_korean": "로저",
+      "source": "namuwiki"
+    },
+    {
+      "id": 245723,
+      "name_full": "Roger Stanford",
+      "current_korean": "로자・T・스탄포도",
+      "new_korean": "로저",
+      "source": "namuwiki"
+    },
+    {
+      "id": 84305,
+      "name_full": "Keith Shadis",
+      "current_korean": "키스・샤디스",
+      "new_korean": "키스 샤디스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 40881,
+      "name_full": "Mikasa Ackerman",
+      "current_korean": "미카사・아카만",
+      "new_korean": "미카사 아커만",
+      "source": "namuwiki"
+    },
+    {
+      "id": 46484,
+      "name_full": "Reiner Braun",
+      "current_korean": "라이나・부라운",
+      "new_korean": "라이너 브라운",
+      "source": "namuwiki"
+    },
+    {
+      "id": 46488,
+      "name_full": "Bertolt Hoover",
+      "current_korean": "베루토루토・후바",
+      "new_korean": "베르톨트 후버",
+      "source": "namuwiki"
+    },
+    {
+      "id": 46490,
+      "name_full": "Annie Leonhart",
+      "current_korean": "아니・레온하토",
+      "new_korean": "애니 레온하트",
+      "source": "namuwiki"
+    },
+    {
+      "id": 40882,
+      "name_full": "Eren Yeager",
+      "current_korean": "에렌・이에가",
+      "new_korean": "엘런 예거",
+      "source": "namuwiki"
+    },
+    {
+      "id": 46498,
+      "name_full": "Jean Kirstein",
+      "current_korean": "잔・키루슈타인",
+      "new_korean": "장 키르슈타인",
+      "source": "namuwiki"
+    },
+    {
+      "id": 62479,
+      "name_full": "Marco Bott",
+      "current_korean": "마루코・보토",
+      "new_korean": "마르코 보트",
+      "source": "namuwiki"
+    },
+    {
+      "id": 45887,
+      "name_full": "Sasha Blouse",
+      "current_korean": "사샤・부라우스",
+      "new_korean": "사샤 브라우스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 62481,
+      "name_full": "Krista Lenz",
+      "current_korean": "쿠리스타・렌즈",
+      "new_korean": "크리스타 렌즈",
+      "source": "namuwiki"
+    },
+    {
+      "id": 22320,
+      "name_full": "Ymir",
+      "current_korean": "유미루",
+      "new_korean": "유미르",
+      "source": "namuwiki"
+    },
+    {
+      "id": 71479,
+      "name_full": "Ymir",
+      "current_korean": "유미루",
+      "new_korean": "유미르",
+      "source": "namuwiki"
+    },
+    {
+      "id": 199551,
+      "name_full": "Ymir Fritz",
+      "current_korean": "유미루・후리츠",
+      "new_korean": "유미르",
+      "source": "namuwiki"
+    },
+    {
+      "id": 46494,
+      "name_full": "Armin Arlert",
+      "current_korean": "아루민・아루레루토",
+      "new_korean": "아르민 알레르토",
+      "source": "namuwiki"
+    },
+    {
+      "id": 843,
+      "name_full": "Masataka Takayanagi",
+      "current_korean": "타카야나기 마사타카",
+      "new_korean": "카야",
+      "source": "namuwiki"
+    },
+    {
+      "id": 844,
+      "name_full": "Mitsuomi Takayanagi",
+      "current_korean": "타카야나기 미츠오미",
+      "new_korean": "카야",
+      "source": "namuwiki"
+    },
+    {
+      "id": 2272,
+      "name_full": "Kairi Okayasu",
+      "current_korean": "오카야스 카이리",
+      "new_korean": "카야",
+      "source": "namuwiki"
+    },
+    {
+      "id": 2718,
+      "name_full": "Akaya Kirihara",
+      "current_korean": "키리하라 아카야",
+      "new_korean": "카야",
+      "source": "namuwiki"
+    },
+    {
+      "id": 3214,
+      "name_full": "Kiko Kayanuma",
+      "current_korean": "카야누마 키코",
+      "new_korean": "카야",
+      "source": "namuwiki"
+    },
+    {
+      "id": 46484,
+      "name_full": "Reiner Braun",
+      "current_korean": "라이나・부라운",
+      "new_korean": "모습라이너 브라운",
+      "source": "namuwiki"
+    },
+    {
+      "id": 46490,
+      "name_full": "Annie Leonhart",
+      "current_korean": "아니・레온하토",
+      "new_korean": "애니 레온하트",
+      "source": "namuwiki"
+    },
+    {
+      "id": 46488,
+      "name_full": "Bertolt Hoover",
+      "current_korean": "베루토루토・후바",
+      "new_korean": "베르톨트 후버",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "애니메이션",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "박주광",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "김단",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "박이서",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "채림",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "유혜지",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "이은조",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "이규창",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "김병현",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "성예원",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "박기욱",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "황해준",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "이다은",
+      "source": "namuwiki"
+    },
+    {
+      "id": 7534,
+      "name_full": "Abdul",
+      "current_korean": "아부도루",
+      "new_korean": "미라지 엔터테인먼트",
+      "source": "namuwiki"
+    },
+    {
+      "id": 10196,
+      "name_full": "Lambdadelta",
+      "current_korean": "라무다데루타",
+      "new_korean": "미라지 엔터테인먼트",
+      "source": "namuwiki"
+    },
+    {
+      "id": 43333,
+      "name_full": "Lambda-11 ",
+      "current_korean": "라무다・이레분",
+      "new_korean": "미라지 엔터테인먼트",
+      "source": "namuwiki"
+    },
+    {
+      "id": 73535,
+      "name_full": "Febdash Danshaku",
+      "current_korean": "단샤쿠 페브다스흐",
+      "new_korean": "미라지 엔터테인먼트",
+      "source": "namuwiki"
+    },
+    {
+      "id": 238263,
+      "name_full": "Rin Molybden-Hakase",
+      "current_korean": "하카세 모르이브덴 린",
+      "new_korean": "미라지 엔터테인먼트",
+      "source": "namuwiki"
+    },
+    {
+      "id": 647,
+      "name_full": "Kristeva",
+      "current_korean": "쿠리스테바",
+      "new_korean": "에바",
+      "source": "namuwiki"
+    },
+    {
+      "id": 953,
+      "name_full": "Evangeline Athanasia Katherine McDowell",
+      "current_korean": "에반지에린・A.K.・마쿠다우에루",
+      "new_korean": "에바",
+      "source": "namuwiki"
+    },
+    {
+      "id": 2730,
+      "name_full": "Mail Jeevas",
+      "current_korean": "마이루・지바스",
+      "new_korean": "에바",
+      "source": "namuwiki"
+    },
+    {
+      "id": 2775,
+      "name_full": "Eva Wei",
+      "current_korean": "웨이 에바",
+      "new_korean": "에바",
+      "source": "namuwiki"
+    },
+    {
+      "id": 4450,
+      "name_full": "Agnes Chevalier de Milan",
+      "current_korean": "아니에스・슈바리에・도・미란",
+      "new_korean": "에바",
+      "source": "namuwiki"
+    },
+    {
+      "id": 15,
+      "name_full": "Ippo Makunouchi",
+      "current_korean": "마쿠노우치 잇포",
+      "new_korean": "국제 연합",
+      "source": "namuwiki"
+    },
+    {
+      "id": 20,
+      "name_full": "Mitsukuni Haninozuka",
+      "current_korean": "하니노즈카 미츠쿠니",
+      "new_korean": "국제 연합",
+      "source": "namuwiki"
+    },
+    {
+      "id": 109,
+      "name_full": "Kokoro Tokunaga",
+      "current_korean": "토쿠나가 코코로",
+      "new_korean": "국제 연합",
+      "source": "namuwiki"
+    },
+    {
+      "id": 114,
+      "name_full": "Athrun Zala",
+      "current_korean": "아스란・자라",
+      "new_korean": "국제 연합",
+      "source": "namuwiki"
+    },
+    {
+      "id": 120,
+      "name_full": "Lunamaria Hawke",
+      "current_korean": "루나마리아・호쿠",
+      "new_korean": "국제 연합",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "화면도 원화",
+      "source": "namuwiki"
+    },
+    {
+      "id": 9781,
+      "name_full": "Colonel Violet",
+      "current_korean": "비오레트 크오로네르",
+      "new_korean": "이름 바이올렛",
+      "source": "namuwiki"
+    },
+    {
+      "id": 40404,
+      "name_full": "Violet el Bridget",
+      "current_korean": "바이오레토・에루・부리지토",
+      "new_korean": "이름 바이올렛",
+      "source": "namuwiki"
+    },
+    {
+      "id": 59553,
+      "name_full": "Gregory Violet",
+      "current_korean": "구레고리・바이오레토",
+      "new_korean": "이름 바이올렛",
+      "source": "namuwiki"
+    },
+    {
+      "id": 85303,
+      "name_full": "Violet Witchie",
+      "current_korean": "위치이에 비오레트",
+      "new_korean": "이름 바이올렛",
+      "source": "namuwiki"
+    },
+    {
+      "id": 90169,
+      "name_full": "Violet Evergarden",
+      "current_korean": "바이오레토・에바가덴",
+      "new_korean": "이름 바이올렛",
+      "source": "namuwiki"
+    },
+    {
+      "id": 90169,
+      "name_full": "Violet Evergarden",
+      "current_korean": "바이오레토・에바가덴",
+      "new_korean": "성씨인 에버가든",
+      "source": "namuwiki"
+    },
+    {
+      "id": 124795,
+      "name_full": "Tiffany Evergarden",
+      "current_korean": "티파니・에바가덴",
+      "new_korean": "성씨인 에버가든",
+      "source": "namuwiki"
+    },
+    {
+      "id": 29493,
+      "name_full": "Levy McGarden",
+      "current_korean": "레비이마구가덴",
+      "new_korean": "가든",
+      "source": "namuwiki"
+    },
+    {
+      "id": 90169,
+      "name_full": "Violet Evergarden",
+      "current_korean": "바이오레토・에바가덴",
+      "new_korean": "가든",
+      "source": "namuwiki"
+    },
+    {
+      "id": 124795,
+      "name_full": "Tiffany Evergarden",
+      "current_korean": "티파니・에바가덴",
+      "new_korean": "가든",
+      "source": "namuwiki"
+    },
+    {
+      "id": 126467,
+      "name_full": "Rebecca Bluegarden ",
+      "current_korean": "레베카・부루가덴",
+      "new_korean": "가든",
+      "source": "namuwiki"
+    },
+    {
+      "id": 180654,
+      "name_full": "Gardener",
+      "current_korean": "가르데네르",
+      "new_korean": "가든",
+      "source": "namuwiki"
+    },
+    {
+      "id": 89563,
+      "name_full": "Shamille Kitra Katvarnmaninik",
+      "current_korean": "샤미유・키토라・카토반마니니쿠",
+      "new_korean": "바이올렛 에버가든",
+      "source": "namuwiki"
+    },
+    {
+      "id": 9781,
+      "name_full": "Colonel Violet",
+      "current_korean": "비오레트 크오로네르",
+      "new_korean": "바이올렛",
+      "source": "namuwiki"
+    },
+    {
+      "id": 40404,
+      "name_full": "Violet el Bridget",
+      "current_korean": "바이오레토・에루・부리지토",
+      "new_korean": "바이올렛",
+      "source": "namuwiki"
+    },
+    {
+      "id": 59553,
+      "name_full": "Gregory Violet",
+      "current_korean": "구레고리・바이오레토",
+      "new_korean": "바이올렛",
+      "source": "namuwiki"
+    },
+    {
+      "id": 85303,
+      "name_full": "Violet Witchie",
+      "current_korean": "위치이에 비오레트",
+      "new_korean": "바이올렛",
+      "source": "namuwiki"
+    },
+    {
+      "id": 90169,
+      "name_full": "Violet Evergarden",
+      "current_korean": "바이오레토・에바가덴",
+      "new_korean": "바이올렛",
+      "source": "namuwiki"
+    },
+    {
+      "id": 959,
+      "name_full": "Julia Silverstein",
+      "current_korean": "주리아・시루바스타인",
+      "new_korean": "줄리아",
+      "source": "namuwiki"
+    },
+    {
+      "id": 12243,
+      "name_full": "Julia Murai",
+      "current_korean": "무라이 주리아",
+      "new_korean": "줄리아",
+      "source": "namuwiki"
+    },
+    {
+      "id": 12779,
+      "name_full": "Julian Mintz",
+      "current_korean": "유리안・민츠",
+      "new_korean": "줄리아",
+      "source": "namuwiki"
+    },
+    {
+      "id": 16746,
+      "name_full": "Julian Solo",
+      "current_korean": "주리안・소로",
+      "new_korean": "줄리아",
+      "source": "namuwiki"
+    },
+    {
+      "id": 21388,
+      "name_full": "Suzanna Julia von Wincott",
+      "current_korean": "윈크옷 본 주리아 스잔아",
+      "new_korean": "줄리아",
+      "source": "namuwiki"
+    },
+    {
+      "id": 278,
+      "name_full": "Christopher Armalite",
+      "current_korean": "쿠리스토파・아마라이토",
+      "new_korean": "우시지마 와카토시",
+      "source": "namuwiki"
+    },
+    {
+      "id": 280,
+      "name_full": "Leopold Scorpse",
+      "current_korean": "레오포루도・스코루푸스",
+      "new_korean": "우시지마 와카토시",
+      "source": "namuwiki"
+    },
+    {
+      "id": 309,
+      "name_full": "Chopper Tony Tony",
+      "current_korean": "토니토니・쵸파",
+      "new_korean": "우시지마 와카토시",
+      "source": "namuwiki"
+    },
+    {
+      "id": 508,
+      "name_full": "Sophie Hatter",
+      "current_korean": "소피하타",
+      "new_korean": "우시지마 와카토시",
+      "source": "namuwiki"
+    },
+    {
+      "id": 574,
+      "name_full": "Ana Coppola",
+      "current_korean": "아나・코포라",
+      "new_korean": "우시지마 와카토시",
+      "source": "namuwiki"
+    },
+    {
+      "id": 167,
+      "name_full": "Yoh Asakura",
+      "current_korean": "아사쿠라 요흐",
+      "new_korean": "키류 와카츠",
+      "source": "namuwiki"
+    },
+    {
+      "id": 173,
+      "name_full": "Horohoro",
+      "current_korean": "호로호로",
+      "new_korean": "키류 와카츠",
+      "source": "namuwiki"
+    },
+    {
+      "id": 413,
+      "name_full": "Motoharu Yano",
+      "current_korean": "야노 모토하루",
+      "new_korean": "키류 와카츠",
+      "source": "namuwiki"
+    },
+    {
+      "id": 498,
+      "name_full": "Rin Tohsaka",
+      "current_korean": "토오사카 린",
+      "new_korean": "키류 와카츠",
+      "source": "namuwiki"
+    },
+    {
+      "id": 696,
+      "name_full": "Tohma Seguchi",
+      "current_korean": "세구치 토흐마",
+      "new_korean": "키류 와카츠",
+      "source": "namuwiki"
+    },
+    {
+      "id": 167,
+      "name_full": "Yoh Asakura",
+      "current_korean": "아사쿠라 요흐",
+      "new_korean": "보쿠토 코타로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 173,
+      "name_full": "Horohoro",
+      "current_korean": "호로호로",
+      "new_korean": "보쿠토 코타로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 413,
+      "name_full": "Motoharu Yano",
+      "current_korean": "야노 모토하루",
+      "new_korean": "보쿠토 코타로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 498,
+      "name_full": "Rin Tohsaka",
+      "current_korean": "토오사카 린",
+      "new_korean": "보쿠토 코타로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 696,
+      "name_full": "Tohma Seguchi",
+      "current_korean": "세구치 토흐마",
+      "new_korean": "보쿠토 코타로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 167,
+      "name_full": "Yoh Asakura",
+      "current_korean": "아사쿠라 요흐",
+      "new_korean": "호시우미 코라이",
+      "source": "namuwiki"
+    },
+    {
+      "id": 173,
+      "name_full": "Horohoro",
+      "current_korean": "호로호로",
+      "new_korean": "호시우미 코라이",
+      "source": "namuwiki"
+    },
+    {
+      "id": 413,
+      "name_full": "Motoharu Yano",
+      "current_korean": "야노 모토하루",
+      "new_korean": "호시우미 코라이",
+      "source": "namuwiki"
+    },
+    {
+      "id": 498,
+      "name_full": "Rin Tohsaka",
+      "current_korean": "토오사카 린",
+      "new_korean": "호시우미 코라이",
+      "source": "namuwiki"
+    },
+    {
+      "id": 696,
+      "name_full": "Tohma Seguchi",
+      "current_korean": "세구치 토흐마",
+      "new_korean": "호시우미 코라이",
+      "source": "namuwiki"
+    },
+    {
+      "id": 153,
+      "name_full": "Kambei Shimada",
+      "current_korean": "칸베이",
+      "new_korean": "하쿠바 가오",
+      "source": "namuwiki"
+    },
+    {
+      "id": 561,
+      "name_full": "Charden Flamberg",
+      "current_korean": "샤루덴･후라무부루구",
+      "new_korean": "하쿠바 가오",
+      "source": "namuwiki"
+    },
+    {
+      "id": 602,
+      "name_full": "Gambino",
+      "current_korean": "간비노",
+      "new_korean": "하쿠바 가오",
+      "source": "namuwiki"
+    },
+    {
+      "id": 618,
+      "name_full": "Tubalcain Alhambra",
+      "current_korean": "토바루카인・아루한부라",
+      "new_korean": "하쿠바 가오",
+      "source": "namuwiki"
+    },
+    {
+      "id": 1445,
+      "name_full": "Bianca von Vandembagu",
+      "current_korean": "반데무바구 본 비안크아",
+      "new_korean": "하쿠바 가오",
+      "source": "namuwiki"
+    },
+    {
+      "id": 278,
+      "name_full": "Christopher Armalite",
+      "current_korean": "쿠리스토파・아마라이토",
+      "new_korean": "히나타 쇼요",
+      "source": "namuwiki"
+    },
+    {
+      "id": 280,
+      "name_full": "Leopold Scorpse",
+      "current_korean": "레오포루도・스코루푸스",
+      "new_korean": "히나타 쇼요",
+      "source": "namuwiki"
+    },
+    {
+      "id": 309,
+      "name_full": "Chopper Tony Tony",
+      "current_korean": "토니토니・쵸파",
+      "new_korean": "히나타 쇼요",
+      "source": "namuwiki"
+    },
+    {
+      "id": 508,
+      "name_full": "Sophie Hatter",
+      "current_korean": "소피하타",
+      "new_korean": "히나타 쇼요",
+      "source": "namuwiki"
+    },
+    {
+      "id": 574,
+      "name_full": "Ana Coppola",
+      "current_korean": "아나・코포라",
+      "new_korean": "히나타 쇼요",
+      "source": "namuwiki"
+    },
+    {
+      "id": 167,
+      "name_full": "Yoh Asakura",
+      "current_korean": "아사쿠라 요흐",
+      "new_korean": "오지로 아란",
+      "source": "namuwiki"
+    },
+    {
+      "id": 173,
+      "name_full": "Horohoro",
+      "current_korean": "호로호로",
+      "new_korean": "오지로 아란",
+      "source": "namuwiki"
+    },
+    {
+      "id": 413,
+      "name_full": "Motoharu Yano",
+      "current_korean": "야노 모토하루",
+      "new_korean": "오지로 아란",
+      "source": "namuwiki"
+    },
+    {
+      "id": 498,
+      "name_full": "Rin Tohsaka",
+      "current_korean": "토오사카 린",
+      "new_korean": "오지로 아란",
+      "source": "namuwiki"
+    },
+    {
+      "id": 696,
+      "name_full": "Tohma Seguchi",
+      "current_korean": "세구치 토흐마",
+      "new_korean": "오지로 아란",
+      "source": "namuwiki"
+    },
+    {
+      "id": 167,
+      "name_full": "Yoh Asakura",
+      "current_korean": "아사쿠라 요흐",
+      "new_korean": "사쿠사 키요오미",
+      "source": "namuwiki"
+    },
+    {
+      "id": 173,
+      "name_full": "Horohoro",
+      "current_korean": "호로호로",
+      "new_korean": "사쿠사 키요오미",
+      "source": "namuwiki"
+    },
+    {
+      "id": 413,
+      "name_full": "Motoharu Yano",
+      "current_korean": "야노 모토하루",
+      "new_korean": "사쿠사 키요오미",
+      "source": "namuwiki"
+    },
+    {
+      "id": 498,
+      "name_full": "Rin Tohsaka",
+      "current_korean": "토오사카 린",
+      "new_korean": "사쿠사 키요오미",
+      "source": "namuwiki"
+    },
+    {
+      "id": 696,
+      "name_full": "Tohma Seguchi",
+      "current_korean": "세구치 토흐마",
+      "new_korean": "사쿠사 키요오미",
+      "source": "namuwiki"
+    },
+    {
+      "id": 153,
+      "name_full": "Kambei Shimada",
+      "current_korean": "칸베이",
+      "new_korean": "스나 린타로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 561,
+      "name_full": "Charden Flamberg",
+      "current_korean": "샤루덴･후라무부루구",
+      "new_korean": "스나 린타로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 602,
+      "name_full": "Gambino",
+      "current_korean": "간비노",
+      "new_korean": "스나 린타로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 618,
+      "name_full": "Tubalcain Alhambra",
+      "current_korean": "토바루카인・아루한부라",
+      "new_korean": "스나 린타로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 1445,
+      "name_full": "Bianca von Vandembagu",
+      "current_korean": "반데무바구 본 비안크아",
+      "new_korean": "스나 린타로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 153,
+      "name_full": "Kambei Shimada",
+      "current_korean": "칸베이",
+      "new_korean": "햐쿠자와 유다이",
+      "source": "namuwiki"
+    },
+    {
+      "id": 561,
+      "name_full": "Charden Flamberg",
+      "current_korean": "샤루덴･후라무부루구",
+      "new_korean": "햐쿠자와 유다이",
+      "source": "namuwiki"
+    },
+    {
+      "id": 602,
+      "name_full": "Gambino",
+      "current_korean": "간비노",
+      "new_korean": "햐쿠자와 유다이",
+      "source": "namuwiki"
+    },
+    {
+      "id": 618,
+      "name_full": "Tubalcain Alhambra",
+      "current_korean": "토바루카인・아루한부라",
+      "new_korean": "햐쿠자와 유다이",
+      "source": "namuwiki"
+    },
+    {
+      "id": 1445,
+      "name_full": "Bianca von Vandembagu",
+      "current_korean": "반데무바구 본 비안크아",
+      "new_korean": "햐쿠자와 유다이",
+      "source": "namuwiki"
+    },
+    {
+      "id": 71,
+      "name_full": "L Lawliet",
+      "current_korean": "에루・로라이토",
+      "new_korean": "헤이와지마 토시로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 80,
+      "name_full": "Light Yagami",
+      "current_korean": "야가미 라이토",
+      "new_korean": "헤이와지마 토시로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 115,
+      "name_full": "Cagalli Yula Athha",
+      "current_korean": "카가리・유라・아스하",
+      "new_korean": "헤이와지마 토시로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 136,
+      "name_full": "Louise Françoise Le Blanc de La Vallière",
+      "current_korean": "루이즈・후란소와즈・루・부란・도・라・바리에루",
+      "new_korean": "헤이와지마 토시로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 278,
+      "name_full": "Christopher Armalite",
+      "current_korean": "쿠리스토파・아마라이토",
+      "new_korean": "헤이와지마 토시로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 167,
+      "name_full": "Yoh Asakura",
+      "current_korean": "아사쿠라 요흐",
+      "new_korean": "니콜라스 로메로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 173,
+      "name_full": "Horohoro",
+      "current_korean": "호로호로",
+      "new_korean": "니콜라스 로메로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 413,
+      "name_full": "Motoharu Yano",
+      "current_korean": "야노 모토하루",
+      "new_korean": "니콜라스 로메로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 498,
+      "name_full": "Rin Tohsaka",
+      "current_korean": "토오사카 린",
+      "new_korean": "니콜라스 로메로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 696,
+      "name_full": "Tohma Seguchi",
+      "current_korean": "세구치 토흐마",
+      "new_korean": "니콜라스 로메로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 153,
+      "name_full": "Kambei Shimada",
+      "current_korean": "칸베이",
+      "new_korean": "소콜로프 타츠토",
+      "source": "namuwiki"
+    },
+    {
+      "id": 561,
+      "name_full": "Charden Flamberg",
+      "current_korean": "샤루덴･후라무부루구",
+      "new_korean": "소콜로프 타츠토",
+      "source": "namuwiki"
+    },
+    {
+      "id": 602,
+      "name_full": "Gambino",
+      "current_korean": "간비노",
+      "new_korean": "소콜로프 타츠토",
+      "source": "namuwiki"
+    },
+    {
+      "id": 618,
+      "name_full": "Tubalcain Alhambra",
+      "current_korean": "토바루카인・아루한부라",
+      "new_korean": "소콜로프 타츠토",
+      "source": "namuwiki"
+    },
+    {
+      "id": 1445,
+      "name_full": "Bianca von Vandembagu",
+      "current_korean": "반데무바구 본 비안크아",
+      "new_korean": "소콜로프 타츠토",
+      "source": "namuwiki"
+    },
+    {
+      "id": 278,
+      "name_full": "Christopher Armalite",
+      "current_korean": "쿠리스토파・아마라이토",
+      "new_korean": "우시지마 와카토시",
+      "source": "namuwiki"
+    },
+    {
+      "id": 280,
+      "name_full": "Leopold Scorpse",
+      "current_korean": "레오포루도・스코루푸스",
+      "new_korean": "우시지마 와카토시",
+      "source": "namuwiki"
+    },
+    {
+      "id": 309,
+      "name_full": "Chopper Tony Tony",
+      "current_korean": "토니토니・쵸파",
+      "new_korean": "우시지마 와카토시",
+      "source": "namuwiki"
+    },
+    {
+      "id": 508,
+      "name_full": "Sophie Hatter",
+      "current_korean": "소피하타",
+      "new_korean": "우시지마 와카토시",
+      "source": "namuwiki"
+    },
+    {
+      "id": 574,
+      "name_full": "Ana Coppola",
+      "current_korean": "아나・코포라",
+      "new_korean": "우시지마 와카토시",
+      "source": "namuwiki"
+    },
+    {
+      "id": 167,
+      "name_full": "Yoh Asakura",
+      "current_korean": "아사쿠라 요흐",
+      "new_korean": "호시우미 코라이",
+      "source": "namuwiki"
+    },
+    {
+      "id": 173,
+      "name_full": "Horohoro",
+      "current_korean": "호로호로",
+      "new_korean": "호시우미 코라이",
+      "source": "namuwiki"
+    },
+    {
+      "id": 413,
+      "name_full": "Motoharu Yano",
+      "current_korean": "야노 모토하루",
+      "new_korean": "호시우미 코라이",
+      "source": "namuwiki"
+    },
+    {
+      "id": 498,
+      "name_full": "Rin Tohsaka",
+      "current_korean": "토오사카 린",
+      "new_korean": "호시우미 코라이",
+      "source": "namuwiki"
+    },
+    {
+      "id": 696,
+      "name_full": "Tohma Seguchi",
+      "current_korean": "세구치 토흐마",
+      "new_korean": "호시우미 코라이",
+      "source": "namuwiki"
+    },
+    {
+      "id": 71,
+      "name_full": "L Lawliet",
+      "current_korean": "에루・로라이토",
+      "new_korean": "이누나키 시온",
+      "source": "namuwiki"
+    },
+    {
+      "id": 80,
+      "name_full": "Light Yagami",
+      "current_korean": "야가미 라이토",
+      "new_korean": "이누나키 시온",
+      "source": "namuwiki"
+    },
+    {
+      "id": 115,
+      "name_full": "Cagalli Yula Athha",
+      "current_korean": "카가리・유라・아스하",
+      "new_korean": "이누나키 시온",
+      "source": "namuwiki"
+    },
+    {
+      "id": 136,
+      "name_full": "Louise Françoise Le Blanc de La Vallière",
+      "current_korean": "루이즈・후란소와즈・루・부란・도・라・바리에루",
+      "new_korean": "이누나키 시온",
+      "source": "namuwiki"
+    },
+    {
+      "id": 278,
+      "name_full": "Christopher Armalite",
+      "current_korean": "쿠리스토파・아마라이토",
+      "new_korean": "이누나키 시온",
+      "source": "namuwiki"
+    },
+    {
+      "id": 153,
+      "name_full": "Kambei Shimada",
+      "current_korean": "칸베이",
+      "new_korean": "아드리아 토마스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 561,
+      "name_full": "Charden Flamberg",
+      "current_korean": "샤루덴･후라무부루구",
+      "new_korean": "아드리아 토마스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 602,
+      "name_full": "Gambino",
+      "current_korean": "간비노",
+      "new_korean": "아드리아 토마스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 618,
+      "name_full": "Tubalcain Alhambra",
+      "current_korean": "토바루카인・아루한부라",
+      "new_korean": "아드리아 토마스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 1445,
+      "name_full": "Bianca von Vandembagu",
+      "current_korean": "반데무바구 본 비안크아",
+      "new_korean": "아드리아 토마스",
+      "source": "namuwiki"
+    },
+    {
+      "id": 278,
+      "name_full": "Christopher Armalite",
+      "current_korean": "쿠리스토파・아마라이토",
+      "new_korean": "오리버 번즈",
+      "source": "namuwiki"
+    },
+    {
+      "id": 280,
+      "name_full": "Leopold Scorpse",
+      "current_korean": "레오포루도・스코루푸스",
+      "new_korean": "오리버 번즈",
+      "source": "namuwiki"
+    },
+    {
+      "id": 309,
+      "name_full": "Chopper Tony Tony",
+      "current_korean": "토니토니・쵸파",
+      "new_korean": "오리버 번즈",
+      "source": "namuwiki"
+    },
+    {
+      "id": 508,
+      "name_full": "Sophie Hatter",
+      "current_korean": "소피하타",
+      "new_korean": "오리버 번즈",
+      "source": "namuwiki"
+    },
+    {
+      "id": 574,
+      "name_full": "Ana Coppola",
+      "current_korean": "아나・코포라",
+      "new_korean": "오리버 번즈",
+      "source": "namuwiki"
+    },
+    {
+      "id": 167,
+      "name_full": "Yoh Asakura",
+      "current_korean": "아사쿠라 요흐",
+      "new_korean": "보쿠토 코타로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 173,
+      "name_full": "Horohoro",
+      "current_korean": "호로호로",
+      "new_korean": "보쿠토 코타로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 413,
+      "name_full": "Motoharu Yano",
+      "current_korean": "야노 모토하루",
+      "new_korean": "보쿠토 코타로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 498,
+      "name_full": "Rin Tohsaka",
+      "current_korean": "토오사카 린",
+      "new_korean": "보쿠토 코타로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 696,
+      "name_full": "Tohma Seguchi",
+      "current_korean": "세구치 토흐마",
+      "new_korean": "보쿠토 코타로",
+      "source": "namuwiki"
+    },
+    {
+      "id": 167,
+      "name_full": "Yoh Asakura",
+      "current_korean": "아사쿠라 요흐",
+      "new_korean": "사쿠사 키요오미",
+      "source": "namuwiki"
+    },
+    {
+      "id": 173,
+      "name_full": "Horohoro",
+      "current_korean": "호로호로",
+      "new_korean": "사쿠사 키요오미",
+      "source": "namuwiki"
+    },
+    {
+      "id": 413,
+      "name_full": "Motoharu Yano",
+      "current_korean": "야노 모토하루",
+      "new_korean": "사쿠사 키요오미",
+      "source": "namuwiki"
+    },
+    {
+      "id": 498,
+      "name_full": "Rin Tohsaka",
+      "current_korean": "토오사카 린",
+      "new_korean": "사쿠사 키요오미",
+      "source": "namuwiki"
+    },
+    {
+      "id": 696,
+      "name_full": "Tohma Seguchi",
+      "current_korean": "세구치 토흐마",
+      "new_korean": "사쿠사 키요오미",
+      "source": "namuwiki"
+    },
+    {
+      "id": 278,
+      "name_full": "Christopher Armalite",
+      "current_korean": "쿠리스토파・아마라이토",
+      "new_korean": "히나타 쇼요",
+      "source": "namuwiki"
+    },
+    {
+      "id": 280,
+      "name_full": "Leopold Scorpse",
+      "current_korean": "레오포루도・스코루푸스",
+      "new_korean": "히나타 쇼요",
+      "source": "namuwiki"
+    },
+    {
+      "id": 309,
+      "name_full": "Chopper Tony Tony",
+      "current_korean": "토니토니・쵸파",
+      "new_korean": "히나타 쇼요",
+      "source": "namuwiki"
+    },
+    {
+      "id": 508,
+      "name_full": "Sophie Hatter",
+      "current_korean": "소피하타",
+      "new_korean": "히나타 쇼요",
+      "source": "namuwiki"
+    },
+    {
+      "id": 574,
+      "name_full": "Ana Coppola",
+      "current_korean": "아나・코포라",
+      "new_korean": "히나타 쇼요",
+      "source": "namuwiki"
+    }
+  ]
+}
