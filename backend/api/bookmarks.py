@@ -12,29 +12,70 @@ router = APIRouter()
 
 
 @router.get("/")
-def get_bookmarks(current_user: UserResponse = Depends(get_current_user)):
+def get_bookmarks(
+    full: bool = False,
+    current_user: UserResponse = Depends(get_current_user)
+):
     """
     Get all bookmarks for current user
     현재 사용자의 모든 북마크 조회
+
+    Args:
+        full: If True, return full activity details. If False, return just activity IDs
     """
-    bookmarks = db.execute_query(
+    if not full:
+        # Return just activity IDs (for backward compatibility)
+        bookmarks = db.execute_query(
+            """
+            SELECT activity_id, created_at
+            FROM activity_bookmarks
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+            """,
+            (current_user.id,)
+        )
+
+        return {
+            'bookmarks': [
+                {
+                    'activity_id': b[0],
+                    'created_at': b[1]
+                }
+                for b in bookmarks
+            ]
+        }
+
+    # Return full activity details
+    from api.activities import format_activity_from_row
+
+    activities = db.execute_query(
         """
-        SELECT activity_id, created_at
-        FROM activity_bookmarks
-        WHERE user_id = ?
-        ORDER BY created_at DESC
+        SELECT
+            a.*,
+            u.username,
+            u.display_name,
+            u.avatar_url,
+            COALESCE(us.otaku_score, 0) as otaku_score,
+            ab.created_at as bookmarked_at
+        FROM activity_bookmarks ab
+        JOIN activities a ON ab.activity_id = a.id
+        JOIN users u ON a.user_id = u.id
+        LEFT JOIN user_stats us ON u.id = us.user_id
+        WHERE ab.user_id = ?
+        ORDER BY ab.created_at DESC
         """,
         (current_user.id,)
     )
 
+    formatted_activities = []
+    for row in activities:
+        activity = format_activity_from_row(row, current_user.id)
+        if activity:
+            formatted_activities.append(activity)
+
     return {
-        'bookmarks': [
-            {
-                'activity_id': b[0],
-                'created_at': b[1]
-            }
-            for b in bookmarks
-        ]
+        'items': formatted_activities,
+        'total': len(formatted_activities)
     }
 
 
