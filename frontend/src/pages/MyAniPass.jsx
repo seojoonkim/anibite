@@ -638,15 +638,13 @@ export default function MyAniPass() {
 
         // Load rated anime by rating category
         for (const rating of ratingCategories) {
-          const ratingData = isOwnProfile
-            ? await ratingService.getMyRatingsByRating(rating, 'RATED')
-            : await ratingService.getAllUserRatings(targetUserId);
-
-          if (ratingData.rated && ratingData.rated.length > 0) {
-            allRatedItems = [...allRatedItems, ...ratingData.rated];
+          try {
+            const ratingData = isOwnProfile
+              ? await ratingService.getMyRatingsByRating(rating, 'RATED')
+              : await ratingService.getAllUserRatings(targetUserId);
 
             // Save stats from first response
-            if (!totalStats) {
+            if (!totalStats && ratingData) {
               totalStats = {
                 average_rating: ratingData.average_rating,
                 total_rated: ratingData.total_rated || 0,
@@ -655,43 +653,59 @@ export default function MyAniPass() {
               };
             }
 
-            // Update displayed anime progressively
-            const currentAnimeData = [
-              ...allRatedItems.map(item => ({ ...item, category: 'rated' })),
-              ...watchlistItems.map(item => ({ ...item, category: 'watchlist' })),
-              ...passItems.map(item => ({ ...item, category: 'pass' }))
-            ];
+            // Add new items if any
+            if (ratingData.rated && ratingData.rated.length > 0) {
+              allRatedItems = [...allRatedItems, ...ratingData.rated];
 
-            setAllAnime(currentAnimeData);
-            setAllRatedAnime(allRatedItems);
-            filterAnimeBySubMenu(currentAnimeData, animeSubMenu);
-          }
+              // Update displayed anime progressively
+              const currentAnimeData = [
+                ...allRatedItems.map(item => ({ ...item, category: 'rated' })),
+                ...watchlistItems.map(item => ({ ...item, category: 'watchlist' })),
+                ...passItems.map(item => ({ ...item, category: 'pass' }))
+              ];
 
-          // Break if this is not own profile (load all at once for other users)
-          if (!isOwnProfile) {
-            allRatedItems = ratingData.rated || [];
-            watchlistItems = ratingData.watchlist || [];
-            passItems = ratingData.pass || [];
-            totalStats = {
-              average_rating: ratingData.average_rating,
-              total_rated: ratingData.total_rated || 0,
-              total_watchlist: ratingData.total_watchlist || 0,
-              total_pass: ratingData.total_pass || 0
-            };
-            break;
+              setAllAnime(currentAnimeData);
+              setAllRatedAnime(allRatedItems);
+              filterAnimeBySubMenu(currentAnimeData, animeSubMenu);
+            }
+
+            // Break if this is not own profile (load all at once for other users)
+            if (!isOwnProfile) {
+              allRatedItems = ratingData.rated || [];
+              watchlistItems = ratingData.watchlist || [];
+              passItems = ratingData.pass || [];
+              totalStats = {
+                average_rating: ratingData.average_rating,
+                total_rated: ratingData.total_rated || 0,
+                total_watchlist: ratingData.total_watchlist || 0,
+                total_pass: ratingData.total_pass || 0
+              };
+              break;
+            }
+          } catch (error) {
+            console.error(`Failed to load rating ${rating}:`, error);
+            // Continue loading other ratings even if one fails
           }
         }
 
         // Load WANT_TO_WATCH status
         if (isOwnProfile) {
-          const watchlistData = await ratingService.getAllMyRatings({ status: 'WANT_TO_WATCH' });
-          watchlistItems = watchlistData.watchlist || [];
+          try {
+            const watchlistData = await ratingService.getAllMyRatings({ status: 'WANT_TO_WATCH' });
+            watchlistItems = watchlistData.watchlist || [];
+          } catch (error) {
+            console.error('Failed to load WANT_TO_WATCH:', error);
+          }
         }
 
         // Load PASS status
         if (isOwnProfile) {
-          const passData = await ratingService.getAllMyRatings({ status: 'PASS' });
-          passItems = passData.pass || [];
+          try {
+            const passData = await ratingService.getAllMyRatings({ status: 'PASS' });
+            passItems = passData.pass || [];
+          } catch (error) {
+            console.error('Failed to load PASS:', error);
+          }
         }
 
         // Final update with all data
@@ -749,44 +763,58 @@ export default function MyAniPass() {
 
         // Load rated characters by rating category
         for (const rating of ratingCategories) {
-          const ratingData = isOwnProfile
-            ? await characterService.getMyCharacterRatingsByRating(rating, 'RATED')
-            : await characterService.getAllUserRatings(targetUserId);
+          try {
+            const ratingData = isOwnProfile
+              ? await characterService.getMyCharacterRatingsByRating(rating, 'RATED')
+              : await characterService.getAllUserRatings(targetUserId);
 
-          if (ratingData.rated && ratingData.rated.length > 0) {
-            allRatedChars = [...allRatedChars, ...ratingData.rated];
+            // Add new items if any
+            if (ratingData.rated && ratingData.rated.length > 0) {
+              allRatedChars = [...allRatedChars, ...ratingData.rated];
 
-            // Update displayed characters progressively
-            const currentCharData = [
-              ...allRatedChars.map(c => ({ ...c, category: 'rated' })),
-              ...wantChars.map(c => ({ ...c, category: 'want' })),
-              ...notInterestedChars.map(c => ({ ...c, category: 'pass' }))
-            ];
+              // Update displayed characters progressively
+              const currentCharData = [
+                ...allRatedChars.map(c => ({ ...c, category: 'rated' })),
+                ...wantChars.map(c => ({ ...c, category: 'want' })),
+                ...notInterestedChars.map(c => ({ ...c, category: 'pass' }))
+              ];
 
-            setAllCharacters(currentCharData);
-            setAllRatedCharacters(allRatedChars);
-            filterCharactersBySubMenu(currentCharData, characterSubMenu);
-          }
+              setAllCharacters(currentCharData);
+              setAllRatedCharacters(allRatedChars);
+              filterCharactersBySubMenu(currentCharData, characterSubMenu);
+            }
 
-          // Break if this is not own profile (load all at once for other users)
-          if (!isOwnProfile) {
-            allRatedChars = ratingData.rated || [];
-            wantChars = ratingData.want_to_know || [];
-            notInterestedChars = ratingData.not_interested || [];
-            break;
+            // Break if this is not own profile (load all at once for other users)
+            if (!isOwnProfile) {
+              allRatedChars = ratingData.rated || [];
+              wantChars = ratingData.want_to_know || [];
+              notInterestedChars = ratingData.not_interested || [];
+              break;
+            }
+          } catch (error) {
+            console.error(`Failed to load character rating ${rating}:`, error);
+            // Continue loading other ratings even if one fails
           }
         }
 
         // Load WANT_TO_KNOW status
         if (isOwnProfile) {
-          const wantData = await characterService.getAllMyRatings({ status: 'WANT_TO_KNOW' });
-          wantChars = wantData.want_to_know || [];
+          try {
+            const wantData = await characterService.getAllMyRatings({ status: 'WANT_TO_KNOW' });
+            wantChars = wantData.want_to_know || [];
+          } catch (error) {
+            console.error('Failed to load WANT_TO_KNOW:', error);
+          }
         }
 
         // Load NOT_INTERESTED status
         if (isOwnProfile) {
-          const passData = await characterService.getAllMyRatings({ status: 'NOT_INTERESTED' });
-          notInterestedChars = passData.not_interested || [];
+          try {
+            const passData = await characterService.getAllMyRatings({ status: 'NOT_INTERESTED' });
+            notInterestedChars = passData.not_interested || [];
+          } catch (error) {
+            console.error('Failed to load NOT_INTERESTED:', error);
+          }
         }
 
         // Final update with all data
