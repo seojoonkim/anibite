@@ -119,6 +119,77 @@ def add_activities_metadata():
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 
+@router.get("/check-rank-promotions")
+def check_rank_promotions():
+    """Check rank promotion activities in database"""
+    try:
+        # Get all rank promotions
+        promotions = db.execute_query("""
+            SELECT user_id, username, activity_time, metadata
+            FROM activities
+            WHERE activity_type = 'rank_promotion'
+            ORDER BY activity_time DESC
+            LIMIT 50
+        """)
+
+        promotion_list = [
+            {
+                "user_id": row[0],
+                "username": row[1],
+                "activity_time": row[2],
+                "metadata": row[3]
+            }
+            for row in promotions
+        ]
+
+        # Get total count
+        count_row = db.execute_query("SELECT COUNT(*) FROM activities WHERE activity_type = 'rank_promotion'")
+        total = count_row[0][0] if count_row else 0
+
+        return {
+            "total": total,
+            "promotions": promotion_list
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+
+@router.get("/check-user-followers/{user_id}")
+def check_user_followers(user_id: int):
+    """Check user's follower and following counts"""
+    try:
+        # Get follower count
+        follower_rows = db.execute_query("SELECT COUNT(*) FROM user_follows WHERE following_id = ?", (user_id,))
+        follower_count = follower_rows[0][0] if follower_rows else 0
+
+        # Get following count
+        following_rows = db.execute_query("SELECT COUNT(*) FROM user_follows WHERE follower_id = ?", (user_id,))
+        following_count = following_rows[0][0] if following_rows else 0
+
+        # Get actual follows
+        followers = db.execute_query("""
+            SELECT follower_id, (SELECT username FROM users WHERE id = follower_id) as username
+            FROM user_follows WHERE following_id = ?
+        """, (user_id,))
+
+        following = db.execute_query("""
+            SELECT following_id, (SELECT username FROM users WHERE id = following_id) as username
+            FROM user_follows WHERE follower_id = ?
+        """, (user_id,))
+
+        return {
+            "user_id": user_id,
+            "follower_count": follower_count,
+            "following_count": following_count,
+            "followers": [{"id": row[0], "username": row[1]} for row in followers],
+            "following": [{"id": row[0], "username": row[1]} for row in following]
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+
 @router.post("/backfill-rank-promotions")
 def backfill_rank_promotions():
     """Backfill past rank promotion activities"""
