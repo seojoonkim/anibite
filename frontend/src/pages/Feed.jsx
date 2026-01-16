@@ -46,15 +46,12 @@ export default function Feed() {
   // Cache removed - was causing inconsistent data on tab switching
 
   // Memoize filters to prevent unnecessary re-renders
-  // Disable pagination for 'saved' and 'notifications' filters
-  const paginationFilters = useMemo(() => {
-    if (feedFilter === 'saved' || feedFilter === 'notifications') {
-      return null; // Signal to skip pagination
-    }
-    return {
-      followingOnly: feedFilter === 'following'
-    };
-  }, [feedFilter]);
+  const paginationFilters = useMemo(() => ({
+    followingOnly: feedFilter === 'following'
+  }), [feedFilter]);
+
+  // Skip pagination for 'saved' and 'notifications' filters
+  const skipPagination = feedFilter === 'saved' || feedFilter === 'notifications';
 
   // Use pagination hook for infinite scroll (disabled for saved/notifications)
   const {
@@ -64,7 +61,7 @@ export default function Feed() {
     hasMore,
     loadMore,
     reset: resetActivities
-  } = useActivityPagination(paginationFilters || {}, 10);
+  } = useActivityPagination(paginationFilters, 10, skipPagination);
 
   // Cache disabled - was causing inconsistent data on tab switching
   // Clear any existing cache on mount

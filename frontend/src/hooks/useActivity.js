@@ -243,20 +243,26 @@ export function useActivityComments(activityId) {
 /**
  * Hook for pagination - 단순하고 빠르게
  */
-export function useActivityPagination(filters = {}, pageSize = 50) {
+export function useActivityPagination(filters = {}, pageSize = 50, skip = false) {
   const [allActivities, setAllActivities] = useState([]);
   const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!skip);
   const [loadingMore, setLoadingMore] = useState(false);
   const [nextPage, setNextPage] = useState(2);
 
   const isResettingRef = useRef(false);
   const loadingRef = useRef(false);
   const filtersStringRef = useRef('');
+  const skipRef = useRef(skip);
+
+  // Update skip ref when it changes
+  useEffect(() => {
+    skipRef.current = skip;
+  }, [skip]);
 
   // 초기 로드 (첫 2페이지를 동시에)
   const loadInitial = useCallback(async (currentFilters) => {
-    if (loadingRef.current) return;
+    if (loadingRef.current || skipRef.current) return;
 
     console.log('[useActivityPagination] Loading initial pages');
     loadingRef.current = true;
@@ -323,6 +329,8 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
 
   // 필터 변경 감지 및 리로드
   useEffect(() => {
+    if (skip) return;
+
     const newFiltersString = JSON.stringify(filters);
 
     if (newFiltersString !== filtersStringRef.current) {
@@ -330,16 +338,18 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
       filtersStringRef.current = newFiltersString;
       loadInitial(filters);
     }
-  }, [filters, loadInitial]);
+  }, [filters, loadInitial, skip]);
 
   // 컴포넌트 마운트 시 초기 로드
   useEffect(() => {
+    if (skip) return;
+
     if (filtersStringRef.current === '') {
       console.log('[useActivityPagination] Initial mount');
       filtersStringRef.current = JSON.stringify(filters);
       loadInitial(filters);
     }
-  }, []); // 빈 배열 - 마운트 시 한 번만
+  }, [skip]); // skip이 변경되면 다시 체크
 
   return {
     activities: isResettingRef.current ? [] : allActivities,
