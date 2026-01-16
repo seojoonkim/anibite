@@ -567,7 +567,7 @@ export default function WriteReviews() {
                   >
                     <img
                       src={getImageUrl(item.type === 'anime' ? item.image_url : item.character_image)}
-                      alt={item.type === 'anime' ? getAnimeTitle(item) : item.character_name}
+                      alt={item.type === 'anime' ? getAnimeTitle(item) : (language === 'ko' && item.character_name_native ? item.character_name_native : item.character_name)}
                       className="w-32 h-48 object-cover object-top group-hover:scale-110 transition-transform duration-[1500ms]"
                       onError={(e) => {
                         e.target.src = '/placeholder-anime.svg';
@@ -583,7 +583,7 @@ export default function WriteReviews() {
                           to={item.type === 'anime' ? `/anime/${item.itemId}` : `/character/${item.itemId}`}
                           className="text-gray-900 hover:text-[#3797F0] transition-colors hover:underline cursor-pointer"
                         >
-                          {item.type === 'anime' ? getAnimeTitle(item) : item.character_name}
+                          {item.type === 'anime' ? getAnimeTitle(item) : (language === 'ko' && item.character_name_native ? item.character_name_native : item.character_name)}
                         </Link>
                       </h3>
                       <span className={`px-2 py-0.5 rounded text-xs font-medium flex-shrink-0 ${
