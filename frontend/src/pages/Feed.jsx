@@ -40,9 +40,7 @@ export default function Feed() {
   const observerRef = useRef(null);
   const loadMoreTriggerRef = useRef(null);
 
-  // Cache state
-  const [cachedActivities, setCachedActivities] = useState(null);
-  const cacheLoadedRef = useRef(false);
+  // Cache removed - was causing inconsistent data on tab switching
 
   // Use pagination hook for infinite scroll
   const {
@@ -59,63 +57,21 @@ export default function Feed() {
     10
   );
 
-  // Load cached data on mount for instant display
+  // Cache disabled - was causing inconsistent data on tab switching
+  // Clear any existing cache on mount
   useEffect(() => {
-    if (!cacheLoadedRef.current && feedFilter !== 'notifications' && feedFilter !== 'saved') {
-      try {
-        const cacheKey = `feed_cache_${feedFilter}`;
-        const cached = sessionStorage.getItem(cacheKey);
-        if (cached) {
-          const { data, timestamp } = JSON.parse(cached);
-          // Use cache if less than 60 seconds old
-          if (Date.now() - timestamp < 60000) {
-            setCachedActivities(data);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to load cache:', err);
-      }
-      cacheLoadedRef.current = true;
+    try {
+      sessionStorage.removeItem('feed_cache_all');
+      sessionStorage.removeItem('feed_cache_following');
+    } catch (err) {
+      // Ignore
     }
-  }, [feedFilter]);
-
-  // Save activities to cache when they update
-  useEffect(() => {
-    if (activities.length > 0 && feedFilter !== 'notifications' && feedFilter !== 'saved') {
-      try {
-        const cacheKey = `feed_cache_${feedFilter}`;
-        sessionStorage.setItem(cacheKey, JSON.stringify({
-          data: activities.slice(0, 20), // Cache first 20 activities
-          timestamp: Date.now()
-        }));
-      } catch (err) {
-        console.error('Failed to save cache:', err);
-      }
-    }
-  }, [activities, feedFilter]);
+  }, []);
 
   // Reset activities when filter changes
   useEffect(() => {
-    // Clear cached activities immediately to prevent showing wrong data
-    setCachedActivities(null);
-    cacheLoadedRef.current = false;
-
-    // Reset activities hook
+    console.log(`[Feed] Filter changed to: ${feedFilter}`);
     resetActivities();
-
-    // Clear any old cache entries from different filters
-    try {
-      if (feedFilter !== 'notifications' && feedFilter !== 'saved') {
-        const allFilters = ['all', 'following'];
-        allFilters.forEach(filter => {
-          if (filter !== feedFilter) {
-            sessionStorage.removeItem(`feed_cache_${filter}`);
-          }
-        });
-      }
-    } catch (err) {
-      console.error('Failed to clear old cache:', err);
-    }
   }, [feedFilter, resetActivities]);
 
   // Intersection Observer for infinite scroll
@@ -323,16 +279,12 @@ export default function Feed() {
       return activities.filter(activity => bookmarks.includes(activity.id));
     }
 
-    // Show cached activities while loading fresh data
-    if (loading && cachedActivities && cachedActivities.length > 0) {
-      return cachedActivities;
-    }
-
+    // No more cache - just return activities directly
     return activities;
   };
 
   const filteredActivities = getFilteredActivities();
-  const isLoading = feedFilter === 'notifications' ? notificationsLoading : (loading && !cachedActivities);
+  const isLoading = feedFilter === 'notifications' ? notificationsLoading : loading;
 
   // Edit modal handlers
   const handleEditContent = (activity, mode = 'edit') => {
