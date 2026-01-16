@@ -2103,6 +2103,19 @@ export default function MyAniPass() {
                           return section;
                         }).filter(Boolean);
                       })()}
+
+                      {/* 더 로드할 항목이 있으면 스켈레톤 표시 (무한 스크롤 트리거) */}
+                      {animeLoadCount < filteredAnime.length && (
+                        <div className="mt-8">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                            {Array.from({ length: Math.min(6, filteredAnime.length - animeLoadCount) }).map((_, idx) => (
+                              <div key={`skeleton-${idx}`} ref={idx === 0 ? animeLoadMoreRef : null}>
+                                <AnimeCardSkeleton />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     // 5점, 보고싶어요, 관심없어요는 섹션 헤더와 함께 표시
@@ -2237,6 +2250,19 @@ export default function MyAniPass() {
                           return section;
                         }).filter(Boolean);
                       })()}
+
+                      {/* 더 로드할 항목이 있으면 스켈레톤 표시 (무한 스크롤 트리거) */}
+                      {characterLoadCount < filteredCharacters.length && (
+                        <div className="mt-8">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                            {Array.from({ length: Math.min(6, filteredCharacters.length - characterLoadCount) }).map((_, idx) => (
+                              <div key={`skeleton-${idx}`} ref={idx === 0 ? characterLoadMoreRef : null}>
+                                <CharacterCardSkeleton />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     // 5점, 알고싶어요, 관심없어요는 섹션 헤더와 함께 표시
