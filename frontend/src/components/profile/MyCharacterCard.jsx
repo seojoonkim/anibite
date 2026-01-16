@@ -32,7 +32,10 @@ function MyCharacterCard({ character, language = 'ko' }) {
     return '/placeholder-anime.svg';
   };
 
-  const name = character.character_name || character.character_name_native || '';
+  // 한국어 설정일 때 name_korean 사용, 없으면 character_name 사용
+  const name = language === 'ko' && character.name_korean
+    ? character.name_korean
+    : (character.character_name || character.character_name_native || character.name_full || '');
 
   return (
     <Link

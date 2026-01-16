@@ -30,8 +30,16 @@ export const ratingService = {
   },
 
   // Get ALL user's ratings at once (RATED, WANT_TO_WATCH, PASS) - 3x faster!
-  async getAllMyRatings() {
-    const response = await api.get('/api/ratings/me/all');
+  async getAllMyRatings(params = {}) {
+    const response = await api.get('/api/ratings/me/all', { params });
+    return response.data;
+  },
+
+  // Get ratings by specific rating value (for progressive loading)
+  async getMyRatingsByRating(rating, status = 'RATED') {
+    const response = await api.get('/api/ratings/me/all', {
+      params: { rating, status }
+    });
     return response.data;
   },
 

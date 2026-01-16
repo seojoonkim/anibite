@@ -330,64 +330,85 @@ def get_user_ratings(
     )
 
 
-def get_all_user_ratings(user_id: int) -> Dict:
+def get_all_user_ratings(user_id: int, rating_filter: float = None, status_filter: str = None) -> Dict:
     """
     사용자의 모든 평점을 한 번에 조회 (RATED, WANT_TO_WATCH, PASS)
     3개의 API 호출을 1개로 줄여 성능 향상
+
+    Args:
+        user_id: 사용자 ID
+        rating_filter: 특정 평점만 필터링 (예: 5.0, 4.5)
+        status_filter: 특정 상태만 필터링 (RATED, WANT_TO_WATCH, PASS)
     """
     # Part 1: RATED - activities 테이블에서 빠르게 조회 (필요한 필드만)
-    rated_rows = db.execute_query(
-        """
-        SELECT
-            item_id as anime_id,
-            user_id,
-            rating,
-            'RATED' as status,
-            item_title as title_romaji,
-            item_title_korean as title_korean,
-            item_image as image_url
-        FROM activities
-        WHERE user_id = ? AND activity_type = 'anime_rating'
-        ORDER BY activity_time DESC
-        """,
-        (user_id,)
-    )
+    if status_filter is None or status_filter == 'RATED':
+        rating_condition = ""
+        params = [user_id]
+
+        if rating_filter is not None:
+            rating_condition = " AND rating = ?"
+            params.append(rating_filter)
+
+        rated_rows = db.execute_query(
+            f"""
+            SELECT
+                item_id as anime_id,
+                user_id,
+                rating,
+                'RATED' as status,
+                item_title as title_romaji,
+                item_title_korean as title_korean,
+                item_image as image_url
+            FROM activities
+            WHERE user_id = ? AND activity_type = 'anime_rating'{rating_condition}
+            ORDER BY activity_time DESC
+            """,
+            tuple(params)
+        )
+    else:
+        rated_rows = []
 
     # Part 2: WANT_TO_WATCH - user_ratings 테이블에서 조회 (필요한 필드만)
-    watchlist_rows = db.execute_query(
-        """
-        SELECT
-            ur.anime_id,
-            ur.user_id,
-            ur.status,
-            a.title_romaji,
-            a.title_korean,
-            a.cover_image_url as image_url
-        FROM user_ratings ur
-        JOIN anime a ON ur.anime_id = a.id
-        WHERE ur.user_id = ? AND ur.status = 'WANT_TO_WATCH'
-        ORDER BY ur.updated_at DESC
-        """,
-        (user_id,)
-    )
+    if status_filter is None or status_filter == 'WANT_TO_WATCH':
+        watchlist_rows = db.execute_query(
+            """
+            SELECT
+                ur.anime_id,
+                ur.user_id,
+                ur.status,
+                a.title_romaji,
+                a.title_korean,
+                a.cover_image_url as image_url
+            FROM user_ratings ur
+            JOIN anime a ON ur.anime_id = a.id
+            WHERE ur.user_id = ? AND ur.status = 'WANT_TO_WATCH'
+            ORDER BY ur.updated_at DESC
+            """,
+            (user_id,)
+        )
+    else:
+        watchlist_rows = []
 
     # Part 3: PASS - user_ratings 테이블에서 조회 (필요한 필드만)
-    pass_rows = db.execute_query(
-        """
-        SELECT
-            ur.anime_id,
-            ur.user_id,
-            ur.status,
-            a.title_romaji,
-            a.title_korean,
-            a.cover_image_url as image_url
-        FROM user_ratings ur
-        JOIN anime a ON ur.anime_id = a.id
-        WHERE ur.user_id = ? AND ur.status = 'PASS'
-        ORDER BY ur.updated_at DESC
-        """,
-        (user_id,)
-    )
+    if status_filter is None or status_filter == 'PASS':
+        pass_rows = db.execute_query(
+            """
+            SELECT
+                ur.anime_id,
+                ur.user_id,
+                ur.status,
+                a.title_romaji,
+                a.title_korean,
+                a.cover_image_url as image_url
+            FROM user_ratings ur
+            JOIN anime a ON ur.anime_id = a.id
+            WHERE ur.user_id = ? AND ur.status = 'PASS'
+            ORDER BY ur.updated_at DESC
+            """,
+            (user_id,)
+        )
+    else:
+        pass_rows = []
 
     # 평균 평점 계산 (RATED만)
     avg_row = db.execute_query(

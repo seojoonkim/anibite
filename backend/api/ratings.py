@@ -43,12 +43,18 @@ def create_rating(
 
 @router.get("/me/all")
 def get_all_my_ratings(
+    rating: Optional[float] = Query(None, description="특정 평점 필터 (예: 5.0, 4.5)"),
+    status: Optional[str] = Query(None, description="상태 필터 (RATED, WANT_TO_WATCH, PASS)"),
     current_user: UserResponse = Depends(get_current_user)
 ):
     """
     내 모든 평점을 한 번에 조회 (RATED, WANT_TO_WATCH, PASS)
 
     3개의 API 호출을 1개로 줄여 로딩 속도 비약적 향상
+
+    Query Parameters:
+        rating: 특정 평점만 필터링 (예: 5.0, 4.5) - 순차 로딩용
+        status: 특정 상태만 필터링 (RATED, WANT_TO_WATCH, PASS)
 
     Returns:
         {
@@ -61,7 +67,7 @@ def get_all_my_ratings(
             "average_rating": 0.0
         }
     """
-    return get_all_user_ratings(current_user.id)
+    return get_all_user_ratings(current_user.id, rating_filter=rating, status_filter=status)
 
 
 @router.get("/me", response_model=UserRatingListResponse)
