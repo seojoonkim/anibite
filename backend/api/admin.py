@@ -156,13 +156,22 @@ def check_rank_promotions():
 
 
 @router.get("/debug-user-feed/{user_id}")
-def debug_user_feed(user_id: int):
+def debug_user_feed(user_id: int, limit: int = 50):
     """Debug user feed data - check what's being returned"""
     try:
         from services.feed_service import get_user_feed
 
+        # Check activities table directly
+        activities_in_db = db.execute_query("""
+            SELECT activity_type, activity_time
+            FROM activities
+            WHERE user_id = ?
+            ORDER BY activity_time DESC
+            LIMIT 20
+        """, (user_id,))
+
         # Get feed
-        feed_data = get_user_feed(user_id, current_user_id=user_id, limit=10, offset=0)
+        feed_data = get_user_feed(user_id, current_user_id=user_id, limit=limit, offset=0)
 
         # Count activity types
         activity_types = {}
@@ -181,9 +190,10 @@ def debug_user_feed(user_id: int):
 
         return {
             "user_id": user_id,
-            "total_activities": len(feed_data),
-            "activity_types": activity_types,
-            "rank_promotions": rank_promotions,
+            "total_activities_from_feed": len(feed_data),
+            "activity_types_from_feed": activity_types,
+            "rank_promotions_from_feed": rank_promotions,
+            "recent_20_from_db": [{"type": row[0], "time": row[1]} for row in activities_in_db],
             "first_activity": feed_data[0] if feed_data else None
         }
     except Exception as e:
