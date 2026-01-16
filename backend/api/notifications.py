@@ -55,15 +55,30 @@ async def get_notifications(
             au.display_name as activity_display_name,
             au.avatar_url as activity_avatar_url,
             COALESCE(aus.otaku_score, 0) as activity_otaku_score,
-            (SELECT COUNT(*) FROM activity_likes WHERE activity_id = a.id) as activity_likes_count,
-            (SELECT COUNT(*) FROM activity_comments WHERE activity_id = a.id) as activity_comments_count,
-            (SELECT COUNT(*) FROM activity_likes WHERE activity_id = a.id AND user_id = ?) > 0 as user_has_liked
+            COALESCE(likes.count, 0) as activity_likes_count,
+            COALESCE(comments.count, 0) as activity_comments_count,
+            CASE WHEN user_like.activity_id IS NOT NULL THEN 1 ELSE 0 END as user_has_liked
         FROM notifications n
         JOIN users u ON n.actor_id = u.id
         LEFT JOIN user_stats us ON u.id = us.user_id
         JOIN activities a ON n.activity_id = a.id
         JOIN users au ON a.user_id = au.id
         LEFT JOIN user_stats aus ON au.id = aus.user_id
+        LEFT JOIN (
+            SELECT activity_id, COUNT(*) as count
+            FROM activity_likes
+            GROUP BY activity_id
+        ) likes ON likes.activity_id = a.id
+        LEFT JOIN (
+            SELECT activity_id, COUNT(*) as count
+            FROM activity_comments
+            GROUP BY activity_id
+        ) comments ON comments.activity_id = a.id
+        LEFT JOIN (
+            SELECT activity_id
+            FROM activity_likes
+            WHERE user_id = ?
+        ) user_like ON user_like.activity_id = a.id
         WHERE n.user_id = ?
         ORDER BY n.created_at DESC
         LIMIT ? OFFSET ?
