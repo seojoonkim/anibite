@@ -29,6 +29,7 @@ export default function Feed() {
   const [notificationsLoading, setNotificationsLoading] = useState(false);
   const [savedActivities, setSavedActivities] = useState([]);
   const [savedLoading, setSavedLoading] = useState(false);
+  const [filterChanging, setFilterChanging] = useState(false);
 
   // Edit modal state
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -46,9 +47,15 @@ export default function Feed() {
   // Cache removed - was causing inconsistent data on tab switching
 
   // Memoize filters to prevent unnecessary re-renders
-  const paginationFilters = useMemo(() => ({
-    followingOnly: feedFilter === 'following'
-  }), [feedFilter]);
+  const paginationFilters = useMemo(() => {
+    // Set filterChanging when filter changes (except for notifications/saved)
+    if (feedFilter !== 'notifications' && feedFilter !== 'saved') {
+      setFilterChanging(true);
+    }
+    return {
+      followingOnly: feedFilter === 'following'
+    };
+  }, [feedFilter]);
 
   // Use pagination hook for infinite scroll
   const {
@@ -75,6 +82,17 @@ export default function Feed() {
   // This prevents flickering when switching tabs
 
   // No auto-load for 'saved' filter - we fetch bookmarked activities from server
+
+  // Clear filterChanging when loading starts or activities are loaded
+  useEffect(() => {
+    if (loading) {
+      // Loading started, filterChanging is no longer needed
+      setFilterChanging(false);
+    } else if (!loading && activities.length > 0) {
+      // Activities loaded successfully
+      setFilterChanging(false);
+    }
+  }, [loading, activities.length]);
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
@@ -131,8 +149,10 @@ export default function Feed() {
   // Load notifications when filter is 'notifications'
   useEffect(() => {
     if (feedFilter === 'notifications') {
+      setFilterChanging(false);
       loadNotifications();
     } else if (feedFilter === 'saved') {
+      setFilterChanging(false);
       loadSavedActivities();
     }
   }, [feedFilter]);
@@ -300,7 +320,8 @@ export default function Feed() {
 
   const filteredActivities = getFilteredActivities();
   const isLoading = feedFilter === 'notifications' ? notificationsLoading :
-                   feedFilter === 'saved' ? savedLoading : loading;
+                   feedFilter === 'saved' ? savedLoading :
+                   (loading || filterChanging);
 
   // Edit modal handlers
   const handleEditContent = (activity, mode = 'edit') => {
