@@ -26,11 +26,80 @@ export default function WriteReviews() {
     total: { reviewed: 0, pending: 0 }
   });
   const [toast, setToast] = useState(null); // { message, type: 'success'|'error' }
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
-    loadData();
+    loadData(true);
     loadStats();
   }, []);
+
+  // Infinite scroll handler
+  useEffect(() => {
+    const handleScroll = () => {
+      if (loadingMore || !hasMore) return;
+
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = document.documentElement.clientHeight;
+
+      // Load more when user is 500px from bottom
+      if (scrollTop + clientHeight >= scrollHeight - 500) {
+        loadMore();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [loadingMore, hasMore, offset]);
+
+  const loadMore = async () => {
+    if (loadingMore || !hasMore) return;
+
+    try {
+      setLoadingMore(true);
+      console.log('[WriteReviews] Loading more items... offset:', offset);
+
+      const data = await ratingPageService.getItemsForReviews(50, offset);
+      console.log('[WriteReviews] Loaded more items:', data?.items?.length || 0);
+
+      const items = (data.items || []).map(item => {
+        const processed = {
+          type: item.type,
+          id: `${item.type}_${item.item_id}`,
+          itemId: item.item_id,
+          rating: item.rating,
+          updated_at: item.updated_at,
+          ...(item.type === 'anime' ? {
+            anime_id: item.item_id,
+            title_romaji: item.item_title,
+            title_english: item.item_title,
+            title_korean: item.item_title_korean,
+            image_url: item.item_image,
+            year: item.item_year
+          } : {}),
+          ...(item.type === 'character' ? {
+            character_id: item.item_id,
+            character_name: item.item_title,
+            character_name_native: item.item_title_korean,
+            character_image: item.item_image,
+            anime_id: item.anime_id,
+            anime_title: item.anime_title_korean || item.anime_title
+          } : {})
+        };
+        return processed;
+      });
+
+      setAllItems(prev => [...prev, ...items]);
+      setOffset(prev => prev + items.length);
+      setHasMore(items.length === 50);
+    } catch (err) {
+      console.error('[WriteReviews] Failed to load more:', err);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const loadStats = async () => {
     try {
@@ -42,13 +111,14 @@ export default function WriteReviews() {
     }
   };
 
-  const loadData = async () => {
+  const loadData = async (resetOffset = false) => {
     try {
       setLoading(true);
-      console.log('[WriteReviews] Starting to load data...');
+      const currentOffset = resetOffset ? 0 : offset;
+      console.log('[WriteReviews] Starting to load data... offset:', currentOffset);
 
       // 초고속 API 사용 - 단일 쿼리로 애니+캐릭터 모두 가져오기 (0.1초 목표)
-      const data = await ratingPageService.getItemsForReviews(50);
+      const data = await ratingPageService.getItemsForReviews(50, currentOffset);
       console.log('[WriteReviews] API response:', data);
       console.log('[WriteReviews] Items count:', data?.items?.length || 0);
 
@@ -95,7 +165,17 @@ export default function WriteReviews() {
       console.log('[WriteReviews] Processed items:', items.length);
 
       // 이미 백엔드에서 정렬되어 옴 (popularity + 랜덤성)
-      setAllItems(items);
+      if (resetOffset) {
+        setAllItems(items);
+        setOffset(50);
+      } else {
+        setAllItems(prev => [...prev, ...items]);
+        setOffset(prev => prev + items.length);
+      }
+
+      // Check if there are more items
+      setHasMore(items.length === 50);
+
       setReviewsLoading(false);
       setLoading(false);
       console.log('[WriteReviews] Data loading complete');
@@ -628,7 +708,23 @@ export default function WriteReviews() {
               </div>
             );
           })}
-          {filteredItems.length === 0 && (
+
+          {/* Loading more indicator */}
+          {loadingMore && (
+            <div className="text-center py-8">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              <p className="text-gray-500 mt-2">더 불러오는 중...</p>
+            </div>
+          )}
+
+          {/* No more items */}
+          {!hasMore && filteredItems.length > 0 && (
+            <div className="text-center py-8 text-gray-500">
+              모든 항목을 불러왔습니다
+            </div>
+          )}
+
+          {filteredItems.length === 0 && !loading && (
             <div className="text-center py-16">
               <p className="text-gray-600">
                 {filter === 'all'
