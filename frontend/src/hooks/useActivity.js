@@ -279,27 +279,36 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
   }, [filters, page, pageSize, initialLoading, loadingMore, hasMore]);
 
   const reset = useCallback(() => {
+    console.log('[useActivityPagination] Resetting pagination');
     setPage(0);
     setAllActivities([]);
     setHasMore(true);
+    setInitialLoading(false);
+    setLoadingMore(false);
   }, []);
 
   useEffect(() => {
+    console.log('[useActivityPagination] Filters changed, resetting');
     reset();
-  }, [JSON.stringify(filters)]);
+  }, [JSON.stringify(filters), reset]);
 
+  // Auto-load first page when page is reset to 0
   useEffect(() => {
-    if (page === 0) {
+    if (page === 0 && allActivities.length === 0 && hasMore && !initialLoading && !loadingMore) {
+      console.log('[useActivityPagination] Auto-loading first page');
       loadMore(false);
-    } else if (page === 1) {
-      // Auto-load second batch silently immediately after first batch
+    }
+  }, [page, allActivities.length, hasMore, initialLoading, loadingMore]);
+
+  // Auto-load second batch silently after first batch loads
+  useEffect(() => {
+    if (page === 1 && hasMore && !initialLoading && !loadingMore) {
+      console.log('[useActivityPagination] Auto-loading second page silently');
       setTimeout(() => {
-        if (hasMore && !initialLoading && !loadingMore) {
-          loadMore(true); // Silent load
-        }
+        loadMore(true); // Silent load
       }, 100);
     }
-  }, [page]);
+  }, [page, hasMore, initialLoading, loadingMore]);
 
   return {
     activities: allActivities,
