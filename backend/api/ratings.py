@@ -44,7 +44,7 @@ def create_rating(
 @router.get("/me/all")
 def get_all_my_ratings(
     rating: Optional[float] = Query(None, description="특정 평점 필터 (예: 5.0, 4.5)"),
-    status: Optional[str] = Query(None, description="상태 필터 (RATED, WANT_TO_WATCH, PASS)"),
+    status_param: Optional[str] = Query(None, alias="status", description="상태 필터 (RATED, WANT_TO_WATCH, PASS)"),
     current_user: UserResponse = Depends(get_current_user)
 ):
     """
@@ -67,7 +67,16 @@ def get_all_my_ratings(
             "average_rating": 0.0
         }
     """
-    return get_all_user_ratings(current_user.id, rating_filter=rating, status_filter=status)
+    try:
+        return get_all_user_ratings(current_user.id, rating_filter=rating, status_filter=status_param)
+    except Exception as e:
+        import traceback
+        print(f"ERROR in get_all_my_ratings: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get ratings: {str(e)}"
+        )
 
 
 @router.get("/me", response_model=UserRatingListResponse)

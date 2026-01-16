@@ -70,7 +70,7 @@ def create_rating(
 @router.get("/me/all")
 def get_all_my_ratings(
     rating: Optional[float] = Query(None, description="특정 평점 필터 (예: 5.0, 4.5)"),
-    status: Optional[str] = Query(None, description="상태 필터 (RATED, WANT_TO_KNOW, NOT_INTERESTED)"),
+    status_param: Optional[str] = Query(None, alias="status", description="상태 필터 (RATED, WANT_TO_KNOW, NOT_INTERESTED)"),
     current_user: UserResponse = Depends(get_current_user)
 ):
     """
@@ -94,7 +94,7 @@ def get_all_my_ratings(
         }
     """
     try:
-        return get_all_user_character_ratings(current_user.id, rating_filter=rating, status_filter=status)
+        return get_all_user_character_ratings(current_user.id, rating_filter=rating, status_filter=status_param)
     except Exception as e:
         import traceback
         print(f"ERROR in get_all_my_ratings: {str(e)}")
@@ -107,7 +107,7 @@ def get_all_my_ratings(
 
 @router.get("/me")
 def get_my_ratings(
-    status: Optional[str] = Query(None, description="상태 필터 (RATED, WANT_TO_KNOW, NOT_INTERESTED)"),
+    status_param: Optional[str] = Query(None, alias="status", description="상태 필터 (RATED, WANT_TO_KNOW, NOT_INTERESTED)"),
     without_review: bool = Query(False, description="리뷰 없는 평점만 조회"),
     limit: Optional[int] = Query(None, ge=1, le=1000, description="최대 개수"),
     current_user: UserResponse = Depends(get_current_user)
@@ -119,7 +119,7 @@ def get_my_ratings(
     - without_review: True일 경우 리뷰가 없는 평점만 조회
     - limit: 최대 개수
     """
-    return get_user_character_ratings(current_user.id, status, limit, without_review)
+    return get_user_character_ratings(current_user.id, status_param, limit, without_review)
 
 
 @router.get("/character/{character_id}")
@@ -180,7 +180,7 @@ def get_all_user_ratings_by_id(
 @router.get("/user/{user_id}")
 def get_user_ratings_by_id(
     user_id: int,
-    status: Optional[str] = Query(None, description="상태 필터"),
+    status_param: Optional[str] = Query(None, alias="status", description="상태 필터"),
     limit: Optional[int] = Query(None, ge=1, le=1000, description="최대 개수")
 ):
     """
@@ -189,4 +189,4 @@ def get_user_ratings_by_id(
     - status: RATED, WANT_TO_KNOW, NOT_INTERESTED
     - limit: 최대 개수
     """
-    return get_user_character_ratings(user_id, status, limit)
+    return get_user_character_ratings(user_id, status_param, limit)
