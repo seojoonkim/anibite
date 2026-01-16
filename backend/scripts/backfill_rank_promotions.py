@@ -99,13 +99,32 @@ def backfill_rank_promotions():
 
             print(f"\n처리 중: {display_name or username} (ID: {user_id})")
 
-            # Get all activities for this user in chronological order
+            # Get all activities from source tables in chronological order
             activities = cursor.execute("""
-                SELECT activity_time, activity_type
-                FROM activities
-                WHERE user_id = ? AND activity_type IN ('anime_rating', 'anime_review', 'character_rating', 'character_review')
+                SELECT 'anime_rating' as activity_type, updated_at as activity_time
+                FROM user_ratings
+                WHERE user_id = ? AND status = 'RATED' AND rating IS NOT NULL
+
+                UNION ALL
+
+                SELECT 'anime_review' as activity_type, created_at as activity_time
+                FROM user_reviews
+                WHERE user_id = ?
+
+                UNION ALL
+
+                SELECT 'character_rating' as activity_type, updated_at as activity_time
+                FROM character_ratings
+                WHERE user_id = ? AND rating IS NOT NULL
+
+                UNION ALL
+
+                SELECT 'character_review' as activity_type, created_at as activity_time
+                FROM character_reviews
+                WHERE user_id = ?
+
                 ORDER BY activity_time ASC
-            """, (user_id,)).fetchall()
+            """, (user_id, user_id, user_id, user_id)).fetchall()
 
             # Calculate otaku_score at each point in time
             anime_ratings_count = 0
