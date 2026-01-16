@@ -253,6 +253,13 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
   const loadMore = useCallback(async (silent = false) => {
     if (initialLoading || loadingMore || !hasMore) return;
 
+    console.log('[useActivityPagination] loadMore called:', {
+      page,
+      silent,
+      filters,
+      currentActivitiesCount: allActivities.length
+    });
+
     // Only show loading indicator for initial load
     if (page === 0) {
       setInitialLoading(true);
@@ -265,6 +272,16 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
         ...filters,
         limit: pageSize,
         offset: page * pageSize
+      });
+
+      console.log('[useActivityPagination] loadMore received data:', {
+        itemsCount: data.items.length,
+        newTotal: [...allActivities, ...data.items].length,
+        firstItem: data.items[0] ? {
+          id: data.items[0].id,
+          username: data.items[0].username,
+          type: data.items[0].activity_type
+        } : null
       });
 
       setAllActivities(prev => [...prev, ...data.items]);

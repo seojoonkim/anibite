@@ -70,7 +70,10 @@ export default function Feed() {
 
   // Reset activities when filter changes
   useEffect(() => {
-    console.log(`[Feed] Filter changed to: ${feedFilter}`);
+    console.log(`[Feed] Filter changed to: ${feedFilter}`, {
+      currentActivitiesLength: activities.length,
+      followingOnly: feedFilter === 'following'
+    });
     resetActivities();
   }, [feedFilter, resetActivities]);
 
@@ -207,14 +210,6 @@ export default function Feed() {
       await userPostService.createPost(newPostContent.trim());
       setNewPostContent('');
 
-      // Clear cache on new post
-      try {
-        sessionStorage.removeItem(`feed_cache_${feedFilter}`);
-        setCachedActivities(null);
-      } catch (err) {
-        console.error('Failed to clear cache:', err);
-      }
-
       resetActivities();
     } catch (err) {
       console.error('Failed to create post:', err);
@@ -280,6 +275,14 @@ export default function Feed() {
     }
 
     // No more cache - just return activities directly
+    console.log(`[Feed] Returning activities for filter=${feedFilter}:`, {
+      count: activities.length,
+      firstActivity: activities[0] ? {
+        id: activities[0].id,
+        username: activities[0].username,
+        type: activities[0].activity_type
+      } : null
+    });
     return activities;
   };
 
@@ -366,14 +369,6 @@ export default function Feed() {
         }
       }
 
-      // Clear cache on edit
-      try {
-        sessionStorage.removeItem(`feed_cache_${feedFilter}`);
-        setCachedActivities(null);
-      } catch (err) {
-        console.error('Failed to clear cache:', err);
-      }
-
       // Refresh activities: reset and reload
       resetActivities();
       // Wait a bit for reset to complete, then reload
@@ -428,14 +423,6 @@ export default function Feed() {
 
       setShowDeleteModal(false);
       setActivityToDelete(null);
-
-      // Clear cache on delete
-      try {
-        sessionStorage.removeItem(`feed_cache_${feedFilter}`);
-        setCachedActivities(null);
-      } catch (err) {
-        console.error('Failed to clear cache:', err);
-      }
 
       // Refresh activities: reset and reload
       resetActivities();
