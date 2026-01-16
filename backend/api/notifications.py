@@ -381,7 +381,9 @@ async def get_notifications(
 
     except Exception as e:
         print(f"Error fetching notifications: {e}")
-        raise HTTPException(status_code=500, detail="Failed to fetch notifications")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Failed to fetch notifications: {str(e)}")
 
 
 @router.get("/unread-count")
