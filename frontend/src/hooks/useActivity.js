@@ -312,12 +312,16 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
     }
   }, [page, pageSize, initialLoading, loadingMore, hasMore, filters]);
 
-  // Refs for preventing duplicate loads
+  // Refs for preventing duplicate loads and tracking reset state
   const firstLoadRef = useRef(false);
   const secondLoadRef = useRef(0);
+  const isResettingRef = useRef(false);
 
   const reset = useCallback(() => {
     console.log('[useActivityPagination] Resetting pagination');
+    // Set resetting flag IMMEDIATELY (synchronous)
+    isResettingRef.current = true;
+
     // Clear states
     setPage(0);
     setAllActivities([]);
@@ -354,6 +358,8 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
     if (page === 0 && allActivities.length === 0 && hasMore && !initialLoading && !loadingMore && !firstLoadRef.current) {
       console.log('[useActivityPagination] Auto-loading first page');
       firstLoadRef.current = true;
+      // Clear resetting flag when loading starts
+      isResettingRef.current = false;
       loadMore(false);
     }
   }, [page, allActivities.length, hasMore, initialLoading, loadingMore, loadMore]);
@@ -370,8 +376,8 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
   }, [page, hasMore, initialLoading, loadingMore, loadMore]);
 
   return {
-    activities: allActivities,
-    loading: initialLoading, // Only true during initial load
+    activities: isResettingRef.current ? [] : allActivities,
+    loading: initialLoading || isResettingRef.current, // Show loading during reset
     loadingMore,
     hasMore,
     loadMore,
