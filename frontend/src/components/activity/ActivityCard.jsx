@@ -577,13 +577,13 @@ const ActivityCard = forwardRef(({
               >
                 {language === 'ko' ? (
                   activity.activity_type === 'character_rating' ? (
-                    // 캐릭터: 한국어 이름 + 줄바꿈 + 영어 이름 작게
-                    <span className="flex flex-col">
-                      <span>{activity.item_title_korean || activity.item_title}</span>
+                    // 캐릭터: 한국어 이름 + 영어 이름 작게 (줄바꿈 없이)
+                    <>
+                      {activity.item_title_korean || activity.item_title}
                       {activity.item_title_korean && activity.item_title && (
-                        <span className="text-xs text-gray-400 font-normal">{activity.item_title}</span>
+                        <span className="text-xs text-gray-400 font-normal ml-1">{activity.item_title}</span>
                       )}
-                    </span>
+                    </>
                   ) : (
                     // 애니메이션: 기존 방식
                     <>
