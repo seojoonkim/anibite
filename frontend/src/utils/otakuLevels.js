@@ -3,6 +3,7 @@
 export const levels = [
   {
     name: '루키',
+    nameEn: 'Rookie',
     threshold: 0,
     max: 49,
     icon: '◆', // 다이아몬드
@@ -14,6 +15,7 @@ export const levels = [
   },
   {
     name: '헌터',
+    nameEn: 'Hunter',
     threshold: 50,
     max: 119,
     icon: '▲', // 삼각형
@@ -25,6 +27,7 @@ export const levels = [
   },
   {
     name: '워리어',
+    nameEn: 'Warrior',
     threshold: 120,
     max: 219,
     icon: '✦', // 별
@@ -36,6 +39,7 @@ export const levels = [
   },
   {
     name: '나이트',
+    nameEn: 'Knight',
     threshold: 220,
     max: 349,
     icon: '◈', // 다이아몬드 변형
@@ -47,6 +51,7 @@ export const levels = [
   },
   {
     name: '마스터',
+    nameEn: 'Master',
     threshold: 350,
     max: 549,
     icon: '★', // 별
@@ -58,6 +63,7 @@ export const levels = [
   },
   {
     name: '하이마스터',
+    nameEn: 'High Master',
     threshold: 550,
     max: 799,
     icon: '✧', // 반짝이는 별
@@ -69,6 +75,7 @@ export const levels = [
   },
   {
     name: '그랜드마스터',
+    nameEn: 'Grand Master',
     threshold: 800,
     max: 1099,
     icon: '♔', // 왕관
@@ -80,6 +87,7 @@ export const levels = [
   },
   {
     name: '오타쿠',
+    nameEn: 'Otaku',
     threshold: 1100,
     max: 1449,
     icon: '◉', // 원
@@ -91,6 +99,7 @@ export const levels = [
   },
   {
     name: '오타쿠 킹',
+    nameEn: 'Otaku King',
     threshold: 1450,
     max: 1799,
     icon: '♕', // 왕관 (채워진)
@@ -102,6 +111,7 @@ export const levels = [
   },
   {
     name: '오타쿠 갓',
+    nameEn: 'Otaku God',
     threshold: 1800,
     max: Infinity,
     icon: '◆', // 다이아몬드 (최고 레벨)
