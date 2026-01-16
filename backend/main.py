@@ -35,6 +35,17 @@ async def startup_event():
         import traceback
         traceback.print_exc()
 
+    # Sync Korean character names
+    print("[Startup] Syncing Korean character names...")
+    try:
+        from scripts.sync_korean_names import sync_korean_names
+        sync_korean_names()
+        print("[Startup] ✓ Korean names sync complete")
+    except Exception as e:
+        print(f"[Startup] ⚠️  Korean names sync failed: {e}")
+        import traceback
+        traceback.print_exc()
+
     # Create bookmarks table
     print("[Startup] Creating bookmarks table...")
     try:
