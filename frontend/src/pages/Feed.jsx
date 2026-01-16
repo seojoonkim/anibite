@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -42,6 +42,11 @@ export default function Feed() {
 
   // Cache removed - was causing inconsistent data on tab switching
 
+  // Memoize filters to prevent unnecessary re-renders
+  const paginationFilters = useMemo(() => ({
+    followingOnly: feedFilter === 'following'
+  }), [feedFilter]);
+
   // Use pagination hook for infinite scroll
   const {
     activities,
@@ -50,12 +55,7 @@ export default function Feed() {
     hasMore,
     loadMore,
     reset: resetActivities
-  } = useActivityPagination(
-    {
-      followingOnly: feedFilter === 'following'
-    },
-    10
-  );
+  } = useActivityPagination(paginationFilters, 10);
 
   // Cache disabled - was causing inconsistent data on tab switching
   // Clear any existing cache on mount

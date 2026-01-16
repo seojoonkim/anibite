@@ -251,13 +251,17 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
   const [loadingMore, setLoadingMore] = useState(false);
 
   const loadMore = useCallback(async (silent = false) => {
-    if (initialLoading || loadingMore || !hasMore) return;
+    if (initialLoading || loadingMore || !hasMore) {
+      console.log('[useActivityPagination] loadMore skipped:', { initialLoading, loadingMore, hasMore });
+      return;
+    }
 
     console.log('[useActivityPagination] loadMore called:', {
       page,
       silent,
       filters,
-      currentActivitiesCount: allActivities.length
+      pageSize,
+      offset: page * pageSize
     });
 
     // Only show loading indicator for initial load
@@ -276,7 +280,6 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
 
       console.log('[useActivityPagination] loadMore received data:', {
         itemsCount: data.items.length,
-        newTotal: [...allActivities, ...data.items].length,
         firstItem: data.items[0] ? {
           id: data.items[0].id,
           username: data.items[0].username,
@@ -284,7 +287,21 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
         } : null
       });
 
-      setAllActivities(prev => [...prev, ...data.items]);
+      setAllActivities(prev => {
+        // CRITICAL FIX: If offset is 0 (first page), ignore prev to avoid stale data
+        const isFirstPage = (page * pageSize) === 0;
+        const base = isFirstPage ? [] : prev;
+        const newActivities = [...base, ...data.items];
+
+        console.log('[useActivityPagination] Updated allActivities:', {
+          isFirstPage,
+          prevLength: prev.length,
+          baseLength: base.length,
+          newLength: newActivities.length,
+          addedCount: data.items.length
+        });
+        return newActivities;
+      });
       setHasMore(data.items.length === pageSize);
       setPage(prev => prev + 1);
     } catch (err) {
@@ -293,7 +310,7 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
       setInitialLoading(false);
       setLoadingMore(false);
     }
-  }, [page, pageSize, initialLoading, loadingMore, hasMore, JSON.stringify(filters)]);
+  }, [page, pageSize, initialLoading, loadingMore, hasMore, filters]);
 
   // Refs for preventing duplicate loads
   const firstLoadRef = useRef(false);
@@ -310,10 +327,25 @@ export function useActivityPagination(filters = {}, pageSize = 50) {
     secondLoadRef.current = 0;
   }, []);
 
+  // Reset when any filter value actually changes
+  const filtersRef = useRef(filters);
   useEffect(() => {
-    console.log('[useActivityPagination] Filters changed, resetting');
-    reset();
-  }, [JSON.stringify(filters), reset]);
+    const prevFilters = filtersRef.current;
+    const hasChanged =
+      prevFilters.followingOnly !== filters.followingOnly ||
+      prevFilters.activityType !== filters.activityType ||
+      prevFilters.userId !== filters.userId ||
+      prevFilters.itemId !== filters.itemId;
+
+    if (hasChanged) {
+      console.log('[useActivityPagination] Filters changed, resetting', {
+        from: prevFilters,
+        to: filters
+      });
+      filtersRef.current = filters;
+      reset();
+    }
+  }, [filters, reset]);
 
   // Auto-load first page when page is reset to 0
   useEffect(() => {
