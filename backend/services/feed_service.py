@@ -238,7 +238,11 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
             LEFT JOIN user_stats us ON a.user_id = us.user_id
             WHERE a.activity_type = 'rank_promotion' AND a.user_id IN ({placeholders})
         )
-        ORDER BY activity_time DESC
+        ORDER BY activity_time DESC,
+                 CASE activity_type
+                     WHEN 'rank_promotion' THEN 1
+                     ELSE 0
+                 END ASC
         LIMIT ? OFFSET ?
         """,
         (*following_id_list, *following_id_list, *following_id_list, *following_id_list, *following_id_list, *following_id_list, limit, offset)
@@ -289,7 +293,11 @@ def get_global_feed(limit: int = 50, offset: int = 0) -> List[Dict]:
             0 as comments_count,
             metadata
         FROM activities
-        ORDER BY activity_time DESC
+        ORDER BY activity_time DESC,
+                 CASE activity_type
+                     WHEN 'rank_promotion' THEN 1
+                     ELSE 0
+                 END ASC
         LIMIT ? OFFSET ?
         """,
         (limit, offset)
@@ -446,7 +454,11 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
         FROM activities a
         LEFT JOIN user_stats us ON a.user_id = us.user_id
         WHERE a.user_id = ?
-        ORDER BY a.activity_time DESC
+        ORDER BY a.activity_time DESC,
+                 CASE a.activity_type
+                     WHEN 'rank_promotion' THEN 1
+                     ELSE 0
+                 END ASC
         LIMIT ? OFFSET ?
         """,
         (user_id, limit, offset)

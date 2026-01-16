@@ -4,6 +4,7 @@
  */
 import { createContext, useState, useContext, useEffect } from 'react';
 import { authService } from '../services/authService';
+import { bookmarkService } from '../services/bookmarkService';
 import { API_BASE_URL } from '../config/api';
 
 const AuthContext = createContext(null);
@@ -80,6 +81,22 @@ export const AuthProvider = ({ children }) => {
 
       // Set user
       setUser(data.user);
+
+      // Migrate localStorage bookmarks to server (one-time migration)
+      try {
+        const migrationKey = `bookmarks_migrated_${data.user.id}`;
+        const alreadyMigrated = localStorage.getItem(migrationKey);
+
+        if (!alreadyMigrated) {
+          const result = await bookmarkService.migrateLocalBookmarks();
+          if (result.migrated > 0) {
+            localStorage.setItem(migrationKey, 'true');
+            console.log(`✅ Migrated ${result.migrated} bookmarks`);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to migrate bookmarks:', error);
+      }
 
       return { success: true, user: data.user };
     } catch (error) {

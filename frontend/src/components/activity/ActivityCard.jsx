@@ -24,6 +24,7 @@ import { ratingService } from '../../services/ratingService';
 import { characterService } from '../../services/characterService';
 import { userPostService } from '../../services/userPostService';
 import { activityService } from '../../services/activityService';
+import { bookmarkService } from '../../services/bookmarkService';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL || API_BASE_URL;
@@ -118,11 +119,27 @@ const ActivityCard = forwardRef(({
     }
   }, [activity]);
 
-  // Initialize bookmark state from localStorage
+  // Initialize bookmark state from server
   useEffect(() => {
-    const bookmarks = JSON.parse(localStorage.getItem('anipass_bookmarks') || '[]');
-    setBookmarked(bookmarks.includes(activity.id));
-  }, [activity.id]);
+    const fetchBookmarkStatus = async () => {
+      if (!user) {
+        setBookmarked(false);
+        return;
+      }
+
+      try {
+        const isBookmarked = await bookmarkService.checkBookmark(activity.id);
+        setBookmarked(isBookmarked);
+      } catch (error) {
+        console.error('Failed to check bookmark status:', error);
+        // Fallback to localStorage
+        const bookmarks = JSON.parse(localStorage.getItem('anipass_bookmarks') || '[]');
+        setBookmarked(bookmarks.includes(activity.id));
+      }
+    };
+
+    fetchBookmarkStatus();
+  }, [activity.id, user]);
 
   // Hooks
   const { liked, likesCount, toggleLike } = useActivityLike(
@@ -267,7 +284,7 @@ const ActivityCard = forwardRef(({
     // Don't call onUpdate() - let the hook handle optimistic updates
   };
 
-  const handleBookmarkClick = () => {
+  const handleBookmarkClick = async () => {
     console.log('Bookmark button clicked!', { user, bookmarked, activityId: activity.id });
 
     if (!user) {
@@ -275,21 +292,24 @@ const ActivityCard = forwardRef(({
       return;
     }
 
-    const bookmarks = JSON.parse(localStorage.getItem('anipass_bookmarks') || '[]');
-    console.log('Current bookmarks:', bookmarks);
+    try {
+      if (bookmarked) {
+        // Remove bookmark from server
+        await bookmarkService.removeBookmark(activity.id);
+        setBookmarked(false);
+        console.log('Bookmark removed from server');
+      } else {
+        // Add bookmark to server
+        await bookmarkService.addBookmark(activity.id);
+        setBookmarked(true);
+        console.log('Bookmark added to server');
+      }
+    } catch (error) {
+      console.error('Failed to update bookmark:', error);
+      alert(language === 'ko' ? '북마크 업데이트에 실패했습니다.' : 'Failed to update bookmark.');
 
-    if (bookmarked) {
-      // Remove bookmark
-      const newBookmarks = bookmarks.filter(id => id !== activity.id);
-      localStorage.setItem('anipass_bookmarks', JSON.stringify(newBookmarks));
-      setBookmarked(false);
-      console.log('Bookmark removed. New bookmarks:', newBookmarks);
-    } else {
-      // Add bookmark
-      const newBookmarks = [...bookmarks, activity.id];
-      localStorage.setItem('anipass_bookmarks', JSON.stringify(newBookmarks));
-      setBookmarked(true);
-      console.log('Bookmark added. New bookmarks:', newBookmarks);
+      // Revert state on error
+      setBookmarked(!bookmarked);
     }
   };
 
