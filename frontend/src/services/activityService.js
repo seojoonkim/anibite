@@ -34,7 +34,28 @@ export const activityService = {
     params.append('limit', limit);
     params.append('offset', offset);
 
+    console.log('[activityService] Fetching activities:', {
+      activityType,
+      userId,
+      itemId,
+      followingOnly,
+      limit,
+      offset,
+      url: `/api/activities?${params}`
+    });
+
     const response = await api.get(`/api/activities?${params}`);
+
+    console.log('[activityService] Received activities:', {
+      count: response.data.items?.length || 0,
+      total: response.data.total,
+      firstItem: response.data.items?.[0] ? {
+        id: response.data.items[0].id,
+        username: response.data.items[0].username,
+        type: response.data.items[0].activity_type
+      } : null
+    });
+
     return response.data;
   },
 
