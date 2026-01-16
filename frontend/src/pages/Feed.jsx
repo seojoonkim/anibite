@@ -68,18 +68,23 @@ export default function Feed() {
     }
   }, []);
 
-  // Reset activities when filter changes
+  // Don't auto-reset on filter change - let the hook handle it naturally
+  // This prevents flickering when switching tabs
+
+  // Auto-load more activities for 'saved' filter to ensure bookmarked items are loaded
   useEffect(() => {
-    console.log(`[Feed] Filter changed to: ${feedFilter}`, {
-      currentActivitiesLength: activities.length,
-      followingOnly: feedFilter === 'following'
-    });
-    resetActivities();
-  }, [feedFilter, resetActivities]);
+    if (feedFilter === 'saved' && !loading && !loadingMore && hasMore && activities.length < 100) {
+      // Keep loading until we have at least 100 activities or no more to load
+      const timer = setTimeout(() => {
+        loadMore();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [feedFilter, loading, loadingMore, hasMore, activities.length, loadMore]);
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
-    if (feedFilter === 'notifications') return; // Skip for notifications
+    if (feedFilter === 'notifications' || feedFilter === 'saved') return; // Skip for notifications and saved
 
     const options = {
       root: null,
@@ -651,6 +656,14 @@ export default function Feed() {
                       <div className="text-gray-400 text-sm">
                         {language === 'ko' ? '모든 활동을 불러왔습니다' : 'All activities loaded'}
                       </div>
+                    )}
+                    {feedFilter === 'saved' && !loading && !loadingMore && hasMore && (
+                      <button
+                        onClick={() => loadMore()}
+                        className="px-4 py-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        {language === 'ko' ? '더 불러오기' : 'Load more'}
+                      </button>
                     )}
                   </div>
                 )}
