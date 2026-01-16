@@ -258,7 +258,8 @@ def get_user_activity_feed(
             END as review_id,
             review_content,
             review_content as post_content,
-            0 as comments_count
+            0 as comments_count,
+            metadata
         FROM activities
         WHERE user_id = ?
         ORDER BY activity_time DESC
