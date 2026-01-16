@@ -6,6 +6,46 @@ from typing import List, Dict, Optional
 from database import db, dict_from_row
 
 
+def _get_activity_id(activity_type: str, activity_user_id: int, item_id: int) -> int:
+    """activities 테이블에서 activity_id 찾기"""
+    try:
+        activity = db.execute_query(
+            "SELECT id FROM activities WHERE activity_type = ? AND user_id = ? AND item_id = ?",
+            (activity_type, activity_user_id, item_id),
+            fetch_one=True
+        )
+        return activity['id'] if activity else None
+    except:
+        return None
+
+
+def _create_comment_notification(user_id: int, activity_user_id: int, activity_type: str,
+                                 item_id: int, comment_id: int, content: str):
+    """댓글 알림 생성"""
+    if user_id == activity_user_id:
+        return
+
+    activity_id = _get_activity_id(activity_type, activity_user_id, item_id)
+    if not activity_id:
+        return
+
+    from api.notifications import create_notification
+    create_notification(db, activity_user_id, user_id, 'comment', activity_id, comment_id, content)
+
+
+def _delete_comment_notification(user_id: int, activity_user_id: int, activity_type: str, item_id: int):
+    """댓글 알림 삭제"""
+    if user_id == activity_user_id:
+        return
+
+    activity_id = _get_activity_id(activity_type, activity_user_id, item_id)
+    if not activity_id:
+        return
+
+    from api.notifications import delete_notification_by_action
+    delete_notification_by_action(db, activity_user_id, user_id, 'comment', activity_id)
+
+
 def get_activity_comments(activity_type: str, activity_user_id: int, item_id: int) -> List[Dict]:
     """
     특정 활동에 대한 댓글 목록 조회 (계층 구조 포함)
@@ -279,6 +319,10 @@ def create_activity_comment(
                 fetch_one=True
             )
 
+            # 알림 생성 (최상위 댓글만)
+            if not parent_comment_id:
+                _create_comment_notification(user_id, activity_user_id, activity_type, item_id, comment_id, content)
+
             return dict_from_row(row) if row else None
 
     # 캐릭터 리뷰 또는 평가에 대한 댓글은 review_comments 테이블 사용
@@ -348,6 +392,10 @@ def create_activity_comment(
                 fetch_one=True
             )
 
+            # 알림 생성 (최상위 댓글만)
+            if not parent_comment_id:
+                _create_comment_notification(user_id, activity_user_id, activity_type, item_id, comment_id, content)
+
             return dict_from_row(row) if row else None
 
     # 기타 활동(anime_rating, character_rating 등)은 activity_comments 사용
@@ -395,6 +443,10 @@ def create_activity_comment(
         fetch_one=True
     )
 
+    # 알림 생성 (최상위 댓글만)
+    if not parent_comment_id:
+        _create_comment_notification(user_id, activity_user_id, activity_type, item_id, comment_id, content)
+
     return dict_from_row(row) if row else None
 
 
@@ -404,32 +456,76 @@ def delete_activity_comment(comment_id: int, user_id: int) -> bool:
     review_comments와 activity_comments 모두 확인 및 삭제
     답글(replies)도 함께 삭제
     """
-    # 먼저 review_comments에서 확인
-    review_comment = db.execute_query(
-        "SELECT id, review_id, review_type FROM review_comments WHERE id = ? AND user_id = ?",
-        (comment_id, user_id),
-        fetch_one=True
-    )
-
-    if review_comment:
-        # review_comments에서 삭제 (CASCADE로 대댓글도 자동 삭제)
-        db.execute_update(
-            "DELETE FROM review_comments WHERE id = ? AND user_id = ?",
-            (comment_id, user_id)
-        )
-        return True
-
-    # activity_comments에서 확인 및 삭제
+    # 먼저 activity_comments에서 확인 및 삭제 (알림 삭제를 위해 정보 먼저 가져오기)
     activity_comment = db.execute_query(
-        "SELECT id FROM activity_comments WHERE id = ? AND user_id = ?",
+        "SELECT id, activity_type, activity_user_id, item_id, parent_comment_id FROM activity_comments WHERE id = ? AND user_id = ?",
         (comment_id, user_id),
         fetch_one=True
     )
 
     if activity_comment:
+        # 최상위 댓글인 경우에만 알림 삭제
+        if not activity_comment['parent_comment_id']:
+            _delete_comment_notification(
+                user_id,
+                activity_comment['activity_user_id'],
+                activity_comment['activity_type'],
+                activity_comment['item_id']
+            )
+
         # activity_comments에서 삭제 (CASCADE로 대댓글도 자동 삭제)
         db.execute_update(
             "DELETE FROM activity_comments WHERE id = ? AND user_id = ?",
+            (comment_id, user_id)
+        )
+        return True
+
+    # review_comments에서 확인
+    review_comment = db.execute_query(
+        "SELECT id, review_id, review_type, parent_comment_id FROM review_comments WHERE id = ? AND user_id = ?",
+        (comment_id, user_id),
+        fetch_one=True
+    )
+
+    if review_comment:
+        # 최상위 댓글인 경우에만 알림 삭제 시도
+        # review_comments는 리뷰에 대한 댓글이므로, 리뷰 정보를 통해 activity 찾아야 함
+        if not review_comment['parent_comment_id']:
+            review_id = review_comment['review_id']
+            review_type = review_comment['review_type']
+
+            if review_type == 'anime':
+                # 애니메이션 리뷰에서 정보 가져오기
+                review_info = db.execute_query(
+                    "SELECT user_id, anime_id FROM user_reviews WHERE id = ?",
+                    (review_id,),
+                    fetch_one=True
+                )
+                if review_info:
+                    _delete_comment_notification(
+                        user_id,
+                        review_info['user_id'],
+                        'anime_review',  # 또는 'anime_rating'
+                        review_info['anime_id']
+                    )
+            elif review_type == 'character':
+                # 캐릭터 리뷰에서 정보 가져오기
+                review_info = db.execute_query(
+                    "SELECT user_id, character_id FROM character_reviews WHERE id = ?",
+                    (review_id,),
+                    fetch_one=True
+                )
+                if review_info:
+                    _delete_comment_notification(
+                        user_id,
+                        review_info['user_id'],
+                        'character_review',  # 또는 'character_rating'
+                        review_info['character_id']
+                    )
+
+        # review_comments에서 삭제 (CASCADE로 대댓글도 자동 삭제)
+        db.execute_update(
+            "DELETE FROM review_comments WHERE id = ? AND user_id = ?",
             (comment_id, user_id)
         )
         return True

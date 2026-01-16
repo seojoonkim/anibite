@@ -241,148 +241,111 @@ export function useActivityComments(activityId) {
 }
 
 /**
- * Hook for pagination
+ * Hook for pagination - 단순하고 빠르게
  */
 export function useActivityPagination(filters = {}, pageSize = 50) {
-  const [page, setPage] = useState(0);
   const [allActivities, setAllActivities] = useState([]);
   const [hasMore, setHasMore] = useState(true);
-  const [initialLoading, setInitialLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [nextPage, setNextPage] = useState(2);
 
-  const loadMore = useCallback(async (silent = false) => {
-    if (initialLoading || loadingMore || !hasMore) {
-      console.log('[useActivityPagination] loadMore skipped:', { initialLoading, loadingMore, hasMore });
+  const isResettingRef = useRef(false);
+  const loadingRef = useRef(false);
+  const filtersStringRef = useRef('');
+
+  // 초기 로드 (첫 2페이지를 동시에)
+  const loadInitial = useCallback(async (currentFilters) => {
+    if (loadingRef.current) return;
+
+    console.log('[useActivityPagination] Loading initial pages');
+    loadingRef.current = true;
+    isResettingRef.current = true;
+    setLoading(true);
+    setAllActivities([]);
+
+    try {
+      // 첫 2페이지를 동시에 로드 (속도 향상)
+      const [page1, page2] = await Promise.all([
+        activityService.getActivities({ ...currentFilters, limit: pageSize, offset: 0 }),
+        activityService.getActivities({ ...currentFilters, limit: pageSize, offset: pageSize })
+      ]);
+
+      console.log('[useActivityPagination] Initial load complete:', {
+        page1Count: page1.items.length,
+        page2Count: page2.items.length
+      });
+
+      const allItems = [...page1.items, ...page2.items];
+      setAllActivities(allItems);
+      setHasMore(page2.items.length === pageSize);
+      setNextPage(2);
+      isResettingRef.current = false;
+    } catch (err) {
+      console.error('[useActivityPagination] Initial load failed:', err);
+      setAllActivities([]);
+      setHasMore(false);
+      isResettingRef.current = false;
+    } finally {
+      setLoading(false);
+      loadingRef.current = false;
+    }
+  }, [pageSize]);
+
+  // 추가 페이지 로드
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore || loading) {
+      console.log('[useActivityPagination] loadMore skipped');
       return;
     }
 
-    console.log('[useActivityPagination] loadMore called:', {
-      page,
-      silent,
-      filters,
-      pageSize,
-      offset: page * pageSize
-    });
-
-    // Only show loading indicator for initial load
-    if (page === 0) {
-      setInitialLoading(true);
-    } else if (!silent) {
-      setLoadingMore(true);
-    }
+    console.log('[useActivityPagination] Loading more, page:', nextPage);
+    setLoadingMore(true);
 
     try {
       const data = await activityService.getActivities({
         ...filters,
         limit: pageSize,
-        offset: page * pageSize
+        offset: nextPage * pageSize
       });
 
-      console.log('[useActivityPagination] loadMore received data:', {
-        itemsCount: data.items.length,
-        firstItem: data.items[0] ? {
-          id: data.items[0].id,
-          username: data.items[0].username,
-          type: data.items[0].activity_type
-        } : null
-      });
+      console.log('[useActivityPagination] Loaded page:', nextPage, 'count:', data.items.length);
 
-      setAllActivities(prev => {
-        // CRITICAL FIX: If offset is 0 (first page), ignore prev to avoid stale data
-        const isFirstPage = (page * pageSize) === 0;
-        const base = isFirstPage ? [] : prev;
-        const newActivities = [...base, ...data.items];
-
-        console.log('[useActivityPagination] Updated allActivities:', {
-          isFirstPage,
-          prevLength: prev.length,
-          baseLength: base.length,
-          newLength: newActivities.length,
-          addedCount: data.items.length
-        });
-        return newActivities;
-      });
+      setAllActivities(prev => [...prev, ...data.items]);
       setHasMore(data.items.length === pageSize);
-      setPage(prev => prev + 1);
+      setNextPage(prev => prev + 1);
     } catch (err) {
-      console.error('Failed to load more activities:', err);
+      console.error('[useActivityPagination] loadMore failed:', err);
     } finally {
-      setInitialLoading(false);
       setLoadingMore(false);
     }
-  }, [page, pageSize, initialLoading, loadingMore, hasMore, filters]);
+  }, [loadingMore, hasMore, loading, nextPage, pageSize, filters]);
 
-  // Refs for preventing duplicate loads and tracking reset state
-  const firstLoadRef = useRef(false);
-  const secondLoadRef = useRef(0);
-  const isResettingRef = useRef(false);
-
-  const reset = useCallback(() => {
-    console.log('[useActivityPagination] Resetting pagination');
-    // Set resetting flag IMMEDIATELY (synchronous)
-    isResettingRef.current = true;
-
-    // Clear states
-    setPage(0);
-    setAllActivities([]);
-    setHasMore(true);
-    // CRITICAL: Set initialLoading to true to prevent flicker
-    // This shows loading spinner immediately while new data loads
-    setInitialLoading(true);
-    setLoadingMore(false);
-    // Reset refs to allow new load
-    firstLoadRef.current = false;
-    secondLoadRef.current = 0;
-  }, []);
-
-  // Reset when any filter value actually changes
-  const filtersRef = useRef(filters);
+  // 필터 변경 감지 및 리로드
   useEffect(() => {
-    const prevFilters = filtersRef.current;
-    const hasChanged =
-      prevFilters.followingOnly !== filters.followingOnly ||
-      prevFilters.activityType !== filters.activityType ||
-      prevFilters.userId !== filters.userId ||
-      prevFilters.itemId !== filters.itemId;
+    const newFiltersString = JSON.stringify(filters);
 
-    if (hasChanged) {
-      console.log('[useActivityPagination] Filters changed, resetting', {
-        from: prevFilters,
-        to: filters
-      });
-      filtersRef.current = filters;
-      reset();
+    if (newFiltersString !== filtersStringRef.current) {
+      console.log('[useActivityPagination] Filters changed');
+      filtersStringRef.current = newFiltersString;
+      loadInitial(filters);
     }
-  }, [filters, reset]);
+  }, [filters, loadInitial]);
 
-  // Auto-load first page when page is reset to 0
+  // 컴포넌트 마운트 시 초기 로드
   useEffect(() => {
-    if (page === 0 && allActivities.length === 0 && hasMore && !initialLoading && !loadingMore && !firstLoadRef.current) {
-      console.log('[useActivityPagination] Auto-loading first page');
-      firstLoadRef.current = true;
-      // Clear resetting flag when loading starts
-      isResettingRef.current = false;
-      loadMore(false);
+    if (filtersStringRef.current === '') {
+      console.log('[useActivityPagination] Initial mount');
+      filtersStringRef.current = JSON.stringify(filters);
+      loadInitial(filters);
     }
-  }, [page, allActivities.length, hasMore, initialLoading, loadingMore, loadMore]);
-
-  // Auto-load second batch silently after first batch loads
-  useEffect(() => {
-    if (page === 1 && hasMore && !initialLoading && !loadingMore && secondLoadRef.current !== page) {
-      console.log('[useActivityPagination] Auto-loading second page silently');
-      secondLoadRef.current = page;
-      setTimeout(() => {
-        loadMore(true); // Silent load
-      }, 100);
-    }
-  }, [page, hasMore, initialLoading, loadingMore, loadMore]);
+  }, []); // 빈 배열 - 마운트 시 한 번만
 
   return {
     activities: isResettingRef.current ? [] : allActivities,
-    loading: initialLoading || isResettingRef.current, // Show loading during reset
+    loading: loading || isResettingRef.current,
     loadingMore,
     hasMore,
-    loadMore,
-    reset
+    loadMore
   };
 }
