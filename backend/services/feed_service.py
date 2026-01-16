@@ -31,6 +31,7 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
         SELECT * FROM (
             -- 애니메이션 평가 활동
             SELECT
+                NULL as id,
                 'anime_rating' as activity_type,
                 ur.user_id,
                 u.username,
@@ -64,6 +65,7 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
 
             -- 캐릭터 평가 활동 (LEFT JOIN으로 최적화)
             SELECT
+                NULL as id,
                 'character_rating' as activity_type,
                 cr.user_id,
                 u.username,
@@ -103,6 +105,7 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
 
             -- 캐릭터 리뷰 (평점 없이)
             SELECT
+                NULL as id,
                 'character_review' as activity_type,
                 cr.user_id,
                 u.username,
@@ -146,6 +149,7 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
 
             -- 애니 리뷰 (평점 없이)
             SELECT
+                NULL as id,
                 'anime_review' as activity_type,
                 r.user_id,
                 u.username,
@@ -184,6 +188,7 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
 
             -- 사용자 게시글
             SELECT
+                NULL as id,
                 'user_post' as activity_type,
                 up.user_id,
                 u.username,
@@ -214,6 +219,7 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
 
             -- 랭크 프로모션
             SELECT
+                a.id,
                 a.activity_type,
                 a.user_id,
                 a.username,
@@ -269,6 +275,7 @@ def get_global_feed(limit: int = 50, offset: int = 0) -> List[Dict]:
     rows = db.execute_query(
         """
         SELECT
+            id,
             activity_type,
             user_id,
             username,
@@ -389,6 +396,7 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
     recent_promotions = db.execute_query(
         """
         SELECT
+            a.id,
             a.activity_type,
             a.user_id,
             a.username,
@@ -428,6 +436,7 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
     rows = db.execute_query(
         """
         SELECT
+            a.id,
             a.activity_type,
             a.user_id,
             a.username,
