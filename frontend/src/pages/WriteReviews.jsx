@@ -82,6 +82,7 @@ export default function WriteReviews() {
           ...(item.type === 'character' ? {
             character_id: item.item_id,
             character_name: item.item_title,
+            character_name_korean: item.item_title_korean, // Korean name
             character_name_native: item.item_title_korean,
             character_image: item.item_image,
             anime_id: item.anime_id,
@@ -144,7 +145,8 @@ export default function WriteReviews() {
           ...(item.type === 'character' ? {
             character_id: item.item_id,
             character_name: item.item_title, // English name
-            character_name_native: item.item_title_korean, // Native name
+            character_name_korean: item.item_title_korean, // Korean name (from name_korean)
+            character_name_native: item.item_title_korean, // Fallback for native name
             character_image: item.item_image,
             anime_id: item.anime_id,
             anime_title_korean: item.anime_title_korean,
@@ -598,12 +600,12 @@ export default function WriteReviews() {
                             )
                           ) : (
                             language === 'ko' ? (
-                              <>
-                                {item.character_name_native || item.character_name}
-                                {item.character_name_native && item.character_name && (
-                                  <span className="text-gray-500"> ({item.character_name})</span>
+                              <span className="flex flex-col">
+                                <span>{item.character_name_korean || item.character_name_native || item.character_name}</span>
+                                {(item.character_name_korean || item.character_name_native) && item.character_name && (
+                                  <span className="text-xs text-gray-400 font-normal">{item.character_name}</span>
                                 )}
-                              </>
+                              </span>
                             ) : (
                               item.character_name || item.character_name_native
                             )
