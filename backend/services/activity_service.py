@@ -53,9 +53,10 @@ def get_activities(
         where_clauses.append("""
             a.user_id IN (
                 SELECT following_id FROM user_follows
-                WHERE follower_id = ?
+                WHERE follower_id = ? AND following_id != ?
             )
         """)
+        params.append(current_user_id)
         params.append(current_user_id)
 
     where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
