@@ -1406,6 +1406,66 @@ def check_korean_names():
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
 
 
+@router.get("/patch-korean-names-from-json")
+def patch_korean_names_from_json():
+    """
+    Patch Korean names from JSON file (GET endpoint for easy execution)
+    JSON 파일에서 한국어 이름 패치 (GET 엔드포인트로 간단히 실행)
+    """
+    import json
+    from pathlib import Path
+
+    try:
+        # JSON 파일 경로
+        json_file = Path(__file__).parent.parent / "scripts" / "korean_names_patch.json"
+
+        if not json_file.exists():
+            raise HTTPException(status_code=404, detail=f"JSON file not found: {json_file}")
+
+        # Load names
+        with open(json_file, "r", encoding="utf-8") as f:
+            names_dict = json.load(f)
+
+        # Patch
+        updated = 0
+        failed = []
+
+        for char_id, korean_name in names_dict.items():
+            try:
+                result = db.execute_update(
+                    "UPDATE character SET name_korean = ? WHERE id = ?",
+                    (korean_name, int(char_id))
+                )
+                if result > 0:
+                    updated += 1
+            except Exception as e:
+                failed.append({"id": char_id, "error": str(e)})
+
+        # Update activities table
+        db.execute_update("""
+            UPDATE activities
+            SET item_title_korean = (
+                SELECT c.name_korean
+                FROM character c
+                WHERE c.id = activities.item_id
+            )
+            WHERE activity_type IN ('character_rating', 'character_review')
+            AND item_id IS NOT NULL
+        """)
+
+        return {
+            "success": True,
+            "total_names": len(names_dict),
+            "updated": updated,
+            "failed": failed[:10],  # 처음 10개만
+            "failed_count": len(failed)
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
+
+
 @router.get("/check-bookmarks-table")
 def check_bookmarks_table():
     """
