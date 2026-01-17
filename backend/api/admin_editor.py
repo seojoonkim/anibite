@@ -52,7 +52,8 @@ def search_content(
         anime_query = """
             SELECT
                 id, title_korean, title_romaji, title_english, title_native,
-                cover_image, format, episodes, status, season_year
+                COALESCE(cover_image_local, cover_image_url) as cover_image,
+                format, episodes, status, season_year
             FROM anime
             WHERE title_korean LIKE ?
                OR title_romaji LIKE ?
@@ -88,7 +89,8 @@ def search_content(
         char_query = """
             SELECT
                 c.id, c.name_korean, c.name_full, c.name_native,
-                c.image_large, c.favourites,
+                COALESCE(c.image_local, c.image_url) as image_large,
+                c.favourites,
                 a.id as anime_id, a.title_korean as anime_title
             FROM character c
             LEFT JOIN anime_character ac ON c.id = ac.character_id
@@ -132,7 +134,9 @@ def get_anime_detail(
     query = """
         SELECT
             id, title_korean, title_romaji, title_english, title_native,
-            cover_image, cover_image_large, banner_image,
+            COALESCE(cover_image_local, cover_image_url) as cover_image,
+            COALESCE(cover_image_url, cover_image_local) as cover_image_large,
+            banner_image_url as banner_image,
             format, episodes, status, season, season_year,
             description, average_score, popularity
         FROM anime
@@ -209,7 +213,8 @@ def get_character_detail(
     query = """
         SELECT
             id, name_korean, name_full, name_native, name_alternative,
-            image_medium, image_large,
+            COALESCE(image_local, image_url) as image_medium,
+            COALESCE(image_url, image_local) as image_large,
             gender, age, description, favourites
         FROM character
         WHERE id = ?
