@@ -1187,3 +1187,72 @@ def debug_rank_promotions():
             "error": str(e),
             "traceback": traceback.format_exc()
         }
+
+
+@router.get("/check-bookmarks-table")
+def check_bookmarks_table():
+    """
+    Check if activity_bookmarks table exists and has data
+    """
+    try:
+        # Check if table exists
+        tables = db.execute_query("""
+            SELECT name FROM sqlite_master
+            WHERE type='table' AND name='activity_bookmarks'
+        """)
+
+        table_exists = len(tables) > 0
+
+        if not table_exists:
+            return {
+                "table_exists": False,
+                "message": "activity_bookmarks table does not exist"
+            }
+
+        # Get table schema
+        schema = db.execute_query("PRAGMA table_info(activity_bookmarks)")
+
+        # Get total count
+        count_row = db.execute_query(
+            "SELECT COUNT(*) as count FROM activity_bookmarks",
+            fetch_one=True
+        )
+        total = count_row['count'] if count_row else 0
+
+        # Get sample data
+        samples = db.execute_query("""
+            SELECT user_id, activity_id, created_at
+            FROM activity_bookmarks
+            ORDER BY created_at DESC
+            LIMIT 10
+        """)
+
+        # Get count by user
+        by_user = db.execute_query("""
+            SELECT user_id, COUNT(*) as count
+            FROM activity_bookmarks
+            GROUP BY user_id
+            ORDER BY count DESC
+        """)
+
+        return {
+            "table_exists": True,
+            "total_bookmarks": total,
+            "columns": [{"name": col['name'], "type": col['type']} for col in schema],
+            "bookmarks_by_user": [{"user_id": row[0], "count": row[1]} for row in by_user],
+            "sample_bookmarks": [
+                {
+                    "user_id": row[0],
+                    "activity_id": row[1],
+                    "created_at": row[2]
+                }
+                for row in samples
+            ]
+        }
+
+    except Exception as e:
+        import traceback
+        return {
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
