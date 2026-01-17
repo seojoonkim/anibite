@@ -385,11 +385,6 @@ export default function MyAniPass() {
 
   const loadData = useCallback(async (forceRefresh = false) => {
     try {
-      // 다른 사용자의 프로필을 볼 때는 anipass 탭은 표시 안함
-      if (!isOwnProfile && activeTab === 'anipass') {
-        return;
-      }
-
       // 이미 로드한 탭이면 스킵 (anime, character, anipass 캐싱)
       // forceRefresh가 true면 캐시 무시
       if (!forceRefresh && loadedTabs[activeTab] && (activeTab === 'anime' || activeTab === 'character' || activeTab === 'anipass')) {
