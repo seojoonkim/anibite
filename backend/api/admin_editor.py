@@ -125,6 +125,10 @@ def search_content(
             for row in char_results
         ]
 
+        # Debug: Log search results
+        for char in results["characters"]:
+            print(f"[Search] Character {char['id']}: image_large = {char['image_large']}")
+
     return results
 
 
@@ -299,7 +303,18 @@ def update_character(
         WHERE id = ?
     """
 
+    print(f"[Admin Editor] SQL query: {query}")
+    print(f"[Admin Editor] SQL values: {values}")
+
     db.execute_update(query, tuple(values))
+
+    # Verify update
+    verify_result = db.execute_query(
+        "SELECT image_url, image_local FROM character WHERE id = ?",
+        (character_id,)
+    )
+    if verify_result:
+        print(f"[Admin Editor] After update - image_url: {verify_result[0][0]}, image_local: {verify_result[0][1]}")
 
     # activities 테이블도 업데이트 (캐릭터 이름 변경 시)
     if "name_korean" in updates:
