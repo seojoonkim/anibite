@@ -8,7 +8,7 @@ import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 export default function Settings() {
   const { user, updateUser } = useAuth();
-  const { language } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const navigate = useNavigate();
 
   // Profile editing state
@@ -266,6 +266,52 @@ export default function Settings() {
 
         {/* Settings Sections */}
         <div className="space-y-6">
+          {/* Language Section */}
+          <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
+            <h2 className="text-xl font-bold mb-4">
+              {language === 'ko' ? '언어 설정' : language === 'ja' ? '言語設定' : 'Language Settings'}
+            </h2>
+            <p className="text-gray-600 mb-4 text-sm">
+              {language === 'ko'
+                ? '사용할 언어를 선택하세요'
+                : language === 'ja'
+                ? '使用する言語を選択してください'
+                : 'Select your preferred language'}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setLanguage('ko')}
+                className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
+                  language === 'ko'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                🇰🇷 한국어
+              </button>
+              <button
+                onClick={() => setLanguage('en')}
+                className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
+                  language === 'en'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                🇺🇸 English
+              </button>
+              <button
+                onClick={() => setLanguage('ja')}
+                className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
+                  language === 'ja'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                🇯🇵 日本語
+              </button>
+            </div>
+          </div>
+
           {/* Profile Picture Section */}
           <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
             <div className="flex justify-between items-center mb-4">
@@ -566,24 +612,6 @@ export default function Settings() {
                 </div>
               </div>
             )}
-          </div>
-
-          {/* Language Section */}
-          <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
-            <h2 className="text-xl font-bold mb-4">
-              {language === 'ko' ? '언어 설정' : 'Language Settings'}
-            </h2>
-            <p className="text-gray-600 mb-4">
-              {language === 'ko'
-                ? '언어는 상단 네비게이션 바에서 변경할 수 있습니다.'
-                : 'Language can be changed from the top navigation bar.'}
-            </p>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="font-medium">{language === 'ko' ? '현재 언어:' : 'Current Language:'}</span>
-              <span className="text-[#3498DB]">
-                {language === 'ko' ? '🇰🇷 한국어' : '🇺🇸 English'}
-              </span>
-            </div>
           </div>
 
           {/* About Section */}
