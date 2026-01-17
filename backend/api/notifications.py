@@ -49,7 +49,7 @@ async def get_notifications(
             a.anime_title_korean,
             a.rating as my_rating,
             a.review_content as activity_text,
-            a.review_id,
+            NULL as review_id,
             a.activity_time as activity_created_at,
             au.username as activity_username,
             au.display_name as activity_display_name,
