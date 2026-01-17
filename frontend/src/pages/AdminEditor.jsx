@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import api from '../services/api';
+import ImageCropModal from '../components/ImageCropModal';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -21,6 +22,8 @@ export default function AdminEditor() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
 
   // 검색
   const handleSearch = async (e) => {
@@ -70,17 +73,45 @@ export default function AdminEditor() {
     }
   };
 
-  // 이미지 업로드
-  const handleImageUpload = async (e) => {
+  // 이미지 파일 선택 (크롭 모달 표시)
+  const handleImageSelect = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    // 파일 타입 체크
+    if (!file.type.startsWith('image/')) {
+      setMessage('❌ 이미지 파일만 업로드 가능합니다.');
+      return;
+    }
+
+    setSelectedImageFile(file);
+    setShowCropModal(true);
+  };
+
+  // 크롭 완료 후 업로드
+  const handleCropComplete = async (croppedFile) => {
+    setShowCropModal(false);
     setUploadingImage(true);
     setMessage('');
 
     try {
+      // 1. 기존 이미지 삭제 (R2에 있는 경우만)
+      const imageField = selectedType === 'anime' ? 'cover_image' : 'image_large';
+      const oldImageUrl = editData[imageField];
+
+      if (oldImageUrl && oldImageUrl.includes('images.anipass.io')) {
+        try {
+          await api.delete('/api/admin/editor/delete-image', {
+            data: { image_url: oldImageUrl }
+          });
+        } catch (error) {
+          console.warn('기존 이미지 삭제 실패 (무시):', error);
+        }
+      }
+
+      // 2. 새 이미지 업로드
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', croppedFile);
 
       const response = await api.post(
         `/api/admin/editor/upload-image?type=${selectedType}`,
@@ -88,15 +119,15 @@ export default function AdminEditor() {
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
 
-      // 업로드된 이미지 URL로 업데이트
-      const imageField = selectedType === 'anime' ? 'cover_image' : 'image_large';
+      // 3. 업로드된 이미지 URL로 업데이트
       setEditData({ ...editData, [imageField]: response.data.url });
-      setMessage('✅ 이미지 업로드 완료! 저장 버튼을 눌러주세요.');
+      setMessage(`✅ 이미지 업로드 완료! (${Math.round(croppedFile.size / 1024)}KB) 저장 버튼을 눌러주세요.`);
     } catch (error) {
       console.error('이미지 업로드 실패:', error);
       setMessage(error.response?.data?.detail || '이미지 업로드 실패');
     } finally {
       setUploadingImage(false);
+      setSelectedImageFile(null);
     }
   };
 
@@ -275,12 +306,15 @@ export default function AdminEditor() {
                       <input
                         type="file"
                         accept="image/*"
-                        onChange={handleImageUpload}
+                        onChange={handleImageSelect}
                         disabled={uploadingImage}
                         className="w-full px-4 py-3 bg-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-purple-600 file:text-white hover:file:bg-purple-700"
                       />
                       <p className="text-xs text-gray-400 mt-2">
-                        JPG, PNG, WebP 파일 (최대 5MB)
+                        • 3:4 비율로 자동 크롭
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        • 최대 400×533px, 200KB로 자동 최적화
                       </p>
                     </div>
                   </div>
@@ -394,6 +428,19 @@ export default function AdminEditor() {
           </div>
         </div>
       </div>
+
+      {/* 이미지 크롭 모달 */}
+      {showCropModal && selectedImageFile && (
+        <ImageCropModal
+          imageFile={selectedImageFile}
+          onComplete={handleCropComplete}
+          onCancel={() => {
+            setShowCropModal(false);
+            setSelectedImageFile(null);
+          }}
+          aspectRatio={3/4}
+        />
+      )}
     </div>
   );
 }

@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 from database import db
 from api.auth import get_current_user
-from utils.r2_storage import upload_file_bytes_to_r2, is_r2_configured
+from utils.r2_storage import upload_file_bytes_to_r2, is_r2_configured, delete_from_r2, extract_object_key_from_url
 import os
 import shutil
 from datetime import datetime
@@ -369,4 +369,47 @@ async def upload_image(
         raise HTTPException(
             status_code=500,
             detail=f"Upload failed: {str(e)}"
+        )
+
+
+class DeleteImageRequest(BaseModel):
+    image_url: str
+
+
+@router.delete("/delete-image")
+async def delete_image(
+    data: DeleteImageRequest,
+    current_user = Depends(require_simon)
+):
+    """R2에서 이미지 삭제"""
+    try:
+        # URL에서 object key 추출
+        object_key = extract_object_key_from_url(data.image_url)
+
+        if not object_key:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid image URL"
+            )
+
+        # R2에서 삭제
+        if is_r2_configured():
+            success = delete_from_r2(object_key)
+            if not success:
+                raise HTTPException(
+                    status_code=500,
+                    detail="Failed to delete from R2"
+                )
+
+        return {
+            "message": "Image deleted successfully",
+            "object_key": object_key
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Delete failed: {str(e)}"
         )
