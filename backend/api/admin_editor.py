@@ -288,6 +288,9 @@ def update_character(
             updates["image_local"] = data.image_large
             print(f"[Admin Editor] Setting image_local to: {data.image_large}")
 
+        # 이미지 변경 시 crawled_at 업데이트 (캐시 무효화용)
+        updates["crawled_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     print(f"[Admin Editor] Updates to apply: {updates}")
 
     if not updates:

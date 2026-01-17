@@ -4,12 +4,22 @@ import ImageCropModal from '../components/ImageCropModal';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-// 이미지 URL 처리 헬퍼 함수
+// 이미지 URL 처리 헬퍼 함수 (어드민용 - 항상 캐시 우회)
 const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
-  if (imagePath.startsWith('http')) return imagePath;
-  if (imagePath.startsWith('/')) return `${API_BASE_URL}${imagePath}`;
-  return `${API_BASE_URL}/${imagePath}`;
+
+  let url;
+  if (imagePath.startsWith('http')) {
+    url = imagePath;
+  } else if (imagePath.startsWith('/')) {
+    url = `${API_BASE_URL}${imagePath}`;
+  } else {
+    url = `${API_BASE_URL}/${imagePath}`;
+  }
+
+  // 어드민 에디터는 항상 최신 이미지를 보여야 하므로 캐시 우회
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}v=${Date.now()}`;
 };
 
 export default function AdminEditor() {
