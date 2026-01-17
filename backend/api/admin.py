@@ -101,6 +101,51 @@ def get_users_status():
         raise HTTPException(status_code=500, detail=f"Failed to get status: {str(e)}")
 
 
+@router.get("/list-volume-files")
+def list_volume_files():
+    """List all files in the volume directory for recovery purposes"""
+    import os
+    import glob
+
+    volume_path = "/app/data"
+    result = {
+        "volume_path": volume_path,
+        "exists": os.path.exists(volume_path),
+        "files": []
+    }
+
+    if os.path.exists(volume_path):
+        for root, dirs, files in os.walk(volume_path):
+            for file in files:
+                filepath = os.path.join(root, file)
+                try:
+                    stat = os.stat(filepath)
+                    result["files"].append({
+                        "path": filepath,
+                        "size": stat.st_size,
+                        "modified": stat.st_mtime
+                    })
+                except:
+                    result["files"].append({"path": filepath, "error": "stat failed"})
+
+    # Also check for any .db files in common locations
+    for pattern in ["/app/*.db", "/app/**/*.db", "/tmp/*.db", "*.db"]:
+        for f in glob.glob(pattern, recursive=True):
+            if f not in [x.get("path") for x in result["files"]]:
+                try:
+                    stat = os.stat(f)
+                    result["files"].append({
+                        "path": f,
+                        "size": stat.st_size,
+                        "modified": stat.st_mtime,
+                        "source": "glob"
+                    })
+                except:
+                    pass
+
+    return result
+
+
 @router.post("/add-activities-metadata")
 def add_activities_metadata():
     """Add metadata column to activities table"""
