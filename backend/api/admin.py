@@ -783,7 +783,6 @@ def rebuild_activities_endpoint():
     이 API는 activities 테이블을 완전히 재구축합니다
     """
     try:
-        db = get_db()
 
         # 1. 애니 평가 마이그레이션
         print("Migrating anime ratings...")
