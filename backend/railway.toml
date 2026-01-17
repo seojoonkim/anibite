@@ -11,3 +11,7 @@ restartPolicyMaxRetries = 10
 # This prevents data loss between deployments
 [[deploy.volumes]]
 mountPath = "/app/data"
+
+# Mount /app/uploads for user-uploaded images (admin editor)
+[[deploy.volumes]]
+mountPath = "/app/uploads"
