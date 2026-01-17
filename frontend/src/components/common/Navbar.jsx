@@ -475,7 +475,7 @@ export default function Navbar() {
                     )}
                     <span className="text-sm font-medium">{user.display_name || user.username}</span>
                     {(() => {
-                      const levelInfo = getCurrentLevelInfo(otakuScore);
+                      const levelInfo = getCurrentLevelInfo(otakuScore, language);
                       return (
                         <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor} hidden sm:inline-flex`}>
                           <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span>

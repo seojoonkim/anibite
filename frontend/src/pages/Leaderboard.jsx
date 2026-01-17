@@ -78,7 +78,7 @@ export default function Leaderboard() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {leaderboard.map((user, index) => {
-                const levelInfo = getCurrentLevelInfo(user.otaku_score);
+                const levelInfo = getCurrentLevelInfo(user.otaku_score, language);
                 const isTopThree = index < 3;
                 const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
 

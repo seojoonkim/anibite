@@ -634,11 +634,11 @@ export default function WriteReviews() {
                               <>
                                 {item.anime_title_korean || item.anime_title}
                                 {item.anime_title_korean && item.anime_title && (
-                                  <span className="text-[10px] text-gray-400 font-normal ml-1">{item.anime_title}</span>
+                                  <span className="text-[10px] text-gray-400 font-normal ml-1">({item.anime_title})</span>
                                 )}
                               </>
                             ) : (
-                              item.anime_title || item.anime_title_korean
+                              item.anime_title
                             )}
                           </Link>
                         ) : (
@@ -646,11 +646,11 @@ export default function WriteReviews() {
                             <>
                               {item.anime_title_korean || item.anime_title}
                               {item.anime_title_korean && item.anime_title && (
-                                <span className="text-[10px] text-gray-400 font-normal ml-1">{item.anime_title}</span>
+                                <span className="text-[10px] text-gray-400 font-normal ml-1">({item.anime_title})</span>
                               )}
                             </>
                           ) : (
-                            item.anime_title || item.anime_title_korean
+                            item.anime_title
                           )
                         )}
                       </p>

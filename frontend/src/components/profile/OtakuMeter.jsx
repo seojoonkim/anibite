@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { levels as otakuLevels, getCurrentLevelInfo as getOtakuLevelInfo } from '../../utils/otakuLevels';
 
-export default function OtakuMeter({ score }) {
+export default function OtakuMeter({ score, language }) {
   const maxScore = 2000;
   const percentage = Math.min((score / maxScore) * 100, 100);
   const [showRoadmap, setShowRoadmap] = useState(false);
@@ -11,7 +11,7 @@ export default function OtakuMeter({ score }) {
   const levels = otakuLevels;
 
   // Use getCurrentLevelInfo from otakuLevels.js
-  const levelInfo = getOtakuLevelInfo(score);
+  const levelInfo = getOtakuLevelInfo(score, language);
   const progressToNext = levelInfo.nextThreshold
     ? ((score - levelInfo.currentThreshold) / (levelInfo.nextThreshold - levelInfo.currentThreshold)) * 100
     : 100;

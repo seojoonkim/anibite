@@ -1425,7 +1425,7 @@ export default function MyAniPass() {
                 </h1>
                 {stats && (
                   (() => {
-                    const levelInfo = getCurrentLevelInfo(stats.otaku_score || 0);
+                    const levelInfo = getCurrentLevelInfo(stats.otaku_score || 0, language);
                     return (
                       <span className={`px-3 py-1 rounded-full text-sm font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}>
                         <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span className="text-gray-700">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
@@ -1736,7 +1736,7 @@ export default function MyAniPass() {
 
                     {/* Badge */}
                     {(() => {
-                      const levelInfo = getCurrentLevelInfo(stats.otaku_score || 0);
+                      const levelInfo = getCurrentLevelInfo(stats.otaku_score || 0, language);
                       return (
                         <span className={`mt-2 text-sm px-3 py-1 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}>
                           <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span className="text-gray-700">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
@@ -1893,7 +1893,7 @@ export default function MyAniPass() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-stretch">
                   {/* 오타쿠 미터 */}
                   <div className="w-full">
-                    {stats && <OtakuMeter score={stats.otaku_score || 0} />}
+                    {stats && <OtakuMeter score={stats.otaku_score || 0} language={language} />}
                   </div>
 
                   {/* 통계 */}
