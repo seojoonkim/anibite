@@ -108,3 +108,45 @@ def upload_file_bytes_to_r2(
 def is_r2_configured() -> bool:
     """Check if R2 is properly configured"""
     return all([R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_ENDPOINT_URL])
+
+
+def delete_from_r2(object_key: str) -> bool:
+    """
+    Delete a file from R2
+
+    Args:
+        object_key: S3 object key (e.g., "admin/anime/123.jpg")
+
+    Returns:
+        True if deleted successfully, False otherwise
+    """
+    try:
+        s3_client = get_r2_client()
+        s3_client.delete_object(
+            Bucket=R2_BUCKET_NAME,
+            Key=object_key
+        )
+        return True
+    except ClientError as e:
+        print(f"Failed to delete from R2: {str(e)}")
+        return False
+
+
+def extract_object_key_from_url(url: str) -> Optional[str]:
+    """
+    Extract R2 object key from public URL
+
+    Args:
+        url: Full URL (e.g., "https://images.anipass.io/admin/anime/123.jpg")
+
+    Returns:
+        Object key (e.g., "admin/anime/123.jpg") or None
+    """
+    if not url:
+        return None
+
+    # Remove R2_PUBLIC_URL prefix
+    if url.startswith(R2_PUBLIC_URL):
+        return url[len(R2_PUBLIC_URL):].lstrip('/')
+
+    return None
