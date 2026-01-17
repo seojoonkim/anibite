@@ -2,8 +2,7 @@
 builder = "nixpacks"
 
 [deploy]
-# IMPORTANT: Only download DB if it doesn't exist (preserve user data!)
-startCommand = "python init_db.py; if [ ! -f /app/data/anime.db ]; then echo 'DB not found, downloading...'; python download_db.py || echo 'Download failed'; else echo 'DB exists, preserving user data'; fi; uvicorn main:app --host 0.0.0.0 --port $PORT"
+# Build is handled by nixpacks.toml at project root
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
 

@@ -1,23 +1,16 @@
 [phases.setup]
-nixPkgs = ["python311"]
+nixPkgs = ['nodejs_20', 'python312']
 
 [phases.install]
 cmds = [
-  "cd backend",
-  # Install with optimizations - Railway/nixpacks handles caching automatically
-  "pip install --no-warn-script-location -r requirements.txt"
+  'pip install -r backend/requirements.txt',
+  'cd frontend && npm ci'
 ]
 
 [phases.build]
 cmds = [
-  "cd backend",
-  "mkdir -p uploads"
+  'cd frontend && npm run build'
 ]
 
 [start]
-cmd = "cd backend && (python3 scripts/create_feed_activities_table.py || true) && (python3 scripts/create_feed_triggers.py || true) && uvicorn main:app --host 0.0.0.0 --port $PORT"
-
-[variables]
-PYTHONUNBUFFERED = "1"
-# Disable pip version check for faster installs
-PIP_DISABLE_PIP_VERSION_CHECK = "1"
+cmd = 'cd backend && python init_db.py && if [ ! -f /app/data/anime.db ]; then echo "DB not found, downloading..."; python download_db.py || echo "Download failed"; else echo "DB exists, preserving user data"; fi && uvicorn main:app --host 0.0.0.0 --port $PORT'

@@ -24,6 +24,7 @@ export default function AdminEditor() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showCropModal, setShowCropModal] = useState(false);
   const [selectedImageFile, setSelectedImageFile] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   // 검색
   const handleSearch = async (e) => {
@@ -76,6 +77,37 @@ export default function AdminEditor() {
   // 이미지 파일 선택 (크롭 모달 표시)
   const handleImageSelect = (e) => {
     const file = e.target.files[0];
+    if (!file) return;
+
+    // 파일 타입 체크
+    if (!file.type.startsWith('image/')) {
+      setMessage('❌ 이미지 파일만 업로드 가능합니다.');
+      return;
+    }
+
+    setSelectedImageFile(file);
+    setShowCropModal(true);
+  };
+
+  // 드래그 앤 드롭 핸들러
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files[0];
     if (!file) return;
 
     // 파일 타입 체크
@@ -303,19 +335,41 @@ export default function AdminEditor() {
                       />
                     )}
                     <div className="flex-1">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageSelect}
-                        disabled={uploadingImage}
-                        className="w-full px-4 py-3 bg-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-purple-600 file:text-white hover:file:bg-purple-700"
-                      />
-                      <p className="text-xs text-gray-400 mt-2">
-                        • 3:4 비율로 자동 크롭
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        • 최대 400×533px, 200KB로 자동 최적화
-                      </p>
+                      {/* 드래그 앤 드롭 영역 */}
+                      <div
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                          isDragging
+                            ? 'border-purple-500 bg-purple-900 bg-opacity-20'
+                            : 'border-gray-600 bg-gray-700'
+                        } ${uploadingImage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                      >
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageSelect}
+                          disabled={uploadingImage}
+                          className="hidden"
+                          id="image-upload"
+                        />
+                        <label
+                          htmlFor="image-upload"
+                          className="cursor-pointer block"
+                        >
+                          <div className="text-4xl mb-2">📁</div>
+                          <p className="text-sm text-gray-300 mb-1">
+                            파일을 여기로 드래그하거나 클릭하세요
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            • 3:4 비율로 자동 크롭
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            • 최대 400×533px, 200KB로 자동 최적화
+                          </p>
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
