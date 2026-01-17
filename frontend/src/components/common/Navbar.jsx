@@ -10,7 +10,7 @@ import { API_BASE_URL, IMAGE_BASE_URL } from '../../config/api';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  const { language, toggleLanguage, t } = useLanguage();
+  const { language, setLanguage, toggleLanguage, t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const [showLangMenu, setShowLangMenu] = useState(false);
@@ -162,9 +162,7 @@ export default function Navbar() {
   };
 
   const handleLanguageChange = (lang) => {
-    if (lang !== language) {
-      toggleLanguage();
-    }
+    setLanguage(lang);
     setShowLangMenu(false);
   };
 
@@ -425,7 +423,7 @@ export default function Navbar() {
                   className="text-[#262626] hover:text-black px-3 py-2 rounded-md text-xs font-medium transition-colors flex items-center gap-1"
                   style={{ minWidth: '70px' }}
                 >
-                  <span>{language === 'ko' ? 'KO' : 'EN'}</span>
+                  <span>{language === 'ko' ? 'KO' : language === 'ja' ? 'JA' : 'EN'}</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
@@ -437,13 +435,19 @@ export default function Navbar() {
                       onClick={() => handleLanguageChange('ko')}
                       className="block w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 rounded-t-md"
                     >
-                      KO
+                      🇰🇷 한국어
                     </button>
                     <button
                       onClick={() => handleLanguageChange('en')}
+                      className="block w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-100"
+                    >
+                      🇺🇸 English
+                    </button>
+                    <button
+                      onClick={() => handleLanguageChange('ja')}
                       className="block w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 rounded-b-md"
                     >
-                      EN
+                      🇯🇵 日本語
                     </button>
                   </div>
                 )}

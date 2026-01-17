@@ -152,6 +152,82 @@ const translations = {
     watchLaterShort: 'Later',
     notInterested: 'Not Interested',
     notInterestedShort: 'Pass',
+  },
+  ja: {
+    // Navbar
+    appName: 'AniPass',
+    rate: 'アニメ評価',
+    rateCharacter: 'キャラ評価',
+    writeReview: 'レビュー作成',
+    browse: 'アニメ検索',
+    leaderboard: 'ランキング',
+    myAnipass: 'マイAniPass',
+    logout: 'ログアウト',
+
+    // Rate page
+    rateTitle: 'アニメ評価',
+    rateDescription: 'カードにマウスを置いて星をクリック (0.5刻み)',
+
+    // Character Rate page
+    characterRateTitle: 'キャラクター評価',
+    characterRateDescription: '視聴したアニメのキャラクターを評価',
+    ratedBadge: '評価済み',
+    loading: '読込中...',
+    allLoaded: '全キャラクター読込完了',
+
+    // Browse page
+    browseTitle: 'アニメ検索',
+    browseDescription: '全アニメを検索・フィルタリング',
+    search: '検索',
+    searchPlaceholder: 'アニメを検索...',
+    sort: '並び替え',
+    sortPopularity: '人気順',
+    sortRatingDesc: '評価高い順',
+    sortRatingAsc: '評価低い順',
+    sortTitle: 'タイトル順',
+    sortYearDesc: '新しい順',
+    sortYearAsc: '古い順',
+    status: '放送状況',
+    statusAll: '全て',
+    statusAiring: '放送中',
+    statusFinished: '完結',
+    statusNotYetAired: '未放送',
+    year: '年',
+    yearPlaceholder: '例: 2024',
+    genre: 'ジャンル',
+    genrePlaceholder: '例: Action',
+    loadMore: 'もっと見る',
+    noResults: '検索結果がありません',
+    episodes: '話',
+    rated: '評価',
+    noRating: '評価なし',
+
+    // My AniPass
+    myAnipassTitle: 'マイAniPass',
+    summary: '概要',
+    ratedAnime: '評価済み',
+    watchlist: 'ウォッチリスト',
+    totalRated: '評価済みアニメ',
+    averageRating: '平均評価',
+    otakuScore: 'オタクスコア',
+
+    // Auth
+    login: 'ログイン',
+    register: '新規登録',
+    username: 'ユーザーID',
+    email: 'メール',
+    password: 'パスワード',
+    displayName: '表示名',
+
+    // Common
+    error: 'エラー',
+    success: '成功',
+
+    // Status actions
+    watchLater: '後で見る',
+    watchLaterShort: '後で',
+    notInterested: '興味なし',
+    notInterestedShort: 'パス',
   }
 };
 
@@ -167,7 +243,11 @@ export function LanguageProvider({ children }) {
   }, [language]);
 
   const toggleLanguage = () => {
-    setLanguage(prev => prev === 'ko' ? 'en' : 'ko');
+    setLanguage(prev => {
+      if (prev === 'ko') return 'en';
+      if (prev === 'en') return 'ja';
+      return 'ko';
+    });
   };
 
   const t = (key) => {
@@ -184,6 +264,15 @@ export function LanguageProvider({ children }) {
       // 한국어 모드: 한국어 제목 우선, 영어 제목 병기
       primaryTitle = anime.title_korean || anime.title_romaji || anime.title_english;
       secondaryTitle = anime.title_english || anime.title_romaji;
+
+      // 같은 제목이면 병기하지 않음
+      if (primaryTitle === secondaryTitle) {
+        secondaryTitle = '';
+      }
+    } else if (language === 'ja') {
+      // 일본어 모드: 일본어 원제 우선, 로마자 제목 병기
+      primaryTitle = anime.title_native || anime.title_romaji || anime.title_english;
+      secondaryTitle = anime.title_romaji || anime.title_english;
 
       // 같은 제목이면 병기하지 않음
       if (primaryTitle === secondaryTitle) {
@@ -214,7 +303,7 @@ export function LanguageProvider({ children }) {
   };
 
   return (
-    <LanguageContext.Provider value={{ language, toggleLanguage, t, getAnimeTitle }}>
+    <LanguageContext.Provider value={{ language, setLanguage, toggleLanguage, t, getAnimeTitle }}>
       {children}
     </LanguageContext.Provider>
   );
