@@ -5,7 +5,7 @@ AniPass Backend - FastAPI Application
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.exceptions import HTTPException
 from config import ALLOWED_ORIGINS, COVER_IMAGES_DIR
 import os
@@ -267,6 +267,41 @@ app.include_router(bookmarks.router, prefix="/api/bookmarks", tags=["Bookmarks"]
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(admin_fix.router, prefix="/api/admin-fix", tags=["Admin Fix"])
 app.include_router(debug_promotion.router, prefix="/api/debug", tags=["Debug"])
+
+
+# Serve React frontend static files
+# This should be mounted AFTER all API routes to avoid conflicts
+frontend_dist = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
+if os.path.exists(frontend_dist):
+    # Mount static assets (JS, CSS, images, etc.)
+    # Use StaticFiles with html=True to properly serve all frontend files
+    app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="frontend-assets")
+
+    # Mount placeholders directory if it exists
+    placeholders_dir = os.path.join(frontend_dist, "placeholders")
+    if os.path.exists(placeholders_dir):
+        app.mount("/placeholders", StaticFiles(directory=placeholders_dir), name="placeholders")
+
+    # Catch-all route for React Router - serve index.html for all non-API routes
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        """
+        Serve React frontend for all non-API routes.
+        This allows React Router to handle client-side routing.
+        """
+        # Check if the requested file exists in dist (for files like favicon.svg, og-image.png, etc.)
+        file_path = os.path.join(frontend_dist, full_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+
+        # For all other routes (like /user/10), serve index.html
+        # This enables direct URL access and React Router will handle the routing
+        index_path = os.path.join(frontend_dist, "index.html")
+        return FileResponse(index_path)
+
+    print(f"[Startup] ✓ Serving React frontend from: {frontend_dist}")
+else:
+    print(f"[Startup] ⚠️  Frontend dist not found at: {frontend_dist}")
 
 
 if __name__ == "__main__":
