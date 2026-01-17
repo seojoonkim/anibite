@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { levels as otakuLevels, getCurrentLevelInfo as getOtakuLevelInfo } from '../../utils/otakuLevels';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function OtakuMeter({ score }) {
   const { language } = useLanguage();

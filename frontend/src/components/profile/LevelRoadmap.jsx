@@ -1,5 +1,5 @@
 import { levels as otakuLevels } from '../../utils/otakuLevels';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function LevelRoadmap({ currentScore }) {
   const { language } = useLanguage();

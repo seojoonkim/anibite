@@ -1,5 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function YearDistributionChart({ distribution }) {
   const { language } = useLanguage();
