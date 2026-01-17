@@ -179,7 +179,15 @@ export default function AdminEditor() {
 
   // 저장
   const handleSave = async () => {
-    if (!selectedItem) return;
+    if (!selectedItem) {
+      console.log('[Admin Editor] No item selected');
+      return;
+    }
+
+    console.log('[Admin Editor] Saving...');
+    console.log('[Admin Editor] Selected type:', selectedType);
+    console.log('[Admin Editor] Selected item:', selectedItem);
+    console.log('[Admin Editor] Edit data:', editData);
 
     setIsLoading(true);
     setMessage('');
@@ -189,13 +197,18 @@ export default function AdminEditor() {
         ? `/api/admin/editor/anime/${selectedItem.id}`
         : `/api/admin/editor/character/${selectedItem.id}`;
 
-      await api.patch(endpoint, editData);
+      console.log('[Admin Editor] Endpoint:', endpoint);
+      console.log('[Admin Editor] Sending data:', editData);
 
+      const response = await api.patch(endpoint, editData);
+
+      console.log('[Admin Editor] Save response:', response.data);
       setMessage('✅ 저장 완료!');
       // 검색 결과 갱신
       handleSearch({ preventDefault: () => {} });
     } catch (error) {
       console.error('저장 실패:', error);
+      console.error('Error response:', error.response?.data);
       setMessage(error.response?.data?.detail || '저장 실패');
     } finally {
       setIsLoading(false);
