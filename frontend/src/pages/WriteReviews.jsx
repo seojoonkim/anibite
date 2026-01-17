@@ -75,6 +75,7 @@ export default function WriteReviews() {
             anime_id: item.item_id,
             title_romaji: item.item_title,
             title_english: item.item_title,
+            title_native: item.item_title_native,
             title_korean: item.item_title_korean,
             image_url: item.item_image,
             year: item.item_year
@@ -138,6 +139,7 @@ export default function WriteReviews() {
             anime_id: item.item_id,
             title_romaji: item.item_title,
             title_english: item.item_title,
+            title_native: item.item_title_native,
             title_korean: item.item_title_korean,
             image_url: item.item_image,
             year: item.item_year
@@ -594,6 +596,13 @@ export default function WriteReviews() {
                               <span>
                                 {item.title_korean || item.title_romaji || item.title_english}
                                 {item.title_korean && (item.title_romaji || item.title_english) && (
+                                  <span className="text-xs text-gray-400 font-normal ml-1.5">({item.title_romaji || item.title_english})</span>
+                                )}
+                              </span>
+                            ) : language === 'ja' ? (
+                              <span>
+                                {item.title_native || item.title_romaji || item.title_english}
+                                {item.title_native && (item.title_romaji || item.title_english) && (
                                   <span className="text-xs text-gray-400 font-normal ml-1.5">({item.title_romaji || item.title_english})</span>
                                 )}
                               </span>
