@@ -2,7 +2,7 @@
 Admin API - Temporary endpoints for database migrations
 임시 관리자 API
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Body
 from database import db
 
 router = APIRouter()
@@ -1282,7 +1282,7 @@ def debug_rank_promotions():
 
 
 @router.post("/patch-korean-names")
-def patch_korean_names(names: dict):
+def patch_korean_names(payload: dict = Body(...)):
     """
     Patch character Korean names without affecting user data
     캐릭터 한국어 이름만 패치 (사용자 데이터 손실 없음)
@@ -1300,7 +1300,7 @@ def patch_korean_names(names: dict):
         updated = 0
         failed = []
 
-        names_dict = names.get("names", {})
+        names_dict = payload.get("names", {})
 
         for char_id, korean_name in names_dict.items():
             try:
