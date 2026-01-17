@@ -39,7 +39,7 @@ export default function Leaderboard() {
     return (
       <div className="min-h-screen pt-12 md:pt-16 bg-transparent">
         <div className="flex justify-center items-center h-screen">
-          <div className="text-xl text-gray-600">{language === 'ko' ? '로딩 중...' : 'Loading...'}</div>
+          <div className="text-xl text-gray-600">{language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...'}</div>
         </div>
       </div>
     );
@@ -54,25 +54,25 @@ export default function Leaderboard() {
             <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-200">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  {language === 'ko' ? '순위' : 'Rank'}
+                  {language === 'ko' ? '순위' : language === 'ja' ? 'ランキング' : 'Rank'}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  {language === 'ko' ? '사용자' : 'User'}
+                  {language === 'ko' ? '사용자' : language === 'ja' ? 'ユーザー' : 'User'}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  {language === 'ko' ? '등급' : 'Level'}
+                  {language === 'ko' ? '등급' : language === 'ja' ? 'レベル' : 'Level'}
                 </th>
                 <th className="hidden md:table-cell px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  {language === 'ko' ? '애니 평가' : 'Anime Rated'}
+                  {language === 'ko' ? '애니 평가' : language === 'ja' ? 'アニメ評価' : 'Anime Rated'}
                 </th>
                 <th className="hidden md:table-cell px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  {language === 'ko' ? '캐릭터 평가' : 'Character Rated'}
+                  {language === 'ko' ? '캐릭터 평가' : language === 'ja' ? 'キャラクター評価' : 'Character Rated'}
                 </th>
                 <th className="hidden md:table-cell px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  {language === 'ko' ? '리뷰' : 'Reviews'}
+                  {language === 'ko' ? '리뷰' : language === 'ja' ? 'レビュー' : 'Reviews'}
                 </th>
                 <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  {language === 'ko' ? '오타쿠 점수' : 'Otaku Score'}
+                  {language === 'ko' ? '오타쿠 점수' : language === 'ja' ? 'オタクスコア' : 'Otaku Score'}
                 </th>
               </tr>
             </thead>
@@ -170,7 +170,7 @@ export default function Leaderboard() {
 
         {leaderboard.length === 0 && (
           <div className="text-center py-16">
-            <p className="text-gray-600">{language === 'ko' ? '아직 사용자가 없습니다.' : 'No users yet.'}</p>
+            <p className="text-gray-600">{language === 'ko' ? '아직 사용자가 없습니다.' : language === 'ja' ? 'まだユーザーがいません。' : 'No users yet.'}</p>
           </div>
         )}
       </div>

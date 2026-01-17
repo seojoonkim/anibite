@@ -842,13 +842,13 @@ export default function MyAniPass() {
 
     switch (activity.activity_type) {
       case 'anime_rating':
-        return language === 'ko' ? `${displayName}님이 평가했어요` : `${displayName} rated an anime`;
+        return language === 'ko' ? `${displayName}님이 평가했어요` : language === 'ja' ? `${displayName}さんが評価しました` : `${displayName} rated an anime`;
       case 'character_rating':
-        return language === 'ko' ? `${displayName}님이 캐릭터를 평가했어요` : `${displayName} rated a character`;
+        return language === 'ko' ? `${displayName}님이 캐릭터를 평가했어요` : language === 'ja' ? `${displayName}さんがキャラクターを評価しました` : `${displayName} rated a character`;
       case 'review':
-        return language === 'ko' ? `${displayName}님이 리뷰를 남겼어요` : `${displayName} left a review`;
+        return language === 'ko' ? `${displayName}님이 리뷰를 남겼어요` : language === 'ja' ? `${displayName}さんがレビューを残しました` : `${displayName} left a review`;
       default:
-        return language === 'ko' ? `${displayName}님의 활동` : `${displayName}'s activity`;
+        return language === 'ko' ? `${displayName}님의 활동` : language === 'ja' ? `${displayName}さんのアクティビティ` : `${displayName}'s activity`;
     }
   };
 
@@ -1041,7 +1041,7 @@ export default function MyAniPass() {
       console.log('[MyAniPass] Comments reloaded and count updated');
     } catch (err) {
       console.error('[MyAniPass] Failed to submit comment:', err);
-      alert(language === 'ko' ? `댓글 작성에 실패했습니다: ${err.message}` : `Failed to post comment: ${err.message}`);
+      alert(language === 'ko' ? `댓글 작성에 실패했습니다: ${err.message}` : language === 'ja' ? `コメント投稿に失敗しました: ${err.message}` : `Failed to post comment: ${err.message}`);
     }
   };
 
@@ -1093,12 +1093,12 @@ export default function MyAniPass() {
       updateActivityCommentsCount(activity, 1);
     } catch (err) {
       console.error('Failed to submit reply:', err);
-      alert(language === 'ko' ? '답글 작성에 실패했습니다.' : 'Failed to post reply.');
+      alert(language === 'ko' ? '답글 작성에 실패했습니다.' : language === 'ja' ? '返信投稿に失敗しました' : 'Failed to post reply.');
     }
   };
 
   const handleDeleteComment = async (activity, commentId) => {
-    if (!confirm(language === 'ko' ? '댓글을 삭제하시겠습니까?' : 'Delete this comment?')) return;
+    if (!confirm(language === 'ko' ? '댓글을 삭제하시겠습니까?' : language === 'ja' ? 'このコメントを削除しますか？' : 'Delete this comment?')) return;
 
     try {
       await ActivityUtils.deleteComment(activity, commentId);
@@ -1106,7 +1106,7 @@ export default function MyAniPass() {
       updateActivityCommentsCount(activity, -1);
     } catch (err) {
       console.error('Failed to delete comment:', err);
-      alert(language === 'ko' ? '댓글 삭제에 실패했습니다.' : 'Failed to delete comment.');
+      alert(language === 'ko' ? '댓글 삭제에 실패했습니다.' : language === 'ja' ? 'コメント削除に失敗しました' : 'Failed to delete comment.');
     }
   };
 
@@ -1168,7 +1168,7 @@ export default function MyAniPass() {
       }
     } catch (err) {
       console.error('Failed to delete activity:', err);
-      alert(language === 'ko' ? '삭제에 실패했습니다.' : 'Failed to delete.');
+      alert(language === 'ko' ? '삭제에 실패했습니다.' : language === 'ja' ? '削除に失敗しました' : 'Failed to delete.');
     }
   };
 
@@ -1213,7 +1213,7 @@ export default function MyAniPass() {
       setExpandedComments(new Set());
     } catch (err) {
       console.error('Failed to create post:', err);
-      alert(language === 'ko' ? '게시물 작성에 실패했습니다.' : 'Failed to create post.');
+      alert(language === 'ko' ? '게시물 작성에 실패했습니다.' : language === 'ja' ? '投稿作成に失敗しました' : 'Failed to create post.');
     }
   };
 
@@ -1327,13 +1327,13 @@ export default function MyAniPass() {
                     onClick={() => openFollowModal('followers')}
                     className="text-sm hover:text-[#737373] transition-colors"
                   >
-                    <span className="font-bold">{followCounts.followers_count}</span> {language === 'ko' ? '팔로워' : 'Followers'}
+                    <span className="font-bold">{followCounts.followers_count}</span> {language === 'ko' ? '팔로워' : language === 'ja' ? 'フォロワー' : 'Followers'}
                   </button>
                   <button
                     onClick={() => openFollowModal('following')}
                     className="text-sm hover:text-[#737373] transition-colors"
                   >
-                    <span className="font-bold">{followCounts.following_count}</span> {language === 'ko' ? '팔로잉' : 'Following'}
+                    <span className="font-bold">{followCounts.following_count}</span> {language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following'}
                   </button>
                 </div>
               </div>
@@ -1350,7 +1350,7 @@ export default function MyAniPass() {
                 }`}
                 style={activeTab === 'feed' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
               >
-                {language === 'ko' ? '피드' : 'Feed'}
+                {language === 'ko' ? '피드' : language === 'ja' ? 'フィード' : 'Feed'}
               </button>
               <button
                 onClick={() => changeTab('anipass')}
@@ -1361,7 +1361,7 @@ export default function MyAniPass() {
                 }`}
                 style={activeTab === 'anipass' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
               >
-                {language === 'ko' ? '애니패스' : 'AniPass'}
+                {language === 'ko' ? '애니패스' : language === 'ja' ? 'AniPass' : 'AniPass'}
               </button>
               <button
                 onClick={() => changeTab('anime')}
@@ -1372,7 +1372,7 @@ export default function MyAniPass() {
                 }`}
                 style={activeTab === 'anime' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
               >
-                {language === 'ko' ? '애니' : 'Anime'}
+                {language === 'ko' ? '애니' : language === 'ja' ? 'アニメ' : 'Anime'}
               </button>
               <button
                 onClick={() => changeTab('character')}
@@ -1383,7 +1383,7 @@ export default function MyAniPass() {
                 }`}
                 style={activeTab === 'character' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
               >
-                {language === 'ko' ? '캐릭터' : 'Character'}
+                {language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character'}
               </button>
             </div>
           </div>
@@ -1439,13 +1439,13 @@ export default function MyAniPass() {
                   onClick={() => openFollowModal('followers')}
                   className="text-sm hover:text-[#737373] transition-colors"
                 >
-                  <span className="font-bold">{followCounts.followers_count}</span> {language === 'ko' ? '팔로워' : 'Followers'}
+                  <span className="font-bold">{followCounts.followers_count}</span> {language === 'ko' ? '팔로워' : language === 'ja' ? 'フォロワー' : 'Followers'}
                 </button>
                 <button
                   onClick={() => openFollowModal('following')}
                   className="text-sm hover:text-[#737373] transition-colors"
                 >
-                  <span className="font-bold">{followCounts.following_count}</span> {language === 'ko' ? '팔로잉' : 'Following'}
+                  <span className="font-bold">{followCounts.following_count}</span> {language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following'}
                 </button>
               </div>
             </div>
@@ -1461,7 +1461,7 @@ export default function MyAniPass() {
                 onMouseEnter={(e) => !isFollowing && (e.target.style.backgroundColor = '#1877F2')}
                 onMouseLeave={(e) => !isFollowing && (e.target.style.backgroundColor = '#3797F0')}
               >
-                {isFollowing ? (language === 'ko' ? '언팔로우' : 'Unfollow') : (language === 'ko' ? '팔로우' : 'Follow')}
+                {isFollowing ? (language === 'ko' ? '언팔로우' : language === 'ja' ? 'フォロー解除' : 'Unfollow') : (language === 'ko' ? '팔로우' : language === 'ja' ? 'フォロー' : 'Follow')}
               </button>
             )}
           </div>
@@ -1477,7 +1477,7 @@ export default function MyAniPass() {
               }`}
               style={activeTab === 'feed' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
             >
-              {language === 'ko' ? '피드' : 'Feed'}
+              {language === 'ko' ? '피드' : language === 'ja' ? 'フィード' : 'Feed'}
             </button>
             <button
               onClick={() => changeTab('anipass')}
@@ -1488,7 +1488,7 @@ export default function MyAniPass() {
               }`}
               style={activeTab === 'anipass' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
             >
-              {language === 'ko' ? '애니패스' : 'AniPass'}
+              {language === 'ko' ? '애니패스' : language === 'ja' ? 'AniPass' : 'AniPass'}
             </button>
             <button
               onClick={() => changeTab('anime')}
@@ -1499,7 +1499,7 @@ export default function MyAniPass() {
               }`}
               style={activeTab === 'anime' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
             >
-              {language === 'ko' ? '애니' : 'Anime'} {stats && <span className="text-xs sm:text-sm">({(stats.total_rated || 0) + (stats.total_want_to_watch || 0) + (stats.total_pass || 0)})</span>}
+              {language === 'ko' ? '애니' : language === 'ja' ? 'アニメ' : 'Anime'} {stats && <span className="text-xs sm:text-sm">({(stats.total_rated || 0) + (stats.total_want_to_watch || 0) + (stats.total_pass || 0)})</span>}
             </button>
             <button
               onClick={() => changeTab('character')}
@@ -1510,7 +1510,7 @@ export default function MyAniPass() {
               }`}
               style={activeTab === 'character' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
             >
-              {language === 'ko' ? '캐릭터' : 'Character'} {stats && <span className="text-xs sm:text-sm">({stats.total_character_ratings || 0})</span>}
+              {language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character'} {stats && <span className="text-xs sm:text-sm">({stats.total_character_ratings || 0})</span>}
             </button>
           </div>
         </div>
@@ -1530,7 +1530,7 @@ export default function MyAniPass() {
                   }`}
                   style={animeSubMenu === 'all' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  {language === 'ko' ? '모두' : 'All'}
+                  {language === 'ko' ? '모두' : language === 'ja' ? 'すべて' : 'All'}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('5')}
@@ -1541,7 +1541,7 @@ export default function MyAniPass() {
                   }`}
                   style={animeSubMenu === '5' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ 5{language === 'ko' ? '점' : ''}
+                  ⭐ 5{language === 'ko' ? '점' : language === 'ja' ? '点' : ''}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('4')}
@@ -1552,7 +1552,7 @@ export default function MyAniPass() {
                   }`}
                   style={animeSubMenu === '4' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ 4{language === 'ko' ? '점대' : ''}
+                  ⭐ 4{language === 'ko' ? '점대' : language === 'ja' ? '点台' : ''}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('3')}
@@ -1563,7 +1563,7 @@ export default function MyAniPass() {
                   }`}
                   style={animeSubMenu === '3' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ 3{language === 'ko' ? '점대' : ''}
+                  ⭐ 3{language === 'ko' ? '점대' : language === 'ja' ? '点台' : ''}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('2')}
@@ -1574,7 +1574,7 @@ export default function MyAniPass() {
                   }`}
                   style={animeSubMenu === '2' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ 2{language === 'ko' ? '점대' : ''}
+                  ⭐ 2{language === 'ko' ? '점대' : language === 'ja' ? '点台' : ''}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('1')}
@@ -1585,7 +1585,7 @@ export default function MyAniPass() {
                   }`}
                   style={animeSubMenu === '1' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ {language === 'ko' ? '1점대 이하' : '≤1.9'}
+                  ⭐ {language === 'ko' ? '1점대 이하' : language === 'ja' ? '≤1.9' : '≤1.9'}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('watchlist')}
@@ -1596,7 +1596,7 @@ export default function MyAniPass() {
                   }`}
                   style={animeSubMenu === 'watchlist' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  {language === 'ko' ? '보고싶어요' : 'Watchlist'}
+                  {language === 'ko' ? '보고싶어요' : language === 'ja' ? 'ウォッチリスト' : 'Watchlist'}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('pass')}
@@ -1607,7 +1607,7 @@ export default function MyAniPass() {
                   }`}
                   style={animeSubMenu === 'pass' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  {language === 'ko' ? '관심없어요' : 'Pass'}
+                  {language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Pass'}
                 </button>
               </div>
             )}
@@ -1622,7 +1622,7 @@ export default function MyAniPass() {
                   }`}
                   style={characterSubMenu === 'all' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  {language === 'ko' ? '모두' : 'All'}
+                  {language === 'ko' ? '모두' : language === 'ja' ? 'すべて' : 'All'}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('5')}
@@ -1633,7 +1633,7 @@ export default function MyAniPass() {
                   }`}
                   style={characterSubMenu === '5' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ 5{language === 'ko' ? '점' : ''}
+                  ⭐ 5{language === 'ko' ? '점' : language === 'ja' ? '点' : ''}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('4')}
@@ -1644,7 +1644,7 @@ export default function MyAniPass() {
                   }`}
                   style={characterSubMenu === '4' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ 4{language === 'ko' ? '점대' : ''}
+                  ⭐ 4{language === 'ko' ? '점대' : language === 'ja' ? '点台' : ''}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('3')}
@@ -1655,7 +1655,7 @@ export default function MyAniPass() {
                   }`}
                   style={characterSubMenu === '3' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ 3{language === 'ko' ? '점대' : ''}
+                  ⭐ 3{language === 'ko' ? '점대' : language === 'ja' ? '点台' : ''}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('2')}
@@ -1666,7 +1666,7 @@ export default function MyAniPass() {
                   }`}
                   style={characterSubMenu === '2' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ 2{language === 'ko' ? '점대' : ''}
+                  ⭐ 2{language === 'ko' ? '점대' : language === 'ja' ? '点台' : ''}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('1')}
@@ -1677,7 +1677,7 @@ export default function MyAniPass() {
                   }`}
                   style={characterSubMenu === '1' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ {language === 'ko' ? '1점대 이하' : '≤1.9'}
+                  ⭐ {language === 'ko' ? '1점대 이하' : language === 'ja' ? '≤1.9' : '≤1.9'}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('want')}
@@ -1688,7 +1688,7 @@ export default function MyAniPass() {
                   }`}
                   style={characterSubMenu === 'want' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  {language === 'ko' ? '알고싶어요' : 'Want to Know'}
+                  {language === 'ko' ? '알고싶어요' : language === 'ja' ? '知りたい' : 'Want to Know'}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('pass')}
@@ -1699,7 +1699,7 @@ export default function MyAniPass() {
                   }`}
                   style={characterSubMenu === 'pass' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  {language === 'ko' ? '관심없어요' : 'Pass'}
+                  {language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Pass'}
                 </button>
               </div>
             )}
@@ -1748,30 +1748,30 @@ export default function MyAniPass() {
                   {/* Stats Summary */}
                   <div className="space-y-3 pt-4 border-t border-gray-200">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{language === 'ko' ? '오타쿠 점수' : 'Otaku Score'}</span>
+                      <span className="text-sm text-gray-600">{language === 'ko' ? '오타쿠 점수' : language === 'ja' ? 'オタクスコア' : 'Otaku Score'}</span>
                       <span className="text-sm font-bold text-gray-900">{Math.round(stats.otaku_score)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{language === 'ko' ? '평가한 애니' : 'Rated Anime'}</span>
+                      <span className="text-sm text-gray-600">{language === 'ko' ? '평가한 애니' : language === 'ja' ? '評価済みアニメ' : 'Rated Anime'}</span>
                       <span className="text-sm font-bold text-gray-900">{stats.total_rated}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{language === 'ko' ? '평가한 캐릭터' : 'Rated Characters'}</span>
+                      <span className="text-sm text-gray-600">{language === 'ko' ? '평가한 캐릭터' : language === 'ja' ? '評価済みキャラ' : 'Rated Characters'}</span>
                       <span className="text-sm font-bold text-gray-900">{stats.total_character_ratings || 0}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{language === 'ko' ? '작성한 리뷰' : 'Reviews Written'}</span>
+                      <span className="text-sm text-gray-600">{language === 'ko' ? '작성한 리뷰' : language === 'ja' ? '作成レビュー' : 'Reviews Written'}</span>
                       <span className="text-sm font-bold text-gray-900">{stats.total_reviews}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</span>
+                      <span className="text-sm text-gray-600">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</span>
                       <span className="text-sm font-bold text-gray-900">{stats.average_rating?.toFixed(1) || 'N/A'}</span>
                     </div>
                     {displayUser?.created_at && (
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">{language === 'ko' ? '가입일' : 'Joined'}</span>
+                        <span className="text-sm text-gray-600">{language === 'ko' ? '가입일' : language === 'ja' ? '登録日' : 'Joined'}</span>
                         <span className="text-sm font-bold text-gray-900">
-                          {new Date(displayUser.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                          {new Date(displayUser.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : language === 'ja' ? 'ja-JP' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                         </span>
                       </div>
                     )}
@@ -1784,7 +1784,7 @@ export default function MyAniPass() {
                       className="flex flex-col items-center hover:text-[#737373] transition-colors"
                     >
                       <span className="text-lg font-bold text-gray-900">{followCounts.followers_count}</span>
-                      <span className="text-xs text-gray-600">{language === 'ko' ? '팔로워' : 'Followers'}</span>
+                      <span className="text-xs text-gray-600">{language === 'ko' ? '팔로워' : language === 'ja' ? 'フォロワー' : 'Followers'}</span>
                     </button>
                     <div className="w-px bg-gray-200"></div>
                     <button
@@ -1792,7 +1792,7 @@ export default function MyAniPass() {
                       className="flex flex-col items-center hover:text-[#737373] transition-colors"
                     >
                       <span className="text-lg font-bold text-gray-900">{followCounts.following_count}</span>
-                      <span className="text-xs text-gray-600">{language === 'ko' ? '팔로잉' : 'Following'}</span>
+                      <span className="text-xs text-gray-600">{language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following'}</span>
                     </button>
                   </div>
                 </div>
@@ -1822,7 +1822,7 @@ export default function MyAniPass() {
                       <textarea
                         value={newPostContent}
                         onChange={(e) => setNewPostContent(e.target.value)}
-                        placeholder={language === 'ko' ? '무슨 생각을 하고 계신가요?' : "What's on your mind?"}
+                        placeholder={language === 'ko' ? '무슨 생각을 하고 계신가요?' : language === 'ja' ? '今何を考えていますか？' : "What's on your mind?"}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
                         rows="3"
                       />
@@ -1835,7 +1835,7 @@ export default function MyAniPass() {
                           onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#1877F2')}
                           onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#3797F0')}
                         >
-                          {language === 'ko' ? '게시' : 'Post'}
+                          {language === 'ko' ? '게시' : language === 'ja' ? '投稿' : 'Post'}
                         </button>
                       </div>
                     </div>
@@ -1846,7 +1846,7 @@ export default function MyAniPass() {
               {/* Feed Activities */}
               {loading ? (
                 <div className="flex justify-center items-center h-64">
-                  <div className="text-xl text-gray-600">{language === 'ko' ? '피드 로딩 중...' : 'Loading feed...'}</div>
+                  <div className="text-xl text-gray-600">{language === 'ko' ? '피드 로딩 중...' : language === 'ja' ? 'フィード読込中...' : 'Loading feed...'}</div>
                 </div>
               ) : userActivities.length > 0 ? (
                 <div className="space-y-4">
@@ -1874,7 +1874,7 @@ export default function MyAniPass() {
                 </div>
               ) : (
                 <div className="text-center py-12 text-gray-600">
-                  {language === 'ko' ? '아직 활동이 없습니다.' : 'No activity yet.'}
+                  {language === 'ko' ? '아직 활동이 없습니다.' : language === 'ja' ? 'まだ活動がありません' : 'No activity yet.'}
                 </div>
               )}
             </div>
@@ -1883,7 +1883,7 @@ export default function MyAniPass() {
 
         {loading && activeTab !== 'feed' ? (
           <div className="flex justify-center items-center h-64">
-            <div className="text-xl text-gray-600">{language === 'ko' ? '로딩 중...' : 'Loading...'}</div>
+            <div className="text-xl text-gray-600">{language === 'ko' ? '로딩 중...' : language === 'ja' ? '読込中...' : 'Loading...'}</div>
           </div>
         ) : activeTab !== 'feed' && (
           <div className={tabLoading ? 'opacity-50 pointer-events-none' : ''}>
@@ -1906,7 +1906,7 @@ export default function MyAniPass() {
                               📺
                             </div>
                             <div className="flex-1">
-                              <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '평가한 애니' : 'Rated Anime'}</div>
+                              <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '평가한 애니' : language === 'ja' ? '評価済みアニメ' : 'Rated Anime'}</div>
                               <div className="text-2xl font-bold text-[#638CCC]">
                                 {stats.total_rated || 0}
                               </div>
@@ -1918,7 +1918,7 @@ export default function MyAniPass() {
                               ⭐
                             </div>
                             <div className="flex-1">
-                              <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '보고싶어요' : 'Watchlist'}</div>
+                              <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '보고싶어요' : language === 'ja' ? 'ウォッチリスト' : 'Watchlist'}</div>
                               <div className="text-2xl font-bold text-[#638CCC]">
                                 {stats.total_want_to_watch || 0}
                               </div>
@@ -1930,7 +1930,7 @@ export default function MyAniPass() {
                               ✨
                             </div>
                             <div className="flex-1">
-                              <div className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-0.5">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</div>
+                              <div className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-0.5">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</div>
                               <div className="text-2xl font-bold text-amber-600">
                                 {stats.average_rating ? `★ ${stats.average_rating.toFixed(1)}` : '-'}
                               </div>
@@ -1942,7 +1942,7 @@ export default function MyAniPass() {
                               ⏱️
                             </div>
                             <div className="flex-1">
-                              <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '시청 시간' : 'Watch Time'}</div>
+                              <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '시청 시간' : language === 'ja' ? '視聴時間' : 'Watch Time'}</div>
                               <div className="text-2xl font-bold text-[#638CCC]">
                                 {formatWatchTime(watchTime?.total_minutes)}
                               </div>
@@ -2010,18 +2010,18 @@ export default function MyAniPass() {
                     <div className="space-y-8">
                       {animeSections.map((section, sectionIndex) => {
                         const categoryLabels = {
-                          '5': language === 'ko' ? '⭐ 5점' : '⭐ 5.0',
-                          '4.5': language === 'ko' ? '⭐ 4.5점' : '⭐ 4.5',
-                          '4': language === 'ko' ? '⭐ 4점' : '⭐ 4.0',
-                          '3.5': language === 'ko' ? '⭐ 3.5점' : '⭐ 3.5',
-                          '3': language === 'ko' ? '⭐ 3점' : '⭐ 3.0',
-                          '2.5': language === 'ko' ? '⭐ 2.5점' : '⭐ 2.5',
-                          '2': language === 'ko' ? '⭐ 2점' : '⭐ 2.0',
-                          '1.5': language === 'ko' ? '⭐ 1.5점' : '⭐ 1.5',
-                          '1': language === 'ko' ? '⭐ 1점' : '⭐ 1.0',
-                          '0.5': language === 'ko' ? '⭐ 0.5점' : '⭐ 0.5',
-                          'watchlist': language === 'ko' ? '📋 보고싶어요' : '📋 Watchlist',
-                          'pass': language === 'ko' ? '🚫 관심없어요' : '🚫 Pass'
+                          '5': language === 'ko' ? '⭐ 5점' : language === 'ja' ? '⭐ 5点' : '⭐ 5.0',
+                          '4.5': language === 'ko' ? '⭐ 4.5점' : language === 'ja' ? '⭐ 4.5点' : '⭐ 4.5',
+                          '4': language === 'ko' ? '⭐ 4점' : language === 'ja' ? '⭐ 4点' : '⭐ 4.0',
+                          '3.5': language === 'ko' ? '⭐ 3.5점' : language === 'ja' ? '⭐ 3.5点' : '⭐ 3.5',
+                          '3': language === 'ko' ? '⭐ 3점' : language === 'ja' ? '⭐ 3点' : '⭐ 3.0',
+                          '2.5': language === 'ko' ? '⭐ 2.5점' : language === 'ja' ? '⭐ 2.5点' : '⭐ 2.5',
+                          '2': language === 'ko' ? '⭐ 2점' : language === 'ja' ? '⭐ 2点' : '⭐ 2.0',
+                          '1.5': language === 'ko' ? '⭐ 1.5점' : language === 'ja' ? '⭐ 1.5点' : '⭐ 1.5',
+                          '1': language === 'ko' ? '⭐ 1점' : language === 'ja' ? '⭐ 1点' : '⭐ 1.0',
+                          '0.5': language === 'ko' ? '⭐ 0.5점' : language === 'ja' ? '⭐ 0.5点' : '⭐ 0.5',
+                          'watchlist': language === 'ko' ? '📋 보고싶어요' : language === 'ja' ? '📋 ウォッチリスト' : '📋 Watchlist',
+                          'pass': language === 'ko' ? '🚫 관심없어요' : language === 'ja' ? '🚫 興味なし' : '🚫 Pass'
                         };
 
                         const isVisible = isAnimeSectionVisible(section.id);
@@ -2059,9 +2059,9 @@ export default function MyAniPass() {
                     // 5점, 보고싶어요, 관심없어요는 섹션 헤더와 함께 표시
                     <div>
                       <h3 className="text-lg font-bold mb-4 text-gray-800">
-                        {animeSubMenu === '5' && (language === 'ko' ? `⭐ 5점 (${displayedAnime.length})` : `⭐ 5.0 (${displayedAnime.length})`)}
-                        {animeSubMenu === 'watchlist' && (language === 'ko' ? `📋 보고싶어요 (${displayedAnime.length})` : `📋 Watchlist (${displayedAnime.length})`)}
-                        {animeSubMenu === 'pass' && (language === 'ko' ? `🚫 관심없어요 (${displayedAnime.length})` : `🚫 Pass (${displayedAnime.length})`)}
+                        {animeSubMenu === '5' && (language === 'ko' ? `⭐ 5점 (${displayedAnime.length})` : language === 'ja' ? `⭐ 5点 (${displayedAnime.length})` : `⭐ 5.0 (${displayedAnime.length})`)}
+                        {animeSubMenu === 'watchlist' && (language === 'ko' ? `📋 보고싶어요 (${displayedAnime.length})` : language === 'ja' ? `📋 ウォッチリスト (${displayedAnime.length})` : `📋 Watchlist (${displayedAnime.length})`)}
+                        {animeSubMenu === 'pass' && (language === 'ko' ? `🚫 관심없어요 (${displayedAnime.length})` : language === 'ja' ? `🚫 興味なし (${displayedAnime.length})` : `🚫 Pass (${displayedAnime.length})`)}
                       </h3>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
                         {displayedAnime.map((anime) => (
@@ -2072,7 +2072,7 @@ export default function MyAniPass() {
                   )
                 ) : (
                   <div className="text-center py-12 text-gray-600">
-                    {language === 'ko' ? '아직 애니가 없습니다.' : 'No anime yet.'}
+                    {language === 'ko' ? '아직 애니가 없습니다.' : language === 'ja' ? 'まだアニメがありません' : 'No anime yet.'}
                   </div>
                 )}
               </div>
@@ -2091,18 +2091,18 @@ export default function MyAniPass() {
                     <div className="space-y-8">
                       {characterSections.map((section, sectionIndex) => {
                         const categoryLabels = {
-                          '5': language === 'ko' ? '⭐ 5점' : '⭐ 5.0',
-                          '4.5': language === 'ko' ? '⭐ 4.5점' : '⭐ 4.5',
-                          '4': language === 'ko' ? '⭐ 4점' : '⭐ 4.0',
-                          '3.5': language === 'ko' ? '⭐ 3.5점' : '⭐ 3.5',
-                          '3': language === 'ko' ? '⭐ 3점' : '⭐ 3.0',
-                          '2.5': language === 'ko' ? '⭐ 2.5점' : '⭐ 2.5',
-                          '2': language === 'ko' ? '⭐ 2점' : '⭐ 2.0',
-                          '1.5': language === 'ko' ? '⭐ 1.5점' : '⭐ 1.5',
-                          '1': language === 'ko' ? '⭐ 1점' : '⭐ 1.0',
-                          '0.5': language === 'ko' ? '⭐ 0.5점' : '⭐ 0.5',
-                          'want': language === 'ko' ? '💭 알고싶어요' : '💭 Want to Know',
-                          'pass': language === 'ko' ? '🚫 관심없어요' : '🚫 Pass'
+                          '5': language === 'ko' ? '⭐ 5점' : language === 'ja' ? '⭐ 5点' : '⭐ 5.0',
+                          '4.5': language === 'ko' ? '⭐ 4.5점' : language === 'ja' ? '⭐ 4.5点' : '⭐ 4.5',
+                          '4': language === 'ko' ? '⭐ 4점' : language === 'ja' ? '⭐ 4点' : '⭐ 4.0',
+                          '3.5': language === 'ko' ? '⭐ 3.5점' : language === 'ja' ? '⭐ 3.5点' : '⭐ 3.5',
+                          '3': language === 'ko' ? '⭐ 3점' : language === 'ja' ? '⭐ 3点' : '⭐ 3.0',
+                          '2.5': language === 'ko' ? '⭐ 2.5점' : language === 'ja' ? '⭐ 2.5点' : '⭐ 2.5',
+                          '2': language === 'ko' ? '⭐ 2점' : language === 'ja' ? '⭐ 2点' : '⭐ 2.0',
+                          '1.5': language === 'ko' ? '⭐ 1.5점' : language === 'ja' ? '⭐ 1.5点' : '⭐ 1.5',
+                          '1': language === 'ko' ? '⭐ 1점' : language === 'ja' ? '⭐ 1点' : '⭐ 1.0',
+                          '0.5': language === 'ko' ? '⭐ 0.5점' : language === 'ja' ? '⭐ 0.5点' : '⭐ 0.5',
+                          'want': language === 'ko' ? '💭 알고싶어요' : language === 'ja' ? '💭 知りたい' : '💭 Want to Know',
+                          'pass': language === 'ko' ? '🚫 관심없어요' : language === 'ja' ? '🚫 興味なし' : '🚫 Pass'
                         };
 
                         const isVisible = isCharacterSectionVisible(section.id);
@@ -2144,9 +2144,9 @@ export default function MyAniPass() {
                     // 5점, 알고싶어요, 관심없어요는 섹션 헤더와 함께 표시
                     <div>
                       <h3 className="text-lg font-bold mb-4 text-gray-800">
-                        {characterSubMenu === '5' && (language === 'ko' ? `⭐ 5점 (${displayedCharacters.length})` : `⭐ 5.0 (${displayedCharacters.length})`)}
-                        {characterSubMenu === 'want' && (language === 'ko' ? `💭 알고싶어요 (${displayedCharacters.length})` : `💭 Want to Know (${displayedCharacters.length})`)}
-                        {characterSubMenu === 'pass' && (language === 'ko' ? `🚫 관심없어요 (${displayedCharacters.length})` : `🚫 Pass (${displayedCharacters.length})`)}
+                        {characterSubMenu === '5' && (language === 'ko' ? `⭐ 5점 (${displayedCharacters.length})` : language === 'ja' ? `⭐ 5点 (${displayedCharacters.length})` : `⭐ 5.0 (${displayedCharacters.length})`)}
+                        {characterSubMenu === 'want' && (language === 'ko' ? `💭 알고싶어요 (${displayedCharacters.length})` : language === 'ja' ? `💭 知りたい (${displayedCharacters.length})` : `💭 Want to Know (${displayedCharacters.length})`)}
+                        {characterSubMenu === 'pass' && (language === 'ko' ? `🚫 관심없어요 (${displayedCharacters.length})` : language === 'ja' ? `🚫 興味なし (${displayedCharacters.length})` : `🚫 Pass (${displayedCharacters.length})`)}
                       </h3>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
                         {displayedCharacters.map((character) => (
@@ -2161,7 +2161,7 @@ export default function MyAniPass() {
                   )
                 ) : (
                   <div className="text-center py-12 text-gray-600">
-                    {language === 'ko' ? '아직 캐릭터가 없습니다.' : 'No characters yet.'}
+                    {language === 'ko' ? '아직 캐릭터가 없습니다.' : language === 'ja' ? 'まだキャラクターがいません' : 'No characters yet.'}
                   </div>
                 )}
               </div>
@@ -2176,7 +2176,7 @@ export default function MyAniPass() {
             <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">
-                  {followModalType === 'followers' ? (language === 'ko' ? '팔로워' : 'Followers') : (language === 'ko' ? '팔로잉' : 'Following')}
+                  {followModalType === 'followers' ? (language === 'ko' ? '팔로워' : language === 'ja' ? 'フォロワー' : 'Followers') : (language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following')}
                 </h2>
                 <button
                   onClick={() => setShowFollowModal(false)}
@@ -2220,8 +2220,8 @@ export default function MyAniPass() {
               ) : (
                 <div className="text-center py-8 text-gray-600">
                   {followModalType === 'followers'
-                    ? (language === 'ko' ? '팔로워가 없습니다.' : 'No followers yet.')
-                    : (language === 'ko' ? '팔로잉하는 사용자가 없습니다.' : 'Not following anyone yet.')}
+                    ? (language === 'ko' ? '팔로워가 없습니다.' : language === 'ja' ? 'フォロワーがいません' : 'No followers yet.')
+                    : (language === 'ko' ? '팔로잉하는 사용자가 없습니다.' : language === 'ja' ? 'フォロー中のユーザーがいません' : 'Not following anyone yet.')}
                 </div>
               )}
             </div>
@@ -2237,7 +2237,7 @@ export default function MyAniPass() {
           >
             <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
               <h3 className="text-xl font-bold mb-2 text-gray-900">
-                {language === 'ko' ? '삭제 옵션' : 'Delete Options'}
+                {language === 'ko' ? '삭제 옵션' : language === 'ja' ? '削除オプション' : 'Delete Options'}
               </h3>
 
               {/* Show what's being deleted */}
@@ -2270,8 +2270,8 @@ export default function MyAniPass() {
                   )}
                   <p className="text-xs text-gray-500">
                     {activityToDelete.activity_type === 'character_rating'
-                      ? (language === 'ko' ? '캐릭터' : 'Character')
-                      : (language === 'ko' ? '애니메이션' : 'Anime')}
+                      ? (language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character')
+                      : (language === 'ko' ? '애니메이션' : language === 'ja' ? 'アニメーション' : 'Anime')}
                   </p>
                 </div>
               </div>
@@ -2288,19 +2288,19 @@ export default function MyAniPass() {
                       onClick={() => handleDeleteActivity('review_only')}
                       className="w-full px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
                     >
-                      {language === 'ko' ? '리뷰만 삭제 (별점 유지)' : 'Delete review only (Keep rating)'}
+                      {language === 'ko' ? '리뷰만 삭제 (별점 유지)' : language === 'ja' ? 'レビューのみ削除 (評価は保持)' : 'Delete review only (Keep rating)'}
                     </button>
                     <button
                       onClick={() => handleDeleteActivity('all')}
                       className="w-full px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
                     >
-                      {language === 'ko' ? '별점까지 모두 삭제' : 'Delete rating and review'}
+                      {language === 'ko' ? '별점까지 모두 삭제' : language === 'ja' ? '評価とレビューを削除' : 'Delete rating and review'}
                     </button>
                     <button
                       onClick={() => setShowDeleteModal(false)}
                       className="w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
                     >
-                      {language === 'ko' ? '취소' : 'Cancel'}
+                      {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                     </button>
                   </div>
                 </>
@@ -2316,13 +2316,13 @@ export default function MyAniPass() {
                       onClick={() => handleDeleteActivity('all')}
                       className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
                     >
-                      {language === 'ko' ? '삭제' : 'Delete'}
+                      {language === 'ko' ? '삭제' : language === 'ja' ? '削除' : 'Delete'}
                     </button>
                     <button
                       onClick={() => setShowDeleteModal(false)}
                       className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
                     >
-                      {language === 'ko' ? '취소' : 'Cancel'}
+                      {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                     </button>
                   </div>
                 </>

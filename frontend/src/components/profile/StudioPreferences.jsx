@@ -6,12 +6,12 @@ export default function StudioPreferences({ studios }) {
   return (
     <div className="bg-white rounded-2xl shadow-md p-6">
       <h3 className="text-lg font-bold mb-4 text-gray-800">
-        {language === 'ko' ? '선호하는 제작사' : 'Favorite Studios'}
+        {language === 'ko' ? '선호하는 제작사' : language === 'ja' ? 'お気に入りのスタジオ' : 'Favorite Studios'}
       </h3>
 
       {!studios || !Array.isArray(studios) || studios.length === 0 ? (
         <div className="text-center py-8 text-gray-500 text-sm">
-          {language === 'ko' ? '데이터가 없습니다' : 'No data available'}
+          {language === 'ko' ? '데이터가 없습니다' : language === 'ja' ? 'データがありません' : 'No data available'}
         </div>
       ) : (
         <div className="space-y-3">
@@ -26,21 +26,30 @@ export default function StudioPreferences({ studios }) {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-600">{studio.anime_count}개</span>
+                  <span className="text-xs text-gray-600">
+                    {studio.anime_count}{language === 'ko' ? '개' : language === 'ja' ? '作品' : ' titles'}
+                  </span>
                   <span className="text-xs text-yellow-600">★ {studio.average_rating?.toFixed(1)}</span>
                 </div>
               </div>
 
               {/* Rating range indicator */}
               <div className="flex items-center gap-2 text-[10px] text-gray-400 ml-7">
-                <span>최고 {studio.max_rating?.toFixed(1)}</span>
+                <span>
+                  {language === 'ko' ? '최고 ' : language === 'ja' ? '最高 ' : 'Max '}
+                  {studio.max_rating?.toFixed(1)}
+                </span>
                 <span>•</span>
-                <span>최저 {studio.min_rating?.toFixed(1)}</span>
+                <span>
+                  {language === 'ko' ? '최저 ' : language === 'ja' ? '最低 ' : 'Min '}
+                  {studio.min_rating?.toFixed(1)}
+                </span>
                 <span>•</span>
                 <span className={`font-medium ${
                   studio.average_rating > studio.overall_avg ? 'text-green-600' : 'text-gray-500'
                 }`}>
-                  평균 대비 {studio.average_rating > studio.overall_avg ? '+' : ''}
+                  {language === 'ko' ? '평균 대비 ' : language === 'ja' ? '平均比 ' : 'vs Avg '}
+                  {studio.average_rating > studio.overall_avg ? '+' : ''}
                   {(studio.average_rating - studio.overall_avg).toFixed(1)}
                 </span>
               </div>

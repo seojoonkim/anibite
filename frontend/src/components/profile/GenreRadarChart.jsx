@@ -8,12 +8,12 @@ export default function GenreRadarChart({ radarData }) {
   return (
     <div className="bg-white rounded-2xl shadow-md p-6">
       <h3 className="text-lg font-bold mb-4 text-gray-800">
-        {language === 'ko' ? '장르별 평가 분포' : 'Genre Rating Distribution'}
+        {language === 'ko' ? '장르별 평가 분포' : language === 'ja' ? 'ジャンル別評価分布' : 'Genre Rating Distribution'}
       </h3>
 
       {!radarData || !radarData.genres || radarData.genres.length === 0 ? (
         <div className="text-center py-8 text-gray-500 text-sm">
-          {language === 'ko' ? '데이터가 없습니다' : 'No data available'}
+          {language === 'ko' ? '데이터가 없습니다' : language === 'ja' ? 'データがありません' : 'No data available'}
         </div>
       ) : (
         <>
@@ -28,7 +28,9 @@ export default function GenreRadarChart({ radarData }) {
                   {genre.genre}
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-600">{genre.count}개</span>
+                  <span className="text-xs text-gray-600">
+                    {genre.count}{language === 'ko' ? '개' : language === 'ja' ? '作品' : ' titles'}
+                  </span>
                   <span className="text-xs text-yellow-600">★ {genre.average_rating?.toFixed(1)}</span>
                 </div>
               </div>
@@ -57,6 +59,8 @@ export default function GenreRadarChart({ radarData }) {
             <p className="text-xs text-gray-500">
               {language === 'ko'
                 ? '평가한 애니메이션이 가장 많은 상위 8개 장르'
+                : language === 'ja'
+                ? '評価したアニメが最も多い上位8つのジャンル'
                 : 'Top 8 genres by number of rated anime'}
             </p>
           </div>

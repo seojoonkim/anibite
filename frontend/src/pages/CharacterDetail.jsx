@@ -275,7 +275,7 @@ export default function CharacterDetail() {
       if (reviewData) processReviews(reviewData);
     } catch (err) {
       console.error('Failed to rate character:', err);
-      alert(language === 'ko' ? '평가를 저장하는데 실패했습니다.' : 'Failed to save rating.');
+      alert(language === 'ko' ? '평가를 저장하는데 실패했습니다.' : language === 'ja' ? '評価の保存に失敗しました。' : 'Failed to save rating.');
     }
   };
 
@@ -288,7 +288,7 @@ export default function CharacterDetail() {
       if (charData) setCharacter(charData);
     } catch (err) {
       console.error('Failed to change status:', err);
-      alert(language === 'ko' ? '상태 변경에 실패했습니다.' : 'Failed to change status.');
+      alert(language === 'ko' ? '상태 변경에 실패했습니다.' : language === 'ja' ? 'ステータス変更に失敗しました。' : 'Failed to change status.');
     }
   };
 
@@ -298,17 +298,17 @@ export default function CharacterDetail() {
     setReviewSuccess('');
 
     if (reviewData.rating === 0 || !reviewData.rating) {
-      setReviewError(language === 'ko' ? '별점을 선택해주세요.' : 'Please select a rating.');
+      setReviewError(language === 'ko' ? '별점을 선택해주세요.' : language === 'ja' ? '評価を選択してください。' : 'Please select a rating.');
       return;
     }
 
     if (!reviewData.content.trim()) {
-      setReviewError(language === 'ko' ? '리뷰 내용을 입력해주세요.' : 'Please enter review content.');
+      setReviewError(language === 'ko' ? '리뷰 내용을 입력해주세요.' : language === 'ja' ? 'レビュー内容を入力してください。' : 'Please enter review content.');
       return;
     }
 
     if (reviewData.content.trim().length < 10) {
-      setReviewError(language === 'ko' ? '리뷰는 최소 10자 이상 작성해주세요.' : 'Review must be at least 10 characters.');
+      setReviewError(language === 'ko' ? '리뷰는 최소 10자 이상 작성해주세요.' : language === 'ja' ? 'レビューは最低10文字以上入力してください。' : 'Review must be at least 10 characters.');
       return;
     }
 
@@ -320,7 +320,7 @@ export default function CharacterDetail() {
           is_spoiler: reviewData.is_spoiler,
           rating: reviewData.rating  // 별점도 함께 전송
         });
-        setReviewSuccess(language === 'ko' ? '리뷰가 수정되었습니다.' : 'Review updated successfully.');
+        setReviewSuccess(language === 'ko' ? '리뷰가 수정되었습니다.' : language === 'ja' ? 'レビューが編集されました。' : 'Review updated successfully.');
       } else {
         // 새로 작성: 별점과 리뷰를 한 번에 전송
         await characterReviewService.createReview({
@@ -333,7 +333,7 @@ export default function CharacterDetail() {
         // 리뷰 생성 후 캐릭터 데이터 새로고침하여 별점 상태 반영
         setCharacter({ ...character, my_rating: reviewData.rating });
 
-        setReviewSuccess(language === 'ko' ? '리뷰가 작성되었습니다.' : 'Review submitted successfully.');
+        setReviewSuccess(language === 'ko' ? '리뷰가 작성되었습니다.' : language === 'ja' ? 'レビューが作成されました。' : 'Review submitted successfully.');
       }
 
       setReviewData({ content: '', is_spoiler: false, rating: 0 });
@@ -374,6 +374,8 @@ export default function CharacterDetail() {
       setReviewError(
         language === 'ko'
           ? err.response?.data?.detail || '리뷰 작성에 실패했습니다.'
+          : language === 'ja'
+          ? err.response?.data?.detail || 'レビュー作成に失敗しました。'
           : err.response?.data?.detail || 'Failed to submit review.'
       );
     }
@@ -404,8 +406,8 @@ export default function CharacterDetail() {
     // 평점만 있는 경우와 리뷰가 있는 경우 다르게 처리
     const isRatingOnly = ActivityUtils.isRatingsOnly(myReview);
     const confirmMessage = isRatingOnly
-      ? (language === 'ko' ? '평점을 삭제하시겠습니까?' : 'Are you sure you want to delete this rating?')
-      : (language === 'ko' ? '리뷰를 삭제하시겠습니까?' : 'Are you sure you want to delete this review?');
+      ? (language === 'ko' ? '평점을 삭제하시겠습니까?' : language === 'ja' ? 'この評価を削除しますか？' : 'Are you sure you want to delete this rating?')
+      : (language === 'ko' ? '리뷰를 삭제하시겠습니까?' : language === 'ja' ? 'このレビューを削除しますか？' : 'Are you sure you want to delete this review?');
 
     if (!window.confirm(confirmMessage)) {
       return;
@@ -423,8 +425,8 @@ export default function CharacterDetail() {
 
       setMyReview(null);
       const successMessage = isRatingOnly
-        ? (language === 'ko' ? '평점이 삭제되었습니다.' : 'Rating deleted successfully.')
-        : (language === 'ko' ? '리뷰가 삭제되었습니다.' : 'Review deleted successfully.');
+        ? (language === 'ko' ? '평점이 삭제되었습니다.' : language === 'ja' ? '評価が削除されました。' : 'Rating deleted successfully.')
+        : (language === 'ko' ? '리뷰가 삭제되었습니다.' : language === 'ja' ? 'レビューが削除されました。' : 'Review deleted successfully.');
       setReviewSuccess(successMessage);
 
       // character stats만 업데이트 (전체 리프레시 없이)
@@ -437,7 +439,7 @@ export default function CharacterDetail() {
       setTimeout(() => setReviewSuccess(''), 3000);
     } catch (err) {
       console.error('Failed to delete:', err);
-      alert(language === 'ko' ? '삭제에 실패했습니다.' : 'Failed to delete.');
+      alert(language === 'ko' ? '삭제에 실패했습니다.' : language === 'ja' ? '削除に失敗しました。' : 'Failed to delete.');
     }
   };
 
@@ -548,7 +550,7 @@ export default function CharacterDetail() {
     } catch (err) {
       console.error('[CharacterDetail] Failed to submit comment:', err);
       console.error('[CharacterDetail] Error details:', err);
-      alert(language === 'ko' ? '댓글 작성에 실패했습니다.' : 'Failed to submit comment.');
+      alert(language === 'ko' ? '댓글 작성에 실패했습니다.' : language === 'ja' ? 'コメント作成に失敗しました。' : 'Failed to submit comment.');
     }
   };
 
@@ -572,12 +574,12 @@ export default function CharacterDetail() {
       updateReviewCommentsCount(reviewId, 1);
     } catch (err) {
       console.error('Failed to submit reply:', err);
-      alert(language === 'ko' ? '답글 작성에 실패했습니다.' : 'Failed to submit reply.');
+      alert(language === 'ko' ? '답글 작성에 실패했습니다.' : language === 'ja' ? '返信作成に失敗しました。' : 'Failed to submit reply.');
     }
   };
 
   const handleDeleteComment = async (reviewId, commentId) => {
-    if (!window.confirm(language === 'ko' ? '댓글을 삭제하시겠습니까?' : 'Are you sure you want to delete this comment?')) {
+    if (!window.confirm(language === 'ko' ? '댓글을 삭제하시겠습니까?' : language === 'ja' ? 'このコメントを削除しますか？' : 'Are you sure you want to delete this comment?')) {
       return;
     }
 
@@ -600,13 +602,13 @@ export default function CharacterDetail() {
     } catch (err) {
       console.error('[CharacterDetail] Failed to delete comment:', err);
       console.error('[CharacterDetail] Error details:', err.response?.data || err.message);
-      alert(language === 'ko' ? '댓글 삭제에 실패했습니다.' : 'Failed to delete comment.');
+      alert(language === 'ko' ? '댓글 삭제에 실패했습니다.' : language === 'ja' ? 'コメント削除に失敗しました。' : 'Failed to delete comment.');
     }
   };
 
   const handleToggleCommentLike = async (commentId) => {
     if (!user) {
-      alert(language === 'ko' ? '로그인이 필요합니다.' : 'Please login first.');
+      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
       return;
     }
 
@@ -677,7 +679,7 @@ export default function CharacterDetail() {
 
   const handleToggleReviewLike = async (reviewId) => {
     if (!user) {
-      alert(language === 'ko' ? '로그인이 필요합니다.' : 'Please login first.');
+      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
       return;
     }
 
@@ -749,10 +751,10 @@ export default function CharacterDetail() {
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
 
-    if (diffInSeconds < 3600) return language === 'ko' ? `${Math.max(1, Math.floor(diffInSeconds / 60))}분 전` : `${Math.max(1, Math.floor(diffInSeconds / 60))}m ago`;
-    if (diffInSeconds < 86400) return language === 'ko' ? `${Math.floor(diffInSeconds / 3600)}시간 전` : `${Math.floor(diffInSeconds / 3600)}h ago`;
-    if (diffInSeconds < 2592000) return language === 'ko' ? `${Math.floor(diffInSeconds / 86400)}일 전` : `${Math.floor(diffInSeconds / 86400)}d ago`;
-    return date.toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US');
+    if (diffInSeconds < 3600) return language === 'ko' ? `${Math.max(1, Math.floor(diffInSeconds / 60))}분 전` : language === 'ja' ? `${Math.max(1, Math.floor(diffInSeconds / 60))}分前` : `${Math.max(1, Math.floor(diffInSeconds / 60))}m ago`;
+    if (diffInSeconds < 86400) return language === 'ko' ? `${Math.floor(diffInSeconds / 3600)}시간 전` : language === 'ja' ? `${Math.floor(diffInSeconds / 3600)}時間前` : `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 2592000) return language === 'ko' ? `${Math.floor(diffInSeconds / 86400)}일 전` : language === 'ja' ? `${Math.floor(diffInSeconds / 86400)}日前` : `${Math.floor(diffInSeconds / 86400)}d ago`;
+    return date.toLocaleDateString(language === 'ko' ? 'ko-KR' : language === 'ja' ? 'ja-JP' : 'en-US');
   };
 
   // Use imageHelpers function for consistency with list pages
@@ -773,11 +775,11 @@ export default function CharacterDetail() {
     if (!date_of_birth_month || !date_of_birth_day) return null;
 
     const parts = [];
-    if (date_of_birth_month) parts.push(`${date_of_birth_month}${language === 'ko' ? '월' : '/'}`);
-    if (date_of_birth_day) parts.push(`${date_of_birth_day}${language === 'ko' ? '일' : ''}`);
-    if (date_of_birth_year) parts.unshift(`${date_of_birth_year}${language === 'ko' ? '년 ' : '-'}`);
+    if (date_of_birth_month) parts.push(`${date_of_birth_month}${language === 'ko' ? '월' : language === 'ja' ? '月' : '/'}`);
+    if (date_of_birth_day) parts.push(`${date_of_birth_day}${language === 'ko' ? '일' : language === 'ja' ? '日' : ''}`);
+    if (date_of_birth_year) parts.unshift(`${date_of_birth_year}${language === 'ko' ? '년 ' : language === 'ja' ? '年' : '-'}`);
 
-    return parts.join(language === 'ko' ? ' ' : '');
+    return parts.join(language === 'ko' ? ' ' : language === 'ja' ? '' : '');
   };
 
   if (loading) {
@@ -827,12 +829,12 @@ export default function CharacterDetail() {
       <div className="min-h-screen pt-12 md:pt-16 bg-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
-            <div className="text-xl text-red-600 mb-4">{error || (language === 'ko' ? '캐릭터를 찾을 수 없습니다.' : 'Character not found.')}</div>
+            <div className="text-xl text-red-600 mb-4">{error || (language === 'ko' ? '캐릭터를 찾을 수 없습니다.' : language === 'ja' ? 'キャラクターが見つかりません。' : 'Character not found.')}</div>
             <button
               onClick={() => navigate(-1)}
               className="text-[#A8E6CF] hover:text-blue-700 font-medium"
             >
-              ← {language === 'ko' ? '뒤로 가기' : 'Go Back'}
+              ← {language === 'ko' ? '뒤로 가기' : language === 'ja' ? '戻る' : 'Go Back'}
             </button>
           </div>
         </div>
@@ -924,7 +926,7 @@ export default function CharacterDetail() {
                 {/* 왼쪽: 종합 평점 */}
                 <div className="flex flex-col items-center">
                   <div className="text-sm font-medium text-gray-600 mb-3">
-                    {language === 'ko' ? '종합 평점' : 'Overall Rating'}
+                    {language === 'ko' ? '종합 평점' : language === 'ja' ? '総合評価' : 'Overall Rating'}
                   </div>
                   <div className="flex items-center gap-3">
                     <span className={`text-6xl ${character.site_rating_count > 0 ? 'text-yellow-500' : 'text-gray-300'}`}>★</span>
@@ -934,8 +936,8 @@ export default function CharacterDetail() {
                       </div>
                       <div className="text-base text-gray-600 mt-1">
                         {character.site_rating_count > 0
-                          ? (language === 'ko' ? `${character.site_rating_count}명 평가` : `${character.site_rating_count} ratings`)
-                          : (language === 'ko' ? '아직 평가 없음' : 'No ratings yet')
+                          ? (language === 'ko' ? `${character.site_rating_count}명 평가` : language === 'ja' ? `${character.site_rating_count}件の評価` : `${character.site_rating_count} ratings`)
+                          : (language === 'ko' ? '아직 평가 없음' : language === 'ja' ? 'まだ評価がありません' : 'No ratings yet')
                         }
                       </div>
                     </div>
@@ -973,25 +975,25 @@ export default function CharacterDetail() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 {character.gender && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '성별:' : 'Gender:'}</span> {character.gender === 'Male' ? (language === 'ko' ? '남성' : 'Male') : character.gender === 'Female' ? (language === 'ko' ? '여성' : 'Female') : character.gender}
+                    <span className="font-medium">{language === 'ko' ? '성별:' : language === 'ja' ? '性別:' : 'Gender:'}</span> {character.gender === 'Male' ? (language === 'ko' ? '남성' : language === 'ja' ? '男性' : 'Male') : character.gender === 'Female' ? (language === 'ko' ? '여성' : language === 'ja' ? '女性' : 'Female') : character.gender}
                   </div>
                 )}
 
                 {getBirthday() && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '생일:' : 'Birthday:'}</span> {getBirthday()}
+                    <span className="font-medium">{language === 'ko' ? '생일:' : language === 'ja' ? '誕生日:' : 'Birthday:'}</span> {getBirthday()}
                   </div>
                 )}
 
                 {character.age && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '나이:' : 'Age:'}</span> {character.age}
+                    <span className="font-medium">{language === 'ko' ? '나이:' : language === 'ja' ? '年齢:' : 'Age:'}</span> {character.age}
                   </div>
                 )}
 
                 {character.blood_type && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '혈액형:' : 'Blood Type:'}</span> {character.blood_type}
+                    <span className="font-medium">{language === 'ko' ? '혈액형:' : language === 'ja' ? '血液型:' : 'Blood Type:'}</span> {character.blood_type}
                   </div>
                 )}
               </div>
@@ -1000,7 +1002,7 @@ export default function CharacterDetail() {
               {character.description && (
                 <div className="mt-6">
                   <h3 className="text-xl font-bold mb-4">
-                    {language === 'ko' ? '설명' : 'Description'}
+                    {language === 'ko' ? '설명' : language === 'ja' ? '説明' : 'Description'}
                   </h3>
                   <p className="text-gray-700 whitespace-pre-wrap">{character.description}</p>
                 </div>
@@ -1014,7 +1016,7 @@ export default function CharacterDetail() {
                 {/* 왼쪽: 종합 평점 */}
                 <div className="flex flex-col items-center">
                   <div className="text-sm font-medium text-gray-600 mb-3">
-                    {language === 'ko' ? '종합 평점' : 'Overall Rating'}
+                    {language === 'ko' ? '종합 평점' : language === 'ja' ? '総合評価' : 'Overall Rating'}
                   </div>
                   <div className="flex items-center gap-3">
                     <span className={`text-6xl ${character.site_rating_count > 0 ? 'text-yellow-500' : 'text-gray-300'}`}>★</span>
@@ -1024,8 +1026,8 @@ export default function CharacterDetail() {
                       </div>
                       <div className="text-base text-gray-600 mt-1">
                         {character.site_rating_count > 0
-                          ? (language === 'ko' ? `${character.site_rating_count}명 평가` : `${character.site_rating_count} ratings`)
-                          : (language === 'ko' ? '아직 평가 없음' : 'No ratings yet')
+                          ? (language === 'ko' ? `${character.site_rating_count}명 평가` : language === 'ja' ? `${character.site_rating_count}件の評価` : `${character.site_rating_count} ratings`)
+                          : (language === 'ko' ? '아직 평가 없음' : language === 'ja' ? 'まだ評価がありません' : 'No ratings yet')
                         }
                       </div>
                     </div>
@@ -1063,12 +1065,12 @@ export default function CharacterDetail() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 {character.gender && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '성별:' : 'Gender:'}</span> {character.gender === 'Male' ? (language === 'ko' ? '남성' : 'Male') : character.gender === 'Female' ? (language === 'ko' ? '여성' : 'Female') : character.gender}
+                    <span className="font-medium">{language === 'ko' ? '성별:' : language === 'ja' ? '性別:' : 'Gender:'}</span> {character.gender === 'Male' ? (language === 'ko' ? '남성' : language === 'ja' ? '男性' : 'Male') : character.gender === 'Female' ? (language === 'ko' ? '여성' : language === 'ja' ? '女性' : 'Female') : character.gender}
                   </div>
                 )}
                 {character.age && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '나이:' : 'Age:'}</span> {character.age}
+                    <span className="font-medium">{language === 'ko' ? '나이:' : language === 'ja' ? '年齢:' : 'Age:'}</span> {character.age}
                   </div>
                 )}
                 {character.date_of_birth && (
@@ -1078,7 +1080,7 @@ export default function CharacterDetail() {
                 )}
                 {character.blood_type && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '혈액형:' : 'Blood Type:'}</span> {character.blood_type}
+                    <span className="font-medium">{language === 'ko' ? '혈액형:' : language === 'ja' ? '血液型:' : 'Blood Type:'}</span> {character.blood_type}
                   </div>
                 )}
                 {character.favourites && character.favourites > 0 && (
@@ -1092,7 +1094,7 @@ export default function CharacterDetail() {
               {character.description && (
                 <div className="mt-6">
                   <h3 className="text-xl font-bold mb-4">
-                    {language === 'ko' ? '설명' : 'Description'}
+                    {language === 'ko' ? '설명' : language === 'ja' ? '説明' : 'Description'}
                   </h3>
                   <p className="text-gray-700 whitespace-pre-wrap">{character.description}</p>
                 </div>
@@ -1102,7 +1104,7 @@ export default function CharacterDetail() {
             {/* Anime Appearances */}
             <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
               <h3 className="text-xl font-bold mb-4">
-                {language === 'ko' ? '출연 작품' : 'Appearances'}
+                {language === 'ko' ? '출연 작품' : language === 'ja' ? '出演作品' : 'Appearances'}
               </h3>
 
               {character.anime && character.anime.length > 0 ? (
@@ -1129,7 +1131,7 @@ export default function CharacterDetail() {
                               ? 'bg-red-500 text-white'
                               : 'bg-blue-500 text-white'
                           }`}>
-                            {anime.role === 'MAIN' ? (language === 'ko' ? '메인' : 'Main') : (language === 'ko' ? '서브' : 'Supporting')}
+                            {anime.role === 'MAIN' ? (language === 'ko' ? '메인' : language === 'ja' ? 'メイン' : 'Main') : (language === 'ko' ? '서브' : language === 'ja' ? 'サポート' : 'Supporting')}
                           </div>
                           {/* My Rating Badge */}
                           {anime.my_anime_rating && (
@@ -1149,7 +1151,7 @@ export default function CharacterDetail() {
                 </div>
               ) : (
                 <p className="text-gray-600">
-                  {language === 'ko' ? '출연 작품이 없습니다.' : 'No anime appearances found.'}
+                  {language === 'ko' ? '출연 작품이 없습니다.' : language === 'ja' ? '出演作品が見つかりません。' : 'No anime appearances found.'}
                 </p>
               )}
             </div>
@@ -1158,7 +1160,7 @@ export default function CharacterDetail() {
             <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold">
-                  {language === 'ko' ? '리뷰' : 'Reviews'} ({activities.length})
+                  {language === 'ko' ? '리뷰' : language === 'ja' ? 'レビュー' : 'Reviews'} ({activities.length})
                 </h3>
                 {!myReview && (
                   <button
@@ -1176,8 +1178,8 @@ export default function CharacterDetail() {
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                   >
                     {showReviewForm
-                      ? (language === 'ko' ? '취소' : 'Cancel')
-                      : (language === 'ko' ? '리뷰 작성' : 'Write Review')
+                      ? (language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel')
+                      : (language === 'ko' ? '리뷰 작성' : language === 'ja' ? 'レビュー作成' : 'Write Review')
                     }
                   </button>
                 )}
@@ -1194,7 +1196,7 @@ export default function CharacterDetail() {
 
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {language === 'ko' ? '별점' : 'Rating'} *
+                      {language === 'ko' ? '별점' : language === 'ja' ? '評価' : 'Rating'} *
                     </label>
                     <StarRating
                       rating={reviewData.rating}
@@ -1206,17 +1208,17 @@ export default function CharacterDetail() {
 
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {language === 'ko' ? '리뷰 내용' : 'Review Content'} *
+                      {language === 'ko' ? '리뷰 내용' : language === 'ja' ? 'レビュー内容' : 'Review Content'} *
                     </label>
                     <textarea
                       value={reviewData.content}
                       onChange={(e) => setReviewData({ ...reviewData, content: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md h-32"
-                      placeholder={language === 'ko' ? '이 캐릭터에 대한 당신의 생각을 공유해주세요...' : 'Share your thoughts about this character...'}
+                      placeholder={language === 'ko' ? '이 캐릭터에 대한 당신의 생각을 공유해주세요...' : language === 'ja' ? 'このキャラクターについてのあなたの感想をシェアしてください...' : 'Share your thoughts about this character...'}
                       required
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      {reviewData.content.length} / 5000 {language === 'ko' ? '자' : 'characters'}
+                      {reviewData.content.length} / 5000 {language === 'ko' ? '자' : language === 'ja' ? '文字' : 'characters'}
                     </p>
                   </div>
 
@@ -1229,7 +1231,7 @@ export default function CharacterDetail() {
                         className="mr-2"
                       />
                       <span className="text-sm text-gray-700">
-                        {language === 'ko' ? '스포일러 포함' : 'Contains spoilers'}
+                        {language === 'ko' ? '스포일러 포함' : language === 'ja' ? 'ネタバレを含む' : 'Contains spoilers'}
                       </span>
                     </label>
                   </div>
@@ -1239,8 +1241,8 @@ export default function CharacterDetail() {
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                   >
                     {isEditingReview
-                      ? (language === 'ko' ? '리뷰 수정' : 'Update Review')
-                      : (language === 'ko' ? '리뷰 등록' : 'Submit Review')
+                      ? (language === 'ko' ? '리뷰 수정' : language === 'ja' ? 'レビュー編集' : 'Update Review')
+                      : (language === 'ko' ? '리뷰 등록' : language === 'ja' ? 'レビュー作成' : 'Submit Review')
                     }
                   </button>
                 </form>
@@ -1299,7 +1301,7 @@ export default function CharacterDetail() {
                   })}
                 </div>
               ) : (
-                <p className="text-gray-600">{language === 'ko' ? '아직 리뷰가 없습니다.' : 'No reviews yet.'}</p>
+                <p className="text-gray-600">{language === 'ko' ? '아직 리뷰가 없습니다.' : language === 'ja' ? 'まだレビューがありません。' : 'No reviews yet.'}</p>
               )}
             </div>
           </div>

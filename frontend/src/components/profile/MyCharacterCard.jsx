@@ -35,6 +35,8 @@ function MyCharacterCard({ character, language = 'ko' }) {
   // 한국어 설정일 때 name_korean 사용, 없으면 character_name 사용
   const name = language === 'ko' && character.name_korean
     ? character.name_korean
+    : language === 'ja' && character.character_name_native
+    ? character.character_name_native
     : (character.character_name || character.character_name_native || character.name_full || '');
 
   return (
@@ -93,6 +95,8 @@ function MyCharacterCard({ character, language = 'ko' }) {
             <p className="text-xs text-gray-500 mt-1 line-clamp-1">
               {language === 'ko' && character.anime_title_korean
                 ? character.anime_title_korean
+                : language === 'ja' && character.anime_title_native
+                ? character.anime_title_native
                 : character.anime_title}
             </p>
           )}

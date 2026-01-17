@@ -11,7 +11,7 @@ export default function Home() {
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [randomPlaceholder, setRandomPlaceholder] = useState(
-    language === 'ko' ? '애니메이션 검색...' : 'Search anime...'
+    language === 'ko' ? '애니메이션 검색...' : language === 'ja' ? 'アニメを検索...' : 'Search anime...'
   );
   const [filters, setFilters] = useState({
     genre: '',
@@ -79,9 +79,11 @@ export default function Home() {
 
           const title = language === 'ko'
             ? (randomAnime.title_korean || randomAnime.title_romaji || randomAnime.title_english)
+            : language === 'ja'
+            ? (randomAnime.title_japanese || randomAnime.title_romaji || randomAnime.title_english)
             : (randomAnime.title_romaji || randomAnime.title_english);
 
-          const placeholderText = language === 'ko' ? `예: ${title}` : `e.g., ${title}`;
+          const placeholderText = language === 'ko' ? `예: ${title}` : language === 'ja' ? `例: ${title}` : `e.g., ${title}`;
           console.log('Setting placeholder to:', placeholderText);
           setRandomPlaceholder(placeholderText);
         }
@@ -205,11 +207,11 @@ export default function Home() {
         {/* Anime Grid */}
         {loading && animeList.length === 0 ? (
           <div className="flex justify-center items-center h-64">
-            <div className="text-xl text-gray-600">{language === 'ko' ? '로딩 중...' : 'Loading...'}</div>
+            <div className="text-xl text-gray-600">{language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...'}</div>
           </div>
         ) : animeList.length === 0 ? (
           <div className="flex justify-center items-center h-64">
-            <div className="text-xl text-gray-600">{language === 'ko' ? '검색 결과가 없습니다.' : 'No results found.'}</div>
+            <div className="text-xl text-gray-600">{language === 'ko' ? '검색 결과가 없습니다.' : language === 'ja' ? '検索結果が見つかりません。' : 'No results found.'}</div>
           </div>
         ) : (
           <>
@@ -227,7 +229,7 @@ export default function Home() {
                   disabled={loading}
                   className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-medium disabled:opacity-50"
                 >
-                  {loading ? (language === 'ko' ? '로딩 중...' : 'Loading...') : (language === 'ko' ? '더 보기' : 'Load More')}
+                  {loading ? (language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...') : (language === 'ko' ? '더 보기' : language === 'ja' ? 'もっと見る' : 'Load More')}
                 </button>
               </div>
             )}

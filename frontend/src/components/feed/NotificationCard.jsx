@@ -35,10 +35,14 @@ export default function NotificationCard({
     if (notification.type === 'like') {
       return language === 'ko'
         ? `${actorName}님이 좋아요를 눌렀습니다`
+        : language === 'ja'
+        ? `${actorName}さんがいいねしました`
         : `${actorName} liked your ${notification.activity_type === 'anime_rating' || notification.activity_type === 'anime_review' ? 'anime rating' : 'character rating'}`;
     } else if (notification.type === 'comment') {
       return language === 'ko'
         ? `${actorName}님이 댓글을 남겼습니다`
+        : language === 'ja'
+        ? `${actorName}さんがコメントしました`
         : `${actorName} commented on your ${notification.activity_type === 'anime_rating' || notification.activity_type === 'anime_review' ? 'anime rating' : 'character rating'}`;
     }
     return '';

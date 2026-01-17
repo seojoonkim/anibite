@@ -10,12 +10,12 @@ export default function SourcePreferences({ sources }) {
   return (
     <div className="bg-white rounded-2xl shadow-md p-6">
       <h3 className="text-lg font-bold mb-4 text-gray-800">
-        {language === 'ko' ? '원작 매체 선호도' : 'Source Material Preferences'}
+        {language === 'ko' ? '원작 매체 선호도' : language === 'ja' ? '原作メディアの好み' : 'Source Material Preferences'}
       </h3>
 
       {!sources || !sources.distribution || sources.distribution.length === 0 ? (
         <div className="text-center py-8 text-gray-500 text-sm">
-          {language === 'ko' ? '데이터가 없습니다' : 'No data available'}
+          {language === 'ko' ? '데이터가 없습니다' : language === 'ja' ? 'データがありません' : 'No data available'}
         </div>
       ) : (
         <>
@@ -30,7 +30,9 @@ export default function SourcePreferences({ sources }) {
                   {source.source_display}
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-600">{source.count}개</span>
+                  <span className="text-xs text-gray-600">
+                    {source.count}{language === 'ko' ? '개' : language === 'ja' ? '作品' : ' titles'}
+                  </span>
                   <span className="text-xs text-yellow-600">★ {source.average_rating?.toFixed(1)}</span>
                 </div>
               </div>
@@ -52,7 +54,7 @@ export default function SourcePreferences({ sources }) {
           {sources.top_source && (
             <div className="mt-4 pt-4 border-t border-gray-100">
               <p className="text-xs text-gray-600">
-                {language === 'ko' ? '가장 선호하는 원작: ' : 'Most preferred source: '}
+                {language === 'ko' ? '가장 선호하는 원작: ' : language === 'ja' ? '最も好きな原作: ' : 'Most preferred source: '}
                 <span className="font-semibold text-gray-900">{sources.top_source}</span>
               </p>
             </div>

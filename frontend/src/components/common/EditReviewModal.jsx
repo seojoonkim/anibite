@@ -75,21 +75,21 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
 
     // 별점 필수
     if (formData.rating === 0) {
-      setError(language === 'ko' ? '별점을 선택해주세요.' : 'Please select a rating.');
+      setError(language === 'ko' ? '별점을 선택해주세요.' : language === 'ja' ? '評価を選択してください。' : 'Please select a rating.');
       return;
     }
 
     // 리뷰 내용 검증 (edit_rating 모드가 아니고 내용이 있을 경우에만)
     if (mode !== 'edit_rating' && formData.content.trim()) {
       if (formData.content.trim().length < 10) {
-        setError(language === 'ko' ? '리뷰는 최소 10자 이상 작성해주세요.' : 'Review must be at least 10 characters.');
+        setError(language === 'ko' ? '리뷰는 최소 10자 이상 작성해주세요.' : language === 'ja' ? 'レビューは10文字以上で入力してください。' : 'Review must be at least 10 characters.');
         return;
       }
     }
 
     // add_review 모드에서는 리뷰 내용 필수
     if (mode === 'add_review' && !formData.content.trim()) {
-      setError(language === 'ko' ? '리뷰 내용을 입력해주세요.' : 'Please enter review content.');
+      setError(language === 'ko' ? '리뷰 내용을 입력해주세요.' : language === 'ja' ? 'レビュー内容を入力してください。' : 'Please enter review content.');
       return;
     }
 
@@ -98,7 +98,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
       await onSave(formData);
       onClose();
     } catch (err) {
-      setError(language === 'ko' ? '저장에 실패했습니다.' : 'Failed to save.');
+      setError(language === 'ko' ? '저장에 실패했습니다.' : language === 'ja' ? '保存に失敗しました。' : 'Failed to save.');
     } finally {
       setSaving(false);
     }
@@ -108,12 +108,12 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
 
   const getTitle = () => {
     if (mode === 'edit_rating') {
-      return language === 'ko' ? '별점 수정' : 'Edit Rating';
+      return language === 'ko' ? '별점 수정' : language === 'ja' ? '評価を編集' : 'Edit Rating';
     }
     if (mode === 'add_review') {
-      return language === 'ko' ? '리뷰 추가' : 'Add Review';
+      return language === 'ko' ? '리뷰 추가' : language === 'ja' ? 'レビューを追加' : 'Add Review';
     }
-    return language === 'ko' ? '리뷰 수정' : 'Edit Review';
+    return language === 'ko' ? '리뷰 수정' : language === 'ja' ? 'レビューを編集' : 'Edit Review';
   };
 
   const modalContent = (
@@ -193,7 +193,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
           {/* Rating */}
           <div className="mb-3">
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              {language === 'ko' ? '별점' : 'Rating'} *
+              {language === 'ko' ? '별점' : language === 'ja' ? '評価' : 'Rating'} *
             </label>
             <StarRating
               rating={formData.rating}
@@ -206,10 +206,10 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
           {/* Review Content */}
           <div className="mb-3">
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              {language === 'ko' ? '리뷰 내용' : 'Review Content'}{' '}
+              {language === 'ko' ? '리뷰 내용' : language === 'ja' ? 'レビュー内容' : 'Review Content'}{' '}
               {mode === 'add_review' ? '*' : (
                 <span className="text-gray-500 font-normal text-xs">
-                  ({language === 'ko' ? '선택' : 'Optional'})
+                  ({language === 'ko' ? '선택' : language === 'ja' ? 'オプション' : 'Optional'})
                 </span>
               )}
             </label>
@@ -217,11 +217,11 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md h-28 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder={language === 'ko' ? '이 작품에 대한 당신의 생각을 공유해주세요...' : 'Share your thoughts about this...'}
+              placeholder={language === 'ko' ? '이 작품에 대한 당신의 생각을 공유해주세요...' : language === 'ja' ? 'この作品についてのあなたの考えを共有してください...' : 'Share your thoughts about this...'}
               required={mode === 'add_review'}
             />
             <p className="text-xs text-gray-500 mt-1">
-              {formData.content.length} / 5000 {language === 'ko' ? '자' : 'characters'}
+              {formData.content.length} / 5000 {language === 'ko' ? '자' : language === 'ja' ? '文字' : 'characters'}
             </p>
           </div>
 
@@ -236,7 +236,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
                 className="mr-2"
               />
               <span className="text-sm text-gray-700">
-                {language === 'ko' ? '스포일러 포함' : 'Contains spoilers'}
+                {language === 'ko' ? '스포일러 포함' : language === 'ja' ? 'ネタバレを含む' : 'Contains spoilers'}
               </span>
             </label>
           </div>
@@ -249,7 +249,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
               className="px-5 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
               disabled={saving}
             >
-              {language === 'ko' ? '취소' : 'Cancel'}
+              {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
             </button>
             <button
               type="submit"
@@ -257,8 +257,8 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
               disabled={saving}
             >
               {saving
-                ? (language === 'ko' ? '저장 중...' : 'Saving...')
-                : (language === 'ko' ? '저장' : 'Save')
+                ? (language === 'ko' ? '저장 중...' : language === 'ja' ? '保存中...' : 'Saving...')
+                : (language === 'ko' ? '저장' : language === 'ja' ? '保存' : 'Save')
               }
             </button>
           </div>

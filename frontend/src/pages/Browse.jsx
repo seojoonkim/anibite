@@ -289,25 +289,25 @@ export default function Browse() {
                   <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-200">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '포스터' : 'Poster'}
+                        {language === 'ko' ? '포스터' : language === 'ja' ? 'ポスター' : 'Poster'}
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '제목' : 'Title'}
+                        {language === 'ko' ? '제목' : language === 'ja' ? 'タイトル' : 'Title'}
                       </th>
                       <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '상태' : 'Status'}
+                        {language === 'ko' ? '상태' : language === 'ja' ? 'ステータス' : 'Status'}
                       </th>
                       <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '연도' : 'Year'}
+                        {language === 'ko' ? '연도' : language === 'ja' ? '年' : 'Year'}
                       </th>
                       <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '화수' : 'Episodes'}
+                        {language === 'ko' ? '화수' : language === 'ja' ? '話数' : 'Episodes'}
                       </th>
                       <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '장르' : 'Genres'}
+                        {language === 'ko' ? '장르' : language === 'ja' ? 'ジャンル' : 'Genres'}
                       </th>
                       <th className="hidden md:table-cell px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '평점' : 'Rating'}
+                        {language === 'ko' ? '평점' : language === 'ja' ? '評価' : 'Rating'}
                       </th>
                     </tr>
                   </thead>
@@ -422,12 +422,12 @@ export default function Browse() {
             <div ref={loadMoreTriggerRef} className="h-20 flex items-center justify-center">
               {loadingMore && (
                 <div className="text-gray-500 text-sm">
-                  {language === 'ko' ? '로딩 중...' : 'Loading...'}
+                  {language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...'}
                 </div>
               )}
               {!initialLoading && !loadingMore && !hasMore && animeList.length > 0 && (
                 <div className="text-gray-400 text-sm">
-                  {language === 'ko' ? '모든 애니메이션을 불러왔습니다' : 'All anime loaded'}
+                  {language === 'ko' ? '모든 애니메이션을 불러왔습니다' : language === 'ja' ? 'すべてのアニメを読み込みました' : 'All anime loaded'}
                 </div>
               )}
             </div>

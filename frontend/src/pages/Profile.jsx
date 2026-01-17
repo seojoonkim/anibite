@@ -101,14 +101,14 @@ export default function Profile() {
                   <div className="text-2xl font-bold text-gray-900">
                     {stats.total_want_to_watch || 0}
                   </div>
-                  <div className="text-sm text-gray-500 mt-1">{language === 'ko' ? '보고싶어요' : 'Watchlist'}</div>
+                  <div className="text-sm text-gray-500 mt-1">{language === 'ko' ? '보고싶어요' : language === 'ja' ? 'ウォッチリスト' : 'Watchlist'}</div>
                 </div>
 
                 <div className="text-center">
                   <div className="text-2xl font-bold text-gray-900">
                     {stats.average_rating ? stats.average_rating.toFixed(1) : '-'}
                   </div>
-                  <div className="text-sm text-gray-500 mt-1">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</div>
+                  <div className="text-sm text-gray-500 mt-1">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</div>
                 </div>
 
                 <div className="text-center">

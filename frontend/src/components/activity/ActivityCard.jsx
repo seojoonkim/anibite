@@ -182,18 +182,18 @@ const ActivityCard = forwardRef(({
 
     if (activity.activity_type === 'anime_rating') {
       if (hasReview) {
-        return language === 'ko' ? '애니를 리뷰했어요' : 'reviewed an anime';
+        return language === 'ko' ? '애니를 리뷰했어요' : language === 'ja' ? 'アニメをレビューしました' : 'reviewed an anime';
       }
-      return language === 'ko' ? '애니를 평가했어요' : 'rated an anime';
+      return language === 'ko' ? '애니를 평가했어요' : language === 'ja' ? 'アニメを評価しました' : 'rated an anime';
     } else if (activity.activity_type === 'character_rating') {
       if (hasReview) {
-        return language === 'ko' ? '캐릭터를 리뷰했어요' : 'reviewed a character';
+        return language === 'ko' ? '캐릭터를 리뷰했어요' : language === 'ja' ? 'キャラクターをレビューしました' : 'reviewed a character';
       }
-      return language === 'ko' ? '캐릭터를 평가했어요' : 'rated a character';
+      return language === 'ko' ? '캐릭터를 평가했어요' : language === 'ja' ? 'キャラクターを評価しました' : 'rated a character';
     } else if (activity.activity_type === 'user_post') {
-      return language === 'ko' ? '포스트를 작성했어요' : 'created a post';
+      return language === 'ko' ? '포스트를 작성했어요' : language === 'ja' ? 'ポストを作成しました' : 'created a post';
     } else if (activity.activity_type === 'rank_promotion') {
-      return language === 'ko' ? '승급했어요!' : 'ranked up!';
+      return language === 'ko' ? '승급했어요!' : language === 'ja' ? 'ランクアップしました！' : 'ranked up!';
     }
     return '';
   };
@@ -222,15 +222,15 @@ const ActivityCard = forwardRef(({
     const diffDays = Math.floor(diffHours / 24);
 
     if (diffSecs < 60) {
-      return language === 'ko' ? '방금 전' : 'Just now';
+      return language === 'ko' ? '방금 전' : language === 'ja' ? 'たった今' : 'Just now';
     } else if (diffMins < 60) {
-      return language === 'ko' ? `${diffMins}분 전` : `${diffMins}m ago`;
+      return language === 'ko' ? `${diffMins}분 전` : language === 'ja' ? `${diffMins}分前` : `${diffMins}m ago`;
     } else if (diffHours < 24) {
-      return language === 'ko' ? `${diffHours}시간 전` : `${diffHours}h ago`;
+      return language === 'ko' ? `${diffHours}시간 전` : language === 'ja' ? `${diffHours}時間前` : `${diffHours}h ago`;
     } else if (diffDays < 7) {
-      return language === 'ko' ? `${diffDays}일 전` : `${diffDays}d ago`;
+      return language === 'ko' ? `${diffDays}일 전` : language === 'ja' ? `${diffDays}日前` : `${diffDays}d ago`;
     } else {
-      return date.toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US', {
+      return date.toLocaleDateString(language === 'ko' ? 'ko-KR' : language === 'ja' ? 'ja-JP' : 'en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
@@ -277,7 +277,7 @@ const ActivityCard = forwardRef(({
   // Handlers
   const handleLikeClick = async () => {
     if (!user) {
-      alert(language === 'ko' ? '로그인이 필요합니다.' : 'Please login first.');
+      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
       return;
     }
     await toggleLike();
@@ -288,7 +288,7 @@ const ActivityCard = forwardRef(({
     console.log('Bookmark button clicked!', { user, bookmarked, activityId: activity.id });
 
     if (!user) {
-      alert(language === 'ko' ? '로그인이 필요합니다.' : 'Please login first.');
+      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
       return;
     }
 
@@ -306,7 +306,7 @@ const ActivityCard = forwardRef(({
       }
     } catch (error) {
       console.error('Failed to update bookmark:', error);
-      alert(language === 'ko' ? '북마크 업데이트에 실패했습니다.' : 'Failed to update bookmark.');
+      alert(language === 'ko' ? '북마크 업데이트에 실패했습니다.' : language === 'ja' ? 'ブックマークの更新に失敗しました。' : 'Failed to update bookmark.');
 
       // Revert state on error
       setBookmarked(!bookmarked);
@@ -315,7 +315,7 @@ const ActivityCard = forwardRef(({
 
   const handleCommentSubmit = async () => {
     if (!user) {
-      alert(language === 'ko' ? '로그인이 필요합니다.' : 'Please login first.');
+      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
       return;
     }
 
@@ -327,7 +327,7 @@ const ActivityCard = forwardRef(({
       // Don't call onUpdate() - useActivityComments already handles optimistic updates
     } catch (err) {
       console.error('Failed to create comment:', err);
-      alert(language === 'ko' ? '댓글 작성에 실패했습니다.' : 'Failed to create comment.');
+      alert(language === 'ko' ? '댓글 작성에 실패했습니다.' : language === 'ja' ? 'コメントの作成に失敗しました。' : 'Failed to create comment.');
     }
   };
 
@@ -341,7 +341,7 @@ const ActivityCard = forwardRef(({
       // Don't call onUpdate() - useActivityComments already handles optimistic updates
     } catch (err) {
       console.error('Failed to create reply:', err);
-      alert(language === 'ko' ? '답글 작성에 실패했습니다.' : 'Failed to create reply.');
+      alert(language === 'ko' ? '답글 작성에 실패했습니다.' : language === 'ja' ? '返信の作成に失敗しました。' : 'Failed to create reply.');
     }
   };
 
@@ -376,7 +376,7 @@ const ActivityCard = forwardRef(({
     }
 
     // Confirm before deleting
-    const confirmMsg = language === 'ko' ? '정말 삭제하시겠습니까?' : 'Are you sure you want to delete this?';
+    const confirmMsg = language === 'ko' ? '정말 삭제하시겠습니까?' : language === 'ja' ? '本当に削除しますか？' : 'Are you sure you want to delete this?';
     if (!window.confirm(confirmMsg)) {
       return;
     }
@@ -405,7 +405,7 @@ const ActivityCard = forwardRef(({
       }
     } catch (err) {
       console.error('Failed to delete:', err);
-      alert(language === 'ko' ? '삭제에 실패했습니다.' : 'Failed to delete.');
+      alert(language === 'ko' ? '삭제에 실패했습니다.' : language === 'ja' ? '削除に失敗しました。' : 'Failed to delete.');
     }
   };
 
@@ -441,7 +441,7 @@ const ActivityCard = forwardRef(({
 
   const handleSaveEditPost = async () => {
     if (!editPostContent.trim()) {
-      alert(language === 'ko' ? '내용을 입력해주세요.' : 'Please enter content.');
+      alert(language === 'ko' ? '내용을 입력해주세요.' : language === 'ja' ? '内容を入力してください。' : 'Please enter content.');
       return;
     }
 
@@ -467,7 +467,7 @@ const ActivityCard = forwardRef(({
       }
     } catch (err) {
       console.error('Failed to update post:', err);
-      alert(language === 'ko' ? '포스트 수정에 실패했습니다.' : 'Failed to update post.');
+      alert(language === 'ko' ? '포스트 수정에 실패했습니다.' : language === 'ja' ? 'ポストの編集に失敗しました。' : 'Failed to update post.');
     }
   };
 
@@ -627,31 +627,31 @@ const ActivityCard = forwardRef(({
                   <>
                     <div className="flex items-center justify-center gap-3">
                       <div className="text-center">
-                        <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '이전 등급' : 'Previous Rank'}</div>
+                        <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '이전 등급' : language === 'ja' ? '以前のランク' : 'Previous Rank'}</div>
                         <div className="text-lg font-bold text-gray-700">
                           {getRankName(metadata.old_rank)} - {toRoman(metadata.old_level)}
                         </div>
                       </div>
                       <div className="text-3xl">🎉</div>
                       <div className="text-center">
-                        <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '새로운 등급' : 'New Rank'}</div>
+                        <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '새로운 등급' : language === 'ja' ? '新しいランク' : 'New Rank'}</div>
                         <div className="text-xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
                           {getRankName(metadata.new_rank)} - {toRoman(metadata.new_level)}
                         </div>
                       </div>
                     </div>
                     <div className="text-center mt-3 text-sm text-gray-600">
-                      {language === 'ko' ? '오타쿠 점수:' : 'Otaku Score:'} <span className="font-bold text-gray-800">{Math.floor(metadata.otaku_score)}</span>
+                      {language === 'ko' ? '오타쿠 점수:' : language === 'ja' ? 'オタクスコア:' : 'Otaku Score:'} <span className="font-bold text-gray-800">{Math.floor(metadata.otaku_score)}</span>
                     </div>
                   </>
                 ) : (
                   <div className="text-center">
                     <div className="text-2xl mb-2">🎉</div>
                     <div className="text-lg font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
-                      {language === 'ko' ? '새로운 등급 달성!' : 'New Rank Achieved!'}
+                      {language === 'ko' ? '새로운 등급 달성!' : language === 'ja' ? '新しいランク達成！' : 'New Rank Achieved!'}
                     </div>
                     <div className="text-xs text-gray-500 mt-2">
-                      {language === 'ko' ? '(세부 정보를 불러오는 중...)' : '(Loading details...)'}
+                      {language === 'ko' ? '(세부 정보를 불러오는 중...)' : language === 'ja' ? '(詳細を読み込み中...)' : '(Loading details...)'}
                     </div>
                   </div>
                 )}
@@ -720,7 +720,7 @@ const ActivityCard = forwardRef(({
               {activity.is_spoiler ? (
                 <details className="cursor-pointer">
                   <summary className="text-red-600 font-medium">
-                    {language === 'ko' ? '스포일러 포함 (클릭하여 보기)' : 'Spoiler (Click to reveal)'}
+                    {language === 'ko' ? '스포일러 포함 (클릭하여 보기)' : language === 'ja' ? 'ネタバレ (クリックして表示)' : 'Spoiler (Click to reveal)'}
                   </summary>
                   <p className="mt-2">{activity.review_content || activity.content}</p>
                 </details>
@@ -753,7 +753,7 @@ const ActivityCard = forwardRef(({
                   </svg>
                 )}
                 <span className="text-sm font-medium">
-                  {language === 'ko' ? '좋아요' : 'Like'}
+                  {language === 'ko' ? '좋아요' : language === 'ja' ? 'いいね' : 'Like'}
                   {likesCount > 0 && <> {likesCount}</>}
                 </span>
               </button>
@@ -767,7 +767,7 @@ const ActivityCard = forwardRef(({
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
                 <span className="text-sm font-medium">
-                  {language === 'ko' ? '댓글' : 'Comment'}
+                  {language === 'ko' ? '댓글' : language === 'ja' ? 'コメント' : 'Comment'}
                   {activity.comments_count > 0 && <> {activity.comments_count}</>}
                 </span>
               </button>
@@ -827,7 +827,7 @@ const ActivityCard = forwardRef(({
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-bold mb-4 text-gray-800">
-              {language === 'ko' ? '포스트 수정' : 'Edit Post'}
+              {language === 'ko' ? '포스트 수정' : language === 'ja' ? 'ポストを編集' : 'Edit Post'}
             </h3>
             <textarea
               ref={editModalTextareaRef}
@@ -835,20 +835,20 @@ const ActivityCard = forwardRef(({
               onChange={(e) => setEditPostContent(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-3 mb-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={6}
-              placeholder={language === 'ko' ? '내용을 입력하세요...' : 'Enter content...'}
+              placeholder={language === 'ko' ? '내용을 입력하세요...' : language === 'ja' ? '内容を入力してください...' : 'Enter content...'}
             />
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setShowEditModal(false)}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
               >
-                {language === 'ko' ? '취소' : 'Cancel'}
+                {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
               </button>
               <button
                 onClick={handleSaveEditPost}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
               >
-                {language === 'ko' ? '저장' : 'Save'}
+                {language === 'ko' ? '저장' : language === 'ja' ? '保存' : 'Save'}
               </button>
             </div>
           </div>

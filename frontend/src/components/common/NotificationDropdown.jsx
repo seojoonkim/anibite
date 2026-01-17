@@ -91,6 +91,8 @@ export default function NotificationDropdown({
     if (notification.type === 'like') {
       return language === 'ko'
         ? `${displayName}님이 회원님의 평가에 좋아요를 눌렀어요`
+        : language === 'ja'
+        ? `${displayName}さんがあなたの評価にいいねしました`
         : `${displayName} liked your rating`;
     } else if (notification.type === 'comment') {
       const preview = notification.comment_content
@@ -100,10 +102,14 @@ export default function NotificationDropdown({
         : '';
       return language === 'ko'
         ? `${displayName}님이 댓글을 남겼어요${preview ? `: "${preview}"` : ''}`
+        : language === 'ja'
+        ? `${displayName}さんがコメントしました${preview ? `: "${preview}"` : ''}`
         : `${displayName} commented${preview ? `: "${preview}"` : ''}`;
     } else if (notification.type === 'follow') {
       return language === 'ko'
         ? `${displayName}님이 회원님을 팔로우하기 시작했어요`
+        : language === 'ja'
+        ? `${displayName}さんがあなたをフォローしました`
         : `${displayName} started following you`;
     }
     return '';
@@ -124,6 +130,12 @@ export default function NotificationDropdown({
       if (hours < 24) return `${hours}시간 전`;
       if (days < 7) return `${days}일 전`;
       return notificationTime.toLocaleDateString('ko-KR');
+    } else if (language === 'ja') {
+      if (minutes < 1) return 'たった今';
+      if (minutes < 60) return `${minutes}分前`;
+      if (hours < 24) return `${hours}時間前`;
+      if (days < 7) return `${days}日前`;
+      return notificationTime.toLocaleDateString('ja-JP');
     } else {
       if (minutes < 1) return 'Just now';
       if (minutes < 60) return `${minutes}m ago`;
@@ -244,7 +256,7 @@ export default function NotificationDropdown({
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
             </svg>
-            {language === 'ko' ? '알림' : 'Notifications'}
+            {language === 'ko' ? '알림' : language === 'ja' ? '通知' : 'Notifications'}
             {unreadCount > 0 && (
               <span className="bg-[#FFB6C1] text-white text-xs px-2 py-0.5 rounded-full font-bold">
                 {unreadCount}
@@ -256,7 +268,7 @@ export default function NotificationDropdown({
               onClick={handleMarkAllRead}
               className="text-white text-xs hover:underline font-medium"
             >
-              {language === 'ko' ? '모두 읽음' : 'Mark all read'}
+              {language === 'ko' ? '모두 읽음' : language === 'ja' ? 'すべて既読' : 'Mark all read'}
             </button>
           )}
         </div>
@@ -266,7 +278,7 @@ export default function NotificationDropdown({
           {loading ? (
             <div className="p-8 text-center text-gray-500">
               <div className="animate-spin w-8 h-8 border-4 border-[#A8E6CF] border-t-transparent rounded-full mx-auto mb-2"></div>
-              {language === 'ko' ? '로딩 중...' : 'Loading...'}
+              {language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...'}
             </div>
           ) : (notifications.length === 0 || unreadCount === 0) ? (
             // 빈 상태
@@ -275,7 +287,7 @@ export default function NotificationDropdown({
                 <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
               </svg>
               <p className="text-gray-600 font-medium">
-                {language === 'ko' ? '새로운 알림이 없습니다' : 'No new notifications'}
+                {language === 'ko' ? '새로운 알림이 없습니다' : language === 'ja' ? '新しい通知はありません' : 'No new notifications'}
               </p>
             </div>
           ) : (
@@ -348,7 +360,7 @@ export default function NotificationDropdown({
               onClick={handleViewAll}
               className="w-full py-3 text-center text-[#A8E6CF] hover:text-[#8EC5FC] font-medium text-sm transition-colors"
             >
-              {language === 'ko' ? '알림 모두보기 →' : 'View all notifications →'}
+              {language === 'ko' ? '알림 모두보기 →' : language === 'ja' ? 'すべての通知を見る →' : 'View all notifications →'}
             </button>
           </div>
         )}
@@ -382,7 +394,7 @@ export default function NotificationDropdown({
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
               </svg>
-              {language === 'ko' ? '알림' : 'Notifications'}
+              {language === 'ko' ? '알림' : language === 'ja' ? '通知' : 'Notifications'}
               {unreadCount > 0 && (
                 <span className="bg-[#FFB6C1] text-white text-xs px-2 py-0.5 rounded-full font-bold">
                   {unreadCount}
@@ -394,7 +406,7 @@ export default function NotificationDropdown({
                 onClick={handleMarkAllRead}
                 className="text-[#A8E6CF] text-sm hover:text-[#8EC5FC] font-medium"
               >
-                {language === 'ko' ? '모두 읽음' : 'Mark all read'}
+                {language === 'ko' ? '모두 읽음' : language === 'ja' ? 'すべて既読' : 'Mark all read'}
               </button>
             )}
           </div>
@@ -404,7 +416,7 @@ export default function NotificationDropdown({
             {loading ? (
               <div className="p-8 text-center text-gray-500">
                 <div className="animate-spin w-8 h-8 border-4 border-[#A8E6CF] border-t-transparent rounded-full mx-auto mb-2"></div>
-                {language === 'ko' ? '로딩 중...' : 'Loading...'}
+                {language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...'}
               </div>
             ) : (notifications.length === 0 || unreadCount === 0) ? (
               <div className="p-8 text-center">
@@ -412,7 +424,7 @@ export default function NotificationDropdown({
                   <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
                 <p className="text-gray-600 font-medium">
-                  {language === 'ko' ? '새로운 알림이 없습니다' : 'No new notifications'}
+                  {language === 'ko' ? '새로운 알림이 없습니다' : language === 'ja' ? '新しい通知はありません' : 'No new notifications'}
                 </p>
               </div>
             ) : (
@@ -476,7 +488,7 @@ export default function NotificationDropdown({
                 onClick={handleViewAll}
                 className="w-full py-4 text-center text-[#A8E6CF] font-medium text-sm"
               >
-                {language === 'ko' ? '알림 모두보기 →' : 'View all notifications →'}
+                {language === 'ko' ? '알림 모두보기 →' : language === 'ja' ? 'すべての通知を見る →' : 'View all notifications →'}
               </button>
             </div>
           )}

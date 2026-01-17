@@ -230,7 +230,7 @@ export default function Feed() {
       resetActivities();
     } catch (err) {
       console.error('Failed to create post:', err);
-      alert(language === 'ko' ? '게시 실패' : 'Failed to post');
+      alert(language === 'ko' ? '게시 실패' : language === 'ja' ? '投稿失敗' : 'Failed to post');
     }
   };
 
@@ -273,6 +273,11 @@ export default function Feed() {
       if (hours < 24) return `${hours}시간 전`;
       if (days < 7) return `${days}일 전`;
       return activityTime.toLocaleDateString('ko-KR');
+    } else if (language === 'ja') {
+      if (minutes < 60) return `${Math.max(1, minutes)}分前`;
+      if (hours < 24) return `${hours}時間前`;
+      if (days < 7) return `${days}日前`;
+      return activityTime.toLocaleDateString('ja-JP');
     } else {
       if (minutes < 60) return `${Math.max(1, minutes)}m ago`;
       if (hours < 24) return `${hours}h ago`;
@@ -447,7 +452,7 @@ export default function Feed() {
       await loadMore(false);
     } catch (err) {
       console.error('Failed to delete:', err);
-      alert(language === 'ko' ? '삭제에 실패했습니다.' : 'Failed to delete.');
+      alert(language === 'ko' ? '삭제에 실패했습니다.' : language === 'ja' ? '削除に失敗しました' : 'Failed to delete.');
     }
   };
 
@@ -475,7 +480,7 @@ export default function Feed() {
                       <rect x="14" y="14" width="7" height="7"></rect>
                       <rect x="3" y="14" width="7" height="7"></rect>
                     </svg>
-                    {language === 'ko' ? '전체 보기' : 'View All'}
+                    {language === 'ko' ? '전체 보기' : language === 'ja' ? '全て表示' : 'View All'}
                   </button>
 
                   <button
@@ -492,7 +497,7 @@ export default function Feed() {
                       <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                       <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
-                    {language === 'ko' ? '팔로잉 보기' : 'Following'}
+                    {language === 'ko' ? '팔로잉 보기' : language === 'ja' ? 'フォロー中' : 'Following'}
                   </button>
 
                   <button
@@ -507,7 +512,7 @@ export default function Feed() {
                       <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                       <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                     </svg>
-                    {language === 'ko' ? '알림 보기' : 'Notifications'}
+                    {language === 'ko' ? '알림 보기' : language === 'ja' ? '通知' : 'Notifications'}
                   </button>
 
                   <button
@@ -521,7 +526,7 @@ export default function Feed() {
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
                     </svg>
-                    {language === 'ko' ? '저장한 피드' : 'Saved'}
+                    {language === 'ko' ? '저장한 피드' : language === 'ja' ? '保存済み' : 'Saved'}
                   </button>
                 </div>
               </nav>
@@ -551,7 +556,7 @@ export default function Feed() {
                     <textarea
                       value={newPostContent}
                       onChange={(e) => setNewPostContent(e.target.value)}
-                      placeholder={language === 'ko' ? '무슨 생각을 하고 계신가요?' : "What's on your mind?"}
+                      placeholder={language === 'ko' ? '무슨 생각을 하고 계신가요?' : language === 'ja' ? '今何を考えていますか？' : "What's on your mind?"}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
                       rows="3"
                     />
@@ -562,7 +567,7 @@ export default function Feed() {
                         className="px-4 py-2 text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                         style={newPostContent.trim() ? { backgroundColor: '#3797F0', fontWeight: '600' } : {}}
                       >
-                        {language === 'ko' ? '게시' : 'Post'}
+                        {language === 'ko' ? '게시' : language === 'ja' ? '投稿' : 'Post'}
                       </button>
                     </div>
                   </div>
@@ -602,11 +607,13 @@ export default function Feed() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
                     <p className="text-gray-600 text-lg font-medium mb-2">
-                      {language === 'ko' ? '알림이 없습니다' : 'No notifications yet'}
+                      {language === 'ko' ? '알림이 없습니다' : language === 'ja' ? '通知がありません' : 'No notifications yet'}
                     </p>
                     <p className="text-gray-500 text-sm">
                       {language === 'ko'
                         ? '다른 사용자가 회원님의 평가에 좋아요를 누르거나 댓글을 남기면 여기에 표시됩니다'
+                        : language === 'ja'
+                        ? '他のユーザーがあなたの評価にいいねやコメントをすると、ここに表示されます'
                         : 'When someone likes or comments on your ratings, you\'ll see it here'}
                     </p>
                   </>
@@ -616,17 +623,19 @@ export default function Feed() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                     </svg>
                     <p className="text-gray-600 text-lg font-medium mb-2">
-                      {language === 'ko' ? '저장한 활동이 없습니다' : 'No saved activities yet'}
+                      {language === 'ko' ? '저장한 활동이 없습니다' : language === 'ja' ? '保存されたアクティビティがありません' : 'No saved activities yet'}
                     </p>
                     <p className="text-gray-500 text-sm">
                       {language === 'ko'
                         ? '활동 카드의 북마크 아이콘을 클릭하여 나중에 보고 싶은 활동을 저장하세요'
+                        : language === 'ja'
+                        ? 'アクティビティカードのブックマークアイコンをクリックして、後で見たいアクティビティを保存してください'
                         : 'Click the bookmark icon on activity cards to save them for later'}
                     </p>
                   </>
                 ) : (
                   <p className="text-gray-600">
-                    {language === 'ko' ? '아직 활동이 없습니다.' : 'No activities yet.'}
+                    {language === 'ko' ? '아직 활동이 없습니다.' : language === 'ja' ? 'まだ活動がありません' : 'No activities yet.'}
                   </p>
                 )}
               </div>
@@ -674,12 +683,12 @@ export default function Feed() {
                   <div ref={loadMoreTriggerRef} className="h-20 flex items-center justify-center">
                     {loadingMore && (
                       <div className="text-gray-500 text-sm">
-                        {language === 'ko' ? '로딩 중...' : 'Loading...'}
+                        {language === 'ko' ? '로딩 중...' : language === 'ja' ? '読込中...' : 'Loading...'}
                       </div>
                     )}
                     {!loading && !loadingMore && !hasMore && activities.length > 0 && (
                       <div className="text-gray-400 text-sm">
-                        {language === 'ko' ? '모든 활동을 불러왔습니다' : 'All activities loaded'}
+                        {language === 'ko' ? '모든 활동을 불러왔습니다' : language === 'ja' ? '全てのアクティビティを読み込みました' : 'All activities loaded'}
                       </div>
                     )}
                   </div>
@@ -731,8 +740,8 @@ export default function Feed() {
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold mb-2 text-gray-900">
               {activityToDelete.activity_type === 'user_post'
-                ? (language === 'ko' ? '포스트 삭제' : 'Delete Post')
-                : (language === 'ko' ? '삭제 옵션' : 'Delete Options')}
+                ? (language === 'ko' ? '포스트 삭제' : language === 'ja' ? '投稿を削除' : 'Delete Post')
+                : (language === 'ko' ? '삭제 옵션' : language === 'ja' ? '削除オプション' : 'Delete Options')}
             </h3>
 
             {activityToDelete.activity_type === 'user_post' ? (
@@ -740,6 +749,8 @@ export default function Feed() {
                 <p className="text-sm text-gray-700 mb-6">
                   {language === 'ko'
                     ? '이 포스트를 삭제하시겠습니까?'
+                    : language === 'ja'
+                    ? 'この投稿を削除してもよろしいですか？'
                     : 'Are you sure you want to delete this post?'}
                 </p>
                 <div className="flex gap-3">
@@ -747,13 +758,13 @@ export default function Feed() {
                     onClick={() => handleDeleteContent('all')}
                     className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
                   >
-                    {language === 'ko' ? '삭제' : 'Delete'}
+                    {language === 'ko' ? '삭제' : language === 'ja' ? '削除' : 'Delete'}
                   </button>
                   <button
                     onClick={() => setShowDeleteModal(false)}
                     className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
                   >
-                    {language === 'ko' ? '취소' : 'Cancel'}
+                    {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                   </button>
                 </div>
               </>
@@ -789,8 +800,8 @@ export default function Feed() {
                     )}
                     <p className="text-xs text-gray-500">
                       {activityToDelete.activity_type === 'character_rating'
-                        ? (language === 'ko' ? '캐릭터' : 'Character')
-                        : (language === 'ko' ? '애니메이션' : 'Anime')}
+                        ? (language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character')
+                        : (language === 'ko' ? '애니메이션' : language === 'ja' ? 'アニメーション' : 'Anime')}
                     </p>
                   </div>
                 </div>
@@ -800,6 +811,8 @@ export default function Feed() {
                 <p className="text-sm text-gray-700 mb-6">
                   {language === 'ko'
                     ? '이 평가에는 리뷰가 포함되어 있습니다. 어떻게 삭제하시겠습니까?'
+                    : language === 'ja'
+                    ? 'この評価にはレビューが含まれています。どのように削除しますか？'
                     : 'This rating includes a review. How would you like to delete it?'}
                 </p>
                 <div className="flex flex-col gap-3">
@@ -807,19 +820,19 @@ export default function Feed() {
                     onClick={() => handleDeleteContent('review_only')}
                     className="w-full px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
                   >
-                    {language === 'ko' ? '리뷰만 삭제 (별점 유지)' : 'Delete review only (Keep rating)'}
+                    {language === 'ko' ? '리뷰만 삭제 (별점 유지)' : language === 'ja' ? 'レビューのみ削除 (評価は保持)' : 'Delete review only (Keep rating)'}
                   </button>
                   <button
                     onClick={() => handleDeleteContent('all')}
                     className="w-full px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
                   >
-                    {language === 'ko' ? '별점까지 모두 삭제' : 'Delete rating and review'}
+                    {language === 'ko' ? '별점까지 모두 삭제' : language === 'ja' ? '評価とレビューを削除' : 'Delete rating and review'}
                   </button>
                   <button
                     onClick={() => setShowDeleteModal(false)}
                     className="w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
                   >
-                    {language === 'ko' ? '취소' : 'Cancel'}
+                    {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                   </button>
                   </div>
                 </>
@@ -828,6 +841,8 @@ export default function Feed() {
                   <p className="text-sm text-gray-700 mb-6">
                     {language === 'ko'
                       ? '이 평가를 삭제하시겠습니까?'
+                      : language === 'ja'
+                      ? 'この評価を削除してもよろしいですか？'
                       : 'Are you sure you want to delete this rating?'}
                   </p>
                   <div className="flex gap-3">
@@ -835,13 +850,13 @@ export default function Feed() {
                       onClick={() => handleDeleteContent('all')}
                       className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
                     >
-                      {language === 'ko' ? '삭제' : 'Delete'}
+                      {language === 'ko' ? '삭제' : language === 'ja' ? '削除' : 'Delete'}
                     </button>
                     <button
                       onClick={() => setShowDeleteModal(false)}
                       className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
                     >
-                      {language === 'ko' ? '취소' : 'Cancel'}
+                      {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                     </button>
                   </div>
                 </>
