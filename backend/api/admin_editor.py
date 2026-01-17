@@ -316,6 +316,7 @@ def update_character(
 async def upload_image(
     file: UploadFile = File(...),
     type: str = "character",  # anime or character
+    item_id: Optional[int] = None,
     current_user = Depends(require_simon)
 ):
     """이미지 업로드 (Cloudflare R2)"""
@@ -332,25 +333,44 @@ async def upload_image(
     # 파일 내용 읽기
     file_bytes = await file.read()
 
-    # MIME 타입 결정
-    content_type = file.content_type or {
-        '.jpg': 'image/jpeg',
-        '.jpeg': 'image/jpeg',
-        '.png': 'image/png',
-        '.webp': 'image/webp'
-    }.get(file_ext, 'application/octet-stream')
+    # MIME 타입은 항상 JPEG (크롭 모달에서 JPEG로 변환됨)
+    content_type = 'image/jpeg'
 
     try:
-        if is_r2_configured():
-            # R2에 업로드 - 표준 경로 사용 (item_id는 나중에 DB 업데이트 시 덮어씀)
-            # 임시로 타임스탬프 기반 이름 사용, 나중에 item_id.jpg로 교체
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-            # 표준 경로: /images/characters/ 또는 /images/covers/
+        # 기존 이미지 삭제 (item_id가 있는 경우)
+        if item_id and is_r2_configured():
+            # DB에서 기존 이미지 URL 조회
             if type == "character":
-                object_key = f"images/characters/upload_{timestamp}.jpg"
+                query = "SELECT image_url, image_local FROM character WHERE id = ?"
             else:  # anime
-                object_key = f"images/covers/upload_{timestamp}.jpg"
+                query = "SELECT cover_image_url, cover_image_local FROM anime WHERE id = ?"
+
+            result = db.execute_query(query, (item_id,))
+            if result:
+                old_image_url = result[0][0] or result[0][1]
+                if old_image_url:
+                    old_object_key = extract_object_key_from_url(old_image_url)
+                    if old_object_key:
+                        try:
+                            delete_from_r2(old_object_key)
+                            print(f"[Admin Editor] Deleted old image: {old_object_key}")
+                        except Exception as e:
+                            print(f"[Admin Editor] Failed to delete old image: {e}")
+
+        if is_r2_configured():
+            # item_id를 파일명으로 사용 (항상 .jpg로 저장)
+            if item_id:
+                if type == "character":
+                    object_key = f"images/characters/{item_id}.jpg"
+                else:  # anime
+                    object_key = f"images/covers/{item_id}.jpg"
+            else:
+                # item_id가 없으면 타임스탬프 사용 (fallback)
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                if type == "character":
+                    object_key = f"images/characters/upload_{timestamp}.jpg"
+                else:
+                    object_key = f"images/covers/upload_{timestamp}.jpg"
 
             file_url = upload_file_bytes_to_r2(
                 file_bytes=file_bytes,
@@ -359,9 +379,13 @@ async def upload_image(
             )
             storage_type = "R2"
         else:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"{timestamp}_{file.filename}"
             # 로컬 저장 (개발 환경 fallback)
+            if item_id:
+                filename = f"{item_id}.jpg"
+            else:
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = f"{timestamp}_{file.filename}"
+
             upload_dir = f"uploads/admin/{type}"
             os.makedirs(upload_dir, exist_ok=True)
             file_path = os.path.join(upload_dir, filename)
