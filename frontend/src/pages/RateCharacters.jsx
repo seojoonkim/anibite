@@ -530,13 +530,17 @@ export default function RateCharacters() {
                 {/* Character Info */}
                 <div className="p-3">
                   <Link to={`/character/${character.id}`} className="block group">
-                    <h3 className="font-bold text-[15px] line-clamp-2 mb-1 group-hover:text-[#3797F0] transition-colors cursor-pointer" title={language === 'ko' && character.name_korean ? character.name_korean : character.name_full}>
-                      {language === 'ko' && character.name_korean ? character.name_korean : character.name_full}
+                    <h3 className="font-bold text-[15px] line-clamp-2 mb-1 group-hover:text-[#3797F0] transition-colors cursor-pointer" title={language === 'ko' ? (character.name_korean || character.name_full) : language === 'ja' ? (character.name_native || character.name_full) : character.name_full}>
+                      {language === 'ko' ? (character.name_korean || character.name_full) : language === 'ja' ? (character.name_native || character.name_full) : character.name_full}
                     </h3>
                   </Link>
                   {language === 'ko' && character.name_korean ? (
                     <p className="text-xs text-gray-500 line-clamp-1 mb-2" title={character.name_full}>
                       {character.name_full}
+                    </p>
+                  ) : language === 'ja' && character.name_native ? (
+                    <p className="text-xs text-gray-500 line-clamp-1 mb-2" title={character.name_full}>
+                      ({character.name_full})
                     </p>
                   ) : (
                     character.name_native && character.name_native !== character.name_full && (
