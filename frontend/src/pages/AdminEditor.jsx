@@ -1,6 +1,16 @@
 import { useState } from 'react';
 import api from '../services/api';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+// 이미지 URL 처리 헬퍼 함수
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  if (imagePath.startsWith('http')) return imagePath;
+  if (imagePath.startsWith('/')) return `${API_BASE_URL}${imagePath}`;
+  return `${API_BASE_URL}/${imagePath}`;
+};
+
 export default function AdminEditor() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchType, setSearchType] = useState('both');
@@ -10,6 +20,7 @@ export default function AdminEditor() {
   const [editData, setEditData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // 검색
   const handleSearch = async (e) => {
@@ -56,6 +67,36 @@ export default function AdminEditor() {
       setMessage(error.response?.data?.detail || '불러오기 실패');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // 이미지 업로드
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    setMessage('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await api.post(
+        `/api/admin/editor/upload-image?type=${selectedType}`,
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+
+      // 업로드된 이미지 URL로 업데이트
+      const imageField = selectedType === 'anime' ? 'cover_image' : 'image_large';
+      setEditData({ ...editData, [imageField]: response.data.url });
+      setMessage('✅ 이미지 업로드 완료! 저장 버튼을 눌러주세요.');
+    } catch (error) {
+      console.error('이미지 업로드 실패:', error);
+      setMessage(error.response?.data?.detail || '이미지 업로드 실패');
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -149,9 +190,10 @@ export default function AdminEditor() {
                       <div className="flex gap-3">
                         {anime.cover_image && (
                           <img
-                            src={anime.cover_image}
+                            src={getImageUrl(anime.cover_image)}
                             alt={anime.title_korean || anime.title_romaji}
                             className="w-12 h-16 object-cover rounded"
+                            onError={(e) => { e.target.style.display = 'none'; }}
                           />
                         )}
                         <div>
@@ -184,9 +226,10 @@ export default function AdminEditor() {
                       <div className="flex gap-3">
                         {char.image_large && (
                           <img
-                            src={char.image_large}
+                            src={getImageUrl(char.image_large)}
                             alt={char.name_korean || char.name_full}
                             className="w-12 h-16 object-cover rounded"
+                            onError={(e) => { e.target.style.display = 'none'; }}
                           />
                         )}
                         <div>
@@ -214,6 +257,35 @@ export default function AdminEditor() {
 
             {selectedItem ? (
               <div className="space-y-6">
+                {/* 이미지 미리보기 및 업로드 */}
+                <div>
+                  <label className="block text-sm font-semibold mb-2">
+                    {selectedType === 'anime' ? '작품 이미지' : '캐릭터 이미지'}
+                  </label>
+                  <div className="flex gap-4 items-start">
+                    {(selectedType === 'anime' ? editData.cover_image : editData.image_large) && (
+                      <img
+                        src={getImageUrl(selectedType === 'anime' ? editData.cover_image : editData.image_large)}
+                        alt="preview"
+                        className="w-24 h-32 object-cover rounded"
+                        onError={(e) => { e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23444" width="100" height="100"/%3E%3C/svg%3E'; }}
+                      />
+                    )}
+                    <div className="flex-1">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={uploadingImage}
+                        className="w-full px-4 py-3 bg-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-purple-600 file:text-white hover:file:bg-purple-700"
+                      />
+                      <p className="text-xs text-gray-400 mt-2">
+                        JPG, PNG, WebP 파일 (최대 5MB)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* 작품 편집 */}
                 {selectedType === 'anime' && (
                   <>
@@ -262,6 +334,14 @@ export default function AdminEditor() {
                 {/* 캐릭터 편집 */}
                 {selectedType === 'character' && (
                   <>
+                    {/* 애니메이션 제목 표시 */}
+                    {editData.anime_title && (
+                      <div className="bg-gray-700 rounded-lg p-3 mb-4">
+                        <div className="text-xs text-gray-400">작품</div>
+                        <div className="text-sm font-semibold text-green-400">{editData.anime_title}</div>
+                      </div>
+                    )}
+
                     <div>
                       <label className="block text-sm font-semibold mb-2">한국어 이름</label>
                       <input

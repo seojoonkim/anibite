@@ -19,12 +19,14 @@ class AnimeUpdate(BaseModel):
     title_romaji: Optional[str] = None
     title_english: Optional[str] = None
     title_native: Optional[str] = None
+    cover_image: Optional[str] = None  # 이미지 URL/경로
 
 
 class CharacterUpdate(BaseModel):
     name_korean: Optional[str] = None
     name_full: Optional[str] = None
     name_native: Optional[str] = None
+    image_large: Optional[str] = None  # 이미지 URL/경로
 
 
 def require_simon(current_user = Depends(get_current_user)):
@@ -185,6 +187,12 @@ def update_anime(
         updates["title_english"] = data.title_english
     if data.title_native is not None:
         updates["title_native"] = data.title_native
+    if data.cover_image is not None:
+        # 이미지 URL인 경우 cover_image_url, 로컬 경로인 경우 cover_image_local
+        if data.cover_image.startswith('http'):
+            updates["cover_image_url"] = data.cover_image
+        else:
+            updates["cover_image_local"] = data.cover_image
 
     if not updates:
         raise HTTPException(status_code=400, detail="No fields to update")
@@ -212,12 +220,16 @@ def get_character_detail(
     """캐릭터 상세 정보"""
     query = """
         SELECT
-            id, name_korean, name_full, name_native, name_alternative,
-            COALESCE(image_local, image_url) as image_medium,
-            COALESCE(image_url, image_local) as image_large,
-            gender, age, description, favourites
-        FROM character
-        WHERE id = ?
+            c.id, c.name_korean, c.name_full, c.name_native, c.name_alternative,
+            COALESCE(c.image_local, c.image_url) as image_medium,
+            COALESCE(c.image_url, c.image_local) as image_large,
+            c.gender, c.age, c.description, c.favourites,
+            a.id as anime_id, a.title_korean as anime_title
+        FROM character c
+        LEFT JOIN anime_character ac ON c.id = ac.character_id
+        LEFT JOIN anime a ON ac.anime_id = a.id
+        WHERE c.id = ?
+        LIMIT 1
     """
     result = db.execute_query(query, (character_id,))
 
@@ -236,7 +248,9 @@ def get_character_detail(
         "gender": row[7],
         "age": row[8],
         "description": row[9],
-        "favourites": row[10]
+        "favourites": row[10],
+        "anime_id": row[11],
+        "anime_title": row[12]
     }
 
 
@@ -255,6 +269,12 @@ def update_character(
         updates["name_full"] = data.name_full
     if data.name_native is not None:
         updates["name_native"] = data.name_native
+    if data.image_large is not None:
+        # 이미지 URL인 경우 image_url, 로컬 경로인 경우 image_local
+        if data.image_large.startswith('http'):
+            updates["image_url"] = data.image_large
+        else:
+            updates["image_local"] = data.image_large
 
     if not updates:
         raise HTTPException(status_code=400, detail="No fields to update")
