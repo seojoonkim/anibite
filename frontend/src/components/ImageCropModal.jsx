@@ -4,7 +4,7 @@ import imageCompression from 'browser-image-compression';
 
 export default function ImageCropModal({ imageFile, onComplete, onCancel, aspectRatio = 3/4 }) {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(0.5);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [imageSrc, setImageSrc] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -102,24 +102,33 @@ export default function ImageCropModal({ imageFile, onComplete, onCancel, aspect
               crop={crop}
               zoom={zoom}
               aspect={aspectRatio}
+              minZoom={0.1}
+              maxZoom={3}
               onCropChange={setCrop}
               onZoomChange={setZoom}
               onCropComplete={onCropComplete}
+              restrictPosition={false}
             />
           )}
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm text-gray-300 mb-2">확대/축소</label>
+          <label className="block text-sm text-gray-300 mb-2">
+            확대/축소: {Math.round(zoom * 100)}%
+          </label>
           <input
             type="range"
-            min={1}
+            min={0.1}
             max={3}
-            step={0.1}
+            step={0.05}
             value={zoom}
-            onChange={(e) => setZoom(e.target.value)}
+            onChange={(e) => setZoom(parseFloat(e.target.value))}
             className="w-full"
           />
+          <div className="flex justify-between text-xs text-gray-400 mt-1">
+            <span>축소</span>
+            <span>확대</span>
+          </div>
         </div>
 
         <div className="text-sm text-gray-400 mb-4">
