@@ -609,42 +609,55 @@ const ActivityCard = forwardRef(({
           )}
 
           {/* Rank Promotion Content */}
-          {activity.activity_type === 'rank_promotion' && (
-            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4 mb-3">
-              {activity.metadata ? (
-                <>
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="text-center">
-                      <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '이전 등급' : 'Previous Rank'}</div>
-                      <div className="text-lg font-bold text-gray-700">
-                        {getRankName(JSON.parse(activity.metadata).old_rank)} - {toRoman(JSON.parse(activity.metadata).old_level)}
+          {activity.activity_type === 'rank_promotion' && (() => {
+            // Parse metadata if it's a string, otherwise use it directly
+            let metadata;
+            try {
+              metadata = typeof activity.metadata === 'string'
+                ? JSON.parse(activity.metadata)
+                : activity.metadata;
+            } catch (e) {
+              console.error('Failed to parse rank promotion metadata:', e);
+              metadata = null;
+            }
+
+            return (
+              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4 mb-3">
+                {metadata && metadata.old_rank && metadata.new_rank ? (
+                  <>
+                    <div className="flex items-center justify-center gap-3">
+                      <div className="text-center">
+                        <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '이전 등급' : 'Previous Rank'}</div>
+                        <div className="text-lg font-bold text-gray-700">
+                          {getRankName(metadata.old_rank)} - {toRoman(metadata.old_level)}
+                        </div>
+                      </div>
+                      <div className="text-3xl">🎉</div>
+                      <div className="text-center">
+                        <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '새로운 등급' : 'New Rank'}</div>
+                        <div className="text-xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                          {getRankName(metadata.new_rank)} - {toRoman(metadata.new_level)}
+                        </div>
                       </div>
                     </div>
-                    <div className="text-3xl">🎉</div>
-                    <div className="text-center">
-                      <div className="text-xs text-gray-600 mb-1">{language === 'ko' ? '새로운 등급' : 'New Rank'}</div>
-                      <div className="text-xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
-                        {getRankName(JSON.parse(activity.metadata).new_rank)} - {toRoman(JSON.parse(activity.metadata).new_level)}
-                      </div>
+                    <div className="text-center mt-3 text-sm text-gray-600">
+                      {language === 'ko' ? '오타쿠 점수:' : 'Otaku Score:'} <span className="font-bold text-gray-800">{Math.floor(metadata.otaku_score)}</span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">🎉</div>
+                    <div className="text-lg font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                      {language === 'ko' ? '새로운 등급 달성!' : 'New Rank Achieved!'}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-2">
+                      {language === 'ko' ? '(세부 정보를 불러오는 중...)' : '(Loading details...)'}
                     </div>
                   </div>
-                  <div className="text-center mt-3 text-sm text-gray-600">
-                    {language === 'ko' ? '오타쿠 점수:' : 'Otaku Score:'} <span className="font-bold text-gray-800">{Math.floor(JSON.parse(activity.metadata).otaku_score)}</span>
-                  </div>
-                </>
-              ) : (
-                <div className="text-center">
-                  <div className="text-2xl mb-2">🎉</div>
-                  <div className="text-lg font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
-                    {language === 'ko' ? '새로운 등급 달성!' : 'New Rank Achieved!'}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-2">
-                    {language === 'ko' ? '(세부 정보를 불러오는 중...)' : '(Loading details...)'}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            );
+          })()}
 
           {/* Rating */}
           {activity.rating && (
