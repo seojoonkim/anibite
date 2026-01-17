@@ -589,10 +589,10 @@ export default function WriteReviews() {
                         >
                           {item.type === 'anime' ? (
                             language === 'ko' ? (
-                              <span className="flex flex-col">
-                                <span>{item.title_korean || item.title_romaji || item.title_english}</span>
+                              <span>
+                                {item.title_korean || item.title_romaji || item.title_english}
                                 {item.title_korean && (item.title_romaji || item.title_english) && (
-                                  <span className="text-xs text-gray-400 font-normal">{item.title_romaji || item.title_english}</span>
+                                  <span className="text-xs text-gray-400 font-normal ml-1.5">({item.title_romaji || item.title_english})</span>
                                 )}
                               </span>
                             ) : (
@@ -600,10 +600,10 @@ export default function WriteReviews() {
                             )
                           ) : (
                             language === 'ko' ? (
-                              <span className="flex flex-col">
-                                <span>{item.character_name_korean || item.character_name_native || item.character_name}</span>
+                              <span>
+                                {item.character_name_korean || item.character_name_native || item.character_name}
                                 {(item.character_name_korean || item.character_name_native) && item.character_name && (
-                                  <span className="text-xs text-gray-400 font-normal">{item.character_name}</span>
+                                  <span className="text-xs text-gray-400 font-normal ml-1.5">({item.character_name})</span>
                                 )}
                               </span>
                             ) : (
