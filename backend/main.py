@@ -228,13 +228,13 @@ async def startup_event():
         print(f"⚠️ Failed to add indexes: {e}")
         print("Server will continue, but queries may be slow.\n")
 
-    # Backfill anime_title_native for character activities
-    print("🌐 Backfilling Japanese anime titles...")
+    # Backfill anime_title_native and item_title_native for character activities
+    print("🌐 Backfilling Japanese titles...")
     try:
         from database import get_db
         db = get_db()
 
-        # Check if column exists
+        # Check if columns exist
         columns = db.execute_query("PRAGMA table_info(activities)")
         column_names = [col[1] for col in columns]
 
@@ -242,7 +242,11 @@ async def startup_event():
             print("  Adding anime_title_native column...")
             db.execute_query("ALTER TABLE activities ADD COLUMN anime_title_native TEXT")
 
-        # Backfill native titles
+        if 'item_title_native' not in column_names:
+            print("  Adding item_title_native column...")
+            db.execute_query("ALTER TABLE activities ADD COLUMN item_title_native TEXT")
+
+        # Backfill anime native titles
         db.execute_query("""
             UPDATE activities
             SET anime_title_native = (
@@ -255,16 +259,36 @@ async def startup_event():
             AND anime_title_native IS NULL
         """)
 
-        updated_count = db.execute_query("""
+        # Backfill character native names
+        db.execute_query("""
+            UPDATE activities
+            SET item_title_native = (
+                SELECT c.name_native
+                FROM character c
+                WHERE c.id = activities.item_id
+            )
+            WHERE activity_type IN ('character_rating', 'character_review')
+            AND item_id IS NOT NULL
+            AND item_title_native IS NULL
+        """)
+
+        anime_count = db.execute_query("""
             SELECT COUNT(*) as count
             FROM activities
             WHERE activity_type IN ('character_rating', 'character_review')
             AND anime_title_native IS NOT NULL
         """, fetch_one=True)
 
-        print(f"✅ Backfilled {updated_count['count'] if updated_count else 0} Japanese anime titles!\n")
+        char_count = db.execute_query("""
+            SELECT COUNT(*) as count
+            FROM activities
+            WHERE activity_type IN ('character_rating', 'character_review')
+            AND item_title_native IS NOT NULL
+        """, fetch_one=True)
+
+        print(f"✅ Backfilled {anime_count['count'] if anime_count else 0} anime titles and {char_count['count'] if char_count else 0} character names!\n")
     except Exception as e:
-        print(f"⚠️ Failed to backfill anime titles: {e}")
+        print(f"⚠️ Failed to backfill titles: {e}")
         print("Server will continue, but Japanese titles may not display.\n")
 
 
