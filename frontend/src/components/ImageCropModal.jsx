@@ -32,12 +32,22 @@ export default function ImageCropModal({ imageFile, onComplete, onCancel, aspect
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
 
+      // 크롭 영역을 이미지 경계 내로 제한
+      const safeX = Math.max(0, Math.min(croppedAreaPixels.x, image.width));
+      const safeY = Math.max(0, Math.min(croppedAreaPixels.y, image.height));
+      const safeWidth = Math.min(croppedAreaPixels.width, image.width - safeX);
+      const safeHeight = Math.min(croppedAreaPixels.height, image.height - safeY);
+
+      console.log('[Crop] Image size:', image.width, 'x', image.height);
+      console.log('[Crop] Original crop:', croppedAreaPixels);
+      console.log('[Crop] Safe crop:', { x: safeX, y: safeY, width: safeWidth, height: safeHeight });
+
       // 목표 크기: 최대 400x533 (3:4 비율)
       const maxWidth = 400;
       const maxHeight = 533;
 
-      let targetWidth = croppedAreaPixels.width;
-      let targetHeight = croppedAreaPixels.height;
+      let targetWidth = safeWidth;
+      let targetHeight = safeHeight;
 
       // 너무 크면 리사이즈
       if (targetWidth > maxWidth || targetHeight > maxHeight) {
@@ -56,10 +66,10 @@ export default function ImageCropModal({ imageFile, onComplete, onCancel, aspect
       // 크롭된 이미지 그리기
       ctx.drawImage(
         image,
-        croppedAreaPixels.x,
-        croppedAreaPixels.y,
-        croppedAreaPixels.width,
-        croppedAreaPixels.height,
+        safeX,
+        safeY,
+        safeWidth,
+        safeHeight,
         0,
         0,
         targetWidth,
