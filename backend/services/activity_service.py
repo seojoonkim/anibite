@@ -123,6 +123,15 @@ def get_activities(
             activity_dict['is_my_activity'] = activity_dict['user_id'] == current_user_id
         else:
             activity_dict['is_my_activity'] = False
+
+        # Parse metadata JSON strings (for rank_promotion)
+        if activity_dict.get('metadata') and isinstance(activity_dict['metadata'], str):
+            try:
+                import json
+                activity_dict['metadata'] = json.loads(activity_dict['metadata'])
+            except (json.JSONDecodeError, TypeError):
+                activity_dict['metadata'] = None
+
         items.append(activity_dict)
 
     return {
@@ -180,6 +189,14 @@ def get_activity_by_id(activity_id: int, current_user_id: Optional[int] = None, 
         activity_dict['is_my_activity'] = activity_dict['user_id'] == current_user_id
     else:
         activity_dict['is_my_activity'] = False
+
+    # Parse metadata JSON strings (for rank_promotion)
+    if activity_dict.get('metadata') and isinstance(activity_dict['metadata'], str):
+        try:
+            import json
+            activity_dict['metadata'] = json.loads(activity_dict['metadata'])
+        except (json.JSONDecodeError, TypeError):
+            activity_dict['metadata'] = None
 
     return activity_dict
 
