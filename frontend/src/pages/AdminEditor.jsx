@@ -146,7 +146,7 @@ export default function AdminEditor() {
       formData.append('file', croppedFile);
 
       const response = await api.post(
-        `/api/admin/editor/upload-image?type=${selectedType}`,
+        `/api/admin/editor/upload-image?type=${selectedType}&item_id=${selectedItem.id}`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
