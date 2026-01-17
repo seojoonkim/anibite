@@ -228,6 +228,45 @@ async def startup_event():
         print(f"⚠️ Failed to add indexes: {e}")
         print("Server will continue, but queries may be slow.\n")
 
+    # Backfill anime_title_native for character activities
+    print("🌐 Backfilling Japanese anime titles...")
+    try:
+        from database import get_db
+        db = get_db()
+
+        # Check if column exists
+        columns = db.execute_query("PRAGMA table_info(activities)")
+        column_names = [col[1] for col in columns]
+
+        if 'anime_title_native' not in column_names:
+            print("  Adding anime_title_native column...")
+            db.execute_query("ALTER TABLE activities ADD COLUMN anime_title_native TEXT")
+
+        # Backfill native titles
+        db.execute_query("""
+            UPDATE activities
+            SET anime_title_native = (
+                SELECT a.title_native
+                FROM anime a
+                WHERE a.id = activities.anime_id
+            )
+            WHERE activity_type IN ('character_rating', 'character_review')
+            AND anime_id IS NOT NULL
+            AND anime_title_native IS NULL
+        """)
+
+        updated_count = db.execute_query("""
+            SELECT COUNT(*) as count
+            FROM activities
+            WHERE activity_type IN ('character_rating', 'character_review')
+            AND anime_title_native IS NOT NULL
+        """, fetch_one=True)
+
+        print(f"✅ Backfilled {updated_count['count'] if updated_count else 0} Japanese anime titles!\n")
+    except Exception as e:
+        print(f"⚠️ Failed to backfill anime titles: {e}")
+        print("Server will continue, but Japanese titles may not display.\n")
+
 
 # Root endpoint
 @app.get("/")
