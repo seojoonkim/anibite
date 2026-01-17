@@ -1,11 +1,17 @@
+import { useLanguage } from '../../contexts/LanguageContext';
+
 export default function GenrePreferences({ preferences }) {
+  const { language } = useLanguage();
+
   if (!preferences || preferences.length === 0) {
     return (
       <div className="bg-gradient-to-br from-white to-purple-50/30 rounded-xl shadow-sm border border-purple-100/50 p-6 w-full h-full flex flex-col">
         <h3 className="text-lg font-bold text-[#638CCC] mb-4">
-          선호 장르
+          {language === 'ko' ? '선호 장르' : language === 'ja' ? 'お気に入りのジャンル' : 'Favorite Genres'}
         </h3>
-        <p className="text-sm text-gray-500">아직 충분한 데이터가 없습니다.</p>
+        <p className="text-sm text-gray-500">
+          {language === 'ko' ? '아직 충분한 데이터가 없습니다.' : language === 'ja' ? 'まだ十分なデータがありません。' : 'Not enough data yet.'}
+        </p>
       </div>
     );
   }
@@ -27,7 +33,7 @@ export default function GenrePreferences({ preferences }) {
   return (
     <div className="bg-gradient-to-br from-white to-purple-50/30 rounded-xl shadow-sm border border-purple-100/50 p-6 w-full h-full flex flex-col">
       <h3 className="text-lg font-bold text-[#638CCC] mb-4">
-        선호 장르 Top 5
+        {language === 'ko' ? '선호 장르 Top 5' : language === 'ja' ? 'お気に入りのジャンルTOP 5' : 'Top 5 Favorite Genres'}
       </h3>
 
       <div className="space-y-3">
@@ -42,7 +48,7 @@ export default function GenrePreferences({ preferences }) {
                 </span>
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-gray-600 font-medium">
-                    {pref.count}작품
+                    {pref.count}{language === 'ko' ? '작품' : language === 'ja' ? '作品' : ' works'}
                   </span>
                   {pref.average_rating && (
                     <span className="font-bold flex items-center gap-0.5 text-amber-500">
