@@ -774,3 +774,157 @@ def create_notifications_table():
     except Exception as e:
         import traceback
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
+
+
+@router.post("/rebuild-activities")
+def rebuild_activities_endpoint():
+    """
+    Rebuild activities table from user_ratings and character_ratings
+    이 API는 activities 테이블을 완전히 재구축합니다
+    """
+    try:
+        db = get_db()
+
+        # 1. 애니 평가 마이그레이션
+        print("Migrating anime ratings...")
+        count_anime = db.execute_query("""
+            SELECT COUNT(*) as count
+            FROM user_ratings ur
+            WHERE ur.status = 'RATED' AND ur.rating IS NOT NULL
+        """, fetch_one=True)
+
+        total_anime = count_anime['count'] if count_anime else 0
+        print(f"  Found {total_anime} anime ratings to migrate")
+
+        if total_anime > 0:
+            db.execute_query("""
+                INSERT OR REPLACE INTO activities (
+                    activity_type, user_id, item_id, activity_time,
+                    username, display_name, avatar_url, otaku_score,
+                    item_title, item_title_korean, item_image,
+                    rating, review_title, review_content, is_spoiler
+                )
+                SELECT
+                    'anime_rating' as activity_type,
+                    ur.user_id,
+                    ur.anime_id as item_id,
+                    COALESCE(rev.created_at, ur.updated_at) as activity_time,
+                    u.username,
+                    u.display_name,
+                    u.avatar_url,
+                    COALESCE(us.otaku_score, 0) as otaku_score,
+                    a.title_romaji as item_title,
+                    a.title_korean as item_title_korean,
+                    COALESCE('/' || a.cover_image_local, a.cover_image_url) as item_image,
+                    ur.rating,
+                    rev.title as review_title,
+                    rev.content as review_content,
+                    COALESCE(rev.is_spoiler, 0) as is_spoiler
+                FROM user_ratings ur
+                JOIN users u ON ur.user_id = u.id
+                JOIN anime a ON ur.anime_id = a.id
+                LEFT JOIN user_stats us ON u.id = us.user_id
+                LEFT JOIN user_reviews rev ON rev.user_id = ur.user_id AND rev.anime_id = ur.anime_id
+                WHERE ur.status = 'RATED' AND ur.rating IS NOT NULL
+            """)
+
+        # 2. 캐릭터 평가 마이그레이션
+        print("Migrating character ratings...")
+        count_char = db.execute_query("""
+            SELECT COUNT(*) as count
+            FROM character_ratings cr
+            WHERE cr.rating IS NOT NULL
+        """, fetch_one=True)
+
+        total_char = count_char['count'] if count_char else 0
+        print(f"  Found {total_char} character ratings to migrate")
+
+        if total_char > 0:
+            db.execute_query("""
+                INSERT OR REPLACE INTO activities (
+                    activity_type, user_id, item_id, activity_time,
+                    username, display_name, avatar_url, otaku_score,
+                    item_title, item_title_korean, item_image,
+                    rating, review_title, review_content, is_spoiler,
+                    anime_id, anime_title, anime_title_korean
+                )
+                SELECT
+                    'character_rating' as activity_type,
+                    cr.user_id,
+                    cr.character_id as item_id,
+                    COALESCE(rev.created_at, cr.updated_at) as activity_time,
+                    u.username,
+                    u.display_name,
+                    u.avatar_url,
+                    COALESCE(us.otaku_score, 0) as otaku_score,
+                    c.name_full as item_title,
+                    c.name_korean as item_title_korean,
+                    COALESCE('/' || c.image_local, c.image_url) as item_image,
+                    cr.rating,
+                    rev.title as review_title,
+                    rev.content as review_content,
+                    COALESCE(rev.is_spoiler, 0) as is_spoiler,
+                    (SELECT a.id FROM anime a
+                     JOIN anime_character ac ON a.id = ac.anime_id
+                     WHERE ac.character_id = cr.character_id
+                     ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END LIMIT 1) as anime_id,
+                    (SELECT a.title_romaji FROM anime a
+                     JOIN anime_character ac ON a.id = ac.anime_id
+                     WHERE ac.character_id = cr.character_id
+                     ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END LIMIT 1) as anime_title,
+                    (SELECT a.title_korean FROM anime a
+                     JOIN anime_character ac ON a.id = ac.anime_id
+                     WHERE ac.character_id = cr.character_id
+                     ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END LIMIT 1) as anime_title_korean
+                FROM character_ratings cr
+                JOIN users u ON cr.user_id = u.id
+                JOIN character c ON cr.character_id = c.id
+                LEFT JOIN user_stats us ON u.id = us.user_id
+                LEFT JOIN character_reviews rev ON rev.user_id = cr.user_id AND rev.character_id = cr.character_id
+                WHERE cr.rating IS NOT NULL
+            """)
+
+        # 3. 유저 포스트 마이그레이션
+        print("Migrating user posts...")
+        count_posts = db.execute_query("""
+            SELECT COUNT(*) as count FROM user_posts
+        """, fetch_one=True)
+
+        total_posts = count_posts['count'] if count_posts else 0
+        print(f"  Found {total_posts} user posts to migrate")
+
+        if total_posts > 0:
+            db.execute_query("""
+                INSERT OR REPLACE INTO activities (
+                    activity_type, user_id, item_id, activity_time,
+                    username, display_name, avatar_url, otaku_score,
+                    review_content
+                )
+                SELECT
+                    'user_post' as activity_type,
+                    up.user_id,
+                    up.id as item_id,
+                    up.created_at as activity_time,
+                    u.username,
+                    u.display_name,
+                    u.avatar_url,
+                    COALESCE(us.otaku_score, 0) as otaku_score,
+                    up.content as review_content
+                FROM user_posts up
+                JOIN users u ON up.user_id = u.id
+                LEFT JOIN user_stats us ON u.id = us.user_id
+            """)
+
+        return {
+            "success": True,
+            "anime_ratings_migrated": total_anime,
+            "character_ratings_migrated": total_char,
+            "user_posts_migrated": total_posts,
+            "total_migrated": total_anime + total_char + total_posts
+        }
+
+    except Exception as e:
+        print(f"Error rebuilding activities: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
