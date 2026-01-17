@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+import api from '../services/api';
 
 export default function AdminEditor() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -22,12 +20,10 @@ export default function AdminEditor() {
     setMessage('');
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(
-        `${API_BASE_URL}/api/admin/editor/search`,
+      const response = await api.get(
+        '/api/admin/editor/search',
         {
-          params: { q: searchQuery, type: searchType, limit: 20 },
-          headers: { Authorization: `Bearer ${token}` }
+          params: { q: searchQuery, type: searchType, limit: 20 }
         }
       );
 
@@ -46,14 +42,11 @@ export default function AdminEditor() {
     setMessage('');
 
     try {
-      const token = localStorage.getItem('token');
       const endpoint = type === 'anime'
         ? `/api/admin/editor/anime/${id}`
         : `/api/admin/editor/character/${id}`;
 
-      const response = await axios.get(`${API_BASE_URL}${endpoint}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get(endpoint);
 
       setSelectedItem(response.data);
       setSelectedType(type);
@@ -74,16 +67,11 @@ export default function AdminEditor() {
     setMessage('');
 
     try {
-      const token = localStorage.getItem('token');
       const endpoint = selectedType === 'anime'
         ? `/api/admin/editor/anime/${selectedItem.id}`
         : `/api/admin/editor/character/${selectedItem.id}`;
 
-      await axios.patch(
-        `${API_BASE_URL}${endpoint}`,
-        editData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.patch(endpoint, editData);
 
       setMessage('✅ 저장 완료!');
       // 검색 결과 갱신
