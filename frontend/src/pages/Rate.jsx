@@ -290,17 +290,17 @@ function RatingCard({ anime, onRate }) {
                 <span className="px-3 py-1 text-white text-xs font-bold rounded-full shadow-lg" style={{
                   background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
                 }}>
-                  평가완료
+                  {language === 'ko' ? '평가완료' : language === 'ja' ? '評価済み' : 'Rated'}
                 </span>
               )}
               {status === 'WANT_TO_WATCH' && (
                 <span className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full shadow-lg">
-                  보고싶어요
+                  {language === 'ko' ? '보고싶어요' : language === 'ja' ? '見たい' : 'Watch Later'}
                 </span>
               )}
               {status === 'PASS' && (
                 <span className="px-3 py-1 bg-gray-500 text-white text-xs font-bold rounded-full shadow-lg">
-                  패스
+                  {language === 'ko' ? '패스' : language === 'ja' ? 'パス' : 'Pass'}
                 </span>
               )}
             </div>
@@ -339,16 +339,16 @@ function RatingCard({ anime, onRate }) {
       {showSeriesModal && seriesInfo && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]" onClick={handleSeriesCancel}>
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold mb-4">시리즈 일괄 처리</h3>
+            <h3 className="text-xl font-bold mb-4">{language === 'ko' ? '시리즈 일괄 처리' : language === 'ja' ? 'シリーズ一括処理' : 'Series Bulk Action'}</h3>
 
             <div className="mb-4">
               <p className="text-gray-700 mb-3">
-                이 작품은 {seriesInfo.sequels.length}개의 후속작이 있습니다.
+                {language === 'ko' ? `이 작품은 ${seriesInfo.sequels.length}개의 후속작이 있습니다.` : language === 'ja' ? `この作品は${seriesInfo.sequels.length}個の続編があります。` : `This work has ${seriesInfo.sequels.length} sequels.`}
               </p>
 
               <div className="bg-[#F5F5F5] border-2 rounded-lg p-4 mb-3" style={{ borderColor: '#A8E6CF' }}>
                 <p className="text-sm font-medium text-[#34495E] mb-2">
-                  후속작 목록:
+                  {language === 'ko' ? '후속작 목록:' : language === 'ja' ? '続編リスト:' : 'Sequels:'}
                 </p>
                 <div className="max-h-32 overflow-y-auto space-y-1">
                   {seriesInfo.sequels.map((sequel, index) => (
@@ -360,13 +360,23 @@ function RatingCard({ anime, onRate }) {
               </div>
 
               <p className="text-gray-700 mb-2">
-                이 작품과 모든 후속작에 <strong style={{ color: '#364F6B' }}>
-                  {pendingStatus === 'WANT_TO_WATCH' ? t('watchLater') : t('notInterested')}
-                </strong>를 적용하시겠습니까?
+                {language === 'ko' ? (
+                  <>이 작품과 모든 후속작에 <strong style={{ color: '#364F6B' }}>
+                    {pendingStatus === 'WANT_TO_WATCH' ? t('watchLater') : t('notInterested')}
+                  </strong>를 적용하시겠습니까?</>
+                ) : language === 'ja' ? (
+                  <>この作品とすべての続編に<strong style={{ color: '#364F6B' }}>
+                    {pendingStatus === 'WANT_TO_WATCH' ? t('watchLater') : t('notInterested')}
+                  </strong>を適用しますか？</>
+                ) : (
+                  <>Apply <strong style={{ color: '#364F6B' }}>
+                    {pendingStatus === 'WANT_TO_WATCH' ? t('watchLater') : t('notInterested')}
+                  </strong> to this work and all sequels?</>
+                )}
               </p>
 
               <p className="text-sm text-gray-700 bg-[#F5F5F5] p-3 rounded">
-                💡 이전 시즌은 영향받지 않습니다. (이미 보셨거나 다른 평가를 했을 수 있으므로)
+                {language === 'ko' ? '💡 이전 시즌은 영향받지 않습니다. (이미 보셨거나 다른 평가를 했을 수 있으므로)' : language === 'ja' ? '💡 前のシーズンは影響を受けません。（既に視聴済みまたは他の評価をしている可能性があるため）' : '💡 Previous seasons are not affected. (You may have already watched or rated them differently)'}
               </p>
             </div>
 
@@ -378,19 +388,19 @@ function RatingCard({ anime, onRate }) {
                 onMouseEnter={(e) => e.target.style.backgroundColor = '#2c3e50'}
                 onMouseLeave={(e) => e.target.style.backgroundColor = '#364F6B'}
               >
-                모두 적용 ({seriesInfo.sequels.length + 1}개)
+                {language === 'ko' ? `모두 적용 (${seriesInfo.sequels.length + 1}개)` : language === 'ja' ? `全て適用 (${seriesInfo.sequels.length + 1}個)` : `Apply All (${seriesInfo.sequels.length + 1})`}
               </button>
               <button
                 onClick={() => handleSeriesConfirm(false)}
                 className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded font-medium transition-colors"
               >
-                현재만
+                {language === 'ko' ? '현재만' : language === 'ja' ? '現在のみ' : 'Current Only'}
               </button>
               <button
                 onClick={handleSeriesCancel}
                 className="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded font-medium transition-colors"
               >
-                취소
+                {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
               </button>
             </div>
           </div>
@@ -585,7 +595,7 @@ export default function Rate() {
       await loadStats();
     } catch (err) {
       console.error('Failed to rate:', err);
-      alert('평가 저장에 실패했습니다. 다시 시도해주세요.');
+      alert(language === 'ko' ? '평가 저장에 실패했습니다. 다시 시도해주세요.' : language === 'ja' ? '評価の保存に失敗しました。もう一度お試しください。' : 'Failed to save rating. Please try again.');
       throw err;
     }
   };
@@ -605,25 +615,25 @@ export default function Rate() {
           <div className="flex gap-3 items-center">
             {/* Rated */}
             <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '평가했어요' : 'Rated'}</div>
+              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '평가했어요' : language === 'ja' ? '評価済み' : 'Rated'}</div>
               <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{stats.rated.toLocaleString()}</div>
             </div>
 
             {/* Watch Later */}
             <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '보고싶어요' : 'Later'}</div>
+              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '보고싶어요' : language === 'ja' ? '見たい' : 'Later'}</div>
               <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{stats.watchLater.toLocaleString()}</div>
             </div>
 
             {/* Pass */}
             <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '관심없어요' : 'Pass'}</div>
+              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Pass'}</div>
               <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{stats.pass.toLocaleString()}</div>
             </div>
 
             {/* Average Rating - Always show */}
             <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '평균 평점' : 'Avg Rating'}</div>
+              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</div>
               <div className="text-lg font-bold text-gray-800 text-center tabular-nums">
                 {stats.averageRating > 0 ? `★ ${stats.averageRating.toFixed(1)}` : '-'}
               </div>

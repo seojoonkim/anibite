@@ -75,13 +75,15 @@ export default function Settings() {
       updateUser(updatedUser);
 
       setIsEditingProfile(false);
-      setProfileSuccess(language === 'ko' ? '프로필이 업데이트되었습니다.' : 'Profile updated successfully.');
+      setProfileSuccess(language === 'ko' ? '프로필이 업데이트되었습니다.' : language === 'ja' ? 'プロフィールが更新されました。' : 'Profile updated successfully.');
       setTimeout(() => setProfileSuccess(''), 3000);
     } catch (err) {
       console.error('Failed to update profile:', err);
       setProfileError(
         language === 'ko'
           ? err.response?.data?.detail || '프로필 업데이트에 실패했습니다.'
+          : language === 'ja'
+          ? err.response?.data?.detail || 'プロフィールの更新に失敗しました。'
           : err.response?.data?.detail || 'Failed to update profile.'
       );
     }
@@ -115,12 +117,12 @@ export default function Settings() {
 
       // Validate
       if (passwordData.new_password.length < 8) {
-        setPasswordError(language === 'ko' ? '새 비밀번호는 최소 8자 이상이어야 합니다.' : 'New password must be at least 8 characters.');
+        setPasswordError(language === 'ko' ? '새 비밀번호는 최소 8자 이상이어야 합니다.' : language === 'ja' ? '新しいパスワードは8文字以上である必要があります。' : 'New password must be at least 8 characters.');
         return;
       }
 
       if (passwordData.new_password !== passwordData.confirm_password) {
-        setPasswordError(language === 'ko' ? '새 비밀번호가 일치하지 않습니다.' : 'New passwords do not match.');
+        setPasswordError(language === 'ko' ? '새 비밀번호가 일치하지 않습니다.' : language === 'ja' ? '新しいパスワードが一致しません。' : 'New passwords do not match.');
         return;
       }
 
@@ -135,13 +137,15 @@ export default function Settings() {
         new_password: '',
         confirm_password: ''
       });
-      setPasswordSuccess(language === 'ko' ? '비밀번호가 변경되었습니다.' : 'Password changed successfully.');
+      setPasswordSuccess(language === 'ko' ? '비밀번호가 변경되었습니다.' : language === 'ja' ? 'パスワードが変更されました。' : 'Password changed successfully.');
       setTimeout(() => setPasswordSuccess(''), 3000);
     } catch (err) {
       console.error('Failed to change password:', err);
       setPasswordError(
         language === 'ko'
           ? err.response?.data?.detail || '비밀번호 변경에 실패했습니다.'
+          : language === 'ja'
+          ? err.response?.data?.detail || 'パスワードの変更に失敗しました。'
           : err.response?.data?.detail || 'Failed to change password.'
       );
     }
@@ -163,7 +167,7 @@ export default function Settings() {
       setFiveStarCharacters(characters);
     } catch (err) {
       console.error('Failed to load characters:', err);
-      setAvatarError(language === 'ko' ? '캐릭터 목록을 불러오지 못했습니다.' : 'Failed to load characters.');
+      setAvatarError(language === 'ko' ? '캐릭터 목록을 불러오지 못했습니다.' : language === 'ja' ? 'キャラクターリストの読み込みに失敗しました。' : 'Failed to load characters.');
     } finally {
       setLoadingCharacters(false);
     }
@@ -183,13 +187,13 @@ export default function Settings() {
       // Validate file type
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       if (!allowedTypes.includes(file.type)) {
-        setAvatarError(language === 'ko' ? '지원되지 않는 파일 형식입니다.' : 'Unsupported file type.');
+        setAvatarError(language === 'ko' ? '지원되지 않는 파일 형식입니다.' : language === 'ja' ? 'サポートされていないファイル形式です。' : 'Unsupported file type.');
         return;
       }
 
       // Validate file size (5MB max)
       if (file.size > 5 * 1024 * 1024) {
-        setAvatarError(language === 'ko' ? '파일 크기는 5MB 이하여야 합니다.' : 'File size must be less than 5MB.');
+        setAvatarError(language === 'ko' ? '파일 크기는 5MB 이하여야 합니다.' : language === 'ja' ? 'ファイルサイズは5MB以下である必要があります。' : 'File size must be less than 5MB.');
         return;
       }
 
@@ -212,7 +216,7 @@ export default function Settings() {
 
       if (avatarMode === 'upload') {
         if (!selectedFile) {
-          setAvatarError(language === 'ko' ? '파일을 선택해주세요.' : 'Please select a file.');
+          setAvatarError(language === 'ko' ? '파일을 선택해주세요.' : language === 'ja' ? 'ファイルを選択してください。' : 'Please select a file.');
           return;
         }
 
@@ -220,7 +224,7 @@ export default function Settings() {
 
       } else if (avatarMode === 'character') {
         if (!selectedCharacterId) {
-          setAvatarError(language === 'ko' ? '캐릭터를 선택해주세요.' : 'Please select a character.');
+          setAvatarError(language === 'ko' ? '캐릭터를 선택해주세요.' : language === 'ja' ? 'キャラクターを選択してください。' : 'Please select a character.');
           return;
         }
 
@@ -235,13 +239,15 @@ export default function Settings() {
       setSelectedFile(null);
       setPreviewUrl(null);
       setSelectedCharacterId(null);
-      setAvatarSuccess(language === 'ko' ? '프로필 사진이 변경되었습니다.' : 'Profile picture changed successfully.');
+      setAvatarSuccess(language === 'ko' ? '프로필 사진이 변경되었습니다.' : language === 'ja' ? 'プロフィール写真が変更されました。' : 'Profile picture changed successfully.');
       setTimeout(() => setAvatarSuccess(''), 3000);
     } catch (err) {
       console.error('Failed to change avatar:', err);
       setAvatarError(
         language === 'ko'
           ? err.response?.data?.detail || '프로필 사진 변경에 실패했습니다.'
+          : language === 'ja'
+          ? err.response?.data?.detail || 'プロフィール写真の変更に失敗しました。'
           : err.response?.data?.detail || 'Failed to change profile picture.'
       );
     }
@@ -316,14 +322,14 @@ export default function Settings() {
           <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">
-                {language === 'ko' ? '프로필 사진' : 'Profile Picture'}
+                {language === 'ko' ? '프로필 사진' : language === 'ja' ? 'プロフィール写真' : 'Profile Picture'}
               </h2>
               {!isChangingAvatar && (
                 <button
                   onClick={handleAvatarChange}
                   className="text-sm text-[#3498DB] hover:text-blue-700 font-medium"
                 >
-                  {language === 'ko' ? '변경' : 'Change'}
+                  {language === 'ko' ? '변경' : language === 'ja' ? '変更' : 'Change'}
                 </button>
               )}
             </div>
@@ -362,6 +368,8 @@ export default function Settings() {
                 <p className="text-sm text-gray-600">
                   {language === 'ko'
                     ? '프로필 사진을 변경하려면 변경 버튼을 클릭하세요.'
+                    : language === 'ja'
+                    ? 'プロフィール写真を変更するには、変更ボタンをクリックしてください。'
                     : 'Click the change button to update your profile picture.'}
                 </p>
               </div>
@@ -372,18 +380,20 @@ export default function Settings() {
                   <div>
                     {loadingCharacters ? (
                       <p className="text-sm text-gray-600">
-                        {language === 'ko' ? '로딩 중...' : 'Loading...'}
+                        {language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...'}
                       </p>
                     ) : fiveStarCharacters.length === 0 ? (
                       <p className="text-sm text-gray-600">
                         {language === 'ko'
                           ? '5점 평가한 캐릭터가 없습니다. 캐릭터를 평가해보세요!'
+                          : language === 'ja'
+                          ? '5つ星の評価をしたキャラクターがありません。まずキャラクターを評価してください！'
                           : 'No 5-star rated characters. Rate some characters first!'}
                       </p>
                     ) : (
                       <>
                         <p className="text-sm font-medium text-gray-700 mb-3">
-                          {language === 'ko' ? '5점 준 캐릭터 중에서 선택하세요' : 'Choose from your 5-star rated characters'}
+                          {language === 'ko' ? '5점 준 캐릭터 중에서 선택하세요' : language === 'ja' ? '5つ星を付けたキャラクターから選んでください' : 'Choose from your 5-star rated characters'}
                         </p>
                         <div className="grid grid-cols-4 gap-3 max-h-96 overflow-y-auto">
                           {fiveStarCharacters.map((char) => (
@@ -421,13 +431,13 @@ export default function Settings() {
                     onClick={handleAvatarSave}
                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
                   >
-                    {language === 'ko' ? '저장' : 'Save'}
+                    {language === 'ko' ? '저장' : language === 'ja' ? '保存' : 'Save'}
                   </button>
                   <button
                     onClick={handleAvatarCancel}
                     className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
                   >
-                    {language === 'ko' ? '취소' : 'Cancel'}
+                    {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                   </button>
                 </div>
               </div>
@@ -437,14 +447,14 @@ export default function Settings() {
           <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">
-                {language === 'ko' ? '프로필 정보' : 'Profile Information'}
+                {language === 'ko' ? '프로필 정보' : language === 'ja' ? 'プロフィール情報' : 'Profile Information'}
               </h2>
               {!isEditingProfile && (
                 <button
                   onClick={handleProfileEdit}
                   className="text-sm text-[#3498DB] hover:text-blue-700 font-medium"
                 >
-                  {language === 'ko' ? '편집' : 'Edit'}
+                  {language === 'ko' ? '편집' : language === 'ja' ? '編集' : 'Edit'}
                 </button>
               )}
             </div>
@@ -464,7 +474,7 @@ export default function Settings() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {language === 'ko' ? '사용자명' : 'Username'}
+                  {language === 'ko' ? '사용자명' : language === 'ja' ? 'ユーザー名' : 'Username'}
                 </label>
                 <input
                   type="text"
@@ -473,12 +483,12 @@ export default function Settings() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  {language === 'ko' ? '사용자명은 변경할 수 없습니다.' : 'Username cannot be changed.'}
+                  {language === 'ko' ? '사용자명은 변경할 수 없습니다.' : language === 'ja' ? 'ユーザー名は変更できません。' : 'Username cannot be changed.'}
                 </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {language === 'ko' ? '이메일' : 'Email'}
+                  {language === 'ko' ? '이메일' : language === 'ja' ? 'メールアドレス' : 'Email'}
                 </label>
                 <input
                   type="email"
@@ -492,7 +502,7 @@ export default function Settings() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {language === 'ko' ? '표시 이름' : 'Display Name'}
+                  {language === 'ko' ? '표시 이름' : language === 'ja' ? '表示名' : 'Display Name'}
                 </label>
                 <input
                   type="text"
@@ -511,13 +521,13 @@ export default function Settings() {
                     onClick={handleProfileSave}
                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
                   >
-                    {language === 'ko' ? '저장' : 'Save'}
+                    {language === 'ko' ? '저장' : language === 'ja' ? '保存' : 'Save'}
                   </button>
                   <button
                     onClick={handleProfileCancel}
                     className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
                   >
-                    {language === 'ko' ? '취소' : 'Cancel'}
+                    {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                   </button>
                 </div>
               )}
@@ -529,14 +539,14 @@ export default function Settings() {
           <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">
-                {language === 'ko' ? '비밀번호' : 'Password'}
+                {language === 'ko' ? '비밀번호' : language === 'ja' ? 'パスワード' : 'Password'}
               </h2>
               {!isChangingPassword && (
                 <button
                   onClick={handlePasswordChange}
                   className="text-sm text-[#3498DB] hover:text-blue-700 font-medium"
                 >
-                  {language === 'ko' ? '변경' : 'Change'}
+                  {language === 'ko' ? '변경' : language === 'ja' ? '変更' : 'Change'}
                 </button>
               )}
             </div>
@@ -555,13 +565,13 @@ export default function Settings() {
 
             {!isChangingPassword ? (
               <p className="text-sm text-gray-600">
-                {language === 'ko' ? '보안을 위해 정기적으로 비밀번호를 변경하세요.' : 'Change your password regularly for security.'}
+                {language === 'ko' ? '보안을 위해 정기적으로 비밀번호를 변경하세요.' : language === 'ja' ? 'セキュリティのため定期的にパスワードを変更してください。' : 'Change your password regularly for security.'}
               </p>
             ) : (
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {language === 'ko' ? '현재 비밀번호' : 'Current Password'}
+                    {language === 'ko' ? '현재 비밀번호' : language === 'ja' ? '現在のパスワード' : 'Current Password'}
                   </label>
                   <input
                     type="password"
@@ -572,7 +582,7 @@ export default function Settings() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {language === 'ko' ? '새 비밀번호' : 'New Password'}
+                    {language === 'ko' ? '새 비밀번호' : language === 'ja' ? '新しいパスワード' : 'New Password'}
                   </label>
                   <input
                     type="password"
@@ -581,12 +591,12 @@ export default function Settings() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    {language === 'ko' ? '최소 8자 이상' : 'At least 8 characters'}
+                    {language === 'ko' ? '최소 8자 이상' : language === 'ja' ? '最低8文字以上' : 'At least 8 characters'}
                   </p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {language === 'ko' ? '새 비밀번호 확인' : 'Confirm New Password'}
+                    {language === 'ko' ? '새 비밀번호 확인' : language === 'ja' ? '新しいパスワード確認' : 'Confirm New Password'}
                   </label>
                   <input
                     type="password"
@@ -601,13 +611,13 @@ export default function Settings() {
                     onClick={handlePasswordSave}
                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
                   >
-                    {language === 'ko' ? '저장' : 'Save'}
+                    {language === 'ko' ? '저장' : language === 'ja' ? '保存' : 'Save'}
                   </button>
                   <button
                     onClick={handlePasswordCancel}
                     className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
                   >
-                    {language === 'ko' ? '취소' : 'Cancel'}
+                    {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                   </button>
                 </div>
               </div>
@@ -617,16 +627,18 @@ export default function Settings() {
           {/* About Section */}
           <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
             <h2 className="text-xl font-bold mb-4">
-              {language === 'ko' ? '애플리케이션 정보' : 'About'}
+              {language === 'ko' ? '애플리케이션 정보' : language === 'ja' ? 'アプリケーション情報' : 'About'}
             </h2>
             <div className="space-y-2 text-sm text-gray-600">
               <p>
-                <span className="font-medium">AniPass</span> - {language === 'ko' ? '애니메이션 평가 플랫폼' : 'Anime Rating Platform'}
+                <span className="font-medium">AniPass</span> - {language === 'ko' ? '애니메이션 평가 플랫폼' : language === 'ja' ? 'アニメ評価プラットフォーム' : 'Anime Rating Platform'}
               </p>
               <p>Version 1.0.0</p>
               <p className="mt-4">
                 {language === 'ko'
                   ? '애니메이션을 평가하고, 캐릭터를 평가하며, 나만의 애니메이션 취향을 발견하세요.'
+                  : language === 'ja'
+                  ? 'アニメを評価し、キャラクターを評価し、自分のアニメの好みを発見しましょう。'
                   : 'Rate anime, rate characters, and discover your anime taste.'}
               </p>
             </div>
@@ -639,7 +651,7 @@ export default function Settings() {
             onClick={() => navigate(-1)}
             className="text-[#3498DB] hover:text-blue-700 font-medium"
           >
-            ← {language === 'ko' ? '뒤로 가기' : 'Go Back'}
+            ← {language === 'ko' ? '뒤로 가기' : language === 'ja' ? '戻る' : 'Go Back'}
           </button>
         </div>
       </div>

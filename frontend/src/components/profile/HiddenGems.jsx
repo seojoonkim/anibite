@@ -18,12 +18,12 @@ export default function HiddenGems({ gems }) {
   return (
     <div className="bg-white rounded-2xl shadow-md p-6">
       <h3 className="text-lg font-bold mb-4 text-gray-800">
-        {language === 'ko' ? '숨겨진 보석 & 과대평가' : 'Hidden Gems & Overrated'}
+        {language === 'ko' ? '숨겨진 보석 & 과대평가' : language === 'ja' ? '隠れた名作 & 過大評価' : 'Hidden Gems & Overrated'}
       </h3>
 
       {!gems || !Array.isArray(gems) || gems.length === 0 ? (
         <div className="text-center py-8 text-gray-500 text-sm">
-          {language === 'ko' ? '데이터가 없습니다' : 'No data available'}
+          {language === 'ko' ? '데이터가 없습니다' : language === 'ja' ? 'データがありません' : 'No data available'}
         </div>
       ) : (
         <div className="space-y-3">
@@ -58,15 +58,21 @@ export default function HiddenGems({ gems }) {
                       : 'bg-orange-100 text-orange-800'
                   }`}>
                     {isHiddenGem
-                      ? (language === 'ko' ? '숨겨진 보석' : 'Hidden Gem')
-                      : (language === 'ko' ? '과대평가' : 'Overrated')
+                      ? (language === 'ko' ? '숨겨진 보석' : language === 'ja' ? '隠れた名作' : 'Hidden Gem')
+                      : (language === 'ko' ? '과대평가' : language === 'ja' ? '過大評価' : 'Overrated')
                     }
                   </span>
                 </div>
                 <div className="flex items-center gap-3 text-[10px] text-gray-500 mt-1">
-                  <span>내 평점: <span className="font-semibold text-gray-700">★ {anime.my_rating?.toFixed(1)}</span></span>
+                  <span>
+                    {language === 'ko' ? '내 평점: ' : language === 'ja' ? '私の評価: ' : 'My rating: '}
+                    <span className="font-semibold text-gray-700">★ {anime.my_rating?.toFixed(1)}</span>
+                  </span>
                   <span>•</span>
-                  <span>평균: {anime.anilist_score || 'N/A'}</span>
+                  <span>
+                    {language === 'ko' ? '평균: ' : language === 'ja' ? '平均: ' : 'Average: '}
+                    {anime.anilist_score || 'N/A'}
+                  </span>
                   <span>•</span>
                   <span className={`font-semibold ${
                     anime.rating_difference > 0 ? 'text-green-600' : 'text-orange-600'

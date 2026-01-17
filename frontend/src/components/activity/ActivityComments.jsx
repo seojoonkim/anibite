@@ -31,7 +31,7 @@ export default function ActivityComments({
   if (loading) {
     return (
       <div className="mt-4 border-t pt-4">
-        <p className="text-[15px] text-gray-500">{language === 'ko' ? '댓글 로딩 중...' : 'Loading comments...'}</p>
+        <p className="text-[15px] text-gray-500">{language === 'ko' ? '댓글 로딩 중...' : language === 'ja' ? 'コメント読み込み中...' : 'Loading comments...'}</p>
       </div>
     );
   }
@@ -69,7 +69,7 @@ export default function ActivityComments({
                     onCommentSubmit();
                   }
                 }}
-                placeholder={language === 'ko' ? '댓글을 입력하세요...' : 'Write a comment...'}
+                placeholder={language === 'ko' ? '댓글을 입력하세요...' : language === 'ja' ? 'コメントを入力してください...' : 'Write a comment...'}
                 className="flex-1 px-3 py-1.5 text-[15px] border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <button
@@ -78,7 +78,7 @@ export default function ActivityComments({
                 className="px-3 py-1.5 text-[15px] font-semibold text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                 style={newCommentText.trim() ? { backgroundColor: '#3797F0' } : {}}
               >
-                {language === 'ko' ? '작성' : 'Post'}
+                {language === 'ko' ? '작성' : language === 'ja' ? '作成' : 'Post'}
               </button>
             </div>
           </div>
@@ -131,7 +131,7 @@ export default function ActivityComments({
                         <span style={{ color: levelInfo.color }}>{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
                       </span>
                       <span className="text-[11px] text-gray-400">
-                        {new Date(comment.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US')}
+                        {new Date(comment.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : language === 'ja' ? 'ja-JP' : 'en-US')}
                       </span>
                     </div>
 
@@ -143,19 +143,19 @@ export default function ActivityComments({
                           onClick={() => setReplyingTo(comment.id)}
                           className="text-[11px] text-gray-500 hover:text-[#3797F0]"
                         >
-                          {language === 'ko' ? '답글' : 'Reply'}
+                          {language === 'ko' ? '답글' : language === 'ja' ? '返信' : 'Reply'}
                         </button>
                       )}
                       {currentUser && currentUser.id === comment.user_id && (
                         <button
                           onClick={() => {
-                            if (window.confirm(language === 'ko' ? '댓글을 삭제하시겠습니까?' : 'Delete this comment?')) {
+                            if (window.confirm(language === 'ko' ? '댓글을 삭제하시겠습니까?' : language === 'ja' ? 'コメントを削除しますか？' : 'Delete this comment?')) {
                               onDeleteComment(comment.id);
                             }
                           }}
                           className="text-[11px] text-red-500 hover:text-red-700"
                         >
-                          {language === 'ko' ? '삭제' : 'Delete'}
+                          {language === 'ko' ? '삭제' : language === 'ja' ? '削除' : 'Delete'}
                         </button>
                       )}
                     </div>
@@ -173,7 +173,7 @@ export default function ActivityComments({
                               onReplySubmit(comment.id);
                             }
                           }}
-                          placeholder={language === 'ko' ? '답글을 입력하세요...' : 'Write a reply...'}
+                          placeholder={language === 'ko' ? '답글을 입력하세요...' : language === 'ja' ? '返信を入力してください...' : 'Write a reply...'}
                           className="flex-1 px-2 py-1 text-[13px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                         />
                         <button
@@ -182,7 +182,7 @@ export default function ActivityComments({
                           className="px-2 py-1 text-[13px] font-semibold text-white rounded transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                           style={replyText.trim() ? { backgroundColor: '#3797F0' } : {}}
                         >
-                          {language === 'ko' ? '작성' : 'Post'}
+                          {language === 'ko' ? '작성' : language === 'ja' ? '作成' : 'Post'}
                         </button>
                         <button
                           onClick={() => {
@@ -191,7 +191,7 @@ export default function ActivityComments({
                           }}
                           className="px-2 py-1 text-[13px] font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
                         >
-                          {language === 'ko' ? '취소' : 'Cancel'}
+                          {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                         </button>
                       </div>
                     )}
@@ -241,7 +241,7 @@ export default function ActivityComments({
                                   </span>
                                   <span className="text-[11px] text-gray-400">
                                     {new Date(reply.created_at).toLocaleDateString(
-                                      language === 'ko' ? 'ko-KR' : 'en-US'
+                                      language === 'ko' ? 'ko-KR' : language === 'ja' ? 'ja-JP' : 'en-US'
                                     )}
                                   </span>
                                 </div>
@@ -254,19 +254,19 @@ export default function ActivityComments({
                                       onClick={() => setReplyingTo(comment.id)}
                                       className="text-[11px] text-gray-500 hover:text-[#3797F0]"
                                     >
-                                      {language === 'ko' ? '답글' : 'Reply'}
+                                      {language === 'ko' ? '답글' : language === 'ja' ? '返信' : 'Reply'}
                                     </button>
                                   )}
                                   {currentUser && currentUser.id === reply.user_id && (
                                     <button
                                       onClick={() => {
-                                        if (window.confirm(language === 'ko' ? '답글을 삭제하시겠습니까?' : 'Delete this reply?')) {
+                                        if (window.confirm(language === 'ko' ? '답글을 삭제하시겠습니까?' : language === 'ja' ? '返信を削除しますか？' : 'Delete this reply?')) {
                                           onDeleteComment(reply.id, comment.id);
                                         }
                                       }}
                                       className="text-[11px] text-red-500 hover:text-red-700"
                                     >
-                                      {language === 'ko' ? '삭제' : 'Delete'}
+                                      {language === 'ko' ? '삭제' : language === 'ja' ? '削除' : 'Delete'}
                                     </button>
                                   )}
                                 </div>

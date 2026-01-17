@@ -94,7 +94,7 @@ export default function ContentMenu({
               onClick={() => handleAction(onEdit)}
               className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors text-sm"
             >
-              {language === 'ko' ? '수정' : 'Edit'}
+              {language === 'ko' ? '수정' : language === 'ja' ? '編集' : 'Edit'}
             </button>
           ) : hasReview ? (
             // 리뷰가 있는 경우
@@ -102,7 +102,7 @@ export default function ContentMenu({
               onClick={() => handleAction(onEdit)}
               className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors text-sm"
             >
-              {language === 'ko' ? '리뷰 수정' : 'Edit Review'}
+              {language === 'ko' ? '리뷰 수정' : language === 'ja' ? 'レビューを編集' : 'Edit Review'}
             </button>
           ) : (
             // 리뷰가 없는 경우 (평가만 있음)
@@ -111,13 +111,13 @@ export default function ContentMenu({
                 onClick={() => handleAction(onEditRating)}
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors text-sm"
               >
-                {language === 'ko' ? '별점 수정' : 'Edit Rating'}
+                {language === 'ko' ? '별점 수정' : language === 'ja' ? '評価を編集' : 'Edit Rating'}
               </button>
               <button
                 onClick={() => handleAction(onAddReview)}
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors text-sm"
               >
-                {language === 'ko' ? '리뷰 추가' : 'Add Review'}
+                {language === 'ko' ? '리뷰 추가' : language === 'ja' ? 'レビューを追加' : 'Add Review'}
               </button>
             </>
           )}
@@ -128,7 +128,7 @@ export default function ContentMenu({
             onClick={() => handleAction(handleDelete)}
             className="w-full text-left px-4 py-2 hover:bg-red-50 transition-colors text-sm text-red-600"
           >
-            {language === 'ko' ? '삭제' : 'Delete'}
+            {language === 'ko' ? '삭제' : language === 'ja' ? '削除' : 'Delete'}
           </button>
         </div>
       )}
