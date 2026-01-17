@@ -1281,6 +1281,131 @@ def debug_rank_promotions():
         }
 
 
+@router.post("/patch-korean-names")
+def patch_korean_names(names: dict):
+    """
+    Patch character Korean names without affecting user data
+    캐릭터 한국어 이름만 패치 (사용자 데이터 손실 없음)
+
+    Input format:
+    {
+        "names": {
+            "character_id": "한국어이름",
+            "138102": "요르 포저",
+            ...
+        }
+    }
+    """
+    try:
+        updated = 0
+        failed = []
+
+        names_dict = names.get("names", {})
+
+        for char_id, korean_name in names_dict.items():
+            try:
+                result = db.execute_update(
+                    "UPDATE character SET name_korean = ? WHERE id = ?",
+                    (korean_name, int(char_id))
+                )
+                if result > 0:
+                    updated += 1
+            except Exception as e:
+                failed.append({"id": char_id, "error": str(e)})
+
+        # Also update activities table
+        db.execute_update("""
+            UPDATE activities
+            SET item_title_korean = (
+                SELECT c.name_korean
+                FROM character c
+                WHERE c.id = activities.item_id
+            )
+            WHERE activity_type IN ('character_rating', 'character_review')
+            AND item_id IS NOT NULL
+        """)
+
+        return {
+            "success": True,
+            "updated": updated,
+            "failed": failed,
+            "total_requested": len(names_dict)
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
+
+
+@router.get("/check-korean-names")
+def check_korean_names():
+    """
+    Check character Korean names status
+    캐릭터 한국어 이름 상태 확인
+    """
+    try:
+        # Total characters
+        total = db.execute_query("SELECT COUNT(*) FROM character", fetch_one=True)
+        total_count = total[0] if total else 0
+
+        # With Korean name
+        has_korean = db.execute_query(
+            "SELECT COUNT(*) FROM character WHERE name_korean IS NOT NULL AND name_korean != ''",
+            fetch_one=True
+        )
+        has_korean_count = has_korean[0] if has_korean else 0
+
+        # Without Korean name
+        no_korean_count = total_count - has_korean_count
+
+        # Names with middle dot (・ or ·)
+        middle_dot = db.execute_query(
+            "SELECT COUNT(*) FROM character WHERE name_korean LIKE '%・%' OR name_korean LIKE '%·%'",
+            fetch_one=True
+        )
+        middle_dot_count = middle_dot[0] if middle_dot else 0
+
+        # Sample: Yor Forger
+        yor = db.execute_query(
+            "SELECT id, name_full, name_korean FROM character WHERE name_full LIKE '%Yor%Forger%'"
+        )
+
+        # Sample middle dot names
+        middle_dot_samples = db.execute_query("""
+            SELECT id, name_full, name_korean
+            FROM character
+            WHERE name_korean LIKE '%・%' OR name_korean LIKE '%·%'
+            ORDER BY favourites DESC
+            LIMIT 10
+        """)
+
+        # Sample good Korean names
+        good_samples = db.execute_query("""
+            SELECT id, name_full, name_korean
+            FROM character
+            WHERE name_korean IS NOT NULL
+              AND name_korean != ''
+              AND name_korean NOT LIKE '%・%'
+              AND name_korean NOT LIKE '%·%'
+            ORDER BY favourites DESC
+            LIMIT 10
+        """)
+
+        return {
+            "total_characters": total_count,
+            "has_korean_name": has_korean_count,
+            "no_korean_name": no_korean_count,
+            "middle_dot_count": middle_dot_count,
+            "yor_forger": [{"id": r[0], "name": r[1], "korean": r[2]} for r in yor] if yor else [],
+            "middle_dot_samples": [{"id": r[0], "name": r[1], "korean": r[2]} for r in middle_dot_samples],
+            "good_korean_samples": [{"id": r[0], "name": r[1], "korean": r[2]} for r in good_samples]
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
+
+
 @router.get("/check-bookmarks-table")
 def check_bookmarks_table():
     """
