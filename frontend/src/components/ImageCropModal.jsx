@@ -110,7 +110,7 @@ export default function ImageCropModal({ imageFile, onComplete, onCancel, aspect
       <div className="bg-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4">
         <h2 className="text-2xl font-bold mb-4 text-white">이미지 크롭 (3:4 비율)</h2>
 
-        <div className="relative h-96 bg-gray-900 rounded mb-4">
+        <div className="relative h-96 bg-white rounded mb-4">
           {imageSrc && (
             <Cropper
               image={imageSrc}
