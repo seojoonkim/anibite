@@ -35,6 +35,9 @@ frontend/build/
 dist/
 build/
 
+# Database files (should be in Railway volume, not in git)
+data/anime.db
+
 # Database temporary files
 *.db-shm
 *.db-wal

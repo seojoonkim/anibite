@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-구글 검색으로 모든 캐릭터의 공식 한국어 이름 업데이트
+구글 검색으로 모든 캐릭터의 공식 한국어 이름 업데이트/검증
 - 기존 한국어 이름도 전부 재검증
-- 구글 rate limit 우회 (여러 브라우저 프로필, 랜덤 딜레이)
-- 최대 속도로 병렬 처리
+- 구글 rate limit 우회 (랜덤 딜레이 + 글로벌 쿨다운)
+- 병렬 처리 + 단일 writer로 DB 잠금 최소화
+- 중간 저장 및 재개 지원
 
 예: "Eren Yeager" 이름 → 엘런 예거
 """
@@ -13,14 +14,20 @@ import re
 import json
 import asyncio
 import random
+import argparse
+import sqlite3
+import time
+import signal
+import atexit
 from datetime import datetime
 from pathlib import Path
-from urllib.parse import unquote
+from urllib.parse import unquote, quote_plus
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'backend'))
 
 from database import db
+from config import DATABASE_PATH
 
 try:
     from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeout
@@ -30,23 +37,28 @@ except ImportError:
 
 
 # ============================================================
-# Configuration - 구글 rate limit 우회 최적화
+# Configuration - 안정적 속도 (봇 감지 우회)
 # ============================================================
-MAX_WORKERS = 5  # 브라우저 5개 동시 실행
+MAX_WORKERS = 3  # 브라우저 동시 실행 수 (안정적)
 MIN_DELAY = 2.0  # 최소 딜레이 (초)
-MAX_DELAY = 4.0  # 최대 딜레이 (초) - 랜덤화로 봇 감지 회피
-PAGE_TIMEOUT = 12000
+MAX_DELAY = 4.0  # 최대 딜레이 (초)
+GLOBAL_MIN_INTERVAL = 1.0  # 전체 요청 간 최소 간격 (초)
+PAGE_TIMEOUT = 15000  # 충분한 타임아웃
 MAX_CHARACTERS = None  # None = 전체, 숫자로 제한 가능
+SAVE_EVERY = 10  # 처리 N개마다 저장
+SAVE_INTERVAL = 60  # N초마다 저장 (보조)
+MIN_SCORE = 3  # 후보 점수 최소 기준 (높을수록 보수적)
 
 # 파일 경로
 PROGRESS_FILE = Path(__file__).parent / "update_all_korean_progress.json"
 ERROR_LOG_FILE = Path(__file__).parent / "update_all_korean_errors.log"
 
-# Global counters
-processed_count = 0
-success_count = 0
-updated_count = 0
-lock = asyncio.Lock()
+# Control flags
+stop_requested = False
+
+# Global progress for emergency save
+_global_progress = None
+_global_progress_lock = None
 
 # User Agent Pool - 다양한 브라우저 시뮬레이션
 USER_AGENTS = [
@@ -81,7 +93,6 @@ def load_progress():
 
 def save_progress(progress):
     try:
-        # 너무 커지지 않도록 same, not_found는 ID만 저장
         with open(PROGRESS_FILE, "w", encoding="utf-8") as f:
             json.dump(progress, f, ensure_ascii=False)
     except Exception as e:
@@ -138,148 +149,261 @@ def is_valid_korean_name(text):
                  '검색', '결과', '나무위키', '위키백과', '더보기', '관련', '문서',
                  '애니메이션', '만화', '게임', '소설', '작품', '시리즈', '캐릭터',
                  '공식', '정보', '프로필', '소개', '한국어', '일본어', '영어',
-                 '번역', '발음', '표기', '원문']
+                 '번역', '발음', '표기', '원문', '스포일러', '줄거리']
     if text in blacklist or any(b == text for b in blacklist):
         return False
     return True
 
 
-def extract_korean_name_from_google(page_text, name_full):
-    """구글 검색 결과에서 한국어 이름 추출"""
+def extract_korean_name_from_google(page_text, name_full, name_native=None):
+    """구글 검색 결과에서 한국어 이름 추출 (점수 기반)"""
     lines = page_text.split('\n')
-    korean_names = []
-    first_name = name_full.split()[0] if ' ' in name_full else name_full
+    candidates = {}
+    name_full_lower = name_full.lower()
+
+    def add_candidate(candidate, score, reason):
+        if not is_valid_korean_name(candidate):
+            return
+        entry = candidates.setdefault(candidate, {"score": 0, "count": 0, "reason": reason})
+        entry["score"] += score
+        entry["count"] += 1
+        if score >= entry.get("best_score", 0):
+            entry["reason"] = reason
+            entry["best_score"] = score
 
     for line in lines:
         line = line.strip()
         if not line:
             continue
 
-        # 패턴 1: "한국어이름 - 나무위키" 형태
-        match = re.search(r'^([가-힣]{2,10}(?:\s[가-힣]{1,10})?)\s*[-–—]\s*나무위키', line)
+        # 패턴 1: "한국어이름 - 나무위키"
+        match = re.search(r'^([가-힣]{2,12}(?:\s[가-힣]{1,12})?)\s*[-–—]\s*나무위키', line)
         if match:
-            name = match.group(1).strip()
-            if is_valid_korean_name(name):
-                korean_names.append(name)
-                continue
+            add_candidate(match.group(1).strip(), 4, "namu_title")
+            continue
 
-        # 패턴 2: "한국어이름(영어이름)" 형태
-        match = re.search(r'^([가-힣]{2,10}(?:\s[가-힣]{1,10})?)\s*[\(（]', line)
+        # 패턴 2: "한국어이름 - 위키"
+        match = re.search(r'^([가-힣]{2,12}(?:\s[가-힣]{1,12})?)\s*[-–—]\s*위키', line)
         if match:
-            # 영어 이름이 포함되어 있는지 확인
-            if first_name.lower() in line.lower():
-                name = match.group(1).strip()
-                if is_valid_korean_name(name):
-                    korean_names.append(name)
-                    continue
+            add_candidate(match.group(1).strip(), 3, "wiki_title")
 
-        # 패턴 3: 나무위키 URL에서 추출 (/w/한국어이름)
+        # 패턴 3: 나무위키 URL (/w/한국어이름)
         match = re.search(r'namu\.wiki/w/([가-힣%]+(?:%20[가-힣%]+)*)', line)
         if match:
             try:
                 name = unquote(match.group(1))
-                # 괄호 제거 (동명이인 구분용)
                 name = re.sub(r'[\(（].*?[\)）]$', '', name).strip()
-                if is_valid_korean_name(name):
-                    korean_names.append(name)
+                add_candidate(name, 4, "namu_url")
             except:
                 pass
 
-        # 패턴 4: 위키백과 제목
-        match = re.search(r'^([가-힣]{2,10}(?:\s[가-힣]{1,10})?)\s*[-–—]\s*위키', line)
+        # 패턴 4: "한국어이름(영어이름)"
+        match = re.search(r'^([가-힣]{2,12}(?:\s[가-힣]{1,12})?)\s*[\(（]', line)
+        if match and name_full_lower in line.lower():
+            add_candidate(match.group(1).strip(), 3, "paren_with_english")
+
+        # 패턴 5: "한국어 이름: XXX"
+        match = re.search(r'한국어\s*이름\s*[:：]\s*([가-힣]{2,12}(?:\s[가-힣]{1,12})?)', line)
         if match:
-            name = match.group(1).strip()
-            if is_valid_korean_name(name):
-                korean_names.append(name)
+            add_candidate(match.group(1).strip(), 3, "korean_label")
 
-    # 가장 많이 나온 이름 반환 (신뢰도 높음)
-    if korean_names:
-        from collections import Counter
-        counter = Counter(korean_names)
-        most_common_name, count = counter.most_common(1)[0]
-        # 최소 1번 이상 나와야 함
-        if count >= 1:
-            return most_common_name
+        # 패턴 6: 영어 이름 포함 + 한국어 이름 같이 존재
+        if name_full_lower in line.lower():
+            for name in re.findall(r'[가-힣]{2,12}(?:\s[가-힣]{1,12})?', line):
+                add_candidate(name, 2, "same_line")
 
-    return None
+        if name_native and name_native in line:
+            for name in re.findall(r'[가-힣]{2,12}(?:\s[가-힣]{1,12})?', line):
+                add_candidate(name, 2, "native_line")
+
+    if not candidates:
+        return None, None
+
+    best_name, meta = max(
+        candidates.items(),
+        key=lambda item: (item[1]["score"], item[1]["count"], -len(item[0]))
+    )
+    if meta["score"] < MIN_SCORE:
+        return None, None
+    return best_name, meta.get("reason")
 
 
-async def search_google_with_retry(page, name_full, max_retries=2):
+class GlobalCooldown:
+    def __init__(self):
+        self._lock = asyncio.Lock()
+        self._until = 0.0
+
+    async def wait(self):
+        async with self._lock:
+            now = time.time()
+            delay = max(0.0, self._until - now)
+        if delay > 0:
+            await asyncio.sleep(delay)
+
+    async def trigger(self, seconds):
+        async with self._lock:
+            self._until = max(self._until, time.time() + seconds)
+
+
+class GlobalRateLimiter:
+    def __init__(self, min_interval):
+        self.min_interval = min_interval
+        self._lock = asyncio.Lock()
+        self._next_time = 0.0
+
+    async def wait(self):
+        async with self._lock:
+            now = time.time()
+            if now < self._next_time:
+                delay = self._next_time - now
+                self._next_time += self.min_interval
+            else:
+                delay = 0.0
+                self._next_time = now + self.min_interval
+        if delay > 0:
+            await asyncio.sleep(delay)
+
+
+def build_queries(name_full, name_native):
+    queries = [f'"{name_full}" 이름']
+    if name_native and name_native not in name_full:
+        queries.append(f'"{name_full}" "{name_native}" 이름')
+    if len(queries) < 2 and len(name_full.split()) == 1:
+        queries.append(f'"{name_full}" 캐릭터 이름')
+    return queries
+
+
+def is_bot_detected(content, url):
+    lowered = content.lower()
+    if "unusual traffic" in lowered or "captcha" in lowered:
+        return True
+    if "sorry" in lowered and "google" in lowered:
+        return True
+    if "우리 시스템에서 비정상적인 트래픽" in content:
+        return True
+    if "자동화된" in content and "트래픽" in content:
+        return True
+    if "sorry" in (url or "") and "/sorry" in (url or ""):
+        return True
+    return False
+
+
+async def search_google_with_retry(page, name_full, name_native, rate_limiter, cooldown, max_retries=2):
     """구글 검색 (재시도 포함)"""
-    search_query = f'"{name_full}" 이름'
+    queries = build_queries(name_full, name_native)
 
-    for attempt in range(max_retries):
-        try:
-            await page.goto(
-                f"https://www.google.com/search?q={search_query}&hl=ko&gl=kr",
-                timeout=PAGE_TIMEOUT,
-                wait_until='domcontentloaded'
-            )
+    for query in queries:
+        search_url = f"https://www.google.com/search?q={quote_plus(query)}&hl=ko&gl=kr"
+        for attempt in range(max_retries):
+            try:
+                await cooldown.wait()
+                await rate_limiter.wait()
 
-            # 봇 감지 체크
-            content = await page.content()
-            if 'unusual traffic' in content.lower() or 'captcha' in content.lower():
-                log_error(f"Bot detection for {name_full}, attempt {attempt + 1}")
-                await asyncio.sleep(30)  # 30초 대기 후 재시도
-                continue
+                await page.goto(
+                    search_url,
+                    timeout=PAGE_TIMEOUT,
+                    wait_until='domcontentloaded'
+                )
 
-            await asyncio.sleep(0.5)
+                content = await page.content()
+                if is_bot_detected(content, page.url):
+                    log_error(f"Bot detection for {name_full}, attempt {attempt + 1}")
+                    await cooldown.trigger(30 + random.uniform(5, 15))  # 쿨다운 감소
+                    await asyncio.sleep(2)  # 대기 시간 감소
+                    continue
 
-            page_text = await page.evaluate("document.body.innerText")
-            korean_name = extract_korean_name_from_google(page_text, name_full)
+                page_text = await page.evaluate("document.body.innerText")  # 즉시 실행
+                korean_name, reason = extract_korean_name_from_google(page_text, name_full, name_native)
+                if korean_name:
+                    return korean_name, reason
 
-            return korean_name
+            except PlaywrightTimeout:
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(1)  # 대기 시간 감소
+                    continue
+                log_error(f"Timeout for {name_full}")
+                return None, None
+            except Exception as e:
+                log_error(f"Error for {name_full}: {e}")
+                return None, None
 
-        except PlaywrightTimeout:
-            if attempt < max_retries - 1:
-                await asyncio.sleep(5)
-                continue
-            log_error(f"Timeout for {name_full}")
-            return None
-        except Exception as e:
-            log_error(f"Error for {name_full}: {e}")
-            return None
-
-    return None
+    return None, None
 
 
-async def worker(worker_id, queue, playwright, total_count, progress):
-    """Worker - 구글 검색 수행"""
-    global processed_count, success_count, updated_count
+async def create_browser(playwright, worker_id):
+    """브라우저 생성 헬퍼 함수 (봇 감지 우회 강화)"""
+    user_agent = random.choice(USER_AGENTS)
+    browser = await playwright.chromium.launch(
+        headless=False,  # 실제 브라우저 사용으로 봇 감지 우회
+        args=[
+            '--disable-blink-features=AutomationControlled',
+            '--no-sandbox',
+            '--disable-dev-shm-usage',
+        ]
+    )
+    context = await browser.new_context(
+        user_agent=user_agent,
+        locale='ko-KR',
+        viewport={'width': 1280, 'height': 720},  # 작은 뷰포트
+        java_script_enabled=True,
+    )
+    await context.add_init_script("""
+        Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+    """)
+
+    # 이미지, CSS, 폰트 차단으로 속도 향상
+    await context.route("**/*.{png,jpg,jpeg,gif,webp,svg,ico}", lambda route: route.abort())
+    await context.route("**/*.{woff,woff2,ttf,otf,eot}", lambda route: route.abort())
+    await context.route("**/fonts.googleapis.com/**", lambda route: route.abort())
+    await context.route("**/fonts.gstatic.com/**", lambda route: route.abort())
+
+    page = await context.new_page()
+    return browser, context, page
+
+
+async def close_browser_safely(browser, context, page):
+    """브라우저 안전하게 닫기"""
+    try:
+        if page:
+            await page.close()
+    except:
+        pass
+    try:
+        if context:
+            await context.close()
+    except:
+        pass
+    try:
+        if browser:
+            await browser.close()
+    except:
+        pass
+
+
+async def worker(worker_id, queue, result_queue, playwright, rate_limiter, cooldown):
+    """Worker - 구글 검색 수행 (크래시 방지 강화)"""
 
     browser = None
     context = None
     page = None
+    consecutive_failures = 0
+    max_consecutive_failures = 5
+    max_browser_restarts = 10
+    browser_restarts = 0
 
     try:
-        # 랜덤 User Agent 선택
-        user_agent = USER_AGENTS[worker_id % len(USER_AGENTS)]
-
-        browser = await playwright.chromium.launch(
-            headless=True,
-            args=['--disable-blink-features=AutomationControlled']  # 봇 감지 우회
-        )
-        context = await browser.new_context(
-            user_agent=user_agent,
-            locale='ko-KR',
-            viewport={'width': 1920, 'height': 1080}
-        )
-
-        # 봇 감지 우회를 위한 추가 설정
-        await context.add_init_script("""
-            Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
-        """)
-
-        page = await context.new_page()
+        browser, context, page = await create_browser(playwright, worker_id)
         log(f"Worker {worker_id}: 시작")
 
-        consecutive_failures = 0
-        max_consecutive_failures = 5
-
         while True:
+            # 큐에서 캐릭터 가져오기
             try:
                 character = queue.get_nowait()
             except asyncio.QueueEmpty:
+                break
+
+            if stop_requested:
+                await queue.put(character)
                 break
 
             char_id = character['id']
@@ -287,68 +411,65 @@ async def worker(worker_id, queue, playwright, total_count, progress):
             name_native = character['name_native']
             current_korean = character['name_korean']
 
-            # 구글 검색
-            found_korean = await search_google_with_retry(page, name_full)
-
-            async with lock:
-                processed_count += 1
-                current = processed_count
+            # 개별 캐릭터 처리를 try-except로 감싸기
+            try:
+                found_korean, reason = await search_google_with_retry(
+                    page, name_full, name_native, rate_limiter, cooldown
+                )
 
                 if found_korean:
-                    success_count += 1
                     consecutive_failures = 0
-
-                    if current_korean != found_korean:
-                        # 업데이트 필요
-                        db.execute_update(
-                            "UPDATE character SET name_korean = ? WHERE id = ?",
-                            (found_korean, char_id)
-                        )
-                        updated_count += 1
-                        progress["updated"][str(char_id)] = {
-                            "name": name_full,
-                            "old": current_korean,
-                            "new": found_korean
-                        }
-                        log(f"✓ [{current}/{total_count}] {name_full}: {current_korean or '없음'} → {found_korean}")
-                    else:
-                        progress["same"].append(char_id)
-                        # 동일한 경우 로그 생략 (너무 많음)
                 else:
                     consecutive_failures += 1
-                    progress["not_found"].append(char_id)
 
-                progress["processed_ids"].append(char_id)
+                await result_queue.put({
+                    "id": char_id,
+                    "name_full": name_full,
+                    "name_native": name_native,
+                    "current_korean": current_korean,
+                    "found_korean": found_korean,
+                    "reason": reason
+                })
 
-                # 50개마다 진행상황 출력 및 저장
-                if current % 50 == 0:
-                    rate = success_count / current * 100 if current > 0 else 0
-                    log(f"\n{'='*50}")
-                    log(f"📊 진행: {current}/{total_count} ({current/total_count*100:.1f}%)")
-                    log(f"   찾음: {success_count}개 ({rate:.1f}%)")
-                    log(f"   업데이트: {updated_count}개")
-                    log(f"{'='*50}\n")
-                    save_progress(progress)
+            except Exception as e:
+                # 개별 처리 실패 시 에러 로그 후 계속 진행
+                log_error(f"Worker {worker_id} error processing {name_full}: {e}")
+                consecutive_failures += 1
+
+                # 결과는 실패로 기록
+                await result_queue.put({
+                    "id": char_id,
+                    "name_full": name_full,
+                    "name_native": name_native,
+                    "current_korean": current_korean,
+                    "found_korean": None,
+                    "reason": "error"
+                })
 
             # 연속 실패 시 브라우저 재시작
             if consecutive_failures >= max_consecutive_failures:
-                log(f"Worker {worker_id}: 연속 실패 {consecutive_failures}회, 브라우저 재시작...")
+                if browser_restarts >= max_browser_restarts:
+                    log(f"Worker {worker_id}: 최대 재시작 횟수 초과, 종료")
+                    break
+
+                log(f"Worker {worker_id}: 연속 실패 {consecutive_failures}회, 브라우저 재시작 ({browser_restarts + 1}/{max_browser_restarts})...")
+                await close_browser_safely(browser, context, page)
+                await asyncio.sleep(3 + random.uniform(0, 2))  # 대기 시간 감소
+
                 try:
-                    await page.close()
-                    await context.close()
-                    await browser.close()
-                except:
-                    pass
-
-                await asyncio.sleep(10)
-
-                browser = await playwright.chromium.launch(headless=True)
-                context = await browser.new_context(
-                    user_agent=random.choice(USER_AGENTS),
-                    locale='ko-KR'
-                )
-                page = await context.new_page()
-                consecutive_failures = 0
+                    browser, context, page = await create_browser(playwright, worker_id)
+                    consecutive_failures = 0
+                    browser_restarts += 1
+                except Exception as e:
+                    log_error(f"Worker {worker_id} browser restart failed: {e}")
+                    await asyncio.sleep(5)  # 대기 시간 감소
+                    try:
+                        browser, context, page = await create_browser(playwright, worker_id)
+                        consecutive_failures = 0
+                        browser_restarts += 1
+                    except:
+                        log(f"Worker {worker_id}: 브라우저 재시작 실패, 종료")
+                        break
 
             # 랜덤 딜레이 (봇 감지 우회)
             delay = random.uniform(MIN_DELAY, MAX_DELAY)
@@ -358,25 +479,152 @@ async def worker(worker_id, queue, playwright, total_count, progress):
         log_error(f"Worker {worker_id} fatal error: {e}")
 
     finally:
-        try:
-            if page:
-                await page.close()
-            if context:
-                await context.close()
-            if browser:
-                await browser.close()
-        except:
-            pass
+        await close_browser_safely(browser, context, page)
         log(f"Worker {worker_id}: 종료")
 
 
+async def writer(result_queue, total_count, progress):
+    """단일 writer - DB 업데이트 및 진행상황 기록"""
+    global _global_progress
+    _global_progress = progress  # 전역 참조 설정 (긴급 저장용)
+
+    processed_count = 0
+    success_count = 0
+    updated_count = 0
+    last_save_time = time.time()
+
+    processed_ids = set(progress.get("processed_ids", []))
+    same_ids = set(progress.get("same", []))
+    not_found_ids = set(progress.get("not_found", []))
+    updated_map = progress.get("updated", {})
+    errors = progress.get("errors", [])
+
+    conn = sqlite3.connect(str(DATABASE_PATH), timeout=60.0)
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA busy_timeout=60000")
+    cursor = conn.cursor()
+
+    try:
+        while processed_count < total_count:
+            result = await result_queue.get()
+            if result is None:
+                break
+
+            processed_count += 1
+            char_id = result["id"]
+            name_full = result["name_full"]
+            current_korean = result["current_korean"]
+            found_korean = result["found_korean"]
+            reason = result.get("reason")
+
+            if found_korean:
+                success_count += 1
+                if current_korean != found_korean:
+                    try:
+                        cursor.execute(
+                            "UPDATE character SET name_korean = ? WHERE id = ?",
+                            (found_korean, char_id)
+                        )
+                        updated_count += 1
+                        updated_map[str(char_id)] = {
+                            "name": name_full,
+                            "old": current_korean,
+                            "new": found_korean,
+                            "reason": reason
+                        }
+                        log(f"✓ [{processed_count}/{total_count}] {name_full}: {current_korean or '없음'} → {found_korean}")
+                    except Exception as e:
+                        errors.append({"id": char_id, "name": name_full, "error": str(e)})
+                        log_error(f"DB update failed for {char_id} {name_full}: {e}")
+                else:
+                    same_ids.add(char_id)
+            else:
+                not_found_ids.add(char_id)
+
+            processed_ids.add(char_id)
+
+            if processed_count % SAVE_EVERY == 0 or (time.time() - last_save_time) >= SAVE_INTERVAL:
+                conn.commit()
+                progress["processed_ids"] = list(processed_ids)
+                progress["same"] = list(same_ids)
+                progress["not_found"] = list(not_found_ids)
+                progress["updated"] = updated_map
+                progress["errors"] = errors
+                save_progress(progress)
+                last_save_time = time.time()
+
+            if processed_count % 10 == 0:
+                rate = success_count / processed_count * 100 if processed_count > 0 else 0
+                log(f"\n{'='*50}")
+                log(f"📊 진행: {processed_count}/{total_count} ({processed_count/total_count*100:.1f}%)")
+                log(f"   찾음: {success_count}개 ({rate:.1f}%)")
+                log(f"   업데이트: {updated_count}개")
+                log(f"{'='*50}\n")
+
+        conn.commit()
+    finally:
+        conn.close()
+
+    progress["processed_ids"] = list(processed_ids)
+    progress["same"] = list(same_ids)
+    progress["not_found"] = list(not_found_ids)
+    progress["updated"] = updated_map
+    progress["errors"] = errors
+    save_progress(progress)
+
+    return processed_count, success_count, updated_count
+
+
+def emergency_save():
+    """긴급 저장 - 프로그램 종료 시 호출"""
+    global _global_progress
+    if _global_progress:
+        try:
+            save_progress(_global_progress)
+            log("💾 긴급 저장 완료")
+        except Exception as e:
+            log_error(f"Emergency save failed: {e}")
+
+
+def handle_signal(signum, frame):
+    global stop_requested
+    stop_requested = True
+    log(f"⚠ 종료 신호 수신 (signal={signum}). 현재 처리 중인 항목까지 저장 후 종료합니다.")
+    emergency_save()
+
+
+# atexit 핸들러 등록
+atexit.register(emergency_save)
+
+
 async def main():
-    global processed_count, success_count, updated_count
+    global MIN_DELAY, MAX_DELAY, MAX_WORKERS, MAX_CHARACTERS, GLOBAL_MIN_INTERVAL, MIN_SCORE
+
+    parser = argparse.ArgumentParser(description="구글 검색으로 캐릭터 한국어 이름 검증/업데이트")
+    parser.add_argument("--workers", type=int, default=MAX_WORKERS)
+    parser.add_argument("--min-delay", type=float, default=MIN_DELAY)
+    parser.add_argument("--max-delay", type=float, default=MAX_DELAY)
+    parser.add_argument("--limit", type=int, default=None)
+    parser.add_argument("--min-interval", type=float, default=GLOBAL_MIN_INTERVAL)
+    parser.add_argument("--min-score", type=int, default=MIN_SCORE)
+    args = parser.parse_args()
+
+    MAX_WORKERS = max(1, args.workers)
+    MIN_DELAY = max(0.5, args.min_delay)
+    MAX_DELAY = max(MIN_DELAY, args.max_delay)
+    MAX_CHARACTERS = args.limit
+    GLOBAL_MIN_INTERVAL = max(0.2, args.min_interval)
+    MIN_SCORE = max(1, args.min_score)
+
+    signal.signal(signal.SIGINT, handle_signal)
+    signal.signal(signal.SIGTERM, handle_signal)
 
     log("=" * 60)
     log("🔍 구글 검색으로 모든 캐릭터 한국어 이름 업데이트")
     log(f"   Worker: {MAX_WORKERS}개")
     log(f"   딜레이: {MIN_DELAY}~{MAX_DELAY}초 (랜덤)")
+    log(f"   글로벌 간격: {GLOBAL_MIN_INTERVAL}초")
+    log(f"   최소 점수: {MIN_SCORE}")
     log("=" * 60)
 
     progress = load_progress()
@@ -399,24 +647,28 @@ async def main():
         log("✅ 처리할 캐릭터가 없습니다!")
         return
 
-    processed_count = 0
-    success_count = 0
-    updated_count = 0
-
     queue = asyncio.Queue()
     for char in characters:
         await queue.put(char)
+
+    result_queue = asyncio.Queue()
 
     log(f"\n🔄 검색 시작...")
     log(f"   예상 시간: {total_count * (MIN_DELAY + MAX_DELAY) / 2 / MAX_WORKERS / 60:.0f}분")
     start_time = datetime.now()
 
     async with async_playwright() as p:
+        rate_limiter = GlobalRateLimiter(GLOBAL_MIN_INTERVAL)
+        cooldown = GlobalCooldown()
+
+        writer_task = asyncio.create_task(writer(result_queue, total_count, progress))
         workers_tasks = [
-            worker(i, queue, p, total_count, progress)
+            worker(i, queue, result_queue, p, rate_limiter, cooldown)
             for i in range(MAX_WORKERS)
         ]
         await asyncio.gather(*workers_tasks)
+        await result_queue.put(None)
+        processed_count, success_count, updated_count = await writer_task
 
     save_progress(progress)
 
