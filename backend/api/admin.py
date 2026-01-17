@@ -927,3 +927,162 @@ def rebuild_activities_endpoint():
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/backfill-rank-promotions")
+def backfill_rank_promotions_endpoint():
+    """
+    Backfill rank promotion activities for all users
+    모든 사용자의 과거 승급 이력을 activities 테이블에 추가
+    """
+    import json
+    from datetime import datetime
+
+    def get_rank_info(otaku_score: float) -> tuple:
+        """Get rank name and level from otaku score"""
+        if otaku_score <= 49:
+            return "루키", 1
+        elif otaku_score <= 119:
+            return "헌터", 2
+        elif otaku_score <= 219:
+            return "워리어", 3
+        elif otaku_score <= 349:
+            return "나이트", 4
+        elif otaku_score <= 549:
+            return "마스터", 5
+        elif otaku_score <= 799:
+            return "하이마스터", 6
+        elif otaku_score <= 1099:
+            return "그랜드마스터", 7
+        elif otaku_score <= 1449:
+            return "오타쿠", 8
+        elif otaku_score <= 1799:
+            return "오타쿠 킹", 9
+        else:
+            return "오타쿠 갓", 10
+
+    try:
+        # Get all users
+        users = db.execute_query("SELECT id, username, display_name, avatar_url FROM users")
+
+        total_promotions = 0
+
+        for user_row in users:
+            user_id = user_row[0]
+            username = user_row[1]
+            display_name = user_row[2]
+            avatar_url = user_row[3]
+
+            print(f"\n처리 중: {display_name or username} (ID: {user_id})")
+
+            # Get all activities in chronological order
+            activities = db.execute_query("""
+                SELECT 'anime_rating' as activity_type, updated_at as activity_time
+                FROM user_ratings
+                WHERE user_id = ? AND status = 'RATED' AND rating IS NOT NULL
+
+                UNION ALL
+
+                SELECT 'anime_review' as activity_type, created_at as activity_time
+                FROM user_reviews
+                WHERE user_id = ?
+
+                UNION ALL
+
+                SELECT 'character_rating' as activity_type, updated_at as activity_time
+                FROM character_ratings
+                WHERE user_id = ? AND rating IS NOT NULL
+
+                UNION ALL
+
+                SELECT 'character_review' as activity_type, created_at as activity_time
+                FROM character_reviews
+                WHERE user_id = ?
+
+                ORDER BY activity_time ASC
+            """, (user_id, user_id, user_id, user_id))
+
+            # Calculate otaku_score at each point in time
+            anime_ratings_count = 0
+            character_ratings_count = 0
+            reviews_count = 0
+
+            prev_rank = None
+            prev_level = None
+
+            for activity in activities:
+                activity_time = activity[1]
+                activity_type = activity[0]
+
+                # Update counts
+                if activity_type == 'anime_rating':
+                    anime_ratings_count += 1
+                elif activity_type == 'character_rating':
+                    character_ratings_count += 1
+                elif activity_type in ('anime_review', 'character_review'):
+                    reviews_count += 1
+
+                # Calculate current otaku_score
+                otaku_score = (anime_ratings_count * 2) + (character_ratings_count * 1) + (reviews_count * 5)
+
+                # Get current rank
+                current_rank, current_level = get_rank_info(otaku_score)
+
+                # Check if rank changed
+                if prev_rank is not None:
+                    if (current_rank != prev_rank) or (current_rank == prev_rank and current_level > prev_level):
+                        # Rank promotion detected!
+                        print(f"  승급: {prev_rank}-{prev_level} → {current_rank}-{current_level} at {activity_time}")
+
+                        # Check if already exists
+                        existing = db.execute_query("""
+                            SELECT id FROM activities
+                            WHERE activity_type = 'rank_promotion'
+                              AND user_id = ?
+                              AND activity_time = ?
+                        """, (user_id, activity_time), fetch_one=True)
+
+                        if not existing:
+                            # Create metadata
+                            metadata = json.dumps({
+                                'old_rank': prev_rank,
+                                'old_level': prev_level,
+                                'new_rank': current_rank,
+                                'new_level': current_level,
+                                'otaku_score': otaku_score
+                            })
+
+                            # Insert rank promotion activity
+                            db.execute_insert("""
+                                INSERT INTO activities (
+                                    activity_type, user_id, username, display_name, avatar_url,
+                                    item_id, metadata, activity_time, created_at, updated_at
+                                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                            """, (
+                                'rank_promotion',
+                                user_id,
+                                username,
+                                display_name,
+                                avatar_url,
+                                None,
+                                metadata,
+                                activity_time
+                            ))
+
+                            total_promotions += 1
+
+                # Update previous rank
+                prev_rank = current_rank
+                prev_level = current_level
+
+        return {
+            "success": True,
+            "total_promotions_created": total_promotions,
+            "users_processed": len(users)
+        }
+
+    except Exception as e:
+        print(f"Error backfilling rank promotions: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
