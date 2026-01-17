@@ -351,7 +351,10 @@ def get_user_stats_by_id(user_id: int):
     다른 사용자의 통계 (공개)
     """
     from services.profile_service import get_user_stats
-    return get_user_stats(user_id)
+    stats = get_user_stats(user_id)
+    if stats is None:
+        raise HTTPException(status_code=404, detail="User stats not found")
+    return stats.model_dump()
 
 
 @router.get("/{user_id}/rating-distribution", response_model=List[Dict])
