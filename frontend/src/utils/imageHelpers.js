@@ -12,8 +12,14 @@ import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
  * @returns {string} Image URL to try first
  */
 export const getCharacterImageUrl = (characterId, imageUrl = null) => {
-  // Priority 1: character ID가 있으면 R2에서 찾기 (확장자 추출)
-  if (characterId) {
+  let finalUrl;
+
+  // Priority 1: imageUrl이 R2 URL이면 그대로 사용 (어드민에서 업로드한 이미지)
+  if (imageUrl && imageUrl.includes(IMAGE_BASE_URL)) {
+    finalUrl = imageUrl;
+  }
+  // Priority 2: character ID가 있으면 R2에서 찾기 (확장자 추출)
+  else if (characterId) {
     // Extract extension from original URL (png, jpg, etc.)
     let extension = 'jpg'; // default
     if (imageUrl) {
@@ -22,27 +28,39 @@ export const getCharacterImageUrl = (characterId, imageUrl = null) => {
         extension = extMatch[1].toLowerCase();
       }
     }
-    return `${IMAGE_BASE_URL}/images/characters/${characterId}.${extension}`;
+    finalUrl = `${IMAGE_BASE_URL}/images/characters/${characterId}.${extension}`;
   }
-
-  // Priority 2: imageUrl에서 AniList character ID 추출 시도
-  if (imageUrl && imageUrl.includes('anilist.co') && imageUrl.includes('/character/')) {
+  // Priority 3: imageUrl에서 AniList character ID 추출 시도
+  else if (imageUrl && imageUrl.includes('anilist.co') && imageUrl.includes('/character/')) {
     const match = imageUrl.match(/\/b(\d+)-/);
     if (match && match[1]) {
       const anilistCharacterId = match[1];
       // Extract extension from URL
       const extMatch = imageUrl.match(/\.(png|jpg|jpeg|webp|gif)(\?|$)/i);
       const extension = extMatch && extMatch[1] ? extMatch[1].toLowerCase() : 'jpg';
-      return `${IMAGE_BASE_URL}/images/characters/${anilistCharacterId}.${extension}`;
+      finalUrl = `${IMAGE_BASE_URL}/images/characters/${anilistCharacterId}.${extension}`;
+    } else {
+      finalUrl = null;
     }
   }
+  // Priority 4: imageUrl을 그대로 사용
+  else if (imageUrl) {
+    if (imageUrl.startsWith('http')) {
+      finalUrl = imageUrl;
+    } else if (imageUrl.startsWith('/')) {
+      finalUrl = `${IMAGE_BASE_URL}${imageUrl}`;
+    } else {
+      finalUrl = `${IMAGE_BASE_URL}${imageUrl}`;
+    }
+  } else {
+    return '/placeholder-anime.svg';
+  }
 
-  // Priority 3: imageUrl을 그대로 사용
-  if (!imageUrl) return '/placeholder-anime.svg';
-  if (imageUrl.startsWith('http')) return imageUrl;
-  if (imageUrl.startsWith('/')) return `${IMAGE_BASE_URL}${imageUrl}`;
+  if (!finalUrl) return '/placeholder-anime.svg';
 
-  return `${IMAGE_BASE_URL}${imageUrl}`;
+  // 캐시 우회: URL에 타임스탬프 추가
+  const separator = finalUrl.includes('?') ? '&' : '?';
+  return `${finalUrl}${separator}t=${Date.now()}`;
 };
 
 /**
