@@ -11,7 +11,7 @@ DATA_DIR = Path("/app/data")
 DB_PATH = DATA_DIR / "anime.db"
 
 # Download URL from environment variable or fallback to localtunnel
-DOWNLOAD_URL = os.getenv("DB_DOWNLOAD_URL", "https://ten-llamas-remain.loca.lt/anime.db")
+DOWNLOAD_URL = os.getenv("DB_DOWNLOAD_URL", "https://github.com/seojoonkim/anipass/releases/download/v1.0.0-db/anime.db")
 
 print(f"Downloading database from: {DOWNLOAD_URL}")
 print(f"Target location: {DB_PATH}")
