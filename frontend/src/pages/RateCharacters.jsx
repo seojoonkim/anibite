@@ -6,7 +6,7 @@ import StarRating from '../components/common/StarRating';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 export default function RateCharacters() {
-  const { t, language } = useLanguage();
+  const { t, language, getAnimeTitle } = useLanguage();
   const navigate = useNavigate();
   const [characters, setCharacters] = useState([]);
   const [allCharacters, setAllCharacters] = useState([]); // All loaded items
@@ -552,9 +552,11 @@ export default function RateCharacters() {
                     <Link
                       to={`/anime/${character.anime_id}`}
                       className="font-medium line-clamp-1 hover:text-[#3797F0] transition-colors cursor-pointer hover:underline"
-                      title={character.anime_title_korean || character.anime_title}
+                      title={language === 'ko' ? (character.anime_title_korean || character.anime_title) : character.anime_title}
                     >
-                      {character.anime_title_korean || character.anime_title}
+                      {language === 'ko'
+                        ? (character.anime_title_korean || character.anime_title)
+                        : character.anime_title}
                     </Link>
                   </div>
 

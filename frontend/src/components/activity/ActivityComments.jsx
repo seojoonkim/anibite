@@ -89,7 +89,7 @@ export default function ActivityComments({
       {comments.length > 0 && (
         <div className="space-y-3">
           {comments.map((comment) => {
-            const levelInfo = getCurrentLevelInfo(comment.otaku_score || 0);
+            const levelInfo = getCurrentLevelInfo(comment.otaku_score || 0, language);
 
             return (
               <div key={comment.id}>
@@ -200,7 +200,7 @@ export default function ActivityComments({
                     {comment.replies && comment.replies.length > 0 && (
                       <div className="mt-3 ml-4 space-y-3 border-l-2 border-gray-200 pl-3">
                         {comment.replies.map((reply) => {
-                          const replyLevelInfo = getCurrentLevelInfo(reply.otaku_score || 0);
+                          const replyLevelInfo = getCurrentLevelInfo(reply.otaku_score || 0, language);
 
                           return (
                             <div key={reply.id} className="flex gap-2">

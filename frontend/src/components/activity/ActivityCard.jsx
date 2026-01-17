@@ -238,7 +238,7 @@ const ActivityCard = forwardRef(({
     }
   };
 
-  const levelInfo = getCurrentLevelInfo(activity.otaku_score || 0);
+  const levelInfo = getCurrentLevelInfo(activity.otaku_score || 0, language);
 
   // Calculate item image src with useMemo - try R2 first
   const itemImageSrc = useMemo(() => {

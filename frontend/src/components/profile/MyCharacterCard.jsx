@@ -93,10 +93,8 @@ function MyCharacterCard({ character, language = 'ko' }) {
           )}
           {character.anime_title && (
             <p className="text-xs text-gray-500 mt-1 line-clamp-1">
-              {language === 'ko' && character.anime_title_korean
-                ? character.anime_title_korean
-                : language === 'ja' && character.anime_title_native
-                ? character.anime_title_native
+              {language === 'ko'
+                ? (character.anime_title_korean || character.anime_title)
                 : character.anime_title}
             </p>
           )}
