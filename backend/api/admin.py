@@ -1086,3 +1086,65 @@ def backfill_rank_promotions_endpoint():
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/debug-db")
+def debug_database():
+    """
+    Debug database path and activities table
+    데이터베이스 경로와 activities 테이블 상태 확인
+    """
+    import os
+    from config import DATABASE_PATH
+
+    try:
+        # Check database file
+        db_exists = os.path.exists(DATABASE_PATH)
+        db_size = os.path.getsize(DATABASE_PATH) if db_exists else 0
+
+        # Count activities
+        activities_count = db.execute_query(
+            "SELECT COUNT(*) as count FROM activities",
+            fetch_one=True
+        )
+
+        # Count by type
+        by_type = db.execute_query("""
+            SELECT activity_type, COUNT(*) as count
+            FROM activities
+            GROUP BY activity_type
+        """)
+
+        # Sample activities
+        sample = db.execute_query("""
+            SELECT id, activity_type, user_id, activity_time, metadata
+            FROM activities
+            ORDER BY activity_time DESC
+            LIMIT 5
+        """)
+
+        return {
+            "database_path": DATABASE_PATH,
+            "database_exists": db_exists,
+            "database_size_bytes": db_size,
+            "activities_total": activities_count['count'] if activities_count else 0,
+            "activities_by_type": [{"type": row[0], "count": row[1]} for row in by_type],
+            "sample_activities": [
+                {
+                    "id": row[0],
+                    "type": row[1],
+                    "user_id": row[2],
+                    "time": row[3],
+                    "metadata": row[4]
+                }
+                for row in sample
+            ]
+        }
+
+    except Exception as e:
+        import traceback
+        return {
+            "error": str(e),
+            "traceback": traceback.format_exc(),
+            "database_path": DATABASE_PATH if 'DATABASE_PATH' in locals() else "unknown"
+        }
