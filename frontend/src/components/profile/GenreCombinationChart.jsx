@@ -1,4 +1,8 @@
+import { useLanguage } from '../../contexts/LanguageContext';
+
 export default function GenreCombinationChart({ combinations }) {
+  const { language } = useLanguage();
+
   if (!combinations || combinations.length === 0) {
     return null;
   }
@@ -7,7 +11,9 @@ export default function GenreCombinationChart({ combinations }) {
 
   return (
     <div className="bg-gradient-to-br from-white to-violet-50/20 rounded-2xl shadow-md p-6 w-full h-full flex flex-col border border-violet-100/40">
-      <h3 className="text-lg font-bold mb-4 text-[#638CCC]">좋아하는 장르 조합 Top 10</h3>
+      <h3 className="text-lg font-bold mb-4 text-[#638CCC]">
+        {language === 'ko' ? '좋아하는 장르 조합 Top 10' : language === 'ja' ? 'お気に入りのジャンル組み合わせTOP 10' : 'Top 10 Genre Combinations'}
+      </h3>
 
       <div className="space-y-2.5">
         {combinations.map((combo, index) => {
@@ -25,7 +31,9 @@ export default function GenreCombinationChart({ combinations }) {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-600 font-medium">{combo.count}개</span>
+                  <span className="text-xs text-gray-600 font-medium">
+                    {combo.count}{language === 'ko' ? '개' : language === 'ja' ? '個' : ''}
+                  </span>
                   <span className="text-xs text-amber-500 font-bold">★ {combo.average_rating?.toFixed(1)}</span>
                 </div>
               </div>
