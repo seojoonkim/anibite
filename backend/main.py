@@ -11,7 +11,7 @@ from config import ALLOWED_ORIGINS, COVER_IMAGES_DIR
 import os
 
 # Import API routers
-from api import auth, anime, ratings, reviews, comments, users, series, characters, character_ratings, feed, follows, activity_comments, activity_likes, comment_likes, user_posts, character_reviews, notifications, activities, rating_pages, admin, admin_fix, debug_promotion, bookmarks
+from api import auth, anime, ratings, reviews, comments, users, series, characters, character_ratings, feed, follows, activity_comments, activity_likes, comment_likes, user_posts, character_reviews, notifications, activities, rating_pages, admin, admin_fix, admin_editor, debug_promotion, bookmarks
 
 app = FastAPI(
     title="AniPass API",
@@ -268,6 +268,7 @@ app.include_router(notifications.router, prefix="/api/notifications", tags=["Not
 app.include_router(bookmarks.router, prefix="/api/bookmarks", tags=["Bookmarks"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(admin_fix.router, prefix="/api/admin-fix", tags=["Admin Fix"])
+app.include_router(admin_editor.router, prefix="/api/admin/editor", tags=["Admin Editor"])
 app.include_router(debug_promotion.router, prefix="/api/debug", tags=["Debug"])
 
 

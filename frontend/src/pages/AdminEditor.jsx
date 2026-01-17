@@ -1,0 +1,331 @@
+import { useState } from 'react';
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
+export default function AdminEditor() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchType, setSearchType] = useState('both');
+  const [searchResults, setSearchResults] = useState({ anime: [], characters: [] });
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedType, setSelectedType] = useState(null);
+  const [editData, setEditData] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
+
+  // 검색
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    setIsLoading(true);
+    setMessage('');
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${API_BASE_URL}/api/admin/editor/search`,
+        {
+          params: { q: searchQuery, type: searchType, limit: 20 },
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error('검색 실패:', error);
+      setMessage(error.response?.data?.detail || '검색 실패');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 항목 선택
+  const selectItem = async (id, type) => {
+    setIsLoading(true);
+    setMessage('');
+
+    try {
+      const token = localStorage.getItem('token');
+      const endpoint = type === 'anime'
+        ? `/api/admin/editor/anime/${id}`
+        : `/api/admin/editor/character/${id}`;
+
+      const response = await axios.get(`${API_BASE_URL}${endpoint}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setSelectedItem(response.data);
+      setSelectedType(type);
+      setEditData(response.data);
+    } catch (error) {
+      console.error('불러오기 실패:', error);
+      setMessage(error.response?.data?.detail || '불러오기 실패');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 저장
+  const handleSave = async () => {
+    if (!selectedItem) return;
+
+    setIsLoading(true);
+    setMessage('');
+
+    try {
+      const token = localStorage.getItem('token');
+      const endpoint = selectedType === 'anime'
+        ? `/api/admin/editor/anime/${selectedItem.id}`
+        : `/api/admin/editor/character/${selectedItem.id}`;
+
+      await axios.patch(
+        `${API_BASE_URL}${endpoint}`,
+        editData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setMessage('✅ 저장 완료!');
+      // 검색 결과 갱신
+      handleSearch({ preventDefault: () => {} });
+    } catch (error) {
+      console.error('저장 실패:', error);
+      setMessage(error.response?.data?.detail || '저장 실패');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white p-8">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl font-bold mb-8">🛠️ Admin Editor</h1>
+
+        {/* 검색 */}
+        <div className="bg-gray-800 rounded-lg p-6 mb-8">
+          <form onSubmit={handleSearch} className="flex gap-4">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="작품 또는 캐릭터 검색 (모든 언어)"
+              className="flex-1 px-4 py-3 bg-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <select
+              value={searchType}
+              onChange={(e) => setSearchType(e.target.value)}
+              className="px-4 py-3 bg-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="both">모두</option>
+              <option value="anime">작품만</option>
+              <option value="character">캐릭터만</option>
+            </select>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="px-8 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold disabled:opacity-50"
+            >
+              {isLoading ? '검색 중...' : '검색'}
+            </button>
+          </form>
+        </div>
+
+        {message && (
+          <div className={`mb-4 p-4 rounded-lg ${message.startsWith('✅') ? 'bg-green-800' : 'bg-red-800'}`}>
+            {message}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* 검색 결과 */}
+          <div className="bg-gray-800 rounded-lg p-6">
+            <h2 className="text-2xl font-bold mb-4">검색 결과</h2>
+
+            {/* 작품 */}
+            {searchResults.anime.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold mb-3 text-blue-400">📺 작품 ({searchResults.anime.length})</h3>
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {searchResults.anime.map((anime) => (
+                    <button
+                      key={anime.id}
+                      onClick={() => selectItem(anime.id, 'anime')}
+                      className={`w-full text-left p-3 rounded-lg transition ${
+                        selectedItem?.id === anime.id && selectedType === 'anime'
+                          ? 'bg-blue-700'
+                          : 'bg-gray-700 hover:bg-gray-600'
+                      }`}
+                    >
+                      <div className="flex gap-3">
+                        {anime.cover_image && (
+                          <img
+                            src={anime.cover_image}
+                            alt={anime.title_korean || anime.title_romaji}
+                            className="w-12 h-16 object-cover rounded"
+                          />
+                        )}
+                        <div>
+                          <div className="font-semibold">{anime.title_korean || anime.title_romaji}</div>
+                          <div className="text-sm text-gray-400">{anime.title_romaji}</div>
+                          <div className="text-xs text-gray-500">{anime.title_english}</div>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 캐릭터 */}
+            {searchResults.characters.length > 0 && (
+              <div>
+                <h3 className="text-xl font-semibold mb-3 text-green-400">👤 캐릭터 ({searchResults.characters.length})</h3>
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {searchResults.characters.map((char) => (
+                    <button
+                      key={char.id}
+                      onClick={() => selectItem(char.id, 'character')}
+                      className={`w-full text-left p-3 rounded-lg transition ${
+                        selectedItem?.id === char.id && selectedType === 'character'
+                          ? 'bg-green-700'
+                          : 'bg-gray-700 hover:bg-gray-600'
+                      }`}
+                    >
+                      <div className="flex gap-3">
+                        {char.image_large && (
+                          <img
+                            src={char.image_large}
+                            alt={char.name_korean || char.name_full}
+                            className="w-12 h-16 object-cover rounded"
+                          />
+                        )}
+                        <div>
+                          <div className="font-semibold">{char.name_korean || char.name_full}</div>
+                          <div className="text-sm text-gray-400">{char.name_full}</div>
+                          <div className="text-xs text-gray-500">{char.anime_title}</div>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {searchResults.anime.length === 0 && searchResults.characters.length === 0 && searchQuery && (
+              <div className="text-center text-gray-400 py-8">
+                검색 결과가 없습니다
+              </div>
+            )}
+          </div>
+
+          {/* 편집 폼 */}
+          <div className="bg-gray-800 rounded-lg p-6">
+            <h2 className="text-2xl font-bold mb-4">편집</h2>
+
+            {selectedItem ? (
+              <div className="space-y-6">
+                {/* 작품 편집 */}
+                {selectedType === 'anime' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">한국어 제목</label>
+                      <input
+                        type="text"
+                        value={editData.title_korean || ''}
+                        onChange={(e) => setEditData({ ...editData, title_korean: e.target.value })}
+                        className="w-full px-4 py-3 bg-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">로마자 제목</label>
+                      <input
+                        type="text"
+                        value={editData.title_romaji || ''}
+                        onChange={(e) => setEditData({ ...editData, title_romaji: e.target.value })}
+                        className="w-full px-4 py-3 bg-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">영어 제목</label>
+                      <input
+                        type="text"
+                        value={editData.title_english || ''}
+                        onChange={(e) => setEditData({ ...editData, title_english: e.target.value })}
+                        className="w-full px-4 py-3 bg-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">일본어 제목</label>
+                      <input
+                        type="text"
+                        value={editData.title_native || ''}
+                        onChange={(e) => setEditData({ ...editData, title_native: e.target.value })}
+                        className="w-full px-4 py-3 bg-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* 캐릭터 편집 */}
+                {selectedType === 'character' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">한국어 이름</label>
+                      <input
+                        type="text"
+                        value={editData.name_korean || ''}
+                        onChange={(e) => setEditData({ ...editData, name_korean: e.target.value })}
+                        className="w-full px-4 py-3 bg-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">영어 이름</label>
+                      <input
+                        type="text"
+                        value={editData.name_full || ''}
+                        onChange={(e) => setEditData({ ...editData, name_full: e.target.value })}
+                        className="w-full px-4 py-3 bg-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">일본어 이름</label>
+                      <input
+                        type="text"
+                        value={editData.name_native || ''}
+                        onChange={(e) => setEditData({ ...editData, name_native: e.target.value })}
+                        className="w-full px-4 py-3 bg-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                    </div>
+                  </>
+                )}
+
+                <button
+                  onClick={handleSave}
+                  disabled={isLoading}
+                  className={`w-full px-6 py-4 rounded-lg font-bold text-lg ${
+                    selectedType === 'anime'
+                      ? 'bg-blue-600 hover:bg-blue-700'
+                      : 'bg-green-600 hover:bg-green-700'
+                  } disabled:opacity-50 transition`}
+                >
+                  {isLoading ? '저장 중...' : '💾 저장'}
+                </button>
+              </div>
+            ) : (
+              <div className="text-center text-gray-400 py-16">
+                ← 왼쪽에서 항목을 선택하세요
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
