@@ -22,6 +22,7 @@ const AnimeDetail = lazy(() => import('./pages/AnimeDetail'));
 const CharacterDetail = lazy(() => import('./pages/CharacterDetail'));
 const MyAniPass = lazy(() => import('./pages/MyAniPass'));
 const Settings = lazy(() => import('./pages/Settings'));
+const AdminEditor = lazy(() => import('./pages/AdminEditor'));
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -168,6 +169,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <Settings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminEditor />
             </ProtectedRoute>
           }
         />
