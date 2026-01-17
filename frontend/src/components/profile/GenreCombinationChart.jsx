@@ -1,4 +1,4 @@
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function GenreCombinationChart({ combinations }) {
   const { language } = useLanguage();
