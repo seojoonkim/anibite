@@ -608,7 +608,12 @@ const ActivityCard = forwardRef(({
                       )}
                     </>
                   ) : language === 'ja' ? (
-                    activity.anime_title_native || activity.anime_title
+                    <>
+                      {activity.anime_title_native || activity.anime_title}
+                      {activity.anime_title_native && activity.anime_title && (
+                        <span className="text-[10px] text-gray-400 font-normal ml-1">({activity.anime_title})</span>
+                      )}
+                    </>
                   ) : (
                     activity.anime_title
                   )}
