@@ -262,6 +262,9 @@ def update_character(
     current_user = Depends(require_simon)
 ):
     """캐릭터 정보 수정"""
+    print(f"[Admin Editor] Updating character {character_id}")
+    print(f"[Admin Editor] Received data: {data}")
+
     # 업데이트할 필드만 선택
     updates = {}
     if data.name_korean is not None:
@@ -271,11 +274,16 @@ def update_character(
     if data.name_native is not None:
         updates["name_native"] = data.name_native
     if data.image_large is not None:
+        print(f"[Admin Editor] Image URL: {data.image_large}")
         # 이미지 URL인 경우 image_url, 로컬 경로인 경우 image_local
         if data.image_large.startswith('http'):
             updates["image_url"] = data.image_large
+            print(f"[Admin Editor] Setting image_url to: {data.image_large}")
         else:
             updates["image_local"] = data.image_large
+            print(f"[Admin Editor] Setting image_local to: {data.image_large}")
+
+    print(f"[Admin Editor] Updates to apply: {updates}")
 
     if not updates:
         raise HTTPException(status_code=400, detail="No fields to update")
@@ -321,10 +329,6 @@ async def upload_image(
             detail=f"Invalid file type. Allowed: {', '.join(allowed_extensions)}"
         )
 
-    # R2가 설정되어 있으면 R2에 업로드, 아니면 로컬에 저장
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"{timestamp}_{file.filename}"
-
     # 파일 내용 읽기
     file_bytes = await file.read()
 
@@ -338,8 +342,16 @@ async def upload_image(
 
     try:
         if is_r2_configured():
-            # R2에 업로드
-            object_key = f"admin/{type}/{filename}"
+            # R2에 업로드 - 표준 경로 사용 (item_id는 나중에 DB 업데이트 시 덮어씀)
+            # 임시로 타임스탬프 기반 이름 사용, 나중에 item_id.jpg로 교체
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            # 표준 경로: /images/characters/ 또는 /images/covers/
+            if type == "character":
+                object_key = f"images/characters/upload_{timestamp}.jpg"
+            else:  # anime
+                object_key = f"images/covers/upload_{timestamp}.jpg"
+
             file_url = upload_file_bytes_to_r2(
                 file_bytes=file_bytes,
                 object_key=object_key,
@@ -347,6 +359,8 @@ async def upload_image(
             )
             storage_type = "R2"
         else:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"{timestamp}_{file.filename}"
             # 로컬 저장 (개발 환경 fallback)
             upload_dir = f"uploads/admin/{type}"
             os.makedirs(upload_dir, exist_ok=True)
@@ -361,7 +375,6 @@ async def upload_image(
         return {
             "message": "File uploaded successfully",
             "url": file_url,
-            "filename": filename,
             "storage": storage_type
         }
 
