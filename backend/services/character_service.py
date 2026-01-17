@@ -99,6 +99,7 @@ def get_characters_from_rated_anime(user_id: int, limit: int = 100) -> List[Dict
                 a2.id as anime_id,
                 a2.title_romaji,
                 a2.title_korean,
+                a2.title_native,
                 COALESCE('/' || a2.cover_image_local, a2.cover_image_url) as anime_cover,
                 ac3.role,
                 ROW_NUMBER() OVER (
@@ -117,6 +118,7 @@ def get_characters_from_rated_anime(user_id: int, limit: int = 100) -> List[Dict
             ca.anime_id,
             ca.title_romaji as anime_title,
             ca.title_korean as anime_title_korean,
+            ca.title_native as anime_title_native,
             ca.anime_cover,
             ca.role
         FROM RankedCharacters rc
@@ -583,7 +585,8 @@ def get_all_user_character_ratings(user_id: int, rating_filter: float = None, st
                 a.item_image as image_url,
                 a.anime_id,
                 a.anime_title,
-                a.anime_title_korean
+                a.anime_title_korean,
+                a.anime_title_native
             FROM activities a
             LEFT JOIN character c ON a.item_id = c.id
             WHERE a.user_id = ? AND a.activity_type = 'character_rating'{rating_condition}
