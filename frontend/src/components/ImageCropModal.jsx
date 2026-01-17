@@ -49,6 +49,11 @@ export default function ImageCropModal({ imageFile, onComplete, onCancel, aspect
       canvas.width = targetWidth;
       canvas.height = targetHeight;
 
+      // 흰색 배경으로 채우기 (JPEG는 투명도 미지원)
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, targetWidth, targetHeight);
+
+      // 크롭된 이미지 그리기
       ctx.drawImage(
         image,
         croppedAreaPixels.x,
