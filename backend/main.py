@@ -31,7 +31,6 @@ async def startup_event():
         print("[Startup] ✓ Schema check complete")
     except Exception as e:
         print(f"[Startup] ⚠️  Schema check failed: {e}")
-        # Don't fail startup, just log the error
         import traceback
         traceback.print_exc()
 
@@ -283,21 +282,28 @@ if os.path.exists(frontend_dist):
         app.mount("/placeholders", StaticFiles(directory=placeholders_dir), name="placeholders")
 
     # Catch-all route for React Router - serve index.html for all non-API routes
-    @app.get("/{full_path:path}")
-    async def serve_frontend(full_path: str):
-        """
-        Serve React frontend for all non-API routes.
-        This allows React Router to handle client-side routing.
-        """
-        # Check if the requested file exists in dist (for files like favicon.svg, og-image.png, etc.)
-        file_path = os.path.join(frontend_dist, full_path)
-        if os.path.isfile(file_path):
-            return FileResponse(file_path)
+    # This is registered AFTER all API routes, so API routes take precedence
+    from starlette.middleware.base import BaseHTTPMiddleware
+    from starlette.responses import Response
 
-        # For all other routes (like /user/10), serve index.html
-        # This enables direct URL access and React Router will handle the routing
-        index_path = os.path.join(frontend_dist, "index.html")
-        return FileResponse(index_path)
+    @app.middleware("http")
+    async def serve_frontend_middleware(request, call_next):
+        """Serve React frontend for non-API, non-static routes"""
+        response = await call_next(request)
+
+        # If the response is 404 and not an API route, serve index.html
+        path = request.url.path
+        if response.status_code == 404 and not path.startswith("/api/") and not path.startswith("/images/"):
+            # Check if it's a static file request
+            file_path = os.path.join(frontend_dist, path.lstrip("/"))
+            if os.path.isfile(file_path):
+                return FileResponse(file_path)
+            # Serve index.html for React Router
+            index_path = os.path.join(frontend_dist, "index.html")
+            if os.path.isfile(index_path):
+                return FileResponse(index_path)
+
+        return response
 
     print(f"[Startup] ✓ Serving React frontend from: {frontend_dist}")
 else:

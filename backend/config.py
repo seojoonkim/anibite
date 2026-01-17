@@ -15,7 +15,7 @@ if BASE_DIR.name == "backend":
 else:
     DATA_DIR = BASE_DIR / "data"
 
-# Database
+# Database - 단일 DB 구조 (볼륨에 영구 저장)
 DATABASE_PATH = os.getenv("DATABASE_PATH", str(DATA_DIR / "anime.db"))
 
 # JWT Settings
