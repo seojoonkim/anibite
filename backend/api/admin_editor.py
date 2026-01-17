@@ -204,7 +204,7 @@ def update_anime(
 
     query = f"""
         UPDATE anime
-        SET {set_clause}, updated_at = CURRENT_TIMESTAMP
+        SET {set_clause}
         WHERE id = ?
     """
 
@@ -286,7 +286,7 @@ def update_character(
 
     query = f"""
         UPDATE character
-        SET {set_clause}, updated_at = CURRENT_TIMESTAMP
+        SET {set_clause}
         WHERE id = ?
     """
 
