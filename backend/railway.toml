@@ -5,3 +5,8 @@ builder = "nixpacks"
 startCommand = "python init_db.py; rm -f /app/data/anime.db; python download_db.py || echo 'Download failed'; uvicorn main:app --host 0.0.0.0 --port $PORT"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
+
+# CRITICAL: Mount /app/data as persistent volume
+# This prevents data loss between deployments
+[[deploy.volumes]]
+mountPath = "/app/data"

@@ -797,7 +797,7 @@ def rebuild_activities_endpoint():
 
         if total_anime > 0:
             db.execute_query("""
-                INSERT OR REPLACE INTO activities (
+                INSERT INTO activities (
                     activity_type, user_id, item_id, activity_time,
                     username, display_name, avatar_url, otaku_score,
                     item_title, item_title_korean, item_image,
@@ -825,6 +825,20 @@ def rebuild_activities_endpoint():
                 LEFT JOIN user_stats us ON u.id = us.user_id
                 LEFT JOIN user_reviews rev ON rev.user_id = ur.user_id AND rev.anime_id = ur.anime_id
                 WHERE ur.status = 'RATED' AND ur.rating IS NOT NULL
+                ON CONFLICT(activity_type, user_id, item_id) DO UPDATE SET
+                    activity_time = excluded.activity_time,
+                    username = excluded.username,
+                    display_name = excluded.display_name,
+                    avatar_url = excluded.avatar_url,
+                    otaku_score = excluded.otaku_score,
+                    item_title = excluded.item_title,
+                    item_title_korean = excluded.item_title_korean,
+                    item_image = excluded.item_image,
+                    rating = excluded.rating,
+                    review_title = excluded.review_title,
+                    review_content = excluded.review_content,
+                    is_spoiler = excluded.is_spoiler,
+                    updated_at = CURRENT_TIMESTAMP
             """)
 
         # 2. 캐릭터 평가 마이그레이션
@@ -840,7 +854,7 @@ def rebuild_activities_endpoint():
 
         if total_char > 0:
             db.execute_query("""
-                INSERT OR REPLACE INTO activities (
+                INSERT INTO activities (
                     activity_type, user_id, item_id, activity_time,
                     username, display_name, avatar_url, otaku_score,
                     item_title, item_title_korean, item_image,
@@ -881,6 +895,23 @@ def rebuild_activities_endpoint():
                 LEFT JOIN user_stats us ON u.id = us.user_id
                 LEFT JOIN character_reviews rev ON rev.user_id = cr.user_id AND rev.character_id = cr.character_id
                 WHERE cr.rating IS NOT NULL
+                ON CONFLICT(activity_type, user_id, item_id) DO UPDATE SET
+                    activity_time = excluded.activity_time,
+                    username = excluded.username,
+                    display_name = excluded.display_name,
+                    avatar_url = excluded.avatar_url,
+                    otaku_score = excluded.otaku_score,
+                    item_title = excluded.item_title,
+                    item_title_korean = excluded.item_title_korean,
+                    item_image = excluded.item_image,
+                    rating = excluded.rating,
+                    review_title = excluded.review_title,
+                    review_content = excluded.review_content,
+                    is_spoiler = excluded.is_spoiler,
+                    anime_id = excluded.anime_id,
+                    anime_title = excluded.anime_title,
+                    anime_title_korean = excluded.anime_title_korean,
+                    updated_at = CURRENT_TIMESTAMP
             """)
 
         # 3. 유저 포스트 마이그레이션
@@ -894,7 +925,7 @@ def rebuild_activities_endpoint():
 
         if total_posts > 0:
             db.execute_query("""
-                INSERT OR REPLACE INTO activities (
+                INSERT INTO activities (
                     activity_type, user_id, item_id, activity_time,
                     username, display_name, avatar_url, otaku_score,
                     review_content
@@ -912,6 +943,14 @@ def rebuild_activities_endpoint():
                 FROM user_posts up
                 JOIN users u ON up.user_id = u.id
                 LEFT JOIN user_stats us ON u.id = us.user_id
+                ON CONFLICT(activity_type, user_id, item_id) DO UPDATE SET
+                    activity_time = excluded.activity_time,
+                    username = excluded.username,
+                    display_name = excluded.display_name,
+                    avatar_url = excluded.avatar_url,
+                    otaku_score = excluded.otaku_score,
+                    review_content = excluded.review_content,
+                    updated_at = CURRENT_TIMESTAMP
             """)
 
         return {
@@ -1042,33 +1081,41 @@ def backfill_rank_promotions_endpoint():
                               AND activity_time = ?
                         """, (user_id, activity_time), fetch_one=True)
 
+                        # Create metadata
+                        metadata = json.dumps({
+                            'old_rank': prev_rank,
+                            'old_level': prev_level,
+                            'new_rank': current_rank,
+                            'new_level': current_level,
+                            'otaku_score': otaku_score
+                        })
+
+                        # Use new_level as item_id to make each rank promotion unique
+                        # This prevents ID changes when rebuilding
+                        db.execute_query("""
+                            INSERT INTO activities (
+                                activity_type, user_id, username, display_name, avatar_url,
+                                item_id, metadata, activity_time, created_at, updated_at
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                            ON CONFLICT(activity_type, user_id, item_id) DO UPDATE SET
+                                username = excluded.username,
+                                display_name = excluded.display_name,
+                                avatar_url = excluded.avatar_url,
+                                metadata = excluded.metadata,
+                                activity_time = excluded.activity_time,
+                                updated_at = CURRENT_TIMESTAMP
+                        """, (
+                            'rank_promotion',
+                            user_id,
+                            username,
+                            display_name,
+                            avatar_url,
+                            current_level,  # Use new_level as item_id
+                            metadata,
+                            activity_time
+                        ))
+
                         if not existing:
-                            # Create metadata
-                            metadata = json.dumps({
-                                'old_rank': prev_rank,
-                                'old_level': prev_level,
-                                'new_rank': current_rank,
-                                'new_level': current_level,
-                                'otaku_score': otaku_score
-                            })
-
-                            # Insert rank promotion activity
-                            db.execute_insert("""
-                                INSERT INTO activities (
-                                    activity_type, user_id, username, display_name, avatar_url,
-                                    item_id, metadata, activity_time, created_at, updated_at
-                                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                            """, (
-                                'rank_promotion',
-                                user_id,
-                                username,
-                                display_name,
-                                avatar_url,
-                                None,
-                                metadata,
-                                activity_time
-                            ))
-
                             total_promotions += 1
 
                 # Update previous rank
@@ -1178,6 +1225,75 @@ def debug_rank_promotions():
                     "created_at": row[5]
                 }
                 for row in promotions
+            ]
+        }
+
+    except Exception as e:
+        import traceback
+        return {
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
+
+
+@router.get("/check-bookmarks-table")
+def check_bookmarks_table():
+    """
+    Check if activity_bookmarks table exists and has data
+    """
+    try:
+        # Check if table exists
+        tables = db.execute_query("""
+            SELECT name FROM sqlite_master
+            WHERE type='table' AND name='activity_bookmarks'
+        """)
+
+        table_exists = len(tables) > 0
+
+        if not table_exists:
+            return {
+                "table_exists": False,
+                "message": "activity_bookmarks table does not exist"
+            }
+
+        # Get table schema
+        schema = db.execute_query("PRAGMA table_info(activity_bookmarks)")
+
+        # Get total count
+        count_row = db.execute_query(
+            "SELECT COUNT(*) as count FROM activity_bookmarks",
+            fetch_one=True
+        )
+        total = count_row['count'] if count_row else 0
+
+        # Get sample data
+        samples = db.execute_query("""
+            SELECT user_id, activity_id, created_at
+            FROM activity_bookmarks
+            ORDER BY created_at DESC
+            LIMIT 10
+        """)
+
+        # Get count by user
+        by_user = db.execute_query("""
+            SELECT user_id, COUNT(*) as count
+            FROM activity_bookmarks
+            GROUP BY user_id
+            ORDER BY count DESC
+        """)
+
+        return {
+            "table_exists": True,
+            "total_bookmarks": total,
+            "columns": [{"name": col['name'], "type": col['type']} for col in schema],
+            "bookmarks_by_user": [{"user_id": row[0], "count": row[1]} for row in by_user],
+            "sample_bookmarks": [
+                {
+                    "user_id": row[0],
+                    "activity_id": row[1],
+                    "created_at": row[2]
+                }
+                for row in samples
             ]
         }
 
