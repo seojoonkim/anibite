@@ -27,9 +27,9 @@ class CharacterUpdate(BaseModel):
     name_native: Optional[str] = None
 
 
-def require_simon(current_user: dict = Depends(get_current_user)):
+def require_simon(current_user = Depends(get_current_user)):
     """Require simon user"""
-    if current_user["username"] != "simon":
+    if current_user.username != "simon":
         raise HTTPException(status_code=403, detail="Admin access only")
     return current_user
 
@@ -39,7 +39,7 @@ def search_content(
     q: str,
     type: str = "both",
     limit: int = 20,
-    current_user: dict = Depends(require_simon)
+    current_user = Depends(require_simon)
 ):
     """
     검색 - 애니메이션 또는 캐릭터
@@ -128,7 +128,7 @@ def search_content(
 @router.get("/anime/{anime_id}")
 def get_anime_detail(
     anime_id: int,
-    current_user: dict = Depends(require_simon)
+    current_user = Depends(require_simon)
 ):
     """애니메이션 상세 정보"""
     query = """
@@ -172,7 +172,7 @@ def get_anime_detail(
 def update_anime(
     anime_id: int,
     data: AnimeUpdate,
-    current_user: dict = Depends(require_simon)
+    current_user = Depends(require_simon)
 ):
     """애니메이션 정보 수정"""
     # 업데이트할 필드만 선택
@@ -207,7 +207,7 @@ def update_anime(
 @router.get("/character/{character_id}")
 def get_character_detail(
     character_id: int,
-    current_user: dict = Depends(require_simon)
+    current_user = Depends(require_simon)
 ):
     """캐릭터 상세 정보"""
     query = """
@@ -244,7 +244,7 @@ def get_character_detail(
 def update_character(
     character_id: int,
     data: CharacterUpdate,
-    current_user: dict = Depends(require_simon)
+    current_user = Depends(require_simon)
 ):
     """캐릭터 정보 수정"""
     # 업데이트할 필드만 선택
@@ -287,7 +287,7 @@ def update_character(
 async def upload_image(
     file: UploadFile = File(...),
     type: str = "character",  # anime or character
-    current_user: dict = Depends(require_simon)
+    current_user = Depends(require_simon)
 ):
     """이미지 업로드"""
     # 파일 확장자 확인
