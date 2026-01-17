@@ -54,7 +54,7 @@ def search_content(
         anime_query = """
             SELECT
                 id, title_korean, title_romaji, title_english, title_native,
-                COALESCE(cover_image_local, cover_image_url) as cover_image,
+                COALESCE(cover_image_url, cover_image_local) as cover_image,
                 format, episodes, status, season_year
             FROM anime
             WHERE title_korean LIKE ?
@@ -91,7 +91,7 @@ def search_content(
         char_query = """
             SELECT
                 c.id, c.name_korean, c.name_full, c.name_native,
-                COALESCE(c.image_local, c.image_url) as image_large,
+                COALESCE(c.image_url, c.image_local) as image_large,
                 c.favourites,
                 a.id as anime_id, a.title_korean as anime_title
             FROM character c
@@ -136,7 +136,7 @@ def get_anime_detail(
     query = """
         SELECT
             id, title_korean, title_romaji, title_english, title_native,
-            COALESCE(cover_image_local, cover_image_url) as cover_image,
+            COALESCE(cover_image_url, cover_image_local) as cover_image,
             COALESCE(cover_image_url, cover_image_local) as cover_image_large,
             banner_image_url as banner_image,
             format, episodes, status, season, season_year,
@@ -221,7 +221,7 @@ def get_character_detail(
     query = """
         SELECT
             c.id, c.name_korean, c.name_full, c.name_native, c.name_alternative,
-            COALESCE(c.image_local, c.image_url) as image_medium,
+            COALESCE(c.image_url, c.image_local) as image_medium,
             COALESCE(c.image_url, c.image_local) as image_large,
             c.gender, c.age, c.description, c.favourites,
             a.id as anime_id, a.title_korean as anime_title
