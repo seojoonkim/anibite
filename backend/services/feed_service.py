@@ -82,6 +82,7 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
                 COALESCE(rev.created_at, cr.updated_at) as activity_time,
                 a.title_romaji as anime_title,
                 a.title_korean as anime_title_korean,
+                a.title_native as anime_title_native,
                 a.id as anime_id,
                 rev.id as review_id,
                 rev.content as review_content,
@@ -94,7 +95,7 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
             LEFT JOIN user_stats us ON u.id = us.user_id
             LEFT JOIN character_reviews rev ON cr.user_id = rev.user_id AND cr.character_id = rev.character_id
             LEFT JOIN (
-                SELECT DISTINCT ac.character_id, a.id, a.title_romaji, a.title_korean,
+                SELECT DISTINCT ac.character_id, a.id, a.title_romaji, a.title_korean, a.title_native,
                        ROW_NUMBER() OVER (PARTITION BY ac.character_id ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END) as rn
                 FROM anime_character ac
                 JOIN anime a ON ac.anime_id = a.id
@@ -122,6 +123,7 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
                 cr.created_at as activity_time,
                 a.title_romaji as anime_title,
                 a.title_korean as anime_title_korean,
+                a.title_native as anime_title_native,
                 NULL as anime_id,
                 cr.id as review_id,
                 cr.content as review_content,
@@ -133,7 +135,7 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
             JOIN character c ON cr.character_id = c.id
             LEFT JOIN user_stats us ON u.id = us.user_id
             LEFT JOIN (
-                SELECT DISTINCT ac.character_id, a.id, a.title_romaji, a.title_korean,
+                SELECT DISTINCT ac.character_id, a.id, a.title_romaji, a.title_korean, a.title_native,
                        ROW_NUMBER() OVER (PARTITION BY ac.character_id ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END) as rn
                 FROM anime_character ac
                 JOIN anime a ON ac.anime_id = a.id
@@ -236,6 +238,7 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
                 a.activity_time,
                 a.anime_title,
                 a.anime_title_korean,
+                a.anime_title_native,
                 a.anime_id,
                 NULL as review_id,
                 a.review_content,
@@ -300,6 +303,7 @@ def get_global_feed(limit: int = 50, offset: int = 0) -> List[Dict]:
             activity_time,
             anime_title,
             anime_title_korean,
+            anime_title_native,
             anime_id,
             CASE
                 WHEN activity_type = 'user_post' THEN item_id
@@ -429,6 +433,7 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
             a.activity_time,
             a.anime_title,
             a.anime_title_korean,
+            a.anime_title_native,
             a.anime_id,
             CASE
                 WHEN a.activity_type = 'user_post' THEN a.item_id
@@ -469,6 +474,7 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
             a.activity_time,
             a.anime_title,
             a.anime_title_korean,
+            a.anime_title_native,
             a.anime_id,
             CASE
                 WHEN a.activity_type = 'user_post' THEN a.item_id
