@@ -152,7 +152,9 @@ export default function AdminEditor() {
       );
 
       // 3. 업로드된 이미지 URL로 업데이트
-      setEditData({ ...editData, [imageField]: response.data.url });
+      const newImageUrl = response.data.url;
+      setEditData(prev => ({ ...prev, [imageField]: newImageUrl }));
+      setSelectedItem(prev => ({ ...prev, [imageField]: newImageUrl }));
       setMessage(`✅ 이미지 업로드 완료! (${Math.round(croppedFile.size / 1024)}KB) 저장 버튼을 눌러주세요.`);
     } catch (error) {
       console.error('이미지 업로드 실패:', error);
