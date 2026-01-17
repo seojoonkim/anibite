@@ -197,10 +197,29 @@ export default function AdminEditor() {
         ? `/api/admin/editor/anime/${selectedItem.id}`
         : `/api/admin/editor/character/${selectedItem.id}`;
 
-      console.log('[Admin Editor] Endpoint:', endpoint);
-      console.log('[Admin Editor] Sending data:', editData);
+      // 필요한 필드만 추출
+      let dataToSend;
+      if (selectedType === 'anime') {
+        dataToSend = {
+          title_korean: editData.title_korean,
+          title_romaji: editData.title_romaji,
+          title_english: editData.title_english,
+          title_native: editData.title_native,
+          cover_image: editData.cover_image
+        };
+      } else {
+        dataToSend = {
+          name_korean: editData.name_korean,
+          name_full: editData.name_full,
+          name_native: editData.name_native,
+          image_large: editData.image_large
+        };
+      }
 
-      const response = await api.patch(endpoint, editData);
+      console.log('[Admin Editor] Endpoint:', endpoint);
+      console.log('[Admin Editor] Sending data:', dataToSend);
+
+      const response = await api.patch(endpoint, dataToSend);
 
       console.log('[Admin Editor] Save response:', response.data);
       setMessage('✅ 저장 완료!');

@@ -264,6 +264,7 @@ def update_character(
     """캐릭터 정보 수정"""
     print(f"[Admin Editor] Updating character {character_id}")
     print(f"[Admin Editor] Received data: {data}")
+    print(f"[Admin Editor] data.image_large = {data.image_large}")
 
     # 업데이트할 필드만 선택
     updates = {}
