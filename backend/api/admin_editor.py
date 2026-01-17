@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 from database import db
 from api.auth import get_current_user
+from utils.r2_storage import upload_file_bytes_to_r2, is_r2_configured
 import os
 import shutil
 from datetime import datetime
@@ -309,7 +310,7 @@ async def upload_image(
     type: str = "character",  # anime or character
     current_user = Depends(require_simon)
 ):
-    """이미지 업로드"""
+    """이미지 업로드 (Cloudflare R2)"""
     # 파일 확장자 확인
     allowed_extensions = {".jpg", ".jpeg", ".png", ".webp"}
     file_ext = os.path.splitext(file.filename)[1].lower()
@@ -320,24 +321,52 @@ async def upload_image(
             detail=f"Invalid file type. Allowed: {', '.join(allowed_extensions)}"
         )
 
-    # 저장 경로
-    upload_dir = f"uploads/admin/{type}"
-    os.makedirs(upload_dir, exist_ok=True)
-
-    # 고유 파일명 생성
+    # R2가 설정되어 있으면 R2에 업로드, 아니면 로컬에 저장
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{timestamp}_{file.filename}"
-    file_path = os.path.join(upload_dir, filename)
 
-    # 파일 저장
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    # 파일 내용 읽기
+    file_bytes = await file.read()
 
-    # URL 반환
-    file_url = f"/{file_path}"
+    # MIME 타입 결정
+    content_type = file.content_type or {
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+        '.webp': 'image/webp'
+    }.get(file_ext, 'application/octet-stream')
 
-    return {
-        "message": "File uploaded successfully",
-        "url": file_url,
-        "filename": filename
-    }
+    try:
+        if is_r2_configured():
+            # R2에 업로드
+            object_key = f"admin/{type}/{filename}"
+            file_url = upload_file_bytes_to_r2(
+                file_bytes=file_bytes,
+                object_key=object_key,
+                content_type=content_type
+            )
+            storage_type = "R2"
+        else:
+            # 로컬 저장 (개발 환경 fallback)
+            upload_dir = f"uploads/admin/{type}"
+            os.makedirs(upload_dir, exist_ok=True)
+            file_path = os.path.join(upload_dir, filename)
+
+            with open(file_path, "wb") as buffer:
+                buffer.write(file_bytes)
+
+            file_url = f"/{file_path}"
+            storage_type = "local"
+
+        return {
+            "message": "File uploaded successfully",
+            "url": file_url,
+            "filename": filename,
+            "storage": storage_type
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Upload failed: {str(e)}"
+        )

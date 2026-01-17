@@ -79,7 +79,7 @@ def save_progress(progress):
 
 
 def get_all_characters(limit=None, exclude_ids=None):
-    """모든 캐릭터 조회"""
+    """모든 캐릭터 조회 (애니메이션 한국어 제목 포함)"""
     exclude_ids = exclude_ids or []
 
     query = """
@@ -88,8 +88,11 @@ def get_all_characters(limit=None, exclude_ids=None):
             c.name_full,
             c.name_native,
             c.name_korean,
-            c.favourites
+            c.favourites,
+            a.title_korean
         FROM character c
+        LEFT JOIN anime_character ac ON c.id = ac.character_id
+        LEFT JOIN anime a ON ac.anime_id = a.id
         WHERE c.name_native IS NOT NULL
           AND c.name_full NOT IN ('Narrator', 'Unknown', 'Extra')
           AND c.name_native != ''
@@ -128,13 +131,20 @@ def is_valid_character_name(name):
 
     # 블랙리스트 - 작품 제목, 일반 문장
     blacklist = [
-        # 작품 제목
-        '하이큐', '데스노트', '원피스', '나루토', '블리치', '귀멸의',
-        '주술회전', '체인소맨', '진격의', '거인', '헌터', '헌터',
-        '강철의', '연금술사', '슈타인즈', '게이트', '가는', '연애',
-        '고백받고', '싶어', '새로운', '시작', '재난', '따라해', '보자',
+        # 작품 제목 (주요)
+        '하이큐', '데스노트', '원피스', '나루토', '블리치', '귀멸의', '도쿄구울',
+        '주술회전', '체인소맨', '진격의', '거인', '헌터', '강철의', '연금술사',
+        '슈타인즈', '게이트', '문호 스트레이독스', '스파이 패밀리', '아카메가',
+        '전생했더니', '슬라임', '방패 용사', '소드 아트', '던전', '마법소녀',
+        '페어리 테일', '블랙 클로버', '나의 히어로', '아카데미아', '도쿄 리벤저스',
+        '귀멸', '칼날', '주술', '회전', '체인소', '만화', '애니메이션',
+        # 종교/단체 (오인 방지)
+        '세계평화', '통일가정', '연합', '교회', '종교',
         # 일반 단어
-        '시리즈', '등장인물', '캐릭터', '애니메이션', '만화', '소설',
+        '시리즈', '등장인물', '캐릭터', '소설', '게임', '위키', '나무위키',
+        '검색', '결과', '정보', '소개', '설명', '프로필', '성우', '목록',
+        '가는', '연애', '고백받고', '싶어', '새로운', '시작', '재난', '따라해', '보자',
+        '보는', '만드는', '하는', '되는', '있는', '없는', '좋은', '나쁜',
     ]
 
     for word in blacklist:
@@ -206,10 +216,10 @@ def extract_korean_name_from_title(title):
     return None
 
 
-def search_serper(name_full, name_native, api_key):
+def search_serper(name_full, name_native, api_key, anime_title_korean=None):
     """Serper.dev로 구글 검색"""
-    # 일본어 이름으로 검색 (더 정확)
-    query = f'"{name_native}" 나무위키' if name_native else f'"{name_full}" 나무위키 캐릭터'
+    # 항상 영어 이름으로만 검색 (일본어 음차 오류 방지)
+    query = f'"{name_full}" 나무위키'
 
     try:
         response = requests.post(
@@ -280,19 +290,11 @@ def process_character(character, api_key):
     name_full = character['name_full']
     name_native = character['name_native']
     current_korean = character['name_korean']
+    # sqlite3.Row는 .get() 메서드를 지원하지 않음
+    anime_title_korean = character['title_korean'] if 'title_korean' in character.keys() else None
 
-    # 기존 값이 유효한 캐릭터 이름이면 건드리지 않음
-    if current_korean and is_valid_character_name(current_korean):
-        return {
-            "id": char_id,
-            "name_full": name_full,
-            "name_native": name_native,
-            "current_korean": current_korean,
-            "found_korean": current_korean,  # 기존 값 유지
-            "reason": "existing_valid"
-        }
-
-    found_korean, reason = search_serper(name_full, name_native, api_key)
+    # 모든 캐릭터를 강제로 재검색 (기존 값 무시)
+    found_korean, reason = search_serper(name_full, name_native, api_key, anime_title_korean)
 
     return {
         "id": char_id,

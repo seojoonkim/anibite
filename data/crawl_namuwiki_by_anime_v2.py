@@ -28,7 +28,7 @@ except ImportError:
 
 # Configuration
 MAX_WORKERS = 5
-MAX_ANIME = 20  # None = 전체, 테스트용
+MAX_ANIME = 10  # 테스트용
 REQUEST_DELAY = 0.5
 
 
@@ -48,7 +48,7 @@ def extract_kanji(text):
 
 
 def get_anime_to_process(limit=None):
-    """한국어 제목이 있고 캐릭터 한국어 이름이 필요한 애니메이션"""
+    """한국어 제목이 있는 모든 애니메이션 (강제 재크롤링)"""
     query = """
         SELECT DISTINCT
             a.id,
@@ -59,7 +59,6 @@ def get_anime_to_process(limit=None):
         JOIN anime_character ac ON a.id = ac.anime_id
         JOIN character c ON ac.character_id = c.id
         WHERE a.title_korean IS NOT NULL
-          AND c.name_korean IS NULL
           AND c.name_native IS NOT NULL
         GROUP BY a.id
         ORDER BY a.popularity DESC
@@ -70,7 +69,7 @@ def get_anime_to_process(limit=None):
 
 
 def get_characters_for_anime(anime_id):
-    """특정 애니메이션의 한국어 이름이 없는 캐릭터들"""
+    """특정 애니메이션의 모든 캐릭터 (강제 재크롤링)"""
     return db.execute_query("""
         SELECT DISTINCT
             c.id,
@@ -79,7 +78,6 @@ def get_characters_for_anime(anime_id):
         FROM character c
         JOIN anime_character ac ON c.id = ac.character_id
         WHERE ac.anime_id = ?
-          AND c.name_korean IS NULL
           AND c.name_native IS NOT NULL
           AND c.name_native != ''
     """, (anime_id,))
