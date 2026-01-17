@@ -190,7 +190,7 @@ def migrate_character_ratings():
             u.avatar_url,
             COALESCE(us.otaku_score, 0) as otaku_score,
             c.name_full as item_title,
-            c.name_native as item_title_korean,
+            c.name_korean as item_title_korean,
             c.image_url as item_image,
             cr.rating,
             rev.title as review_title,
