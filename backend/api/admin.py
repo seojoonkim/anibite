@@ -1148,3 +1148,42 @@ def debug_database():
             "traceback": traceback.format_exc(),
             "database_path": DATABASE_PATH if 'DATABASE_PATH' in locals() else "unknown"
         }
+
+
+@router.get("/debug-rank-promotions")
+def debug_rank_promotions():
+    """
+    Debug rank promotion activities and their metadata
+    """
+    try:
+        promotions = db.execute_query("""
+            SELECT id, user_id, username, activity_time, metadata, created_at
+            FROM activities
+            WHERE activity_type = 'rank_promotion'
+            ORDER BY activity_time DESC
+            LIMIT 5
+        """)
+
+        return {
+            "total_rank_promotions": len(promotions),
+            "promotions": [
+                {
+                    "id": row[0],
+                    "user_id": row[1],
+                    "username": row[2],
+                    "activity_time": row[3],
+                    "metadata": row[4],
+                    "metadata_type": str(type(row[4])),
+                    "metadata_length": len(row[4]) if row[4] else 0,
+                    "created_at": row[5]
+                }
+                for row in promotions
+            ]
+        }
+
+    except Exception as e:
+        import traceback
+        return {
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
