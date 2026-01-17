@@ -47,7 +47,9 @@ const PageLoader = () => (
 function AppRoutes() {
   const location = useLocation();
   const publicPaths = ['/login', '/register', '/verify-email', '/email-sent', '/resend-verification'];
+  const noNavbarPaths = ['/admin'];
   const isPublicPage = publicPaths.includes(location.pathname);
+  const showNavbar = !isPublicPage && !noNavbarPaths.includes(location.pathname);
 
   // 스크롤 성능 최적화 - 스크롤 시 hover 효과 비활성화
   useEffect(() => {
@@ -74,8 +76,8 @@ function AppRoutes() {
 
   return (
     <>
-      {/* Show Navbar on all authenticated pages - render to body via portal */}
-      {!isPublicPage && createPortal(<Navbar />, document.body)}
+      {/* Show Navbar on all authenticated pages except admin - render to body via portal */}
+      {showNavbar && createPortal(<Navbar />, document.body)}
 
       <Suspense fallback={<PageLoader />}>
         <Routes>
