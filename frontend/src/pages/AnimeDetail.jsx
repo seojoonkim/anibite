@@ -14,6 +14,7 @@ import RatingWidget from '../components/anime/RatingWidget';
 import ActivityCard from '../components/activity/ActivityCard';
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
+import { getCharacterImageFallback } from '../utils/imageHelpers';
 
 export default function AnimeDetail() {
   const { id } = useParams();
@@ -600,6 +601,16 @@ export default function AnimeDetail() {
 
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.svg';
+
+    // Handle AniList character images - convert to R2
+    if (imageUrl.includes('anilist.co') && imageUrl.includes('/character/')) {
+      const match = imageUrl.match(/\/b(\d+)-/);
+      if (match && match[1]) {
+        const characterId = match[1];
+        return `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
+      }
+    }
+
     if (imageUrl.startsWith('http')) return imageUrl;
     // Use covers_large for better quality
     const processedUrl = imageUrl.includes('/covers/')
@@ -1032,7 +1043,10 @@ export default function AnimeDetail() {
                             alt={char.character_name}
                             className="w-16 h-16 rounded-full object-cover"
                             onError={(e) => {
-                              e.target.src = '/placeholder-anime.svg';
+                              const fallback = getCharacterImageFallback(char.character_image, e.target.src);
+                              if (e.target.src !== fallback) {
+                                e.target.src = fallback;
+                              }
                             }}
                           />
                           {/* Role Badge */}
@@ -1061,7 +1075,10 @@ export default function AnimeDetail() {
                             alt={char.voice_actor_name}
                             className="w-16 h-16 rounded-full object-cover"
                             onError={(e) => {
-                              e.target.src = '/placeholder-anime.svg';
+                              // Voice actors are stored in AniList, keep original URL as fallback
+                              if (e.target.src !== '/placeholder-anime.svg') {
+                                e.target.src = '/placeholder-anime.svg';
+                              }
                             }}
                           />
                           <div className="flex-1 min-w-0">

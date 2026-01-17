@@ -18,27 +18,18 @@ export const getCharacterImageUrl = (characterId, imageUrl = null) => {
   if (imageUrl && imageUrl.includes(IMAGE_BASE_URL)) {
     finalUrl = imageUrl;
   }
-  // Priority 2: character ID가 있으면 R2에서 찾기 (확장자 추출)
+  // Priority 2: character ID가 있으면 R2에서 찾기 (jpg 먼저 시도)
   else if (characterId) {
-    // Extract extension from original URL (png, jpg, etc.)
-    let extension = 'jpg'; // default
-    if (imageUrl) {
-      const extMatch = imageUrl.match(/\.(png|jpg|jpeg|webp|gif)(\?|$)/i);
-      if (extMatch && extMatch[1]) {
-        extension = extMatch[1].toLowerCase();
-      }
-    }
-    finalUrl = `${IMAGE_BASE_URL}/images/characters/${characterId}.${extension}`;
+    // Try jpg first (most common format in R2)
+    finalUrl = `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
   }
-  // Priority 3: imageUrl에서 AniList character ID 추출 시도
+  // Priority 3: imageUrl에서 AniList character ID 추출 시도 (jpg 먼저 시도)
   else if (imageUrl && imageUrl.includes('anilist.co') && imageUrl.includes('/character/')) {
     const match = imageUrl.match(/\/b(\d+)-/);
     if (match && match[1]) {
       const anilistCharacterId = match[1];
-      // Extract extension from URL
-      const extMatch = imageUrl.match(/\.(png|jpg|jpeg|webp|gif)(\?|$)/i);
-      const extension = extMatch && extMatch[1] ? extMatch[1].toLowerCase() : 'jpg';
-      finalUrl = `${IMAGE_BASE_URL}/images/characters/${anilistCharacterId}.${extension}`;
+      // Try jpg first (most common format in R2)
+      finalUrl = `${IMAGE_BASE_URL}/images/characters/${anilistCharacterId}.jpg`;
     } else {
       finalUrl = null;
     }
@@ -64,19 +55,34 @@ export const getCharacterImageUrl = (characterId, imageUrl = null) => {
 /**
  * Get fallback image URL for character
  * Used in onError handler when R2 image fails
+ * Strategy: jpg → png → jpeg → webp → gif → original AniList URL → placeholder
  * @param {string|null} imageUrl - External or database image URL
  * @param {string|null} currentSrc - Current src that failed (to try alternate extension)
  * @returns {string} Fallback image URL
  */
 export const getCharacterImageFallback = (imageUrl, currentSrc = null) => {
-  // If current src is R2 with one extension, try the other extension
+  // Extension fallback order
+  const extensionOrder = ['jpg', 'png', 'jpeg', 'webp', 'gif'];
+
+  // If current src is R2 character image, try next extension
   if (currentSrc && currentSrc.includes('/images/characters/')) {
-    if (currentSrc.endsWith('.jpg')) {
-      // Try .png
-      return currentSrc.replace(/\.jpg$/, '.png');
-    } else if (currentSrc.endsWith('.png')) {
-      // Try .jpg
-      return currentSrc.replace(/\.png$/, '.jpg');
+    // Extract current extension
+    const currentExtMatch = currentSrc.match(/\.([a-z]+)$/i);
+    if (currentExtMatch && currentExtMatch[1]) {
+      const currentExt = currentExtMatch[1].toLowerCase();
+      const currentIndex = extensionOrder.indexOf(currentExt);
+
+      // Try next extension in the order
+      if (currentIndex !== -1 && currentIndex < extensionOrder.length - 1) {
+        const nextExt = extensionOrder[currentIndex + 1];
+        return currentSrc.replace(/\.[a-z]+$/i, `.${nextExt}`);
+      }
+
+      // All extensions tried, fallback to original AniList URL
+      if (imageUrl && imageUrl.startsWith('http')) {
+        return imageUrl;
+      }
+      return '/placeholder-anime.svg';
     }
   }
 
