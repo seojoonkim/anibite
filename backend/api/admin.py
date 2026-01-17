@@ -707,3 +707,70 @@ def fix_korean_names_endpoint():
     except Exception as e:
         import traceback
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
+
+
+@router.post("/create-notifications-table")
+def create_notifications_table():
+    """
+    Create notifications table if it doesn't exist
+    알림 테이블 생성
+    """
+    try:
+        # Check if table exists
+        existing = db.execute_query("""
+            SELECT name FROM sqlite_master
+            WHERE type='table' AND name='notifications'
+        """)
+
+        if existing:
+            return {
+                "success": True,
+                "message": "Notifications table already exists",
+                "created": False
+            }
+
+        # Create notifications table
+        db.execute_query("""
+            CREATE TABLE notifications (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                actor_id INTEGER NOT NULL,
+                type TEXT NOT NULL,
+                activity_id INTEGER,
+                comment_id INTEGER,
+                content TEXT,
+                is_read BOOLEAN DEFAULT FALSE,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                FOREIGN KEY (actor_id) REFERENCES users(id) ON DELETE CASCADE,
+                FOREIGN KEY (activity_id) REFERENCES activities(id) ON DELETE CASCADE
+            )
+        """)
+
+        # Create indexes for better performance
+        db.execute_query("""
+            CREATE INDEX IF NOT EXISTS idx_notifications_user
+            ON notifications(user_id, created_at DESC)
+        """)
+
+        db.execute_query("""
+            CREATE INDEX IF NOT EXISTS idx_notifications_read
+            ON notifications(user_id, is_read)
+        """)
+
+        # Verify table was created
+        verify = db.execute_query("""
+            SELECT name FROM sqlite_master
+            WHERE type='table' AND name='notifications'
+        """)
+
+        return {
+            "success": True,
+            "message": "Notifications table created successfully",
+            "created": True,
+            "verified": bool(verify)
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
