@@ -153,8 +153,20 @@ export default function AdminEditor() {
 
       // 3. 업로드된 이미지 URL로 업데이트
       const newImageUrl = response.data.url;
-      setEditData(prev => ({ ...prev, [imageField]: newImageUrl }));
-      setSelectedItem(prev => ({ ...prev, [imageField]: newImageUrl }));
+      console.log('[Admin Editor] Upload response:', response.data);
+      console.log('[Admin Editor] New image URL:', newImageUrl);
+      console.log('[Admin Editor] Image field:', imageField);
+
+      setEditData(prev => {
+        const updated = { ...prev, [imageField]: newImageUrl };
+        console.log('[Admin Editor] Updated editData:', updated);
+        return updated;
+      });
+      setSelectedItem(prev => {
+        const updated = { ...prev, [imageField]: newImageUrl };
+        console.log('[Admin Editor] Updated selectedItem:', updated);
+        return updated;
+      });
       setMessage(`✅ 이미지 업로드 완료! (${Math.round(croppedFile.size / 1024)}KB) 저장 버튼을 눌러주세요.`);
     } catch (error) {
       console.error('이미지 업로드 실패:', error);

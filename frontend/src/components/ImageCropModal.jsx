@@ -107,7 +107,7 @@ export default function ImageCropModal({ imageFile, onComplete, onCancel, aspect
               onCropChange={setCrop}
               onZoomChange={setZoom}
               onCropComplete={onCropComplete}
-              restrictPosition={false}
+              restrictPosition={true}
             />
           )}
         </div>
