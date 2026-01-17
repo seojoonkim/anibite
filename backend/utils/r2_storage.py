@@ -15,6 +15,14 @@ R2_BUCKET_NAME = os.getenv("R2_BUCKET_NAME", "anipass-images")
 R2_ENDPOINT_URL = os.getenv("R2_ENDPOINT_URL")
 R2_PUBLIC_URL = os.getenv("IMAGE_BASE_URL", "https://images.anipass.io")
 
+# Debug: Print R2 configuration on startup
+print(f"[R2 Storage] Configuration loaded:")
+print(f"  - R2_BUCKET_NAME: {R2_BUCKET_NAME}")
+print(f"  - R2_ENDPOINT_URL: {R2_ENDPOINT_URL[:50] if R2_ENDPOINT_URL else 'NOT SET'}...")
+print(f"  - R2_PUBLIC_URL (IMAGE_BASE_URL): {R2_PUBLIC_URL}")
+print(f"  - R2_ACCESS_KEY_ID: {'SET' if R2_ACCESS_KEY_ID else 'NOT SET'}")
+print(f"  - R2_SECRET_ACCESS_KEY: {'SET' if R2_SECRET_ACCESS_KEY else 'NOT SET'}")
+
 
 def get_r2_client():
     """Get configured R2 S3 client"""
