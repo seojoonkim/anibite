@@ -582,6 +582,13 @@ const ActivityCard = forwardRef(({
                       <span className="text-xs text-gray-400 font-normal ml-1">{activity.item_title}</span>
                     )}
                   </>
+                ) : language === 'ja' ? (
+                  <>
+                    {activity.item_title_native || activity.item_title}
+                    {activity.item_title_native && activity.item_title && (
+                      <span className="text-xs text-gray-400 font-normal ml-1">({activity.item_title})</span>
+                    )}
+                  </>
                 ) : (
                   <>
                     {activity.item_title || activity.item_title_korean}
