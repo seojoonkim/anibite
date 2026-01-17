@@ -82,11 +82,12 @@ export default function WriteReviews() {
           ...(item.type === 'character' ? {
             character_id: item.item_id,
             character_name: item.item_title,
-            character_name_korean: item.item_title_korean, // Korean name
-            character_name_native: item.item_title_korean,
+            character_name_korean: item.item_title_korean,
+            character_name_native: item.item_title_native,
             character_image: item.item_image,
             anime_id: item.anime_id,
             anime_title_korean: item.anime_title_korean,
+            anime_title_native: item.anime_title_native,
             anime_title: item.anime_title
           } : {})
         };
@@ -144,12 +145,13 @@ export default function WriteReviews() {
           // 캐릭터 필드
           ...(item.type === 'character' ? {
             character_id: item.item_id,
-            character_name: item.item_title, // English name
-            character_name_korean: item.item_title_korean, // Korean name (from name_korean)
-            character_name_native: item.item_title_korean, // Fallback for native name
+            character_name: item.item_title,
+            character_name_korean: item.item_title_korean,
+            character_name_native: item.item_title_native,
             character_image: item.item_image,
             anime_id: item.anime_id,
             anime_title_korean: item.anime_title_korean,
+            anime_title_native: item.anime_title_native,
             anime_title: item.anime_title
           } : {})
         };
@@ -598,17 +600,22 @@ export default function WriteReviews() {
                             ) : (
                               item.title_romaji || item.title_english || item.title_korean
                             )
+                          ) : language === 'ko' ? (
+                            <span>
+                              {item.character_name_korean || item.character_name_native || item.character_name}
+                              {(item.character_name_korean || item.character_name_native) && item.character_name && (
+                                <span className="text-xs text-gray-400 font-normal ml-1.5">({item.character_name})</span>
+                              )}
+                            </span>
+                          ) : language === 'ja' ? (
+                            <span>
+                              {item.character_name_native || item.character_name}
+                              {item.character_name_native && item.character_name && (
+                                <span className="text-xs text-gray-400 font-normal ml-1.5">({item.character_name})</span>
+                              )}
+                            </span>
                           ) : (
-                            language === 'ko' ? (
-                              <span>
-                                {item.character_name_korean || item.character_name_native || item.character_name}
-                                {(item.character_name_korean || item.character_name_native) && item.character_name && (
-                                  <span className="text-xs text-gray-400 font-normal ml-1.5">({item.character_name})</span>
-                                )}
-                              </span>
-                            ) : (
-                              item.character_name || item.character_name_native
-                            )
+                            item.character_name || item.character_name_native
                           )}
                         </Link>
                       </h3>
@@ -622,7 +629,7 @@ export default function WriteReviews() {
                     </div>
 
                     {/* Character's Anime */}
-                    {item.type === 'character' && (item.anime_title_korean || item.anime_title) && (
+                    {item.type === 'character' && (item.anime_title_korean || item.anime_title_native || item.anime_title) && (
                       <p className="text-xs text-gray-500 mb-1">
                         from:{' '}
                         {item.anime_id ? (
@@ -637,6 +644,13 @@ export default function WriteReviews() {
                                   <span className="text-[10px] text-gray-400 font-normal ml-1">({item.anime_title})</span>
                                 )}
                               </>
+                            ) : language === 'ja' ? (
+                              <>
+                                {item.anime_title_native || item.anime_title}
+                                {item.anime_title_native && item.anime_title && (
+                                  <span className="text-[10px] text-gray-400 font-normal ml-1">({item.anime_title})</span>
+                                )}
+                              </>
                             ) : (
                               item.anime_title
                             )}
@@ -646,6 +660,13 @@ export default function WriteReviews() {
                             <>
                               {item.anime_title_korean || item.anime_title}
                               {item.anime_title_korean && item.anime_title && (
+                                <span className="text-[10px] text-gray-400 font-normal ml-1">({item.anime_title})</span>
+                              )}
+                            </>
+                          ) : language === 'ja' ? (
+                            <>
+                              {item.anime_title_native || item.anime_title}
+                              {item.anime_title_native && item.anime_title && (
                                 <span className="text-[10px] text-gray-400 font-normal ml-1">({item.anime_title})</span>
                               )}
                             </>
