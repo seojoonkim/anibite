@@ -45,56 +45,8 @@ async def startup_event():
         import traceback
         traceback.print_exc()
 
-    # Patch Korean names from JSON (one-time migration)
-    print("[Startup] Patching Korean names from JSON...")
-    try:
-        from pathlib import Path
-        import json
-        from database import get_db
-
-        json_file = Path(__file__).parent / "scripts" / "korean_names_patch.json"
-        flag_file = Path(__file__).parent / "scripts" / ".korean_names_patched"
-
-        # Only run if not already patched
-        if json_file.exists() and not flag_file.exists():
-            print("[Startup] Starting Korean names migration (this will take a moment)...")
-            db = get_db()
-            with open(json_file, "r", encoding="utf-8") as f:
-                names_dict = json.load(f)
-
-            updated = 0
-            failed = 0
-            for char_id, korean_name in names_dict.items():
-                try:
-                    result = db.execute_update(
-                        "UPDATE character SET name_korean = ? WHERE id = ?",
-                        (korean_name, int(char_id))
-                    )
-                    if result > 0:
-                        updated += 1
-                except Exception as e:
-                    failed += 1
-
-            # Update activities
-            db.execute_update("""
-                UPDATE activities SET item_title_korean = (
-                    SELECT c.name_korean FROM character c WHERE c.id = activities.item_id
-                )
-                WHERE activity_type IN ('character_rating', 'character_review') AND item_id IS NOT NULL
-            """)
-
-            # Create flag file to prevent re-running
-            flag_file.touch()
-
-            print(f"[Startup] ✓ Korean names migration complete: {updated} updated, {failed} failed")
-        elif flag_file.exists():
-            print(f"[Startup] ⏭️  Korean names already patched (skipping)")
-        else:
-            print(f"[Startup] ⚠️  Korean names JSON not found")
-    except Exception as e:
-        print(f"[Startup] ⚠️  Korean names patch failed: {e}")
-        import traceback
-        traceback.print_exc()
+    # Note: Korean names are already synced by sync_korean_names.py above
+    # No additional patching needed
 
     # Create bookmarks table
     print("[Startup] Creating bookmarks table...")
