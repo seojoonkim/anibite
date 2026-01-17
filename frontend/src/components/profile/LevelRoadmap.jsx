@@ -1,6 +1,8 @@
 import { levels as otakuLevels } from '../../utils/otakuLevels';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function LevelRoadmap({ currentScore }) {
+  const { language } = useLanguage();
   // Gradient colors for progress bars (visual only)
   const gradientColors = [
     'from-gray-400 to-gray-500',        // 루키
@@ -17,7 +19,7 @@ export default function LevelRoadmap({ currentScore }) {
 
   // Map otakuLevels to LevelRoadmap format
   const levels = otakuLevels.map((level, index) => ({
-    name: level.name,
+    name: language === 'ko' ? level.name : language === 'ja' ? level.nameJa : level.nameEn,
     min: level.threshold,
     max: level.max,
     color: gradientColors[index],
@@ -34,7 +36,7 @@ export default function LevelRoadmap({ currentScore }) {
     <div className="bg-white rounded-2xl shadow-lg p-5 hover:shadow-xl transition-all duration-300">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
-          레벨 로드맵
+          {language === 'ko' ? '레벨 로드맵' : language === 'ja' ? 'レベルロードマップ' : 'Level Roadmap'}
         </h3>
         {/* 점수 획득 방법 - 인라인 */}
         <div className="flex items-center gap-3 text-xs">
@@ -88,7 +90,7 @@ export default function LevelRoadmap({ currentScore }) {
                       {level.name}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {level.min}~{level.max}점
+                      {level.min}~{level.max}{language === 'ko' ? '점' : language === 'ja' ? '点' : ' pts'}
                     </div>
                   </div>
                 </div>
@@ -123,7 +125,7 @@ export default function LevelRoadmap({ currentScore }) {
       {currentLevelIndex >= 0 && currentLevelIndex < levels.length - 1 && (
         <div className="mt-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-3">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-gray-600">다음 레벨까지</span>
+            <span className="text-gray-600">{language === 'ko' ? '다음 레벨까지' : language === 'ja' ? '次のレベルまで' : 'Until next level'}</span>
             {(() => {
               const pointsNeeded = levels[currentLevelIndex].max - currentScore;
               const animeRatingsNeeded = Math.ceil(pointsNeeded / 2);
@@ -134,17 +136,17 @@ export default function LevelRoadmap({ currentScore }) {
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1">
                     <span className="font-bold text-blue-600">{animeRatingsNeeded}</span>
-                    <span className="text-gray-600">작품평가</span>
+                    <span className="text-gray-600">{language === 'ko' ? '작품평가' : language === 'ja' ? 'アニメ評価' : 'Anime ratings'}</span>
                   </div>
-                  <span className="text-gray-400">또는</span>
+                  <span className="text-gray-400">{language === 'ko' ? '또는' : language === 'ja' ? 'または' : 'or'}</span>
                   <div className="flex items-center gap-1">
                     <span className="font-bold text-green-600">{characterRatingsNeeded}</span>
-                    <span className="text-gray-600">캐릭터평가</span>
+                    <span className="text-gray-600">{language === 'ko' ? '캐릭터평가' : language === 'ja' ? 'キャラクター評価' : 'Character ratings'}</span>
                   </div>
-                  <span className="text-gray-400">또는</span>
+                  <span className="text-gray-400">{language === 'ko' ? '또는' : language === 'ja' ? 'または' : 'or'}</span>
                   <div className="flex items-center gap-1">
                     <span className="font-bold text-purple-600">{reviewsNeeded}</span>
-                    <span className="text-gray-600">리뷰</span>
+                    <span className="text-gray-600">{language === 'ko' ? '리뷰' : language === 'ja' ? 'レビュー' : 'Reviews'}</span>
                   </div>
                 </div>
               );
@@ -156,7 +158,9 @@ export default function LevelRoadmap({ currentScore }) {
       {currentScore >= 1800 && (
         <div className="mt-3 text-center p-3 bg-gradient-to-r from-pink-100 via-yellow-100 to-purple-100 rounded-lg">
           <span className="text-xl mr-2">🎉</span>
-          <span className="font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-600 bg-clip-text text-transparent">최고 레벨 달성! 오타쿠 갓!</span>
+          <span className="font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-600 bg-clip-text text-transparent">
+            {language === 'ko' ? '최고 레벨 달성! 오타쿠 갓!' : language === 'ja' ? '最高レベル達成！オタクゴッド！' : 'Max level achieved! Otaku God!'}
+          </span>
         </div>
       )}
     </div>

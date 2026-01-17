@@ -1,4 +1,8 @@
+import { useLanguage } from '../../contexts/LanguageContext';
+
 export default function EpisodeLengthChart({ distribution }) {
+  const { language } = useLanguage();
+
   if (!distribution || distribution.length === 0) {
     return null;
   }
@@ -6,9 +10,9 @@ export default function EpisodeLengthChart({ distribution }) {
   const total = distribution.reduce((sum, item) => sum + item.count, 0);
 
   const lengthNames = {
-    'SHORT': '단편 (1-12화)',
-    'MEDIUM': '중편 (13-26화)',
-    'LONG': '장편 (27화+)'
+    'SHORT': language === 'ko' ? '단편 (1-12화)' : language === 'ja' ? '短編 (1-12話)' : 'Short (1-12 episodes)',
+    'MEDIUM': language === 'ko' ? '중편 (13-26화)' : language === 'ja' ? '中編 (13-26話)' : 'Medium (13-26 episodes)',
+    'LONG': language === 'ko' ? '장편 (27화+)' : language === 'ja' ? '長編 (27話+)' : 'Long (27+ episodes)'
   };
 
   const lengthGradients = {
@@ -19,7 +23,9 @@ export default function EpisodeLengthChart({ distribution }) {
 
   return (
     <div className="bg-gradient-to-br from-white to-indigo-50/20 rounded-2xl shadow-md p-6 w-full h-full flex flex-col border border-indigo-100/40">
-      <h3 className="text-lg font-bold mb-4 text-[#638CCC]">에피소드 길이 선호도</h3>
+      <h3 className="text-lg font-bold mb-4 text-[#638CCC]">
+        {language === 'ko' ? '에피소드 길이 선호도' : language === 'ja' ? 'エピソード長の好み' : 'Episode Length Preferences'}
+      </h3>
 
       <div className="space-y-3">
         {distribution.map((item) => {
@@ -33,7 +39,9 @@ export default function EpisodeLengthChart({ distribution }) {
                   {lengthNames[item.length_category] || item.length_category}
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600 font-medium">{item.count}개</span>
+                  <span className="text-sm text-gray-600 font-medium">
+                    {item.count}{language === 'ko' ? '개' : language === 'ja' ? '作品' : ' titles'}
+                  </span>
                   <span className="text-sm font-bold text-[#638CCC]">{percentage}%</span>
                 </div>
               </div>

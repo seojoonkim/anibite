@@ -1,4 +1,8 @@
+import { useLanguage } from '../../contexts/LanguageContext';
+
 export default function FormatDistribution({ distribution }) {
+  const { language } = useLanguage();
+
   if (!distribution || distribution.length === 0) {
     return null;
   }
@@ -6,12 +10,12 @@ export default function FormatDistribution({ distribution }) {
   const total = distribution.reduce((sum, item) => sum + item.count, 0);
 
   const formatNames = {
-    'TV': 'TV 시리즈',
-    'MOVIE': '영화',
+    'TV': language === 'ko' ? 'TV 시리즈' : language === 'ja' ? 'TVシリーズ' : 'TV Series',
+    'MOVIE': language === 'ko' ? '영화' : language === 'ja' ? '映画' : 'Movie',
     'OVA': 'OVA',
     'ONA': 'ONA',
-    'SPECIAL': '스페셜',
-    'MUSIC': '뮤직'
+    'SPECIAL': language === 'ko' ? '스페셜' : language === 'ja' ? 'スペシャル' : 'Special',
+    'MUSIC': language === 'ko' ? '뮤직' : language === 'ja' ? 'ミュージック' : 'Music'
   };
 
   const formatGradients = {
@@ -25,7 +29,9 @@ export default function FormatDistribution({ distribution }) {
 
   return (
     <div className="bg-gradient-to-br from-white to-blue-50/20 rounded-2xl shadow-md p-6 w-full h-full flex flex-col border border-blue-100/40">
-      <h3 className="text-lg font-bold mb-4 text-[#638CCC]">포맷 선호도</h3>
+      <h3 className="text-lg font-bold mb-4 text-[#638CCC]">
+        {language === 'ko' ? '포맷 선호도' : language === 'ja' ? 'フォーマットの好み' : 'Format Preferences'}
+      </h3>
 
       <div className="space-y-3">
         {distribution.map((item) => {
@@ -39,7 +45,9 @@ export default function FormatDistribution({ distribution }) {
                   {formatNames[item.format] || item.format}
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600 font-medium">{item.count}개</span>
+                  <span className="text-sm text-gray-600 font-medium">
+                    {item.count}{language === 'ko' ? '개' : language === 'ja' ? '作品' : ' titles'}
+                  </span>
                   <span className="text-sm font-bold text-[#638CCC]">{percentage}%</span>
                 </div>
               </div>

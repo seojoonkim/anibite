@@ -1,4 +1,8 @@
+import { useLanguage } from '../../contexts/LanguageContext';
+
 export default function SeasonStats({ seasons }) {
+  const { language } = useLanguage();
+
   if (!seasons || seasons.length === 0) {
     return null;
   }
@@ -6,10 +10,10 @@ export default function SeasonStats({ seasons }) {
   const total = seasons.reduce((sum, item) => sum + item.count, 0);
 
   const seasonNames = {
-    'SPRING': '봄',
-    'SUMMER': '여름',
-    'FALL': '가을',
-    'WINTER': '겨울'
+    'SPRING': language === 'ko' ? '봄' : language === 'ja' ? '春' : 'Spring',
+    'SUMMER': language === 'ko' ? '여름' : language === 'ja' ? '夏' : 'Summer',
+    'FALL': language === 'ko' ? '가을' : language === 'ja' ? '秋' : 'Fall',
+    'WINTER': language === 'ko' ? '겨울' : language === 'ja' ? '冬' : 'Winter'
   };
 
   const seasonEmojis = {
@@ -28,7 +32,9 @@ export default function SeasonStats({ seasons }) {
 
   return (
     <div className="bg-gradient-to-br from-white to-emerald-50/20 rounded-2xl shadow-md p-6 w-full h-full flex flex-col border border-emerald-100/40">
-      <h3 className="text-lg font-bold mb-4 text-[#638CCC]">시즌 선호도</h3>
+      <h3 className="text-lg font-bold mb-4 text-[#638CCC]">
+        {language === 'ko' ? '시즌 선호도' : language === 'ja' ? 'シーズンの好み' : 'Season Preferences'}
+      </h3>
 
       <div className="space-y-3">
         {seasons.map((item) => {
@@ -45,7 +51,9 @@ export default function SeasonStats({ seasons }) {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600 font-medium">{item.count}개</span>
+                  <span className="text-sm text-gray-600 font-medium">
+                    {item.count}{language === 'ko' ? '개' : language === 'ja' ? '作品' : ' titles'}
+                  </span>
                   <span className="text-sm font-bold text-[#638CCC]">{percentage}%</span>
                 </div>
               </div>

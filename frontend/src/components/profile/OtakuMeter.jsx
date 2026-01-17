@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { levels as otakuLevels, getCurrentLevelInfo as getOtakuLevelInfo } from '../../utils/otakuLevels';
+import { useLanguage } from '../../contexts/LanguageContext';
 
-export default function OtakuMeter({ score, language }) {
+export default function OtakuMeter({ score }) {
+  const { language } = useLanguage();
   const maxScore = 2000;
   const percentage = Math.min((score / maxScore) * 100, 100);
   const [showRoadmap, setShowRoadmap] = useState(false);
@@ -20,12 +22,14 @@ export default function OtakuMeter({ score, language }) {
     <>
       <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-6 w-full h-full flex flex-col">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-base font-semibold text-gray-900">애니패스 등급</h3>
+          <h3 className="text-base font-semibold text-gray-900">
+            {language === 'ko' ? '애니패스 등급' : language === 'ja' ? 'アニパス等級' : 'AniPass Grade'}
+          </h3>
           <button
             onClick={() => setShowRoadmap(true)}
             className="text-sm font-medium text-[#3797F0] hover:text-[#2a7dc4] transition-colors"
           >
-            자세히 보기
+            {language === 'ko' ? '자세히 보기' : language === 'ja' ? '詳しく見る' : 'View details'}
           </button>
         </div>
 
@@ -47,11 +51,11 @@ export default function OtakuMeter({ score, language }) {
               <div className="flex items-baseline gap-2 mb-1">
                 <span className="text-xl font-bold" style={{ color: levelInfo.color }}>{levelInfo.level}</span>
                 <span className="text-xs text-gray-500">
-                  ({levelInfo.rank}/{levelInfo.total} 등급)
+                  ({levelInfo.rank}/{levelInfo.total} {language === 'ko' ? '등급' : language === 'ja' ? '等級' : 'grade'})
                 </span>
               </div>
               <div className="text-sm text-gray-600">
-                현재 점수: <span className="font-semibold text-gray-900">{score.toFixed(0)}점</span>
+                {language === 'ko' ? '현재 점수' : language === 'ja' ? '現在のスコア' : 'Current score'}: <span className="font-semibold text-gray-900">{score.toFixed(0)}{language === 'ko' ? '점' : language === 'ja' ? '点' : ' pts'}</span>
               </div>
             </div>
           </div>
@@ -62,7 +66,7 @@ export default function OtakuMeter({ score, language }) {
           <div className="mb-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-gray-600 flex items-center gap-1.5">
-                다음 등급:
+                {language === 'ko' ? '다음 등급' : language === 'ja' ? '次の等級' : 'Next grade'}:
                 <span
                   className="text-base font-bold"
                   style={{
@@ -77,7 +81,7 @@ export default function OtakuMeter({ score, language }) {
                 <span className="font-medium text-gray-900">{levelInfo.nextLevel}</span>
               </span>
               <span className="text-sm font-semibold text-gray-900">
-                {Math.max(0, levelInfo.nextThreshold - score).toFixed(0)}점 남음
+                {Math.max(0, levelInfo.nextThreshold - score).toFixed(0)}{language === 'ko' ? '점 남음' : language === 'ja' ? '点残り' : ' pts left'}
               </span>
             </div>
             <div className="w-full bg-gray-100 rounded-full h-2.5">
@@ -91,17 +95,27 @@ export default function OtakuMeter({ score, language }) {
 
         {levelInfo.nextLevel === null && (
           <div className="mb-5 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg">
-            <p className="text-sm font-medium text-yellow-900">🎉 최고 등급 달성!</p>
+            <p className="text-sm font-medium text-yellow-900">
+              🎉 {language === 'ko' ? '최고 등급 달성!' : language === 'ja' ? '最高等級達成！' : 'Max grade achieved!'}
+            </p>
           </div>
         )}
 
         {/* Calculation info */}
         <div className="pt-4 border-t border-gray-200 mt-auto">
-          <p className="text-xs font-semibold text-gray-700 mb-2">점수 계산</p>
+          <p className="text-xs font-semibold text-gray-700 mb-2">
+            {language === 'ko' ? '점수 계산' : language === 'ja' ? 'スコア計算' : 'Score calculation'}
+          </p>
           <div className="text-xs text-gray-600 space-y-1">
-            <p>• 애니 평가 1개 = 2점</p>
-            <p>• 캐릭터 평가 1개 = 1점</p>
-            <p>• 리뷰 1개 = 5점</p>
+            <p>
+              • {language === 'ko' ? '애니 평가 1개 = 2점' : language === 'ja' ? 'アニメ評価 1件 = 2点' : 'Anime rating = 2 pts'}
+            </p>
+            <p>
+              • {language === 'ko' ? '캐릭터 평가 1개 = 1점' : language === 'ja' ? 'キャラクター評価 1件 = 1点' : 'Character rating = 1 pt'}
+            </p>
+            <p>
+              • {language === 'ko' ? '리뷰 1개 = 5점' : language === 'ja' ? 'レビュー 1件 = 5点' : 'Review = 5 pts'}
+            </p>
           </div>
         </div>
       </div>
@@ -111,7 +125,9 @@ export default function OtakuMeter({ score, language }) {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[95vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-gray-900">애니패스 등급 로드맵</h3>
+              <h3 className="text-lg font-bold text-gray-900">
+                {language === 'ko' ? '애니패스 등급 로드맵' : language === 'ja' ? 'アニパス等級ロードマップ' : 'AniPass Grade Roadmap'}
+              </h3>
               <button
                 onClick={() => setShowRoadmap(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -158,17 +174,19 @@ export default function OtakuMeter({ score, language }) {
                               Lv.{index + 1}
                             </span>
                             <span className="font-bold text-sm" style={{ color: level.color }}>
-                              {level.name}
+                              {language === 'ko' ? level.name : language === 'ja' ? level.nameJa : level.nameEn}
                             </span>
                             {isCurrentLevel && (
-                              <span className="text-xs text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: '#8EC5FC' }}>현재</span>
+                              <span className="text-xs text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: '#8EC5FC' }}>
+                                {language === 'ko' ? '현재' : language === 'ja' ? '現在' : 'Current'}
+                              </span>
                             )}
                             {isPassed && (
                               <span className="text-xs text-green-600">✓</span>
                             )}
                           </div>
                           <div className="text-xs text-gray-600 mt-0.5">
-                            {level.threshold}점 ~ {level.max === Infinity ? '최고' : `${level.max}점`}
+                            {level.threshold}{language === 'ko' ? '점' : language === 'ja' ? '点' : ' pts'} ~ {level.max === Infinity ? (language === 'ko' ? '최고' : language === 'ja' ? '最高' : 'Max') : `${level.max}${language === 'ko' ? '점' : language === 'ja' ? '点' : ' pts'}`}
                           </div>
                         </div>
                       </div>

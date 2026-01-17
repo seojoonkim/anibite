@@ -1,4 +1,8 @@
+import { useLanguage } from '../../contexts/LanguageContext';
+
 export default function StudioStats({ studios }) {
+  const { language } = useLanguage();
+
   if (!studios || studios.length === 0) {
     return null;
   }
@@ -7,7 +11,9 @@ export default function StudioStats({ studios }) {
 
   return (
     <div className="bg-gradient-to-br from-white to-pink-50/20 rounded-2xl shadow-md p-6 w-full h-full flex flex-col border border-pink-100/40">
-      <h3 className="text-lg font-bold mb-4 text-[#638CCC]">애니메이션 스튜디오 Top 10</h3>
+      <h3 className="text-lg font-bold mb-4 text-[#638CCC]">
+        {language === 'ko' ? '애니메이션 스튜디오 Top 10' : language === 'ja' ? 'スタジオ TOP 10' : 'Top 10 Studios'}
+      </h3>
 
       <div className="space-y-2.5">
         {studios.map((studio, index) => {
@@ -23,7 +29,9 @@ export default function StudioStats({ studios }) {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-600 font-medium">{studio.count}개</span>
+                  <span className="text-xs text-gray-600 font-medium">
+                    {studio.count}{language === 'ko' ? '개' : language === 'ja' ? '作品' : ' titles'}
+                  </span>
                   <span className="text-xs text-amber-500 font-bold">★ {studio.average_rating?.toFixed(1)}</span>
                 </div>
               </div>
