@@ -292,11 +292,13 @@ def get_items_for_review_writing(user_id: int, limit: int = 50) -> List[Dict]:
             activity_time as updated_at,
             item_title,
             item_title_korean,
+            item_title_native,
             item_image,
             item_year,
             NULL as anime_id,
             NULL as anime_title,
-            NULL as anime_title_korean
+            NULL as anime_title_korean,
+            NULL as anime_title_native
         FROM activities
         WHERE user_id = ? AND activity_type = 'anime_rating'
         AND (review_content IS NULL OR review_content = '')
@@ -311,11 +313,13 @@ def get_items_for_review_writing(user_id: int, limit: int = 50) -> List[Dict]:
             activity_time as updated_at,
             item_title,
             item_title_korean,
+            item_title_native,
             item_image,
             NULL as item_year,
             anime_id,
             anime_title,
-            anime_title_korean
+            anime_title_korean,
+            anime_title_native
         FROM activities
         WHERE user_id = ? AND activity_type = 'character_rating'
         AND (review_content IS NULL OR review_content = '')
