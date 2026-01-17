@@ -774,3 +774,416 @@ def create_notifications_table():
     except Exception as e:
         import traceback
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
+
+
+@router.post("/rebuild-activities")
+def rebuild_activities_endpoint():
+    """
+    Rebuild activities table from user_ratings and character_ratings
+    이 API는 activities 테이블을 완전히 재구축합니다
+    """
+    try:
+
+        # 1. 애니 평가 마이그레이션
+        print("Migrating anime ratings...")
+        count_anime = db.execute_query("""
+            SELECT COUNT(*) as count
+            FROM user_ratings ur
+            WHERE ur.status = 'RATED' AND ur.rating IS NOT NULL
+        """, fetch_one=True)
+
+        total_anime = count_anime['count'] if count_anime else 0
+        print(f"  Found {total_anime} anime ratings to migrate")
+
+        if total_anime > 0:
+            db.execute_query("""
+                INSERT OR REPLACE INTO activities (
+                    activity_type, user_id, item_id, activity_time,
+                    username, display_name, avatar_url, otaku_score,
+                    item_title, item_title_korean, item_image,
+                    rating, review_title, review_content, is_spoiler
+                )
+                SELECT
+                    'anime_rating' as activity_type,
+                    ur.user_id,
+                    ur.anime_id as item_id,
+                    COALESCE(rev.created_at, ur.updated_at) as activity_time,
+                    u.username,
+                    u.display_name,
+                    u.avatar_url,
+                    COALESCE(us.otaku_score, 0) as otaku_score,
+                    a.title_romaji as item_title,
+                    a.title_korean as item_title_korean,
+                    COALESCE('/' || a.cover_image_local, a.cover_image_url) as item_image,
+                    ur.rating,
+                    rev.title as review_title,
+                    rev.content as review_content,
+                    COALESCE(rev.is_spoiler, 0) as is_spoiler
+                FROM user_ratings ur
+                JOIN users u ON ur.user_id = u.id
+                JOIN anime a ON ur.anime_id = a.id
+                LEFT JOIN user_stats us ON u.id = us.user_id
+                LEFT JOIN user_reviews rev ON rev.user_id = ur.user_id AND rev.anime_id = ur.anime_id
+                WHERE ur.status = 'RATED' AND ur.rating IS NOT NULL
+            """)
+
+        # 2. 캐릭터 평가 마이그레이션
+        print("Migrating character ratings...")
+        count_char = db.execute_query("""
+            SELECT COUNT(*) as count
+            FROM character_ratings cr
+            WHERE cr.rating IS NOT NULL
+        """, fetch_one=True)
+
+        total_char = count_char['count'] if count_char else 0
+        print(f"  Found {total_char} character ratings to migrate")
+
+        if total_char > 0:
+            db.execute_query("""
+                INSERT OR REPLACE INTO activities (
+                    activity_type, user_id, item_id, activity_time,
+                    username, display_name, avatar_url, otaku_score,
+                    item_title, item_title_korean, item_image,
+                    rating, review_title, review_content, is_spoiler,
+                    anime_id, anime_title, anime_title_korean
+                )
+                SELECT
+                    'character_rating' as activity_type,
+                    cr.user_id,
+                    cr.character_id as item_id,
+                    COALESCE(rev.created_at, cr.updated_at) as activity_time,
+                    u.username,
+                    u.display_name,
+                    u.avatar_url,
+                    COALESCE(us.otaku_score, 0) as otaku_score,
+                    c.name_full as item_title,
+                    c.name_korean as item_title_korean,
+                    COALESCE('/' || c.image_local, c.image_url) as item_image,
+                    cr.rating,
+                    rev.title as review_title,
+                    rev.content as review_content,
+                    COALESCE(rev.is_spoiler, 0) as is_spoiler,
+                    (SELECT a.id FROM anime a
+                     JOIN anime_character ac ON a.id = ac.anime_id
+                     WHERE ac.character_id = cr.character_id
+                     ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END LIMIT 1) as anime_id,
+                    (SELECT a.title_romaji FROM anime a
+                     JOIN anime_character ac ON a.id = ac.anime_id
+                     WHERE ac.character_id = cr.character_id
+                     ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END LIMIT 1) as anime_title,
+                    (SELECT a.title_korean FROM anime a
+                     JOIN anime_character ac ON a.id = ac.anime_id
+                     WHERE ac.character_id = cr.character_id
+                     ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END LIMIT 1) as anime_title_korean
+                FROM character_ratings cr
+                JOIN users u ON cr.user_id = u.id
+                JOIN character c ON cr.character_id = c.id
+                LEFT JOIN user_stats us ON u.id = us.user_id
+                LEFT JOIN character_reviews rev ON rev.user_id = cr.user_id AND rev.character_id = cr.character_id
+                WHERE cr.rating IS NOT NULL
+            """)
+
+        # 3. 유저 포스트 마이그레이션
+        print("Migrating user posts...")
+        count_posts = db.execute_query("""
+            SELECT COUNT(*) as count FROM user_posts
+        """, fetch_one=True)
+
+        total_posts = count_posts['count'] if count_posts else 0
+        print(f"  Found {total_posts} user posts to migrate")
+
+        if total_posts > 0:
+            db.execute_query("""
+                INSERT OR REPLACE INTO activities (
+                    activity_type, user_id, item_id, activity_time,
+                    username, display_name, avatar_url, otaku_score,
+                    review_content
+                )
+                SELECT
+                    'user_post' as activity_type,
+                    up.user_id,
+                    up.id as item_id,
+                    up.created_at as activity_time,
+                    u.username,
+                    u.display_name,
+                    u.avatar_url,
+                    COALESCE(us.otaku_score, 0) as otaku_score,
+                    up.content as review_content
+                FROM user_posts up
+                JOIN users u ON up.user_id = u.id
+                LEFT JOIN user_stats us ON u.id = us.user_id
+            """)
+
+        return {
+            "success": True,
+            "anime_ratings_migrated": total_anime,
+            "character_ratings_migrated": total_char,
+            "user_posts_migrated": total_posts,
+            "total_migrated": total_anime + total_char + total_posts
+        }
+
+    except Exception as e:
+        print(f"Error rebuilding activities: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/backfill-rank-promotions")
+def backfill_rank_promotions_endpoint():
+    """
+    Backfill rank promotion activities for all users
+    모든 사용자의 과거 승급 이력을 activities 테이블에 추가
+    """
+    import json
+    from datetime import datetime
+
+    def get_rank_info(otaku_score: float) -> tuple:
+        """Get rank name and level from otaku score"""
+        if otaku_score <= 49:
+            return "루키", 1
+        elif otaku_score <= 119:
+            return "헌터", 2
+        elif otaku_score <= 219:
+            return "워리어", 3
+        elif otaku_score <= 349:
+            return "나이트", 4
+        elif otaku_score <= 549:
+            return "마스터", 5
+        elif otaku_score <= 799:
+            return "하이마스터", 6
+        elif otaku_score <= 1099:
+            return "그랜드마스터", 7
+        elif otaku_score <= 1449:
+            return "오타쿠", 8
+        elif otaku_score <= 1799:
+            return "오타쿠 킹", 9
+        else:
+            return "오타쿠 갓", 10
+
+    try:
+        # Get all users
+        users = db.execute_query("SELECT id, username, display_name, avatar_url FROM users")
+
+        total_promotions = 0
+
+        for user_row in users:
+            user_id = user_row[0]
+            username = user_row[1]
+            display_name = user_row[2]
+            avatar_url = user_row[3]
+
+            print(f"\n처리 중: {display_name or username} (ID: {user_id})")
+
+            # Get all activities in chronological order
+            activities = db.execute_query("""
+                SELECT 'anime_rating' as activity_type, updated_at as activity_time
+                FROM user_ratings
+                WHERE user_id = ? AND status = 'RATED' AND rating IS NOT NULL
+
+                UNION ALL
+
+                SELECT 'anime_review' as activity_type, created_at as activity_time
+                FROM user_reviews
+                WHERE user_id = ?
+
+                UNION ALL
+
+                SELECT 'character_rating' as activity_type, updated_at as activity_time
+                FROM character_ratings
+                WHERE user_id = ? AND rating IS NOT NULL
+
+                UNION ALL
+
+                SELECT 'character_review' as activity_type, created_at as activity_time
+                FROM character_reviews
+                WHERE user_id = ?
+
+                ORDER BY activity_time ASC
+            """, (user_id, user_id, user_id, user_id))
+
+            # Calculate otaku_score at each point in time
+            anime_ratings_count = 0
+            character_ratings_count = 0
+            reviews_count = 0
+
+            prev_rank = None
+            prev_level = None
+
+            for activity in activities:
+                activity_time = activity[1]
+                activity_type = activity[0]
+
+                # Update counts
+                if activity_type == 'anime_rating':
+                    anime_ratings_count += 1
+                elif activity_type == 'character_rating':
+                    character_ratings_count += 1
+                elif activity_type in ('anime_review', 'character_review'):
+                    reviews_count += 1
+
+                # Calculate current otaku_score
+                otaku_score = (anime_ratings_count * 2) + (character_ratings_count * 1) + (reviews_count * 5)
+
+                # Get current rank
+                current_rank, current_level = get_rank_info(otaku_score)
+
+                # Check if rank changed
+                if prev_rank is not None:
+                    if (current_rank != prev_rank) or (current_rank == prev_rank and current_level > prev_level):
+                        # Rank promotion detected!
+                        print(f"  승급: {prev_rank}-{prev_level} → {current_rank}-{current_level} at {activity_time}")
+
+                        # Check if already exists
+                        existing = db.execute_query("""
+                            SELECT id FROM activities
+                            WHERE activity_type = 'rank_promotion'
+                              AND user_id = ?
+                              AND activity_time = ?
+                        """, (user_id, activity_time), fetch_one=True)
+
+                        if not existing:
+                            # Create metadata
+                            metadata = json.dumps({
+                                'old_rank': prev_rank,
+                                'old_level': prev_level,
+                                'new_rank': current_rank,
+                                'new_level': current_level,
+                                'otaku_score': otaku_score
+                            })
+
+                            # Insert rank promotion activity
+                            db.execute_insert("""
+                                INSERT INTO activities (
+                                    activity_type, user_id, username, display_name, avatar_url,
+                                    item_id, metadata, activity_time, created_at, updated_at
+                                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                            """, (
+                                'rank_promotion',
+                                user_id,
+                                username,
+                                display_name,
+                                avatar_url,
+                                None,
+                                metadata,
+                                activity_time
+                            ))
+
+                            total_promotions += 1
+
+                # Update previous rank
+                prev_rank = current_rank
+                prev_level = current_level
+
+        return {
+            "success": True,
+            "total_promotions_created": total_promotions,
+            "users_processed": len(users)
+        }
+
+    except Exception as e:
+        print(f"Error backfilling rank promotions: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/debug-db")
+def debug_database():
+    """
+    Debug database path and activities table
+    데이터베이스 경로와 activities 테이블 상태 확인
+    """
+    import os
+    from config import DATABASE_PATH
+
+    try:
+        # Check database file
+        db_exists = os.path.exists(DATABASE_PATH)
+        db_size = os.path.getsize(DATABASE_PATH) if db_exists else 0
+
+        # Count activities
+        activities_count = db.execute_query(
+            "SELECT COUNT(*) as count FROM activities",
+            fetch_one=True
+        )
+
+        # Count by type
+        by_type = db.execute_query("""
+            SELECT activity_type, COUNT(*) as count
+            FROM activities
+            GROUP BY activity_type
+        """)
+
+        # Sample activities
+        sample = db.execute_query("""
+            SELECT id, activity_type, user_id, activity_time, metadata
+            FROM activities
+            ORDER BY activity_time DESC
+            LIMIT 5
+        """)
+
+        return {
+            "database_path": DATABASE_PATH,
+            "database_exists": db_exists,
+            "database_size_bytes": db_size,
+            "activities_total": activities_count['count'] if activities_count else 0,
+            "activities_by_type": [{"type": row[0], "count": row[1]} for row in by_type],
+            "sample_activities": [
+                {
+                    "id": row[0],
+                    "type": row[1],
+                    "user_id": row[2],
+                    "time": row[3],
+                    "metadata": row[4]
+                }
+                for row in sample
+            ]
+        }
+
+    except Exception as e:
+        import traceback
+        return {
+            "error": str(e),
+            "traceback": traceback.format_exc(),
+            "database_path": DATABASE_PATH if 'DATABASE_PATH' in locals() else "unknown"
+        }
+
+
+@router.get("/debug-rank-promotions")
+def debug_rank_promotions():
+    """
+    Debug rank promotion activities and their metadata
+    """
+    try:
+        promotions = db.execute_query("""
+            SELECT id, user_id, username, activity_time, metadata, created_at
+            FROM activities
+            WHERE activity_type = 'rank_promotion'
+            ORDER BY activity_time DESC
+            LIMIT 5
+        """)
+
+        return {
+            "total_rank_promotions": len(promotions),
+            "promotions": [
+                {
+                    "id": row[0],
+                    "user_id": row[1],
+                    "username": row[2],
+                    "activity_time": row[3],
+                    "metadata": row[4],
+                    "metadata_type": str(type(row[4])),
+                    "metadata_length": len(row[4]) if row[4] else 0,
+                    "created_at": row[5]
+                }
+                for row in promotions
+            ]
+        }
+
+    except Exception as e:
+        import traceback
+        return {
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }

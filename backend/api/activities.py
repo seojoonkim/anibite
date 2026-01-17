@@ -51,6 +51,9 @@ class ActivityResponse(BaseModel):
     anime_title: Optional[str]
     anime_title_korean: Optional[str]
 
+    # Metadata (for rank_promotion and other special types)
+    metadata: Optional[dict] = None
+
     # Engagement
     likes_count: int = 0
     comments_count: int = 0
