@@ -4,3 +4,6 @@ nixpacksConfigPath = "nixpacks.toml"
 
 [build.nixpacks]
 pythonVersion = "3.11"
+
+[deploy]
+volumeMountPath = "/app/data"
