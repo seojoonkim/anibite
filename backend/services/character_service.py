@@ -27,7 +27,7 @@ def get_user_rated_characters(user_id: int, limit: int = 100, offset: int = 0) -
              WHERE ac2.character_id = c.id
              ORDER BY CASE WHEN ac2.role = 'MAIN' THEN 0 ELSE 1 END, a2.start_date ASC, a2.popularity DESC
              LIMIT 1) as anime_id,
-            (SELECT COALESCE(a2.title_korean, a2.title_romaji) FROM anime a2
+            (SELECT a2.title_romaji FROM anime a2
              JOIN anime_character ac2 ON a2.id = ac2.anime_id
              WHERE ac2.character_id = c.id
              ORDER BY CASE WHEN ac2.role = 'MAIN' THEN 0 ELSE 1 END, a2.start_date ASC, a2.popularity DESC
@@ -421,7 +421,7 @@ def get_user_character_ratings(
                  WHERE ac.character_id = c.id
                  ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
                  LIMIT 1) as anime_id,
-                (SELECT COALESCE(a.title_korean, a.title_romaji) FROM anime a
+                (SELECT a.title_romaji FROM anime a
                  JOIN anime_character ac ON a.id = ac.anime_id
                  WHERE ac.character_id = c.id
                  ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
@@ -628,7 +628,7 @@ def get_all_user_character_ratings(user_id: int, rating_filter: float = None, st
                  WHERE ac.character_id = c.id
                  ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
                  LIMIT 1) as anime_id,
-                (SELECT COALESCE(a.title_korean, a.title_romaji) FROM anime a
+                (SELECT a.title_romaji FROM anime a
                  JOIN anime_character ac ON a.id = ac.anime_id
                  WHERE ac.character_id = c.id
                  ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
@@ -670,7 +670,7 @@ def get_all_user_character_ratings(user_id: int, rating_filter: float = None, st
                  WHERE ac.character_id = c.id
                  ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
                  LIMIT 1) as anime_id,
-                (SELECT COALESCE(a.title_korean, a.title_romaji) FROM anime a
+                (SELECT a.title_romaji FROM anime a
                  JOIN anime_character ac ON a.id = ac.anime_id
                  WHERE ac.character_id = c.id
                  ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC

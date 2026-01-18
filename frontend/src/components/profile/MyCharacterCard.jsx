@@ -51,6 +51,7 @@ function MyCharacterCard({ character }) {
     if (language === 'ko' && character.anime_title_korean) {
       return character.anime_title_korean;
     }
+    // English: use anime_title (romaji)
     return character.anime_title || '';
   };
 
