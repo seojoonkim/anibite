@@ -2,7 +2,7 @@
 builder = "nixpacks"
 nixpacksConfigPath = "nixpacks.toml"
 # Only rebuild when backend files change
-watchPaths = ["backend/**", "nixpacks.toml", "railway.toml"]
+watchPaths = ["backend/**", "nixpacks.toml", "railway.toml", "data/**"]
 
 [build.nixpacks]
 pythonVersion = "3.11"
