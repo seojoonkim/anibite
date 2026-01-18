@@ -141,7 +141,9 @@ def get_characters_for_rating(user_id: int, limit: int = 50) -> List[Dict]:
             c.favourites,
             ac.role,
             a.id as anime_id,
-            COALESCE(a.title_korean, a.title_romaji) as anime_title,
+            a.title_romaji as anime_title,
+            a.title_korean as anime_title_korean,
+            a.title_native as anime_title_native,
             COALESCE('/' || a.cover_image_local, a.cover_image_url) as anime_cover
         FROM character c
         INNER JOIN anime_character ac ON c.id = ac.character_id
