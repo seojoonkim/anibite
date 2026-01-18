@@ -1585,7 +1585,7 @@ export default function MyAniPass() {
                   }`}
                   style={animeSubMenu === '1' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ {language === 'ko' ? '1점대 이하' : language === 'ja' ? '≤1.9' : '≤1.9'}
+                  ⭐ {language === 'ko' ? '1점대 이하' : language === 'ja' ? '≤1.5' : '≤1.5'}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('watchlist')}
@@ -1677,7 +1677,7 @@ export default function MyAniPass() {
                   }`}
                   style={characterSubMenu === '1' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ {language === 'ko' ? '1점대 이하' : language === 'ja' ? '≤1.9' : '≤1.9'}
+                  ⭐ {language === 'ko' ? '1점대 이하' : language === 'ja' ? '≤1.5' : '≤1.5'}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('want')}
