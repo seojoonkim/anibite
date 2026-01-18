@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import StarRating from '../common/StarRating';
+import { useLanguage } from '../../context/LanguageContext';
 import { IMAGE_BASE_URL } from '../../config/api';
 
 /**
@@ -8,7 +9,8 @@ import { IMAGE_BASE_URL } from '../../config/api';
  * Optimized with React.memo to prevent unnecessary re-renders
  * Shows skeleton with name first, then loads image progressively
  */
-function MyCharacterCard({ character, language = 'ko' }) {
+function MyCharacterCard({ character }) {
+  const { language } = useLanguage();
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const getCharacterImageUrl = (characterId, imageUrl) => {
@@ -32,12 +34,27 @@ function MyCharacterCard({ character, language = 'ko' }) {
     return '/placeholder-anime.svg';
   };
 
-  // 한국어 설정일 때 name_korean 사용, 없으면 character_name 사용
-  const name = language === 'ko' && character.name_korean
-    ? character.name_korean
-    : language === 'ja' && character.character_name_native
-    ? character.character_name_native
-    : (character.character_name || character.character_name_native || character.name_full || '');
+  const getDisplayName = () => {
+    if (language === 'ja' && character.name_native) {
+      return character.name_native;
+    }
+    if (language === 'ko' && character.name_korean) {
+      return character.name_korean;
+    }
+    return character.name_full || character.character_name || '';
+  };
+
+  const getAnimeTitle = () => {
+    if (language === 'ja' && character.anime_title_native) {
+      return character.anime_title_native;
+    }
+    if (language === 'ko' && character.anime_title_korean) {
+      return character.anime_title_korean;
+    }
+    return character.anime_title || '';
+  };
+
+  const name = getDisplayName();
 
   return (
     <Link
@@ -93,9 +110,7 @@ function MyCharacterCard({ character, language = 'ko' }) {
           )}
           {character.anime_title && (
             <p className="text-xs text-gray-500 mt-1 line-clamp-1">
-              {language === 'ko'
-                ? (character.anime_title_korean || character.anime_title)
-                : character.anime_title}
+              {getAnimeTitle()}
             </p>
           )}
         </div>
