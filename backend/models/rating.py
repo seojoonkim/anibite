@@ -61,6 +61,7 @@ class RatingResponse(BaseModel):
     title_romaji: Optional[str] = None
     title_english: Optional[str] = None
     title_korean: Optional[str] = None
+    title_native: Optional[str] = None  # Japanese/native title
     image_url: Optional[str] = None
     season_year: Optional[int] = None
     episodes: Optional[int] = None

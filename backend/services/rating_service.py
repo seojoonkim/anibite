@@ -200,6 +200,7 @@ def get_user_ratings(
                 a.title_romaji,
                 a.title_english,
                 a.title_korean,
+                a.title_native,
                 a.cover_image_url as image_url,
                 a.season_year,
                 a.episodes
@@ -263,6 +264,7 @@ def get_user_ratings(
                 item_title as title_romaji,
                 item_title as title_english,
                 item_title_korean as title_korean,
+                item_title_native as title_native,
                 item_image as image_url,
                 NULL as season_year,
                 NULL as episodes
@@ -310,6 +312,7 @@ def get_user_ratings(
                 item_title as title_romaji,
                 item_title as title_english,
                 item_title_korean as title_korean,
+                item_title_native as title_native,
                 item_image as image_url,
                 NULL as season_year,
                 NULL as episodes
