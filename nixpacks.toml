@@ -13,4 +13,4 @@ cmds = [
 ]
 
 [start]
-cmd = 'cd backend && python init_db.py && if [ ! -f /app/data/anime.db ]; then echo "DB not found, downloading..."; python download_db.py || echo "Download failed"; else echo "DB exists, preserving user data"; fi && uvicorn main:app --host 0.0.0.0 --port $PORT'
+cmd = 'cd backend && python download_db.py && uvicorn main:app --host 0.0.0.0 --port $PORT'
