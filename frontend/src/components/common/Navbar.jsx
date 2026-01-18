@@ -409,16 +409,8 @@ export default function Navbar() {
                 ))}
               </div>
 
-              {/* Right Side - Language & User */}
+              {/* Right Side - User */}
               <div className="flex items-center space-x-2">
-              {/* Language Toggle */}
-              <button
-                onClick={toggleLanguage}
-                className="text-[#262626] hover:text-black px-3 py-2 rounded-md text-xs font-medium transition-colors"
-              >
-                {language === 'ko' ? '🇰🇷 KO' : language === 'ja' ? '🇯🇵 JA' : '🇺🇸 EN'}
-              </button>
-
               {/* Notification Bell */}
               {user && (
                 <div className="relative" ref={notificationRef}>
