@@ -425,7 +425,17 @@ def get_user_character_ratings(
                  JOIN anime_character ac ON a.id = ac.anime_id
                  WHERE ac.character_id = c.id
                  ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
-                 LIMIT 1) as anime_title
+                 LIMIT 1) as anime_title,
+                (SELECT a.title_korean FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = c.id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
+                 LIMIT 1) as anime_title_korean,
+                (SELECT a.title_native FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = c.id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
+                 LIMIT 1) as anime_title_native
             FROM character_ratings cr
             JOIN character c ON cr.character_id = c.id
             WHERE {where_clause}
@@ -482,11 +492,13 @@ def get_user_character_ratings(
                 a.activity_time as updated_at,
                 a.created_at,
                 a.item_title as name_full,
-                a.item_title_korean as name_native,
+                a.item_title_native as name_native,
                 c.name_korean,
                 a.item_image as image_url,
-                NULL as anime_id,
-                NULL as anime_title
+                a.anime_id,
+                a.anime_title,
+                a.anime_title_korean,
+                a.anime_title_native
             FROM activities a
             LEFT JOIN character c ON a.item_id = c.id
             WHERE a.user_id = ? AND a.activity_type = 'character_rating'
@@ -530,11 +542,13 @@ def get_user_character_ratings(
                 a.activity_time as updated_at,
                 a.created_at,
                 a.item_title as name_full,
-                a.item_title_korean as name_native,
+                a.item_title_native as name_native,
                 c.name_korean,
                 a.item_image as image_url,
-                NULL as anime_id,
-                NULL as anime_title
+                a.anime_id,
+                a.anime_title,
+                a.anime_title_korean,
+                a.anime_title_native
             FROM activities a
             LEFT JOIN character c ON a.item_id = c.id
             WHERE a.user_id = ? AND a.activity_type = 'character_rating'
@@ -580,7 +594,7 @@ def get_all_user_character_ratings(user_id: int, rating_filter: float = None, st
                 a.rating,
                 'RATED' as status,
                 a.item_title as name_full,
-                a.item_title_korean as name_native,
+                a.item_title_native as name_native,
                 c.name_korean,
                 a.item_image as image_url,
                 a.anime_id,
@@ -618,7 +632,17 @@ def get_all_user_character_ratings(user_id: int, rating_filter: float = None, st
                  JOIN anime_character ac ON a.id = ac.anime_id
                  WHERE ac.character_id = c.id
                  ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
-                 LIMIT 1) as anime_title
+                 LIMIT 1) as anime_title,
+                (SELECT a.title_korean FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = c.id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
+                 LIMIT 1) as anime_title_korean,
+                (SELECT a.title_native FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = c.id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
+                 LIMIT 1) as anime_title_native
             FROM character_ratings cr
             JOIN character c ON cr.character_id = c.id
             WHERE cr.user_id = ? AND cr.status = 'WANT_TO_KNOW'
@@ -650,7 +674,17 @@ def get_all_user_character_ratings(user_id: int, rating_filter: float = None, st
                  JOIN anime_character ac ON a.id = ac.anime_id
                  WHERE ac.character_id = c.id
                  ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
-                 LIMIT 1) as anime_title
+                 LIMIT 1) as anime_title,
+                (SELECT a.title_korean FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = c.id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
+                 LIMIT 1) as anime_title_korean,
+                (SELECT a.title_native FROM anime a
+                 JOIN anime_character ac ON a.id = ac.anime_id
+                 WHERE ac.character_id = c.id
+                 ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.start_date ASC
+                 LIMIT 1) as anime_title_native
             FROM character_ratings cr
             JOIN character c ON cr.character_id = c.id
             WHERE cr.user_id = ? AND cr.status = 'NOT_INTERESTED'
