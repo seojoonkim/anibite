@@ -38,6 +38,7 @@ class ActivityResponse(BaseModel):
     item_id: Optional[int]
     item_title: Optional[str]
     item_title_korean: Optional[str]
+    item_title_native: Optional[str] = None  # Japanese/native title
     item_image: Optional[str]
 
     # Rating & Review
@@ -50,6 +51,7 @@ class ActivityResponse(BaseModel):
     anime_id: Optional[int]
     anime_title: Optional[str]
     anime_title_korean: Optional[str]
+    anime_title_native: Optional[str] = None  # Japanese/native title
 
     # Metadata (for rank_promotion and other special types)
     metadata: Optional[dict] = None
