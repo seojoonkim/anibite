@@ -361,6 +361,7 @@ def get_all_user_ratings(user_id: int, rating_filter: float = None, status_filte
                 'RATED' as status,
                 item_title as title_romaji,
                 item_title_korean as title_korean,
+                item_title_native as title_native,
                 item_image as image_url
             FROM activities
             WHERE user_id = ? AND activity_type = 'anime_rating'{rating_condition}
@@ -381,6 +382,7 @@ def get_all_user_ratings(user_id: int, rating_filter: float = None, status_filte
                 ur.status,
                 a.title_romaji,
                 a.title_korean,
+                a.title_native,
                 a.cover_image_url as image_url
             FROM user_ratings ur
             JOIN anime a ON ur.anime_id = a.id
@@ -402,6 +404,7 @@ def get_all_user_ratings(user_id: int, rating_filter: float = None, status_filte
                 ur.status,
                 a.title_romaji,
                 a.title_korean,
+                a.title_native,
                 a.cover_image_url as image_url
             FROM user_ratings ur
             JOIN anime a ON ur.anime_id = a.id
