@@ -1552,7 +1552,7 @@ export default function MyAniPass() {
                   }`}
                   style={animeSubMenu === '4' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ 4{language === 'ko' ? '점대' : language === 'ja' ? '点台' : ''}
+                  ⭐ 4{language === 'ko' ? '점대' : language === 'ja' ? '点台' : '.0-4.5'}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('3')}
@@ -1563,7 +1563,7 @@ export default function MyAniPass() {
                   }`}
                   style={animeSubMenu === '3' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ 3{language === 'ko' ? '점대' : language === 'ja' ? '点台' : ''}
+                  ⭐ 3{language === 'ko' ? '점대' : language === 'ja' ? '点台' : '.0-3.5'}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('2')}
@@ -1574,7 +1574,7 @@ export default function MyAniPass() {
                   }`}
                   style={animeSubMenu === '2' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ 2{language === 'ko' ? '점대' : language === 'ja' ? '点台' : ''}
+                  ⭐ 2{language === 'ko' ? '점대' : language === 'ja' ? '点台' : '.0-2.5'}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('1')}
@@ -1644,7 +1644,7 @@ export default function MyAniPass() {
                   }`}
                   style={characterSubMenu === '4' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ 4{language === 'ko' ? '점대' : language === 'ja' ? '点台' : ''}
+                  ⭐ 4{language === 'ko' ? '점대' : language === 'ja' ? '点台' : '.0-4.5'}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('3')}
@@ -1655,7 +1655,7 @@ export default function MyAniPass() {
                   }`}
                   style={characterSubMenu === '3' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
-                  ⭐ 3{language === 'ko' ? '점대' : language === 'ja' ? '点台' : ''}
+                  ⭐ 3{language === 'ko' ? '점대' : language === 'ja' ? '点台' : '.0-3.5'}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('2')}
