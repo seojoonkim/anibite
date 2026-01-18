@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import StarRating from '../common/StarRating';
+import { useLanguage } from '../../context/LanguageContext';
 import { IMAGE_BASE_URL } from '../../config/api';
 
 /**
@@ -9,6 +10,7 @@ import { IMAGE_BASE_URL } from '../../config/api';
  * Shows skeleton with title first, then loads image progressively
  */
 function MyAnimeCard({ anime }) {
+  const { language } = useLanguage();
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const getImageUrl = (imageUrl) => {
@@ -20,7 +22,17 @@ function MyAnimeCard({ anime }) {
     return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
-  const title = anime.title_korean || anime.title_romaji || anime.title_english || 'Unknown';
+  const getDisplayTitle = () => {
+    if (language === 'ja' && anime.title_native) {
+      return anime.title_native;
+    }
+    if (language === 'ko' && anime.title_korean) {
+      return anime.title_korean;
+    }
+    return anime.title_romaji || anime.title_english || 'Unknown';
+  };
+
+  const title = getDisplayTitle();
   const imageUrl = anime.image_url;
 
   return (
