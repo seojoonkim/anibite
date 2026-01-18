@@ -1,6 +1,7 @@
 """
 AniPass Backend - FastAPI Application
 왓챠피디아 스타일 애니메이션 평가 플랫폼
+Updated: 2026-01-18 - Added native title support for feed
 """
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
