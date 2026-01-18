@@ -24,7 +24,12 @@ app = FastAPI(
 # Startup event to ensure database schema is up to date
 @app.on_event("startup")
 async def startup_event():
-    """Run on application startup"""
+    """Run on application startup - Complete initialization and backfill"""
+    print("\n" + "="*60)
+    print("🚀 ANIPASS BACKEND STARTUP")
+    print("="*60 + "\n")
+
+    # 1. Schema updates
     print("[Startup] Ensuring database schema is up to date...")
     try:
         from scripts.ensure_schema import main as ensure_schema
@@ -35,7 +40,7 @@ async def startup_event():
         import traceback
         traceback.print_exc()
 
-    # Sync Korean character names
+    # 2. Sync Korean character names
     print("[Startup] Syncing Korean character names...")
     try:
         from scripts.sync_korean_names import sync_korean_names
@@ -46,10 +51,7 @@ async def startup_event():
         import traceback
         traceback.print_exc()
 
-    # Note: Korean names are already synced by sync_korean_names.py above
-    # No additional patching needed
-
-    # Create bookmarks table
+    # 3. Create bookmarks table
     print("[Startup] Creating bookmarks table...")
     try:
         from database import get_db
@@ -70,7 +72,134 @@ async def startup_event():
     except Exception as e:
         print(f"[Startup] ⚠️  Failed to create bookmarks table: {e}")
 
-    # Debug: Log database info
+    # 4. Add preferred_language column if needed
+    print("\n🗄️ Checking database schema...")
+    try:
+        from scripts.add_preferred_language import add_preferred_language_column
+        add_preferred_language_column()
+        print("✅ Database schema up to date!\n")
+    except Exception as e:
+        print(f"⚠️ Failed to update schema: {e}\n")
+
+    # 5. Verify existing users (one-time migration for email verification feature)
+    print("👤 Verifying existing users...")
+    try:
+        from scripts.verify_existing_users import verify_existing_users
+        verify_existing_users()
+        print("✅ Existing users verified!\n")
+    except Exception as e:
+        print(f"⚠️ Failed to verify existing users: {e}\n")
+
+    # 6. Fix triggers
+    print("🔧 Checking and fixing database triggers...")
+    try:
+        from scripts.fix_railway_triggers import fix_triggers
+        fix_triggers()
+        print("✅ Triggers fixed successfully!\n")
+    except Exception as e:
+        print(f"⚠️ Failed to fix triggers: {e}")
+        print("Server will continue, but rating save may fail.\n")
+
+    # 7. Add activity indexes for performance
+    print("📊 Adding database indexes for performance...")
+    try:
+        from scripts.add_activity_indexes import add_indexes
+        add_indexes()
+        print("✅ Indexes created successfully!\n")
+    except Exception as e:
+        print(f"⚠️ Failed to add indexes: {e}")
+        print("Server will continue, but queries may be slow.\n")
+
+    # 8. CRITICAL: Backfill anime_title_native and item_title_native for ALL activities
+    print("🌐 Backfilling Japanese titles for ALL activities...")
+    try:
+        from database import get_db
+        db = get_db()
+
+        # Check if columns exist
+        columns = db.execute_query("PRAGMA table_info(activities)")
+        column_names = [col[1] for col in columns]
+
+        if 'anime_title_native' not in column_names:
+            print("  Adding anime_title_native column...")
+            db.execute_update("ALTER TABLE activities ADD COLUMN anime_title_native TEXT")
+
+        if 'item_title_native' not in column_names:
+            print("  Adding item_title_native column...")
+            db.execute_update("ALTER TABLE activities ADD COLUMN item_title_native TEXT")
+
+        # Backfill 1: Anime native titles for character activities
+        db.execute_update("""
+            UPDATE activities
+            SET anime_title_native = (
+                SELECT a.title_native
+                FROM anime a
+                WHERE a.id = activities.anime_id
+            )
+            WHERE activity_type IN ('character_rating', 'character_review')
+            AND anime_id IS NOT NULL
+            AND anime_title_native IS NULL
+        """)
+
+        # Backfill 2: Character native names
+        db.execute_update("""
+            UPDATE activities
+            SET item_title_native = (
+                SELECT c.name_native
+                FROM character c
+                WHERE c.id = activities.item_id
+            )
+            WHERE activity_type IN ('character_rating', 'character_review')
+            AND item_id IS NOT NULL
+            AND item_title_native IS NULL
+        """)
+
+        # Backfill 3: Anime native titles for anime activities (THIS WAS MISSING!)
+        db.execute_update("""
+            UPDATE activities
+            SET item_title_native = (
+                SELECT a.title_native
+                FROM anime a
+                WHERE a.id = activities.item_id
+            )
+            WHERE activity_type IN ('anime_rating', 'anime_review')
+            AND item_id IS NOT NULL
+            AND item_title_native IS NULL
+        """)
+
+        # Count results
+        anime_char_count = db.execute_query("""
+            SELECT COUNT(*) as count
+            FROM activities
+            WHERE activity_type IN ('character_rating', 'character_review')
+            AND anime_title_native IS NOT NULL
+        """, fetch_one=True)
+
+        char_count = db.execute_query("""
+            SELECT COUNT(*) as count
+            FROM activities
+            WHERE activity_type IN ('character_rating', 'character_review')
+            AND item_title_native IS NOT NULL
+        """, fetch_one=True)
+
+        anime_count = db.execute_query("""
+            SELECT COUNT(*) as count
+            FROM activities
+            WHERE activity_type IN ('anime_rating', 'anime_review')
+            AND item_title_native IS NOT NULL
+        """, fetch_one=True)
+
+        print(f"✅ Backfilled:")
+        print(f"   - {anime_char_count['count'] if anime_char_count else 0} character activity anime titles")
+        print(f"   - {char_count['count'] if char_count else 0} character names")
+        print(f"   - {anime_count['count'] if anime_count else 0} anime activity titles\n")
+    except Exception as e:
+        print(f"⚠️ Failed to backfill titles: {e}")
+        print("Server will continue, but Japanese titles may not display.\n")
+        import traceback
+        traceback.print_exc()
+
+    # 9. Debug: Log database info
     try:
         from config import DATABASE_PATH
         from database import get_db
@@ -105,6 +234,10 @@ async def startup_event():
         print(f"  - TOTAL: {user4_total[0][0] if user4_total else 0}")
     except Exception as e:
         print(f"[Startup DEBUG] Failed to log database info: {e}")
+
+    print("\n" + "="*60)
+    print("✅ STARTUP COMPLETE")
+    print("="*60 + "\n")
 
 # Debug: Print allowed origins on startup
 print(f"[CORS] Allowed origins: {ALLOWED_ORIGINS}")
@@ -187,110 +320,8 @@ if not os.path.exists(uploads_dir):
 app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
 
-# Startup event - Fix triggers on server start
-@app.on_event("startup")
-async def startup_event():
-    """서버 시작 시 데이터베이스 마이그레이션 및 트리거 수정"""
-    # Add preferred_language column if needed
-    print("\n🗄️ Checking database schema...")
-    try:
-        from scripts.add_preferred_language import add_preferred_language_column
-        add_preferred_language_column()
-        print("✅ Database schema up to date!\n")
-    except Exception as e:
-        print(f"⚠️ Failed to update schema: {e}\n")
-
-    # Verify existing users (one-time migration for email verification feature)
-    print("👤 Verifying existing users...")
-    try:
-        from scripts.verify_existing_users import verify_existing_users
-        verify_existing_users()
-        print("✅ Existing users verified!\n")
-    except Exception as e:
-        print(f"⚠️ Failed to verify existing users: {e}\n")
-
-    # Fix triggers
-    print("🔧 Checking and fixing database triggers...")
-    try:
-        from scripts.fix_railway_triggers import fix_triggers
-        fix_triggers()
-        print("✅ Triggers fixed successfully!\n")
-    except Exception as e:
-        print(f"⚠️ Failed to fix triggers: {e}")
-        print("Server will continue, but rating save may fail.\n")
-
-    # Add activity indexes for performance
-    print("📊 Adding database indexes for performance...")
-    try:
-        from scripts.add_activity_indexes import add_indexes
-        add_indexes()
-        print("✅ Indexes created successfully!\n")
-    except Exception as e:
-        print(f"⚠️ Failed to add indexes: {e}")
-        print("Server will continue, but queries may be slow.\n")
-
-    # Backfill anime_title_native and item_title_native for character activities
-    print("🌐 Backfilling Japanese titles...")
-    try:
-        from database import get_db
-        db = get_db()
-
-        # Check if columns exist
-        columns = db.execute_query("PRAGMA table_info(activities)")
-        column_names = [col[1] for col in columns]
-
-        if 'anime_title_native' not in column_names:
-            print("  Adding anime_title_native column...")
-            db.execute_query("ALTER TABLE activities ADD COLUMN anime_title_native TEXT")
-
-        if 'item_title_native' not in column_names:
-            print("  Adding item_title_native column...")
-            db.execute_query("ALTER TABLE activities ADD COLUMN item_title_native TEXT")
-
-        # Backfill anime native titles
-        db.execute_query("""
-            UPDATE activities
-            SET anime_title_native = (
-                SELECT a.title_native
-                FROM anime a
-                WHERE a.id = activities.anime_id
-            )
-            WHERE activity_type IN ('character_rating', 'character_review')
-            AND anime_id IS NOT NULL
-            AND anime_title_native IS NULL
-        """)
-
-        # Backfill character native names
-        db.execute_query("""
-            UPDATE activities
-            SET item_title_native = (
-                SELECT c.name_native
-                FROM character c
-                WHERE c.id = activities.item_id
-            )
-            WHERE activity_type IN ('character_rating', 'character_review')
-            AND item_id IS NOT NULL
-            AND item_title_native IS NULL
-        """)
-
-        anime_count = db.execute_query("""
-            SELECT COUNT(*) as count
-            FROM activities
-            WHERE activity_type IN ('character_rating', 'character_review')
-            AND anime_title_native IS NOT NULL
-        """, fetch_one=True)
-
-        char_count = db.execute_query("""
-            SELECT COUNT(*) as count
-            FROM activities
-            WHERE activity_type IN ('character_rating', 'character_review')
-            AND item_title_native IS NOT NULL
-        """, fetch_one=True)
-
-        print(f"✅ Backfilled {anime_count['count'] if anime_count else 0} anime titles and {char_count['count'] if char_count else 0} character names!\n")
-    except Exception as e:
-        print(f"⚠️ Failed to backfill titles: {e}")
-        print("Server will continue, but Japanese titles may not display.\n")
+# Note: Startup event is now consolidated above (lines 25-240)
+# This duplicate was removed to prevent conflicts
 
 
 # Root endpoint
