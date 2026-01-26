@@ -199,6 +199,42 @@ def delete_character_review(review_id: int, user_id: int) -> bool:
     return True
 
 
+def delete_character_review_by_character(user_id: int, character_id: int) -> bool:
+    """character_id로 캐릭터 리뷰 삭제 (관련 댓글과 좋아요도 함께 삭제)"""
+
+    # 리뷰 찾기
+    existing = db.execute_query(
+        "SELECT id FROM character_reviews WHERE user_id = ? AND character_id = ?",
+        (user_id, character_id),
+        fetch_one=True
+    )
+
+    if not existing:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Review not found"
+        )
+
+    review_id = existing['id']
+
+    # 관련 댓글 삭제 (review_comments)
+    db.execute_update(
+        "DELETE FROM review_comments WHERE review_id = ? AND review_type = 'character'",
+        (review_id,)
+    )
+
+    # 관련 좋아요 삭제 (character_review_likes)
+    db.execute_update(
+        "DELETE FROM character_review_likes WHERE review_id = ?",
+        (review_id,)
+    )
+
+    # 리뷰 삭제
+    db.execute_update("DELETE FROM character_reviews WHERE id = ?", (review_id,))
+
+    return True
+
+
 def get_character_review_by_id(review_id: int) -> Optional[CharacterReviewResponse]:
     """캐릭터 리뷰 ID로 조회"""
 

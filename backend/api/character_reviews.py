@@ -68,6 +68,20 @@ def delete(
     delete_character_review(review_id, current_user.id)
 
 
+@router.delete("/character/{character_id}/my-review", status_code=status.HTTP_204_NO_CONTENT)
+def delete_my_character_review(
+    character_id: int,
+    current_user: UserResponse = Depends(get_current_user)
+):
+    """
+    내 캐릭터 리뷰 삭제 (character_id로 삭제)
+
+    본인의 리뷰만 삭제 가능
+    """
+    from services.character_review_service import delete_character_review_by_character
+    delete_character_review_by_character(current_user.id, character_id)
+
+
 @router.get("/{review_id}", response_model=CharacterReviewResponse)
 def get_review(review_id: int):
     """

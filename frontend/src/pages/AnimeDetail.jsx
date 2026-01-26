@@ -611,7 +611,9 @@ export default function AnimeDetail() {
       }
     }
 
-    if (imageUrl.startsWith('http')) return imageUrl;
+    // External URLs (AniList, etc) - use placeholder
+    if (imageUrl.startsWith('http')) return '/placeholder-anime.svg';
+
     // Use covers_large for better quality
     const processedUrl = imageUrl.includes('/covers/')
       ? imageUrl.replace('/covers/', '/covers_large/')

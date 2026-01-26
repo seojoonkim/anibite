@@ -25,9 +25,14 @@ export const characterReviewService = {
     return data;
   },
 
-  // 캐릭터 리뷰 삭제
+  // 캐릭터 리뷰 삭제 (review ID로)
   async deleteReview(reviewId) {
     await api.delete(`/api/character-reviews/${reviewId}`);
+  },
+
+  // 내 캐릭터 리뷰 삭제 (character ID로)
+  async deleteMyReview(characterId) {
+    await api.delete(`/api/character-reviews/character/${characterId}/my-review`);
   },
 
   // 캐릭터 리뷰 좋아요

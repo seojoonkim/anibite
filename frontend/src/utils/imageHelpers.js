@@ -34,14 +34,15 @@ export const getCharacterImageUrl = (characterId, imageUrl = null) => {
       finalUrl = null;
     }
   }
-  // Priority 4: imageUrl을 그대로 사용
+  // Priority 4: imageUrl이 상대경로면 R2 사용, 외부 URL(AniList 등)은 무시
   else if (imageUrl) {
-    if (imageUrl.startsWith('http')) {
-      finalUrl = imageUrl;
-    } else if (imageUrl.startsWith('/')) {
+    if (imageUrl.startsWith('/')) {
       finalUrl = `${IMAGE_BASE_URL}${imageUrl}`;
+    } else if (!imageUrl.startsWith('http')) {
+      finalUrl = `${IMAGE_BASE_URL}/${imageUrl}`;
     } else {
-      finalUrl = `${IMAGE_BASE_URL}${imageUrl}`;
+      // External URLs (AniList, etc) - don't use, return placeholder
+      return '/placeholder-anime.svg';
     }
   } else {
     return '/placeholder-anime.svg';
@@ -78,17 +79,12 @@ export const getCharacterImageFallback = (imageUrl, currentSrc = null) => {
         return currentSrc.replace(/\.[a-z]+$/i, `.${nextExt}`);
       }
 
-      // All extensions tried, fallback to original AniList URL
-      if (imageUrl && imageUrl.startsWith('http')) {
-        return imageUrl;
-      }
+      // All extensions tried, use placeholder (no AniList fallback)
       return '/placeholder-anime.svg';
     }
   }
 
-  // Fallback to original URL
-  if (!imageUrl) return '/placeholder-anime.svg';
-  if (imageUrl.startsWith('http')) return imageUrl;
+  // No valid R2 path, use placeholder
   return '/placeholder-anime.svg';
 };
 
@@ -102,13 +98,14 @@ export const getCharacterImageFallback = (imageUrl, currentSrc = null) => {
 export const getAvatarUrl = (avatarUrl, characterId = null) => {
   if (!avatarUrl) return null;
 
-  // 외부 URL은 그대로 사용하되, character ID가 있으면 R2 우선
+  // 외부 URL(AniList 등)은 사용하지 않음 - R2만 사용
   if (avatarUrl.startsWith('http')) {
-    // If we have character ID, try R2 first (will fallback in onError)
+    // If we have character ID, use R2
     if (characterId) {
       return `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
     }
-    return avatarUrl;
+    // External URL without character ID - return null (will show gradient placeholder)
+    return null;
   }
 
   // /uploads로 시작하면 API 서버 (파일 업로드)
@@ -132,8 +129,7 @@ export const getAvatarUrl = (avatarUrl, characterId = null) => {
  * @returns {string|null} Fallback URL or null for gradient placeholder
  */
 export const getAvatarFallback = (avatarUrl) => {
-  if (!avatarUrl) return null;
-  if (avatarUrl.startsWith('http')) return avatarUrl;
+  // No external URL fallback - use gradient placeholder
   return null;
 };
 

@@ -254,24 +254,38 @@ const ActivityCard = forwardRef(({
       }
     }
 
-    // If it's already a relative path, use IMAGE_BASE_URL
+    // If it's a relative path, use IMAGE_BASE_URL
     if (!url.startsWith('http')) {
       return `${IMAGE_BASE_URL}${url}`;
     }
 
-    // Otherwise use as-is
-    return url;
+    // External URLs (AniList, etc) - use placeholder
+    return '/placeholder-anime.svg';
   }, [activity.item_image]);
 
-  // Handle item image load error - fallback to original URL without re-rendering
+  // Handle item image load error - try different R2 extensions
   const handleItemImageError = (e) => {
-    const originalUrl = activity.item_image;
-    // Only fallback if current src is not already the original URL
-    if (originalUrl && e.target.src !== originalUrl && originalUrl.startsWith('http')) {
-      e.target.src = originalUrl;
-    } else {
-      e.target.src = '/placeholder-anime.svg';
+    const currentSrc = e.target.src;
+    const extensionOrder = ['jpg', 'png', 'jpeg', 'webp', 'gif'];
+
+    // If current src is R2 character image, try next extension
+    if (currentSrc && currentSrc.includes('/images/characters/')) {
+      const currentExtMatch = currentSrc.match(/\.([a-z]+)$/i);
+      if (currentExtMatch && currentExtMatch[1]) {
+        const currentExt = currentExtMatch[1].toLowerCase();
+        const currentIndex = extensionOrder.indexOf(currentExt);
+
+        // Try next extension in the order
+        if (currentIndex !== -1 && currentIndex < extensionOrder.length - 1) {
+          const nextExt = extensionOrder[currentIndex + 1];
+          e.target.src = currentSrc.replace(/\.[a-z]+$/i, `.${nextExt}`);
+          return;
+        }
+      }
     }
+
+    // All extensions tried or not an R2 image - use placeholder
+    e.target.src = '/placeholder-anime.svg';
   };
 
   // Handlers

@@ -39,13 +39,13 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
       }
     }
 
-    // If it's already a relative path, use IMAGE_BASE_URL
+    // If it's a relative path, use IMAGE_BASE_URL
     if (!url.startsWith('http')) {
       return `${IMAGE_BASE_URL}${url}`;
     }
 
-    // Otherwise use as-is
-    return url;
+    // External URLs (AniList, etc) - use placeholder
+    return '/placeholder-anime.svg';
   };
 
   useEffect(() => {
