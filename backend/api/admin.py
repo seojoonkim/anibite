@@ -1466,6 +1466,36 @@ def patch_korean_names_from_json():
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
 
 
+@router.get("/download-db")
+def download_database(secret: str = None):
+    """
+    Download database file for local development sync
+    로컬 개발 환경 동기화를 위한 데이터베이스 다운로드
+
+    Usage: GET /api/admin/download-db?secret=YOUR_SECRET_KEY
+    Set ADMIN_SECRET environment variable on the server
+    """
+    import os
+    from fastapi.responses import FileResponse
+    from config import DATABASE_PATH
+
+    # Check secret key
+    admin_secret = os.getenv("ADMIN_SECRET", "anipass-local-dev-2024")
+    if secret != admin_secret:
+        raise HTTPException(status_code=403, detail="Invalid secret key")
+
+    # Check if database exists
+    if not os.path.exists(DATABASE_PATH):
+        raise HTTPException(status_code=404, detail=f"Database not found: {DATABASE_PATH}")
+
+    # Return database file
+    return FileResponse(
+        path=DATABASE_PATH,
+        filename="anime.db",
+        media_type="application/octet-stream"
+    )
+
+
 @router.get("/check-bookmarks-table")
 def check_bookmarks_table():
     """
