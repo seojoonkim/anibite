@@ -3,6 +3,13 @@ AniPass Backend - FastAPI Application
 왓챠피디아 스타일 애니메이션 평가 플랫폼
 Updated: 2026-01-18 - Added native title support for feed
 """
+# Fix Windows console encoding issues
+import sys
+import io
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -26,7 +33,7 @@ app = FastAPI(
 async def startup_event():
     """Run on application startup - Complete initialization and backfill"""
     print("\n" + "="*60)
-    print("🚀 ANIPASS BACKEND STARTUP")
+    print(">>> ANIPASS BACKEND STARTUP")
     print("="*60 + "\n")
 
     # 1. Schema updates
@@ -34,9 +41,9 @@ async def startup_event():
     try:
         from scripts.ensure_schema import main as ensure_schema
         ensure_schema()
-        print("[Startup] ✓ Schema check complete")
+        print("[Startup] OK - Schema check complete")
     except Exception as e:
-        print(f"[Startup] ⚠️  Schema check failed: {e}")
+        print(f"[Startup] WARNING -Schema check failed: {e}")
         import traceback
         traceback.print_exc()
 
@@ -45,9 +52,9 @@ async def startup_event():
     try:
         from scripts.sync_korean_names import sync_korean_names
         sync_korean_names()
-        print("[Startup] ✓ Korean names sync complete")
+        print("[Startup] OK - Korean names sync complete")
     except Exception as e:
-        print(f"[Startup] ⚠️  Korean names sync failed: {e}")
+        print(f"[Startup] WARNING -Korean names sync failed: {e}")
         import traceback
         traceback.print_exc()
 
@@ -68,18 +75,18 @@ async def startup_event():
         """)
         db.execute_update("CREATE INDEX IF NOT EXISTS idx_bookmarks_user_id ON activity_bookmarks(user_id)")
         db.execute_update("CREATE INDEX IF NOT EXISTS idx_bookmarks_activity_id ON activity_bookmarks(activity_id)")
-        print("[Startup] ✓ Bookmarks table ready")
+        print("[Startup] OK - Bookmarks table ready")
     except Exception as e:
-        print(f"[Startup] ⚠️  Failed to create bookmarks table: {e}")
+        print(f"[Startup] WARNING -Failed to create bookmarks table: {e}")
 
     # 4. Add preferred_language column if needed
-    print("\n🗄️ Checking database schema...")
+    print("\n[DB] Checking database schema...")
     try:
         from scripts.add_preferred_language import add_preferred_language_column
         add_preferred_language_column()
         print("✅ Database schema up to date!\n")
     except Exception as e:
-        print(f"⚠️ Failed to update schema: {e}\n")
+        print(f"WARNING: Failed to update schema: {e}\n")
 
     # 5. Verify existing users (one-time migration for email verification feature)
     print("👤 Verifying existing users...")
@@ -88,7 +95,7 @@ async def startup_event():
         verify_existing_users()
         print("✅ Existing users verified!\n")
     except Exception as e:
-        print(f"⚠️ Failed to verify existing users: {e}\n")
+        print(f"WARNING: Failed to verify existing users: {e}\n")
 
     # 6. Fix triggers
     print("🔧 Checking and fixing database triggers...")
@@ -97,7 +104,7 @@ async def startup_event():
         fix_triggers()
         print("✅ Triggers fixed successfully!\n")
     except Exception as e:
-        print(f"⚠️ Failed to fix triggers: {e}")
+        print(f"WARNING: Failed to fix triggers: {e}")
         print("Server will continue, but rating save may fail.\n")
 
     # 7. Add activity indexes for performance
@@ -107,7 +114,7 @@ async def startup_event():
         add_indexes()
         print("✅ Indexes created successfully!\n")
     except Exception as e:
-        print(f"⚠️ Failed to add indexes: {e}")
+        print(f"WARNING: Failed to add indexes: {e}")
         print("Server will continue, but queries may be slow.\n")
 
     # 8. CRITICAL: Backfill anime_title_native and item_title_native for ALL activities
@@ -194,7 +201,7 @@ async def startup_event():
         print(f"   - {char_count['count'] if char_count else 0} character names")
         print(f"   - {anime_count['count'] if anime_count else 0} anime activity titles\n")
     except Exception as e:
-        print(f"⚠️ Failed to backfill titles: {e}")
+        print(f"WARNING: Failed to backfill titles: {e}")
         print("Server will continue, but Japanese titles may not display.\n")
         import traceback
         traceback.print_exc()
@@ -404,9 +411,9 @@ if os.path.exists(frontend_dist):
 
         return response
 
-    print(f"[Startup] ✓ Serving React frontend from: {frontend_dist}")
+    print(f"[Startup] OK - Serving React frontend from: {frontend_dist}")
 else:
-    print(f"[Startup] ⚠️  Frontend dist not found at: {frontend_dist}")
+    print(f"[Startup] WARNING - Frontend dist not found at: {frontend_dist}")
 
 
 if __name__ == "__main__":
