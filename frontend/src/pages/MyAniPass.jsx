@@ -829,7 +829,8 @@ export default function MyAniPass() {
       }
     }
 
-    if (imageUrl.startsWith('http')) return imageUrl;
+    // External URLs (AniList, etc) - use placeholder
+    if (imageUrl.startsWith('http')) return '/placeholder-anime.svg';
 
     const processedUrl = imageUrl.includes('/covers/')
       ? imageUrl.replace('/covers/', '/covers_large/')

@@ -250,13 +250,13 @@ export default function Feed() {
       }
     }
 
-    // If it's already a relative path, use IMAGE_BASE_URL
+    // If it's a relative path, use IMAGE_BASE_URL
     if (!url.startsWith('http')) {
       return `${IMAGE_BASE_URL}${url}`;
     }
 
-    // Otherwise use as-is
-    return url;
+    // External URLs (AniList, etc) - use placeholder
+    return '/placeholder-anime.svg';
   };
 
   const getTimeAgo = (timestamp) => {
@@ -427,11 +427,11 @@ export default function Feed() {
           await activityService.deleteActivity(activity.id);
         }
       } else if (deleteType === 'review_only' && hasReview) {
-        // 리뷰만 삭제 (별점은 유지)
+        // 리뷰만 삭제 (별점은 유지) - item_id로 삭제
         if (isAnime) {
-          await reviewService.deleteReview(activity.id);
+          await reviewService.deleteMyReview(activity.item_id);
         } else {
-          await characterReviewService.deleteReview(activity.id);
+          await characterReviewService.deleteMyReview(activity.item_id);
         }
       } else {
         // 별점까지 모두 삭제
@@ -442,14 +442,19 @@ export default function Feed() {
         }
       }
 
+      // 삭제 성공 - 모달 닫기
       setShowDeleteModal(false);
       setActivityToDelete(null);
 
-      // Refresh activities: reset and reload
-      resetActivities();
-      // Wait a bit for reset to complete, then reload
-      await new Promise(resolve => setTimeout(resolve, 100));
-      await loadMore(false);
+      // Refresh activities: reset and reload (에러 발생해도 삭제는 이미 완료됨)
+      try {
+        resetActivities();
+        await new Promise(resolve => setTimeout(resolve, 100));
+        await loadMore(false);
+      } catch (refreshErr) {
+        console.error('Failed to refresh after delete:', refreshErr);
+        // 새로고침 실패해도 삭제는 성공했으므로 에러 표시 안함
+      }
     } catch (err) {
       console.error('Failed to delete:', err);
       alert(language === 'ko' ? '삭제에 실패했습니다.' : language === 'ja' ? '削除に失敗しました' : 'Failed to delete.');

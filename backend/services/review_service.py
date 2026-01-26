@@ -216,6 +216,46 @@ def delete_review(review_id: int, user_id: int) -> bool:
     return True
 
 
+def delete_review_by_anime(user_id: int, anime_id: int) -> bool:
+    """anime_id로 리뷰 삭제 (관련 댓글과 좋아요도 함께 삭제)"""
+
+    # 리뷰 찾기
+    existing = db.execute_query(
+        "SELECT id FROM user_reviews WHERE user_id = ? AND anime_id = ?",
+        (user_id, anime_id),
+        fetch_one=True
+    )
+
+    if not existing:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Review not found"
+        )
+
+    review_id = existing['id']
+
+    # 관련 댓글 삭제 (review_comments)
+    db.execute_update(
+        "DELETE FROM review_comments WHERE review_id = ? AND review_type = 'anime'",
+        (review_id,)
+    )
+
+    # 관련 좋아요 삭제 (review_likes)
+    db.execute_update(
+        "DELETE FROM review_likes WHERE review_id = ?",
+        (review_id,)
+    )
+
+    # 리뷰 삭제
+    db.execute_update("DELETE FROM user_reviews WHERE id = ?", (review_id,))
+
+    # 사용자 통계 업데이트
+    from services.rating_service import _update_user_stats
+    _update_user_stats(user_id)
+
+    return True
+
+
 def get_review_by_id(review_id: int) -> Optional[ReviewResponse]:
     """리뷰 ID로 조회"""
 

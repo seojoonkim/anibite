@@ -33,9 +33,15 @@ export const reviewService = {
     return response.data;
   },
 
-  // Delete review
+  // Delete review by review ID
   async deleteReview(reviewId) {
     const response = await api.delete(`/api/reviews/${reviewId}`);
+    return response.data;
+  },
+
+  // Delete my review by anime ID (더 편리한 방법)
+  async deleteMyReview(animeId) {
+    const response = await api.delete(`/api/reviews/anime/${animeId}/my-review`);
     return response.data;
   },
 

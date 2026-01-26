@@ -138,12 +138,12 @@ export default function RateCharacters() {
     if (!rating || rating === 0) return;
 
     try {
-      // Add animation effect
-      setCharacters(characters.map(char =>
+      // Add animation effect - use functional updates to avoid stale closure
+      setCharacters(prev => prev.map(char =>
         char.id === characterId ? { ...char, _animating: true } : char
       ));
       setTimeout(() => {
-        setCharacters(characters.map(char =>
+        setCharacters(prev => prev.map(char =>
           char.id === characterId ? { ...char, _animating: false } : char
         ));
       }, 600);
@@ -157,11 +157,11 @@ export default function RateCharacters() {
         window.dispatchEvent(new Event('storage'));
       }
 
-      // Update the character in both lists for immediate UI update
-      setCharacters(characters.map(char =>
+      // Update the character in both lists for immediate UI update - use functional updates
+      setCharacters(prev => prev.map(char =>
         char.id === characterId ? { ...char, my_rating: rating, my_status: 'RATED' } : char
       ));
-      setAllCharacters(allCharacters.map(char =>
+      setAllCharacters(prev => prev.map(char =>
         char.id === characterId ? { ...char, my_rating: rating, my_status: 'RATED' } : char
       ));
 
@@ -181,12 +181,12 @@ export default function RateCharacters() {
 
   const handleStatusChange = async (characterId, status) => {
     try {
-      // Add animation effect
-      setCharacters(characters.map(char =>
+      // Add animation effect - use functional updates to avoid stale closure
+      setCharacters(prev => prev.map(char =>
         char.id === characterId ? { ...char, _animating: true } : char
       ));
       setTimeout(() => {
-        setCharacters(characters.map(char =>
+        setCharacters(prev => prev.map(char =>
           char.id === characterId ? { ...char, _animating: false } : char
         ));
       }, 600);
@@ -210,11 +210,11 @@ export default function RateCharacters() {
         [characterId]: newStatus
       }));
 
-      // Update my_status and clear rating in both character lists
-      setCharacters(characters.map(char =>
+      // Update my_status and clear rating in both character lists - use functional updates
+      setCharacters(prev => prev.map(char =>
         char.id === characterId ? { ...char, my_status: newStatus, my_rating: 0 } : char
       ));
-      setAllCharacters(allCharacters.map(char =>
+      setAllCharacters(prev => prev.map(char =>
         char.id === characterId ? { ...char, my_status: newStatus, my_rating: 0 } : char
       ));
 
