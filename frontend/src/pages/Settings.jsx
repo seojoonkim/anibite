@@ -273,11 +273,11 @@ export default function Settings() {
         {/* Settings Sections */}
         <div className="space-y-6">
           {/* Language Section */}
-          <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
-            <h2 className="text-xl font-bold mb-4">
+          <div className="bg-surface rounded-lg shadow-lg border border-border p-6">
+            <h2 className="text-xl font-bold text-text-primary mb-4">
               {language === 'ko' ? '언어 설정' : language === 'ja' ? '言語設定' : 'Language Settings'}
             </h2>
-            <p className="text-gray-600 mb-4 text-sm">
+            <p className="text-text-secondary mb-4 text-sm">
               {language === 'ko'
                 ? '사용할 언어를 선택하세요'
                 : language === 'ja'
@@ -289,8 +289,8 @@ export default function Settings() {
                 onClick={() => setLanguage('ko')}
                 className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
                   language === 'ko'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-primary text-text-primary'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                 }`}
               >
                 🇰🇷 한국어
@@ -299,8 +299,8 @@ export default function Settings() {
                 onClick={() => setLanguage('en')}
                 className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
                   language === 'en'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-primary text-text-primary'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                 }`}
               >
                 🇺🇸 English
@@ -309,8 +309,8 @@ export default function Settings() {
                 onClick={() => setLanguage('ja')}
                 className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
                   language === 'ja'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-primary text-text-primary'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                 }`}
               >
                 🇯🇵 日本語
@@ -319,15 +319,15 @@ export default function Settings() {
           </div>
 
           {/* Profile Picture Section */}
-          <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
+          <div className="bg-surface rounded-lg shadow-lg border border-border p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">
+              <h2 className="text-xl font-bold text-text-primary">
                 {language === 'ko' ? '프로필 사진' : language === 'ja' ? 'プロフィール写真' : 'Profile Picture'}
               </h2>
               {!isChangingAvatar && (
                 <button
                   onClick={handleAvatarChange}
-                  className="text-sm text-[#3498DB] hover:text-blue-700 font-medium"
+                  className="text-sm text-primary hover:text-primary-light font-medium"
                 >
                   {language === 'ko' ? '변경' : language === 'ja' ? '変更' : 'Change'}
                 </button>
@@ -335,13 +335,13 @@ export default function Settings() {
             </div>
 
             {avatarSuccess && (
-              <div className="mb-4 p-3 bg-green-100 border border-green-300 text-green-800 rounded-md text-sm">
+              <div className="mb-4 p-3 bg-success/20 border border-success/40 text-success rounded-md text-sm">
                 {avatarSuccess}
               </div>
             )}
 
             {avatarError && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-800 rounded-md text-sm">
+              <div className="mb-4 p-3 bg-error/20 border border-error/40 text-error rounded-md text-sm">
                 {avatarError}
               </div>
             )}
@@ -352,20 +352,20 @@ export default function Settings() {
                   <img
                     src={getAvatarUrl(user.avatar_url)}
                     alt="Profile"
-                    className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                    className="w-20 h-20 rounded-full object-cover border-2 border-border"
                     onError={(e) => {
                       e.target.src = '';
                       e.target.style.display = 'none';
                     }}
                   />
                 ) : (
-                  <div className="w-20 h-20 rounded-full gradient-custom-profile flex items-center justify-center border-2 border-gray-200">
-                    <span className="text-white text-3xl font-bold">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center border-2 border-border">
+                    <span className="text-text-primary text-3xl font-bold">
                       {(user?.display_name || user?.username || '?').charAt(0).toUpperCase()}
                     </span>
                   </div>
                 )}
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-text-secondary">
                   {language === 'ko'
                     ? '프로필 사진을 변경하려면 변경 버튼을 클릭하세요.'
                     : language === 'ja'
@@ -379,11 +379,11 @@ export default function Settings() {
                 {(
                   <div>
                     {loadingCharacters ? (
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-text-secondary">
                         {language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...'}
                       </p>
                     ) : fiveStarCharacters.length === 0 ? (
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-text-secondary">
                         {language === 'ko'
                           ? '5점 평가한 캐릭터가 없습니다. 캐릭터를 평가해보세요!'
                           : language === 'ja'
@@ -392,7 +392,7 @@ export default function Settings() {
                       </p>
                     ) : (
                       <>
-                        <p className="text-sm font-medium text-gray-700 mb-3">
+                        <p className="text-sm font-medium text-text-secondary mb-3">
                           {language === 'ko' ? '5점 준 캐릭터 중에서 선택하세요' : language === 'ja' ? '5つ星を付けたキャラクターから選んでください' : 'Choose from your 5-star rated characters'}
                         </p>
                         <div className="grid grid-cols-4 gap-3 max-h-96 overflow-y-auto">
@@ -402,8 +402,8 @@ export default function Settings() {
                               onClick={() => setSelectedCharacterId(char.character_id)}
                               className={`flex flex-col items-center p-2 rounded-lg border-2 transition-all ${
                                 selectedCharacterId === char.character_id
-                                  ? 'border-blue-500 bg-blue-50'
-                                  : 'border-gray-200 hover:border-gray-300'
+                                  ? 'border-primary bg-primary/10'
+                                  : 'border-border hover:border-border-hover'
                               }`}
                             >
                               <img
@@ -414,7 +414,7 @@ export default function Settings() {
                                   e.target.src = '/placeholder-avatar.png';
                                 }}
                               />
-                              <span className="text-xs text-center line-clamp-2">
+                              <span className="text-xs text-center line-clamp-2 text-text-primary">
                                 {char.name_full}
                               </span>
                             </button>
@@ -429,13 +429,13 @@ export default function Settings() {
                 <div className="flex gap-3 pt-2">
                   <button
                     onClick={handleAvatarSave}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
+                    className="px-4 py-2 bg-primary text-text-primary rounded-md hover:bg-primary-dark transition-colors font-medium"
                   >
                     {language === 'ko' ? '저장' : language === 'ja' ? '保存' : 'Save'}
                   </button>
                   <button
                     onClick={handleAvatarCancel}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
+                    className="px-4 py-2 bg-surface-elevated text-text-secondary rounded-md hover:bg-surface-hover transition-colors font-medium"
                   >
                     {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                   </button>
@@ -443,16 +443,16 @@ export default function Settings() {
               </div>
             )}
           </div>
-          {/* Profile Picture Section */}
-          <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
+          {/* Profile Information Section */}
+          <div className="bg-surface rounded-lg shadow-lg border border-border p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">
+              <h2 className="text-xl font-bold text-text-primary">
                 {language === 'ko' ? '프로필 정보' : language === 'ja' ? 'プロフィール情報' : 'Profile Information'}
               </h2>
               {!isEditingProfile && (
                 <button
                   onClick={handleProfileEdit}
-                  className="text-sm text-[#3498DB] hover:text-blue-700 font-medium"
+                  className="text-sm text-primary hover:text-primary-light font-medium"
                 >
                   {language === 'ko' ? '편집' : language === 'ja' ? '編集' : 'Edit'}
                 </button>
@@ -460,34 +460,34 @@ export default function Settings() {
             </div>
 
             {profileSuccess && (
-              <div className="mb-4 p-3 bg-green-100 border border-green-300 text-green-800 rounded-md text-sm">
+              <div className="mb-4 p-3 bg-success/20 border border-success/40 text-success rounded-md text-sm">
                 {profileSuccess}
               </div>
             )}
 
             {profileError && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-800 rounded-md text-sm">
+              <div className="mb-4 p-3 bg-error/20 border border-error/40 text-error rounded-md text-sm">
                 {profileError}
               </div>
             )}
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-text-secondary mb-1">
                   {language === 'ko' ? '사용자명' : language === 'ja' ? 'ユーザー名' : 'Username'}
                 </label>
                 <input
                   type="text"
                   value={user?.username || ''}
                   disabled
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
+                  className="w-full px-3 py-2 border border-border rounded-md bg-surface-elevated text-text-tertiary"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-text-tertiary mt-1">
                   {language === 'ko' ? '사용자명은 변경할 수 없습니다.' : language === 'ja' ? 'ユーザー名は変更できません。' : 'Username cannot be changed.'}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-text-secondary mb-1">
                   {language === 'ko' ? '이메일' : language === 'ja' ? 'メールアドレス' : 'Email'}
                 </label>
                 <input
@@ -495,13 +495,13 @@ export default function Settings() {
                   value={isEditingProfile ? profileData.email : (user?.email || '')}
                   disabled={!isEditingProfile}
                   onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
-                    isEditingProfile ? 'bg-white text-gray-900' : 'bg-gray-50 text-gray-500'
+                  className={`w-full px-3 py-2 border border-border rounded-md ${
+                    isEditingProfile ? 'bg-input text-text-primary focus:bg-input-focus focus:border-border-focus' : 'bg-surface-elevated text-text-tertiary'
                   }`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-text-secondary mb-1">
                   {language === 'ko' ? '표시 이름' : language === 'ja' ? '表示名' : 'Display Name'}
                 </label>
                 <input
@@ -509,8 +509,8 @@ export default function Settings() {
                   value={isEditingProfile ? profileData.display_name : (user?.display_name || '')}
                   disabled={!isEditingProfile}
                   onChange={(e) => setProfileData({ ...profileData, display_name: e.target.value })}
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
-                    isEditingProfile ? 'bg-white text-gray-900' : 'bg-gray-50 text-gray-500'
+                  className={`w-full px-3 py-2 border border-border rounded-md ${
+                    isEditingProfile ? 'bg-input text-text-primary focus:bg-input-focus focus:border-border-focus' : 'bg-surface-elevated text-text-tertiary'
                   }`}
                 />
               </div>
@@ -519,13 +519,13 @@ export default function Settings() {
                 <div className="flex gap-3 pt-2">
                   <button
                     onClick={handleProfileSave}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
+                    className="px-4 py-2 bg-primary text-text-primary rounded-md hover:bg-primary-dark transition-colors font-medium"
                   >
                     {language === 'ko' ? '저장' : language === 'ja' ? '保存' : 'Save'}
                   </button>
                   <button
                     onClick={handleProfileCancel}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
+                    className="px-4 py-2 bg-surface-elevated text-text-secondary rounded-md hover:bg-surface-hover transition-colors font-medium"
                   >
                     {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                   </button>
@@ -536,15 +536,15 @@ export default function Settings() {
 
 
           {/* Password Section */}
-          <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
+          <div className="bg-surface rounded-lg shadow-lg border border-border p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">
+              <h2 className="text-xl font-bold text-text-primary">
                 {language === 'ko' ? '비밀번호' : language === 'ja' ? 'パスワード' : 'Password'}
               </h2>
               {!isChangingPassword && (
                 <button
                   onClick={handlePasswordChange}
-                  className="text-sm text-[#3498DB] hover:text-blue-700 font-medium"
+                  className="text-sm text-primary hover:text-primary-light font-medium"
                 >
                   {language === 'ko' ? '변경' : language === 'ja' ? '変更' : 'Change'}
                 </button>
@@ -552,70 +552,70 @@ export default function Settings() {
             </div>
 
             {passwordSuccess && (
-              <div className="mb-4 p-3 bg-green-100 border border-green-300 text-green-800 rounded-md text-sm">
+              <div className="mb-4 p-3 bg-success/20 border border-success/40 text-success rounded-md text-sm">
                 {passwordSuccess}
               </div>
             )}
 
             {passwordError && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-800 rounded-md text-sm">
+              <div className="mb-4 p-3 bg-error/20 border border-error/40 text-error rounded-md text-sm">
                 {passwordError}
               </div>
             )}
 
             {!isChangingPassword ? (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-text-secondary">
                 {language === 'ko' ? '보안을 위해 정기적으로 비밀번호를 변경하세요.' : language === 'ja' ? 'セキュリティのため定期的にパスワードを変更してください。' : 'Change your password regularly for security.'}
               </p>
             ) : (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-secondary mb-1">
                     {language === 'ko' ? '현재 비밀번호' : language === 'ja' ? '現在のパスワード' : 'Current Password'}
                   </label>
                   <input
                     type="password"
                     value={passwordData.current_password}
                     onChange={(e) => setPasswordData({ ...passwordData, current_password: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className="w-full px-3 py-2 border border-border rounded-md bg-input text-text-primary focus:bg-input-focus focus:border-border-focus"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-secondary mb-1">
                     {language === 'ko' ? '새 비밀번호' : language === 'ja' ? '新しいパスワード' : 'New Password'}
                   </label>
                   <input
                     type="password"
                     value={passwordData.new_password}
                     onChange={(e) => setPasswordData({ ...passwordData, new_password: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className="w-full px-3 py-2 border border-border rounded-md bg-input text-text-primary focus:bg-input-focus focus:border-border-focus"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-text-tertiary mt-1">
                     {language === 'ko' ? '최소 8자 이상' : language === 'ja' ? '最低8文字以上' : 'At least 8 characters'}
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-secondary mb-1">
                     {language === 'ko' ? '새 비밀번호 확인' : language === 'ja' ? '新しいパスワード確認' : 'Confirm New Password'}
                   </label>
                   <input
                     type="password"
                     value={passwordData.confirm_password}
                     onChange={(e) => setPasswordData({ ...passwordData, confirm_password: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className="w-full px-3 py-2 border border-border rounded-md bg-input text-text-primary focus:bg-input-focus focus:border-border-focus"
                   />
                 </div>
 
                 <div className="flex gap-3 pt-2">
                   <button
                     onClick={handlePasswordSave}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
+                    className="px-4 py-2 bg-primary text-text-primary rounded-md hover:bg-primary-dark transition-colors font-medium"
                   >
                     {language === 'ko' ? '저장' : language === 'ja' ? '保存' : 'Save'}
                   </button>
                   <button
                     onClick={handlePasswordCancel}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
+                    className="px-4 py-2 bg-surface-elevated text-text-secondary rounded-md hover:bg-surface-hover transition-colors font-medium"
                   >
                     {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                   </button>
@@ -625,13 +625,13 @@ export default function Settings() {
           </div>
 
           {/* About Section */}
-          <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
-            <h2 className="text-xl font-bold mb-4">
+          <div className="bg-surface rounded-lg shadow-lg border border-border p-6">
+            <h2 className="text-xl font-bold text-text-primary mb-4">
               {language === 'ko' ? '애플리케이션 정보' : language === 'ja' ? 'アプリケーション情報' : 'About'}
             </h2>
-            <div className="space-y-2 text-sm text-gray-600">
+            <div className="space-y-2 text-sm text-text-secondary">
               <p>
-                <span className="font-medium">AniPass</span> - {language === 'ko' ? '애니메이션 평가 플랫폼' : language === 'ja' ? 'アニメ評価プラットフォーム' : 'Anime Rating Platform'}
+                <span className="font-medium text-primary">AniPass</span> - {language === 'ko' ? '애니메이션 평가 플랫폼' : language === 'ja' ? 'アニメ評価プラットフォーム' : 'Anime Rating Platform'}
               </p>
               <p>Version 1.0.0</p>
               <p className="mt-4">
@@ -649,7 +649,7 @@ export default function Settings() {
         <div className="mt-8">
           <button
             onClick={() => navigate(-1)}
-            className="text-[#3498DB] hover:text-blue-700 font-medium"
+            className="text-primary hover:text-primary-light font-medium"
           >
             ← {language === 'ko' ? '뒤로 가기' : language === 'ja' ? '戻る' : 'Go Back'}
           </button>

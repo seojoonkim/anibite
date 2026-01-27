@@ -24,6 +24,12 @@ export default {
         'surface-elevated': 'var(--color-surface-elevated)',
         'surface-hover': 'var(--color-surface-hover)',
 
+        // Input field colors - darker for distinction
+        input: {
+          DEFAULT: 'var(--color-input)',
+          focus: 'var(--color-input-focus)',
+        },
+
         primary: {
           DEFAULT: 'var(--color-primary)',
           dark: 'var(--color-primary-dark)',
@@ -39,6 +45,11 @@ export default {
           dark: 'var(--color-accent-dark)',
           light: 'var(--color-accent-light)',
         },
+        tertiary: {
+          DEFAULT: 'var(--color-tertiary)',
+          dark: 'var(--color-tertiary-dark)',
+          light: 'var(--color-tertiary-light)',
+        },
 
         text: {
           primary: 'var(--color-text-primary)',
@@ -49,6 +60,7 @@ export default {
         border: {
           DEFAULT: 'var(--color-border)',
           hover: 'var(--color-border-hover)',
+          focus: 'var(--color-border-focus)',
         },
 
         success: 'var(--color-success)',

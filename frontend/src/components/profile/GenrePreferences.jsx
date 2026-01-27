@@ -5,11 +5,11 @@ export default function GenrePreferences({ preferences }) {
 
   if (!preferences || preferences.length === 0) {
     return (
-      <div className="bg-gradient-to-br from-white to-purple-50/30 rounded-xl shadow-sm border border-purple-100/50 p-6 w-full h-full flex flex-col">
-        <h3 className="text-lg font-bold text-[#638CCC] mb-4">
+      <div className="bg-surface rounded-xl shadow-lg border border-border p-6 w-full h-full flex flex-col">
+        <h3 className="text-lg font-bold text-primary mb-4">
           {language === 'ko' ? '선호 장르' : language === 'ja' ? 'お気に入りのジャンル' : 'Favorite Genres'}
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-text-secondary">
           {language === 'ko' ? '아직 충분한 데이터가 없습니다.' : language === 'ja' ? 'まだ十分なデータがありません。' : 'Not enough data yet.'}
         </p>
       </div>
@@ -18,21 +18,21 @@ export default function GenrePreferences({ preferences }) {
 
   const maxCount = Math.max(...preferences.map((p) => p.count));
 
-  // 각 장르마다 다른 그라데이션 색상
+  // 각 장르마다 다른 그라데이션 색상 - Neon terminal style
   const getGradient = (index) => {
     const gradients = [
-      'linear-gradient(135deg, #8EC5FC 0%, #638CCC 100%)',
-      'linear-gradient(135deg, #90B2E4 0%, #8EC5FC 100%)',
-      'linear-gradient(135deg, #638CCC 0%, #90B2E4 100%)',
-      'linear-gradient(135deg, #8EC5FC 0%, #90B2E4 100%)',
-      'linear-gradient(135deg, #638CCC 0%, #8EC5FC 100%)',
+      'linear-gradient(135deg, #58a6ff 0%, #388bfd 100%)', // Primary blue
+      'linear-gradient(135deg, #f778ba 0%, #db61a2 100%)', // Secondary pink
+      'linear-gradient(135deg, #3fb950 0%, #2ea043 100%)', // Tertiary green
+      'linear-gradient(135deg, #f0b429 0%, #d29922 100%)', // Accent gold
+      'linear-gradient(135deg, #79c0ff 0%, #58a6ff 100%)', // Light blue
     ];
     return gradients[index % gradients.length];
   };
 
   return (
-    <div className="bg-gradient-to-br from-white to-purple-50/30 rounded-xl shadow-sm border border-purple-100/50 p-6 w-full h-full flex flex-col">
-      <h3 className="text-lg font-bold text-[#638CCC] mb-4">
+    <div className="bg-surface rounded-xl shadow-lg border border-border p-6 w-full h-full flex flex-col">
+      <h3 className="text-lg font-bold text-primary mb-4">
         {language === 'ko' ? '선호 장르 Top 5' : language === 'ja' ? 'お気に入りのジャンルTOP 5' : 'Top 5 Favorite Genres'}
       </h3>
 
@@ -43,22 +43,22 @@ export default function GenrePreferences({ preferences }) {
           return (
             <div key={pref.genre}>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-bold text-[#638CCC]">
+                <span className="text-sm font-bold text-text-primary">
                   {pref.genre}
                 </span>
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-gray-600 font-medium">
+                  <span className="text-text-secondary font-medium">
                     {pref.count}{language === 'ko' ? '작품' : language === 'ja' ? '作品' : ' works'}
                   </span>
                   {pref.average_rating && (
-                    <span className="font-bold flex items-center gap-0.5 text-amber-500">
+                    <span className="font-bold flex items-center gap-0.5 text-accent">
                       <span>★</span>
                       <span>{pref.average_rating.toFixed(1)}</span>
                     </span>
                   )}
                 </div>
               </div>
-              <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-surface-elevated rounded-full h-2 overflow-hidden">
                 <div
                   className="h-2 rounded-full transition-all duration-500 shadow-sm"
                   style={{ width: `${percentage}%`, background: getGradient(index) }}

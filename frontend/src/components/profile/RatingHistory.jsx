@@ -7,9 +7,9 @@ export default function RatingHistory({ ratings }) {
   const { language } = useLanguage();
   if (!ratings || ratings.length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">최근 평가</h3>
-        <p className="text-sm text-gray-500">아직 평가한 애니메이션이 없습니다.</p>
+      <div className="bg-surface rounded-xl shadow-lg border border-border p-6">
+        <h3 className="text-lg font-semibold text-text-primary mb-4">최근 평가</h3>
+        <p className="text-sm text-text-secondary">아직 평가한 애니메이션이 없습니다.</p>
       </div>
     );
   }
@@ -35,8 +35,8 @@ export default function RatingHistory({ ratings }) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+    <div className="bg-surface rounded-xl shadow-lg border border-border p-6">
+      <h3 className="text-lg font-semibold text-text-primary mb-4">
         최근 평가 ({ratings.length})
       </h3>
 
@@ -46,19 +46,19 @@ export default function RatingHistory({ ratings }) {
             <Link
               key={rating.anime_id}
               to={`/anime/${rating.anime_id}`}
-              className="flex gap-4 p-3 rounded-lg hover:bg-gray-50 transition-all border border-gray-100 hover:border-[#3498DB] cursor-pointer group"
+              className="flex gap-4 p-3 rounded-lg hover:bg-surface-hover transition-all border border-border hover:border-primary cursor-pointer group"
             >
               <img
                 src={getImageUrl(rating.cover_image_url || rating.image_url)}
                 alt={getDisplayTitle(rating)}
-                className="w-12 h-16 object-cover rounded flex-shrink-0 border-2 border-transparent group-hover:border-[#3498DB] transition-all"
+                className="w-12 h-16 object-cover rounded flex-shrink-0 border-2 border-transparent group-hover:border-primary transition-all"
                 onError={(e) => {
                   e.target.src = '/placeholder-anime.svg';
                 }}
               />
 
               <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-medium text-gray-900 mb-1 truncate group-hover:text-[#3498DB] transition-colors">
+                <h4 className="text-sm font-medium text-text-primary mb-1 truncate group-hover:text-primary transition-colors">
                   {getDisplayTitle(rating)}
                 </h4>
 
@@ -68,7 +68,7 @@ export default function RatingHistory({ ratings }) {
                   </div>
                 )}
 
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-text-tertiary">
                   {new Date(rating.created_at).toLocaleDateString('ko-KR')}
                 </p>
               </div>
