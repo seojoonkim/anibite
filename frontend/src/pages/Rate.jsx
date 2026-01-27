@@ -153,14 +153,14 @@ function RatingCard({ anime, onRate }) {
     } else if (displayRating >= position - 0.5) {
       return (
         <span className="relative inline-block">
-          <span className="text-gray-300">★</span>
+          <span className="text-white/40">★</span>
           <span className="absolute top-0 left-0 overflow-hidden w-1/2" style={gradientStyle}>
             ★
           </span>
         </span>
       );
     }
-    return <span className="text-gray-300">★</span>;
+    return <span className="text-white/40">★</span>;
   };
 
   const getCardBackgroundColor = () => {
@@ -199,10 +199,15 @@ function RatingCard({ anime, onRate }) {
               }}
             />
 
+            {/* Dark overlay for rated cards to make stars visible */}
+            {status === 'RATED' && currentRating > 0 && (
+              <div className="absolute inset-0 bg-black/40 group-hover:opacity-0 transition-opacity pointer-events-none" />
+            )}
+
             {/* Show clear rating on already rated anime */}
             {status === 'RATED' && currentRating > 0 && (
               <div className="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity pointer-events-none z-10">
-                <div className="flex justify-center gap-1" style={{ fontSize: starSize }}>
+                <div className="flex justify-center gap-1 drop-shadow-lg" style={{ fontSize: starSize }}>
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span key={star}>
                       {renderStar(star)}
@@ -264,7 +269,7 @@ function RatingCard({ anime, onRate }) {
                     className={`transition-colors underline-offset-2 hover:underline ${
                       status === 'WANT_TO_WATCH'
                         ? 'text-white font-semibold'
-                        : 'text-white/80 hover:text-white'
+                        : 'text-white/70 hover:text-white'
                     }`}
                   >
                     {t('watchLater')}
@@ -279,7 +284,7 @@ function RatingCard({ anime, onRate }) {
                     className={`transition-colors underline-offset-2 hover:underline ${
                       status === 'PASS'
                         ? 'text-white font-semibold'
-                        : 'text-white/60 hover:text-white/90'
+                        : 'text-white/70 hover:text-white'
                     }`}
                   >
                     {t('notInterested')}

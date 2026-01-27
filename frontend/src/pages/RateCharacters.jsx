@@ -407,10 +407,15 @@ export default function RateCharacters() {
                           </div>
                         )}
 
+                        {/* Dark overlay for rated cards */}
+                        {hasRated && hoveredCharacter !== character.id && (
+                          <div className="absolute inset-0 bg-black/40 pointer-events-none" />
+                        )}
+
                         {/* Show rating stars on rated characters */}
                         {hasRated && hoveredCharacter !== character.id && starSizes[character.id] && character.my_rating && character.my_rating > 0 && (
                           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                            <div className="flex gap-1" style={{ fontSize: starSizes[character.id] }}>
+                            <div className="flex gap-1 drop-shadow-lg" style={{ fontSize: starSizes[character.id] }}>
                               {[1, 2, 3, 4, 5].map((position) => {
                                 const rating = character.my_rating;
                                 const gradientStyle = {
@@ -425,12 +430,12 @@ export default function RateCharacters() {
                                 } else if (rating >= position - 0.5) {
                                   return (
                                     <span key={position} className="relative inline-block">
-                                      <span className="text-gray-300">★</span>
+                                      <span className="text-white/40">★</span>
                                       <span className="absolute top-0 left-0 overflow-hidden w-1/2" style={gradientStyle}>★</span>
                                     </span>
                                   );
                                 }
-                                return <span key={position} className="text-gray-300">★</span>;
+                                return <span key={position} className="text-white/40">★</span>;
                               })}
                             </div>
                           </div>
@@ -469,12 +474,12 @@ export default function RateCharacters() {
                                   } else if (displayRating >= position - 0.5) {
                                     starContent = (
                                       <span className="relative inline-block">
-                                        <span className="text-gray-300">★</span>
+                                        <span className="text-white/40">★</span>
                                         <span className="absolute top-0 left-0 overflow-hidden w-1/2" style={gradientStyle}>★</span>
                                       </span>
                                     );
                                   } else {
-                                    starContent = <span className="text-gray-300">★</span>;
+                                    starContent = <span className="text-white/40">★</span>;
                                   }
 
                                   return (
