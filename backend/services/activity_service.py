@@ -359,6 +359,20 @@ def like_activity(activity_id: int, user_id: int) -> bool:
     """Like an activity"""
     db = default_db
 
+    # Get activity details for the required fields
+    activity = db.execute_query(
+        "SELECT activity_type, user_id as activity_user_id, item_id FROM activities WHERE id = ?",
+        (activity_id,),
+        fetch_one=True
+    )
+
+    if not activity:
+        return False
+
+    activity_type = activity[0]
+    activity_user_id = activity[1]
+    item_id = activity[2]
+
     # Check if already liked
     existing = db.execute_query(
         "SELECT 1 FROM activity_likes WHERE activity_id = ? AND user_id = ?",
@@ -376,8 +390,10 @@ def like_activity(activity_id: int, user_id: int) -> bool:
     else:
         # Not liked, add like
         db.execute_insert(
-            "INSERT INTO activity_likes (activity_id, user_id, created_at) VALUES (?, ?, CURRENT_TIMESTAMP)",
-            (activity_id, user_id)
+            """INSERT INTO activity_likes
+               (activity_id, user_id, activity_type, activity_user_id, item_id, created_at)
+               VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)""",
+            (activity_id, user_id, activity_type, activity_user_id, item_id)
         )
         return True
 
