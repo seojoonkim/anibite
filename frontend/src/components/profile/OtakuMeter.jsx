@@ -23,7 +23,7 @@ export default function OtakuMeter({ score }) {
       <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-6 w-full h-full flex flex-col">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-base font-semibold text-gray-900">
-            {language === 'ko' ? '애니패스 등급' : language === 'ja' ? 'アニパス等級' : 'AniPass Grade'}
+            {language === 'ko' ? '애니바이트 등급' : language === 'ja' ? 'アニバイト等級' : 'AniBite Grade'}
           </h3>
           <button
             onClick={() => setShowRoadmap(true)}
@@ -126,7 +126,7 @@ export default function OtakuMeter({ score }) {
           <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[95vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
               <h3 className="text-lg font-bold text-gray-900">
-                {language === 'ko' ? '애니패스 등급 로드맵' : language === 'ja' ? 'アニパス等級ロードマップ' : 'AniPass Grade Roadmap'}
+                {language === 'ko' ? '애니바이트 등급 로드맵' : language === 'ja' ? 'アニバイト等級ロードマップ' : 'AniBite Grade Roadmap'}
               </h3>
               <button
                 onClick={() => setShowRoadmap(false)}
@@ -147,13 +147,12 @@ export default function OtakuMeter({ score }) {
                   return (
                     <div
                       key={level.name}
-                      className={`p-3 rounded-lg border-2 transition-all ${
-                        isCurrentLevel
+                      className={`p-3 rounded-lg border-2 transition-all ${isCurrentLevel
                           ? 'bg-gray-50'
                           : isPassed
-                          ? 'bg-gray-50 border-gray-200'
-                          : 'bg-white border-gray-200'
-                      }`}
+                            ? 'bg-gray-50 border-gray-200'
+                            : 'bg-white border-gray-200'
+                        }`}
                       style={isCurrentLevel ? { borderColor: '#8EC5FC' } : {}}
                     >
                       <div className="flex items-center gap-2 mb-1">

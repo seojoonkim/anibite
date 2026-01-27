@@ -1149,8 +1149,8 @@ export default function MyAniPass() {
         // Remove review content but keep rating activity
         setUserActivities(prev => prev.map(a =>
           (a.activity_type === activity.activity_type &&
-           a.user_id === activity.user_id &&
-           a.item_id === activity.item_id)
+            a.user_id === activity.user_id &&
+            a.item_id === activity.item_id)
             ? { ...a, review_content: '', review_id: null }
             : a
         ));
@@ -1344,44 +1344,40 @@ export default function MyAniPass() {
             <div className="flex border-b border-gray-200 overflow-x-auto">
               <button
                 onClick={() => changeTab('feed')}
-                className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
-                  activeTab === 'feed'
+                className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'feed'
                     ? 'border-b-2'
                     : 'text-gray-600 hover:text-gray-800'
-                }`}
+                  }`}
                 style={activeTab === 'feed' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
               >
                 {language === 'ko' ? '피드' : language === 'ja' ? 'フィード' : 'Feed'}
               </button>
               <button
                 onClick={() => changeTab('anipass')}
-                className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
-                  activeTab === 'anipass'
+                className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'anipass'
                     ? 'border-b-2'
                     : 'text-gray-600 hover:text-gray-800'
-                }`}
+                  }`}
                 style={activeTab === 'anipass' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
               >
-                {language === 'ko' ? '애니패스' : language === 'ja' ? 'AniPass' : 'AniPass'}
+                {language === 'ko' ? '애니바이트' : language === 'ja' ? 'AniBite' : 'AniBite'}
               </button>
               <button
                 onClick={() => changeTab('anime')}
-                className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
-                  activeTab === 'anime'
+                className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'anime'
                     ? 'border-b-2'
                     : 'text-gray-600 hover:text-gray-800'
-                }`}
+                  }`}
                 style={activeTab === 'anime' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
               >
                 {language === 'ko' ? '애니' : language === 'ja' ? 'アニメ' : 'Anime'}
               </button>
               <button
                 onClick={() => changeTab('character')}
-                className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
-                  activeTab === 'character'
+                className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'character'
                     ? 'border-b-2'
                     : 'text-gray-600 hover:text-gray-800'
-                }`}
+                  }`}
                 style={activeTab === 'character' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
               >
                 {language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character'}
@@ -1453,11 +1449,10 @@ export default function MyAniPass() {
             {!isOwnProfile && (
               <button
                 onClick={handleFollowToggle}
-                className={`ml-auto px-4 py-2 rounded-lg font-medium transition-colors ${
-                  isFollowing
+                className={`ml-auto px-4 py-2 rounded-lg font-medium transition-colors ${isFollowing
                     ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     : 'text-white'
-                }`}
+                  }`}
                 style={!isFollowing ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 onMouseEnter={(e) => !isFollowing && (e.target.style.backgroundColor = '#1877F2')}
                 onMouseLeave={(e) => !isFollowing && (e.target.style.backgroundColor = '#3797F0')}
@@ -1471,44 +1466,40 @@ export default function MyAniPass() {
           <div className="flex border-b border-gray-200 overflow-x-auto">
             <button
               onClick={() => changeTab('feed')}
-              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
-                activeTab === 'feed'
+              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'feed'
                   ? 'border-b-2'
                   : 'text-gray-600 hover:text-gray-800'
-              }`}
+                }`}
               style={activeTab === 'feed' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
             >
               {language === 'ko' ? '피드' : language === 'ja' ? 'フィード' : 'Feed'}
             </button>
             <button
               onClick={() => changeTab('anipass')}
-              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
-                activeTab === 'anipass'
+              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'anipass'
                   ? 'border-b-2'
                   : 'text-gray-600 hover:text-gray-800'
-              }`}
+                }`}
               style={activeTab === 'anipass' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
             >
               {language === 'ko' ? '애니패스' : language === 'ja' ? 'AniPass' : 'AniPass'}
             </button>
             <button
               onClick={() => changeTab('anime')}
-              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
-                activeTab === 'anime'
+              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'anime'
                   ? 'border-b-2'
                   : 'text-gray-600 hover:text-gray-800'
-              }`}
+                }`}
               style={activeTab === 'anime' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
             >
               {language === 'ko' ? '애니' : language === 'ja' ? 'アニメ' : 'Anime'} {stats && <span className="text-xs sm:text-sm">({(stats.total_rated || 0) + (stats.total_want_to_watch || 0) + (stats.total_pass || 0)})</span>}
             </button>
             <button
               onClick={() => changeTab('character')}
-              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
-                activeTab === 'character'
+              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'character'
                   ? 'border-b-2'
                   : 'text-gray-600 hover:text-gray-800'
-              }`}
+                }`}
               style={activeTab === 'character' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
             >
               {language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character'} {stats && <span className="text-xs sm:text-sm">({stats.total_character_ratings || 0})</span>}
@@ -1524,88 +1515,80 @@ export default function MyAniPass() {
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setAnimeSubMenu('all')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    animeSubMenu === 'all'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === 'all'
                       ? ''
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                   style={animeSubMenu === 'all' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
                   {language === 'ko' ? '모두' : language === 'ja' ? 'すべて' : 'All'}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('5')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    animeSubMenu === '5'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === '5'
                       ? ''
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                   style={animeSubMenu === '5' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
                   ⭐ 5{language === 'ko' ? '점' : language === 'ja' ? '点' : ''}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('4')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    animeSubMenu === '4'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === '4'
                       ? ''
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                   style={animeSubMenu === '4' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
                   ⭐ 4{language === 'ko' ? '점대' : language === 'ja' ? '点台' : '.0-4.5'}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('3')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    animeSubMenu === '3'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === '3'
                       ? 'text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                   style={animeSubMenu === '3' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
                   ⭐ 3{language === 'ko' ? '점대' : language === 'ja' ? '点台' : '.0-3.5'}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('2')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    animeSubMenu === '2'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === '2'
                       ? 'text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                   style={animeSubMenu === '2' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
                   ⭐ 2{language === 'ko' ? '점대' : language === 'ja' ? '点台' : '.0-2.5'}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('1')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    animeSubMenu === '1'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === '1'
                       ? 'text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                   style={animeSubMenu === '1' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
                   ⭐ {language === 'ko' ? '1점대 이하' : language === 'ja' ? '≤1.5' : '≤1.5'}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('watchlist')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    animeSubMenu === 'watchlist'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === 'watchlist'
                       ? 'text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                   style={animeSubMenu === 'watchlist' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
                   {language === 'ko' ? '보고싶어요' : language === 'ja' ? 'ウォッチリスト' : 'Watchlist'}
                 </button>
                 <button
                   onClick={() => setAnimeSubMenu('pass')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    animeSubMenu === 'pass'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === 'pass'
                       ? 'text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                   style={animeSubMenu === 'pass' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
                   {language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Pass'}
@@ -1616,88 +1599,80 @@ export default function MyAniPass() {
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setCharacterSubMenu('all')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    characterSubMenu === 'all'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === 'all'
                       ? ''
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                   style={characterSubMenu === 'all' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
                   {language === 'ko' ? '모두' : language === 'ja' ? 'すべて' : 'All'}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('5')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    characterSubMenu === '5'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === '5'
                       ? ''
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                   style={characterSubMenu === '5' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
                   ⭐ 5{language === 'ko' ? '점' : language === 'ja' ? '点' : ''}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('4')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    characterSubMenu === '4'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === '4'
                       ? ''
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                   style={characterSubMenu === '4' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
                   ⭐ 4{language === 'ko' ? '점대' : language === 'ja' ? '点台' : '.0-4.5'}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('3')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    characterSubMenu === '3'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === '3'
                       ? 'text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                   style={characterSubMenu === '3' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
                   ⭐ 3{language === 'ko' ? '점대' : language === 'ja' ? '点台' : '.0-3.5'}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('2')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    characterSubMenu === '2'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === '2'
                       ? 'text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                   style={characterSubMenu === '2' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
                   ⭐ 2{language === 'ko' ? '점대' : language === 'ja' ? '点台' : ''}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('1')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    characterSubMenu === '1'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === '1'
                       ? 'text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                   style={characterSubMenu === '1' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
                   ⭐ {language === 'ko' ? '1점대 이하' : language === 'ja' ? '≤1.5' : '≤1.5'}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('want')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    characterSubMenu === 'want'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === 'want'
                       ? 'text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                   style={characterSubMenu === 'want' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
                   {language === 'ko' ? '알고싶어요' : language === 'ja' ? '知りたい' : 'Want to Know'}
                 </button>
                 <button
                   onClick={() => setCharacterSubMenu('pass')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    characterSubMenu === 'pass'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === 'pass'
                       ? 'text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                   style={characterSubMenu === 'pass' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
                   {language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Pass'}
