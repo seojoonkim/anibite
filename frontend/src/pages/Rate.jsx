@@ -195,8 +195,6 @@ function RatingCard({ anime, onRate }) {
           <img
             src={getImageUrl(anime.cover_image_url)}
             alt={getAnimeTitle(anime)}
-            loading="lazy"
-            decoding="async"
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms]"
             onError={(e) => {
               e.target.src = '/placeholder-anime.svg';
@@ -314,11 +312,11 @@ function RatingCard({ anime, onRate }) {
               const titles = getAnimeTitle(anime, true);
               return (
                 <>
-                  <h3 className="font-semibold text-lg line-clamp-2 text-gray-900 leading-snug mb-1 group-hover/title:text-[#3498DB] transition-colors cursor-pointer">
+                  <h3 className="font-semibold text-lg line-clamp-2 text-text-primary leading-snug mb-1 group-hover/title:text-primary transition-colors cursor-pointer">
                     {titles.primary}
                   </h3>
                   {titles.secondary && (
-                    <p className="text-xs text-gray-500 line-clamp-1 mb-1">
+                    <p className="text-xs text-text-tertiary line-clamp-1 mb-1">
                       {titles.secondary}
                     </p>
                   )}
@@ -326,7 +324,7 @@ function RatingCard({ anime, onRate }) {
               );
             })()}
           </Link>
-          <div className="flex items-center gap-2 text-xs text-gray-500">
+          <div className="flex items-center gap-2 text-xs text-text-secondary">
             {anime.season_year && <span>{anime.season_year}</span>}
             {anime.episodes && <span>·</span>}
             {anime.episodes && <span>{anime.episodes}{t('episodes')}</span>}
@@ -337,45 +335,45 @@ function RatingCard({ anime, onRate }) {
 
       {/* 시리즈 일괄 처리 모달 */}
       {showSeriesModal && seriesInfo && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]" onClick={handleSeriesCancel}>
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold mb-4">{language === 'ko' ? '시리즈 일괄 처리' : language === 'ja' ? 'シリーズ一括処理' : 'Series Bulk Action'}</h3>
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[60]" onClick={handleSeriesCancel}>
+          <div className="bg-surface rounded-lg p-6 max-w-md w-full mx-4 border border-border" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold mb-4 text-text-primary">{language === 'ko' ? '시리즈 일괄 처리' : language === 'ja' ? 'シリーズ一括処理' : 'Series Bulk Action'}</h3>
 
             <div className="mb-4">
-              <p className="text-gray-700 mb-3">
+              <p className="text-text-secondary mb-3">
                 {language === 'ko' ? `이 작품은 ${seriesInfo.sequels.length}개의 후속작이 있습니다.` : language === 'ja' ? `この作品は${seriesInfo.sequels.length}個の続編があります。` : `This work has ${seriesInfo.sequels.length} sequels.`}
               </p>
 
-              <div className="bg-[#F5F5F5] border-2 rounded-lg p-4 mb-3" style={{ borderColor: '#A8E6CF' }}>
-                <p className="text-sm font-medium text-[#34495E] mb-2">
+              <div className="bg-surface-elevated border border-tertiary rounded-lg p-4 mb-3">
+                <p className="text-sm font-medium text-text-primary mb-2">
                   {language === 'ko' ? '후속작 목록:' : language === 'ja' ? '続編リスト:' : 'Sequels:'}
                 </p>
                 <div className="max-h-32 overflow-y-auto space-y-1">
                   {seriesInfo.sequels.map((sequel, index) => (
-                    <p key={sequel.id} className="text-sm text-gray-700">
+                    <p key={sequel.id} className="text-sm text-text-secondary">
                       {index + 1}. {sequel.title_korean || sequel.title_romaji}
                     </p>
                   ))}
                 </div>
               </div>
 
-              <p className="text-gray-700 mb-2">
+              <p className="text-text-secondary mb-2">
                 {language === 'ko' ? (
-                  <>이 작품과 모든 후속작에 <strong style={{ color: '#364F6B' }}>
+                  <>이 작품과 모든 후속작에 <strong className="text-primary">
                     {pendingStatus === 'WANT_TO_WATCH' ? t('watchLater') : t('notInterested')}
                   </strong>를 적용하시겠습니까?</>
                 ) : language === 'ja' ? (
-                  <>この作品とすべての続編に<strong style={{ color: '#364F6B' }}>
+                  <>この作品とすべての続編に<strong className="text-primary">
                     {pendingStatus === 'WANT_TO_WATCH' ? t('watchLater') : t('notInterested')}
                   </strong>を適用しますか？</>
                 ) : (
-                  <>Apply <strong style={{ color: '#364F6B' }}>
+                  <>Apply <strong className="text-primary">
                     {pendingStatus === 'WANT_TO_WATCH' ? t('watchLater') : t('notInterested')}
                   </strong> to this work and all sequels?</>
                 )}
               </p>
 
-              <p className="text-sm text-gray-700 bg-[#F5F5F5] p-3 rounded">
+              <p className="text-sm text-text-secondary bg-surface-hover p-3 rounded">
                 {language === 'ko' ? '💡 이전 시즌은 영향받지 않습니다. (이미 보셨거나 다른 평가를 했을 수 있으므로)' : language === 'ja' ? '💡 前のシーズンは影響を受けません。（既に視聴済みまたは他の評価をしている可能性があるため）' : '💡 Previous seasons are not affected. (You may have already watched or rated them differently)'}
               </p>
             </div>
@@ -383,22 +381,19 @@ function RatingCard({ anime, onRate }) {
             <div className="flex gap-3">
               <button
                 onClick={() => handleSeriesConfirm(true)}
-                className="flex-1 text-white py-2 px-4 rounded font-medium transition-colors"
-                style={{ backgroundColor: '#364F6B' }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#2c3e50'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#364F6B'}
+                className="flex-1 bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded font-medium transition-colors"
               >
                 {language === 'ko' ? `모두 적용 (${seriesInfo.sequels.length + 1}개)` : language === 'ja' ? `全て適用 (${seriesInfo.sequels.length + 1}個)` : `Apply All (${seriesInfo.sequels.length + 1})`}
               </button>
               <button
                 onClick={() => handleSeriesConfirm(false)}
-                className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded font-medium transition-colors"
+                className="flex-1 bg-surface-elevated hover:bg-surface-hover text-text-secondary py-2 px-4 rounded font-medium transition-colors"
               >
                 {language === 'ko' ? '현재만' : language === 'ja' ? '現在のみ' : 'Current Only'}
               </button>
               <button
                 onClick={handleSeriesCancel}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded font-medium transition-colors"
+                className="bg-surface-hover hover:bg-border text-text-tertiary py-2 px-4 rounded font-medium transition-colors"
               >
                 {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
               </button>
@@ -612,29 +607,29 @@ export default function Rate() {
         {/* Header with Stats */}
         <div className="flex justify-center items-center mb-8">
           {/* Stats */}
-          <div className="flex gap-3 items-center">
+          <div className="flex gap-3 items-center flex-wrap justify-center">
             {/* Rated */}
-            <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '평가했어요' : language === 'ja' ? '評価済み' : 'Rated'}</div>
-              <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{stats.rated.toLocaleString()}</div>
+            <div className="bg-surface px-4 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-shadow min-w-[100px] border border-border">
+              <div className="text-xs text-text-secondary mb-0.5 text-center">{language === 'ko' ? '평가했어요' : language === 'ja' ? '評価済み' : 'Rated'}</div>
+              <div className="text-lg font-bold text-primary text-center tabular-nums">{stats.rated.toLocaleString()}</div>
             </div>
 
             {/* Watch Later */}
-            <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '보고싶어요' : language === 'ja' ? '見たい' : 'Later'}</div>
-              <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{stats.watchLater.toLocaleString()}</div>
+            <div className="bg-surface px-4 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-shadow min-w-[100px] border border-border">
+              <div className="text-xs text-text-secondary mb-0.5 text-center">{language === 'ko' ? '보고싶어요' : language === 'ja' ? '見たい' : 'Later'}</div>
+              <div className="text-lg font-bold text-secondary text-center tabular-nums">{stats.watchLater.toLocaleString()}</div>
             </div>
 
             {/* Pass */}
-            <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Pass'}</div>
-              <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{stats.pass.toLocaleString()}</div>
+            <div className="bg-surface px-4 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-shadow min-w-[100px] border border-border">
+              <div className="text-xs text-text-secondary mb-0.5 text-center">{language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Pass'}</div>
+              <div className="text-lg font-bold text-text-tertiary text-center tabular-nums">{stats.pass.toLocaleString()}</div>
             </div>
 
             {/* Average Rating - Always show */}
-            <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</div>
-              <div className="text-lg font-bold text-gray-800 text-center tabular-nums">
+            <div className="bg-surface px-4 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-shadow min-w-[100px] border border-border">
+              <div className="text-xs text-text-secondary mb-0.5 text-center">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</div>
+              <div className="text-lg font-bold text-accent text-center tabular-nums">
                 {stats.averageRating > 0 ? `★ ${stats.averageRating.toFixed(1)}` : '-'}
               </div>
             </div>
@@ -646,13 +641,13 @@ export default function Rate() {
           {loading && animeList.length === 0 ? (
             // Skeleton cards during initial load
             Array.from({ length: 8 }).map((_, index) => (
-              <div key={`skeleton-${index}`} className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden animate-pulse">
+              <div key={`skeleton-${index}`} className="bg-surface rounded-lg shadow-md overflow-hidden animate-pulse border border-border">
                 {/* Skeleton Image */}
-                <div className="aspect-[3/4] bg-gray-200" />
+                <div className="aspect-[3/4] bg-surface-elevated" />
                 {/* Skeleton Title */}
                 <div className="p-4 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-3/4" />
-                  <div className="h-3 bg-gray-200 rounded w-1/2" />
+                  <div className="h-4 bg-surface-elevated rounded w-3/4" />
+                  <div className="h-3 bg-surface-elevated rounded w-1/2" />
                 </div>
               </div>
             ))
@@ -666,7 +661,7 @@ export default function Rate() {
         {/* Loading more indicator */}
         {loading && animeList.length > 0 && (
           <div className="text-center py-8">
-            <div className="text-gray-600">{t('loading')}</div>
+            <div className="text-text-secondary">{t('loading')}</div>
           </div>
         )}
 
@@ -674,7 +669,7 @@ export default function Rate() {
         <div ref={observerRef} className="h-10" />
 
         {!hasMore && animeList.length > 0 && (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-text-tertiary">
             {t('allLoaded')}
           </div>
         )}
