@@ -39,42 +39,52 @@ def get_r2_client():
 
 
 def upload_to_r2(
-    file_path: str,
+    file_data,  # Can be file path (str) or bytes
     object_key: str,
     content_type: Optional[str] = None
 ) -> str:
     """
     Upload a file to R2
-
+    
     Args:
-        file_path: Local file path to upload
+        file_data: Local file path (str) or file bytes (bytes)
         object_key: S3 object key (path in bucket, e.g., "admin/anime/123.jpg")
         content_type: MIME type (auto-detected if not provided)
-
+    
     Returns:
         Public URL of uploaded file
     """
-    if not content_type:
-        content_type, _ = mimetypes.guess_type(file_path)
+    # Handle file path vs bytes
+    if isinstance(file_data, str):
+        # File path provided
+        if not content_type:
+            content_type, _ = mimetypes.guess_type(file_data)
+            if not content_type:
+                content_type = 'application/octet-stream'
+        
+        with open(file_data, 'rb') as f:
+            file_bytes = f.read()
+    else:
+        # Bytes provided
+        file_bytes = file_data
         if not content_type:
             content_type = 'application/octet-stream'
-
+    
     try:
         s3_client = get_r2_client()
-
-        with open(file_path, 'rb') as file_data:
-            s3_client.put_object(
-                Bucket=R2_BUCKET_NAME,
-                Key=object_key,
-                Body=file_data,
-                ContentType=content_type,
-                CacheControl='public, max-age=31536000',  # 1 year cache
-            )
-
+        
+        s3_client.put_object(
+            Bucket=R2_BUCKET_NAME,
+            Key=object_key,
+            Body=file_bytes,
+            ContentType=content_type,
+            CacheControl='public, max-age=31536000',  # 1 year cache
+        )
+        
         # Return public URL
         public_url = f"{R2_PUBLIC_URL}/{object_key}"
         return public_url
-
+    
     except ClientError as e:
         raise Exception(f"Failed to upload to R2: {str(e)}")
 
@@ -138,6 +148,31 @@ def delete_from_r2(object_key: str) -> bool:
     except ClientError as e:
         print(f"Failed to delete from R2: {str(e)}")
         return False
+
+
+def check_r2_object_exists(object_key: str) -> bool:
+    """
+    Check if an object exists in R2
+    
+    Args:
+        object_key: S3 object key (e.g., "images/characters/123.jpg")
+    
+    Returns:
+        True if object exists, False otherwise
+    """
+    try:
+        s3_client = get_r2_client()
+        s3_client.head_object(
+            Bucket=R2_BUCKET_NAME,
+            Key=object_key
+        )
+        return True
+    except ClientError as e:
+        # 404 means object doesn't exist
+        if e.response['Error']['Code'] == '404':
+            return False
+        # Other errors, re-raise
+        raise
 
 
 def extract_object_key_from_url(url: str) -> Optional[str]:

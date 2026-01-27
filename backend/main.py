@@ -20,6 +20,7 @@ import os
 
 # Import API routers
 from api import auth, anime, ratings, reviews, comments, users, series, characters, character_ratings, feed, follows, activity_comments, activity_likes, comment_likes, user_posts, character_reviews, notifications, activities, rating_pages, admin, admin_fix, admin_editor, debug_promotion, bookmarks
+from routers import image_proxy
 
 app = FastAPI(
     title="AniPass API",
@@ -402,6 +403,7 @@ app.include_router(comment_likes.router, prefix="/api/comment-likes", tags=["Com
 app.include_router(user_posts.router, prefix="/api/user-posts", tags=["User Posts"])
 app.include_router(notifications.router, prefix="/api/notifications", tags=["Notifications"])
 app.include_router(bookmarks.router, prefix="/api/bookmarks", tags=["Bookmarks"])
+app.include_router(image_proxy.router, prefix="/api", tags=["Image Proxy"])  # Auto-download images from AniList
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(admin_fix.router, prefix="/api/admin-fix", tags=["Admin Fix"])
 app.include_router(admin_editor.router, prefix="/api/admin/editor", tags=["Admin Editor"])
