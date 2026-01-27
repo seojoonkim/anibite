@@ -310,14 +310,21 @@ export default function RateCharacters() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
             {/* Skeleton cards during initial load */}
             {Array.from({ length: 10 }).map((_, index) => (
-              <div key={`skeleton-${index}`} className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden animate-pulse">
+              <div
+                key={`skeleton-${index}`}
+                className="bg-white rounded-lg overflow-hidden"
+                style={{
+                  boxShadow: 'var(--shadow-md)',
+                  animation: `slideUp var(--transition-slow) ease-out ${index * 50}ms`
+                }}
+              >
                 {/* Skeleton Image */}
-                <div className="aspect-[3/4] bg-gray-200" />
+                <div className="aspect-[3/4] skeleton" />
                 {/* Skeleton Info */}
                 <div className="p-3 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-4/5" />
-                  <div className="h-3 bg-gray-200 rounded w-3/5" />
-                  <div className="h-3 bg-gray-200 rounded w-2/3" />
+                  <div className="h-4 skeleton rounded w-4/5" />
+                  <div className="h-3 skeleton rounded w-3/5" />
+                  <div className="h-3 skeleton rounded w-2/3" />
                 </div>
               </div>
             ))}
@@ -508,8 +515,8 @@ export default function RateCharacters() {
                                     handleStatusChange(character.id, 'WANT_TO_KNOW');
                                   }}
                                   className={`transition-colors underline-offset-2 hover:underline ${characterStatuses[character.id] === 'WANT_TO_KNOW'
-                                      ? 'font-semibold'
-                                      : 'text-gray-300 hover:text-gray-100'
+                                    ? 'font-semibold'
+                                    : 'text-gray-300 hover:text-gray-100'
                                     }`}
                                 >
                                   {language === 'ko' ? '알고싶어요' : language === 'ja' ? '知りたい' : 'Want to Know'}
@@ -522,8 +529,8 @@ export default function RateCharacters() {
                                     handleStatusChange(character.id, 'NOT_INTERESTED');
                                   }}
                                   className={`transition-colors underline-offset-2 hover:underline ${characterStatuses[character.id] === 'NOT_INTERESTED'
-                                      ? 'font-semibold'
-                                      : 'text-gray-300 hover:text-gray-100'
+                                    ? 'font-semibold'
+                                    : 'text-gray-300 hover:text-gray-100'
                                     }`}
                                 >
                                   {language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Not Interested'}
