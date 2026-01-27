@@ -4,7 +4,7 @@
  */
 
 import { activityCommentService } from '../services/activityCommentService';
-import { activityLikeService } from '../services/activityLikeService';
+import { activityService } from '../services/activityService';
 import { reviewCommentService } from '../services/reviewCommentService';
 import { reviewService } from '../services/reviewService';
 import { characterReviewService } from '../services/characterReviewService';
@@ -308,31 +308,14 @@ export async function deleteComment(item, commentId) {
 
 /**
  * 좋아요 토글 (평점/리뷰에 대한 좋아요)
- * @param {Object} item - 평점/리뷰 아이템
- * @returns {Promise<void>}
+ * @param {Object} item - 평점/리뷰 아이템 (activity_id가 포함된 객체)
+ * @returns {Promise<Object>} - { liked: boolean, likes_count: number }
  */
 export async function toggleLike(item) {
-  const activityType = getActivityType(item);
-  const userId = item.user_id || item.userId;
-  const itemId = item.character_id || item.characterId || item.anime_id || item.animeId;
-  const reviewId = item.id;
-
-
-  // 평점만 있는 경우 - activity_likes 사용
-  if (isRatingsOnly(item)) {
-    return await activityLikeService.toggleLike(activityType, userId, itemId);
+  if (!item.id) {
+    throw new Error('Activity ID is required for toggling like');
   }
-
-  // 리뷰가 있는 경우 - review_likes 또는 character_review_likes 사용
-  if (activityType === 'character_review') {
-    // 현재 좋아요 상태에 따라 like/unlike 호출
-    // 이건 호출하는 쪽에서 처리해야 할 수도 있음
-    // 여기서는 characterReviewService를 직접 사용하지 않고 반환
-    throw new Error('Character review like should be handled by calling component');
-  } else {
-    // 애니 리뷰
-    throw new Error('Anime review like should be handled by calling component');
-  }
+  return await activityService.toggleLike(item.id);
 }
 
 /**

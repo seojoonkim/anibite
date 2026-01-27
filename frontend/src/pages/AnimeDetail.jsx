@@ -287,8 +287,8 @@ export default function AnimeDetail() {
       const currentLike = reviewLikes[reviewId];
       const newLiked = !currentLike.liked;
 
-      // Use activityLikeService with activity_type, activity_user_id, item_id
-      await activityLikeService.toggleLike('anime_rating', review.user_id, review.anime_id);
+      // Use activityService with activity_id
+      await activityService.toggleLike(reviewId);
 
       setReviewLikes(prev => ({
         ...prev,
