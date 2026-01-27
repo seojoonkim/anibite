@@ -19,21 +19,13 @@ function RatingCard({ anime, onRate }) {
   const [starSize, setStarSize] = useState('3rem');
 
   const getImageUrl = (imageUrl) => {
-    if (!imageUrl) {
-      console.log('[Rate] No imageUrl provided');
-      return '/placeholder-anime.svg';
-    }
-    if (imageUrl.startsWith('http')) {
-      console.log('[Rate] Using http URL:', imageUrl);
-      return imageUrl;
-    }
+    if (!imageUrl) return '/placeholder-anime.svg';
+    if (imageUrl.startsWith('http')) return imageUrl;
     // Use covers_large for better quality
     const processedUrl = imageUrl.includes('/covers/')
       ? imageUrl.replace('/covers/', '/covers_large/')
       : imageUrl;
-    const finalUrl = `${IMAGE_BASE_URL}${processedUrl}`;
-    console.log('[Rate] Generated URL:', finalUrl, 'from:', imageUrl);
-    return finalUrl;
+    return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
   // Update status and rating when anime props change
@@ -179,36 +171,32 @@ function RatingCard({ anime, onRate }) {
   };
 
   return (
-    <div className="group relative" ref={cardRef}>
-      {/* Gradient border wrapper for RATED cards */}
-      <div
-        className={`rounded-lg overflow-hidden transition-all duration-500 ease-out ${
-          animating ? 'scale-110' : 'scale-100'
-        }`}
-        style={{
-          background: status === 'RATED'
-            ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
-            : 'transparent',
-          padding: status === 'RATED' ? '2px' : '0',
-          boxShadow: status === 'RATED'
-            ? '0 4px 20px rgba(225, 48, 108, 0.3)'
-            : undefined
-        }}
-      >
-        <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out group ${
-          status === 'PASS' ? 'opacity-50' : 'opacity-100'
-        } ${status !== 'RATED' ? 'border border-border' : ''}`}>
+    <div
+      ref={cardRef}
+      className={`rounded-lg overflow-hidden transition-all duration-500 ease-out ${
+        animating ? 'scale-110' : 'scale-100'
+      }`}
+      style={{
+        background: status === 'RATED'
+          ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+          : 'transparent',
+        padding: status === 'RATED' ? '2px' : '0',
+        boxShadow: status === 'RATED'
+          ? '0 4px 20px rgba(225, 48, 108, 0.3)'
+          : undefined
+      }}
+    >
+      <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out group ${
+        status === 'PASS' ? 'opacity-50' : 'opacity-100'
+      } ${status !== 'RATED' ? 'border border-border' : ''}`}>
         {/* Cover Image */}
         <Link to={`/anime/${anime.id}`} className="block">
-          <div className="aspect-[3/4] bg-red-500 relative overflow-hidden" style={{ minHeight: '200px' }}>
+          <div className="aspect-[3/4] bg-surface-elevated relative overflow-hidden">
             <img
               src={getImageUrl(anime.cover_image_url)}
               alt={getAnimeTitle(anime)}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms]"
-              style={{ border: '3px solid lime' }}
-              onLoad={(e) => console.log('[Rate] Image loaded:', e.target.src)}
               onError={(e) => {
-                console.log('[Rate] Image error:', e.target.src);
                 e.target.src = '/placeholder-anime.svg';
               }}
             />
@@ -343,7 +331,6 @@ function RatingCard({ anime, onRate }) {
             {anime.episodes && <span>{anime.episodes}{t('episodes')}</span>}
           </div>
         </div>
-      </div>
       </div>
 
       {/* 시리즈 일괄 처리 모달 */}
