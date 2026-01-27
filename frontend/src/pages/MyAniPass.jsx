@@ -1345,8 +1345,8 @@ export default function MyAniPass() {
               <button
                 onClick={() => changeTab('feed')}
                 className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'feed'
-                    ? 'border-b-2'
-                    : 'text-gray-600 hover:text-gray-800'
+                  ? 'border-b-2'
+                  : 'text-gray-600 hover:text-gray-800'
                   }`}
                 style={activeTab === 'feed' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
               >
@@ -1355,8 +1355,8 @@ export default function MyAniPass() {
               <button
                 onClick={() => changeTab('anipass')}
                 className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'anipass'
-                    ? 'border-b-2'
-                    : 'text-gray-600 hover:text-gray-800'
+                  ? 'border-b-2'
+                  : 'text-gray-600 hover:text-gray-800'
                   }`}
                 style={activeTab === 'anipass' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
               >
@@ -1365,8 +1365,8 @@ export default function MyAniPass() {
               <button
                 onClick={() => changeTab('anime')}
                 className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'anime'
-                    ? 'border-b-2'
-                    : 'text-gray-600 hover:text-gray-800'
+                  ? 'border-b-2'
+                  : 'text-gray-600 hover:text-gray-800'
                   }`}
                 style={activeTab === 'anime' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
               >
@@ -1375,8 +1375,8 @@ export default function MyAniPass() {
               <button
                 onClick={() => changeTab('character')}
                 className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'character'
-                    ? 'border-b-2'
-                    : 'text-gray-600 hover:text-gray-800'
+                  ? 'border-b-2'
+                  : 'text-gray-600 hover:text-gray-800'
                   }`}
                 style={activeTab === 'character' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
               >
@@ -1450,8 +1450,8 @@ export default function MyAniPass() {
               <button
                 onClick={handleFollowToggle}
                 className={`ml-auto px-4 py-2 rounded-lg font-medium transition-colors ${isFollowing
-                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    : 'text-white'
+                  ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  : 'text-white'
                   }`}
                 style={!isFollowing ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 onMouseEnter={(e) => !isFollowing && (e.target.style.backgroundColor = '#1877F2')}
@@ -1467,8 +1467,8 @@ export default function MyAniPass() {
             <button
               onClick={() => changeTab('feed')}
               className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'feed'
-                  ? 'border-b-2'
-                  : 'text-gray-600 hover:text-gray-800'
+                ? 'border-b-2'
+                : 'text-gray-600 hover:text-gray-800'
                 }`}
               style={activeTab === 'feed' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
             >
@@ -1477,18 +1477,18 @@ export default function MyAniPass() {
             <button
               onClick={() => changeTab('anipass')}
               className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'anipass'
-                  ? 'border-b-2'
-                  : 'text-gray-600 hover:text-gray-800'
+                ? 'border-b-2'
+                : 'text-gray-600 hover:text-gray-800'
                 }`}
               style={activeTab === 'anipass' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
             >
-              {language === 'ko' ? '애니패스' : language === 'ja' ? 'AniPass' : 'AniPass'}
+              {language === 'ko' ? '애니바이트' : language === 'ja' ? 'AniBite' : 'AniBite'}
             </button>
             <button
               onClick={() => changeTab('anime')}
               className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'anime'
-                  ? 'border-b-2'
-                  : 'text-gray-600 hover:text-gray-800'
+                ? 'border-b-2'
+                : 'text-gray-600 hover:text-gray-800'
                 }`}
               style={activeTab === 'anime' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
             >
@@ -1497,8 +1497,8 @@ export default function MyAniPass() {
             <button
               onClick={() => changeTab('character')}
               className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'character'
-                  ? 'border-b-2'
-                  : 'text-gray-600 hover:text-gray-800'
+                ? 'border-b-2'
+                : 'text-gray-600 hover:text-gray-800'
                 }`}
               style={activeTab === 'character' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
             >
@@ -1516,8 +1516,8 @@ export default function MyAniPass() {
                 <button
                   onClick={() => setAnimeSubMenu('all')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === 'all'
-                      ? ''
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? ''
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   style={animeSubMenu === 'all' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
@@ -1526,8 +1526,8 @@ export default function MyAniPass() {
                 <button
                   onClick={() => setAnimeSubMenu('5')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === '5'
-                      ? ''
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? ''
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   style={animeSubMenu === '5' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
@@ -1536,8 +1536,8 @@ export default function MyAniPass() {
                 <button
                   onClick={() => setAnimeSubMenu('4')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === '4'
-                      ? ''
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? ''
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   style={animeSubMenu === '4' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
@@ -1546,8 +1546,8 @@ export default function MyAniPass() {
                 <button
                   onClick={() => setAnimeSubMenu('3')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === '3'
-                      ? 'text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   style={animeSubMenu === '3' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
@@ -1556,8 +1556,8 @@ export default function MyAniPass() {
                 <button
                   onClick={() => setAnimeSubMenu('2')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === '2'
-                      ? 'text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   style={animeSubMenu === '2' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
@@ -1566,8 +1566,8 @@ export default function MyAniPass() {
                 <button
                   onClick={() => setAnimeSubMenu('1')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === '1'
-                      ? 'text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   style={animeSubMenu === '1' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
@@ -1576,8 +1576,8 @@ export default function MyAniPass() {
                 <button
                   onClick={() => setAnimeSubMenu('watchlist')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === 'watchlist'
-                      ? 'text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   style={animeSubMenu === 'watchlist' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
@@ -1586,8 +1586,8 @@ export default function MyAniPass() {
                 <button
                   onClick={() => setAnimeSubMenu('pass')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === 'pass'
-                      ? 'text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   style={animeSubMenu === 'pass' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
@@ -1600,8 +1600,8 @@ export default function MyAniPass() {
                 <button
                   onClick={() => setCharacterSubMenu('all')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === 'all'
-                      ? ''
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? ''
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   style={characterSubMenu === 'all' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
@@ -1610,8 +1610,8 @@ export default function MyAniPass() {
                 <button
                   onClick={() => setCharacterSubMenu('5')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === '5'
-                      ? ''
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? ''
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   style={characterSubMenu === '5' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
@@ -1620,8 +1620,8 @@ export default function MyAniPass() {
                 <button
                   onClick={() => setCharacterSubMenu('4')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === '4'
-                      ? ''
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? ''
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   style={characterSubMenu === '4' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
@@ -1630,8 +1630,8 @@ export default function MyAniPass() {
                 <button
                   onClick={() => setCharacterSubMenu('3')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === '3'
-                      ? 'text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   style={characterSubMenu === '3' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
@@ -1640,8 +1640,8 @@ export default function MyAniPass() {
                 <button
                   onClick={() => setCharacterSubMenu('2')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === '2'
-                      ? 'text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   style={characterSubMenu === '2' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
@@ -1650,8 +1650,8 @@ export default function MyAniPass() {
                 <button
                   onClick={() => setCharacterSubMenu('1')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === '1'
-                      ? 'text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   style={characterSubMenu === '1' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
@@ -1660,8 +1660,8 @@ export default function MyAniPass() {
                 <button
                   onClick={() => setCharacterSubMenu('want')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === 'want'
-                      ? 'text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   style={characterSubMenu === 'want' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
@@ -1670,8 +1670,8 @@ export default function MyAniPass() {
                 <button
                   onClick={() => setCharacterSubMenu('pass')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === 'pass'
-                      ? 'text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   style={characterSubMenu === 'pass' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
                 >
