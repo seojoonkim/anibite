@@ -11,30 +11,33 @@
    DESIGN TOKENS
    ============================================ */
 :root {
-  /* Brand Colors - Vibrant, Anime-Inspired */
-  --color-primary: #3797F0;
-  --color-primary-dark: #2563EB;
-  --color-primary-light: #60A5FA;
+  /* Dark Backgrounds - Navy Terminal Theme */
+  --color-background: #0B1120;
+  --color-surface: #131B2E;
+  --color-surface-elevated: #1A2332;
+  --color-surface-hover: #1F2937;
 
-  --color-secondary: #E1306C;
-  --color-secondary-dark: #C13584;
-  --color-secondary-light: #F77737;
+  /* Text Colors */
+  --color-text-primary: #E2E8F0;
+  --color-text-secondary: #94A3B8;
+  --color-text-tertiary: #64748B;
 
-  --color-accent: #FCAF45;
+  /* Accent Colors */
+  --color-primary: #60A5FA;
+  --color-primary-dark: #3B82F6;
+  --color-primary-light: #93C5FD;
+
+  --color-secondary: #F472B6;
+  --color-secondary-dark: #EC4899;
+  --color-secondary-light: #F9A8D4;
+
+  --color-accent: #FBBF24;
   --color-accent-dark: #F59E0B;
   --color-accent-light: #FCD34D;
 
-  /* Neutrals */
-  --color-background: #F5F5F7;
-  --color-surface: #FFFFFF;
-  --color-surface-elevated: #FFFFFF;
-
-  --color-text-primary: #1A1A1A;
-  --color-text-secondary: #6B7280;
-  --color-text-tertiary: #9CA3AF;
-
-  --color-border: #E5E7EB;
-  --color-border-hover: #D1D5DB;
+  /* Borders */
+  --color-border: #1E293B;
+  --color-border-hover: #334155;
 
   /* Semantic Colors */
   --color-success: #10B981;
@@ -42,61 +45,69 @@
   --color-error: #EF4444;
   --color-info: #3B82F6;
 
-  /* Spacing Scale (4px base) */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 48px;
-  --space-3xl: 64px;
+  /* Spacing Scale - 10% SMALLER */
+  --space-xs: 3.6px;
+  --space-sm: 7.2px;
+  --space-md: 14.4px;
+  --space-lg: 21.6px;
+  --space-xl: 28.8px;
+  --space-2xl: 43.2px;
+  --space-3xl: 57.6px;
 
-  /* Typography Scale */
-  --font-size-xs: 0.75rem;
-  /* 12px */
-  --font-size-sm: 0.875rem;
-  /* 14px */
-  --font-size-base: 1rem;
-  /* 16px */
-  --font-size-lg: 1.125rem;
+  /* Typography Scale - 10% SMALLER */
+  --font-size-xs: 0.675rem;
+  /* 10.8px */
+  --font-size-sm: 0.7875rem;
+  /* 12.6px */
+  --font-size-base: 0.9rem;
+  /* 14.4px */
+  --font-size-lg: 1.0125rem;
+  /* 16.2px */
+  --font-size-xl: 1.125rem;
   /* 18px */
-  --font-size-xl: 1.25rem;
-  /* 20px */
-  --font-size-2xl: 1.5rem;
-  /* 24px */
-  --font-size-3xl: 1.875rem;
-  /* 30px */
-  --font-size-4xl: 2.25rem;
-  /* 36px */
+  --font-size-2xl: 1.35rem;
+  /* 21.6px */
+  --font-size-3xl: 1.6875rem;
+  /* 27px */
+  --font-size-4xl: 2.025rem;
+  /* 32.4px */
 
-  /* Line Heights */
-  --line-height-tight: 1.25;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.75;
+  /* Line Heights - Tighter */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.6;
 
-  /* Border Radius */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 24px;
+  /* Border Radius - 10% SMALLER */
+  --radius-sm: 3.6px;
+  --radius-md: 7.2px;
+  --radius-lg: 10.8px;
+  --radius-xl: 14.4px;
+  --radius-2xl: 21.6px;
   --radius-full: 9999px;
 
-  /* Shadows - Multi-layer for depth */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  /* Shadows - Darker for dark mode */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -2px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 10px 10px -5px rgba(0, 0, 0, 0.6);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
 
-  /* Colored Shadows for Cards */
-  --shadow-primary: 0 10px 25px -5px rgba(55, 151, 240, 0.2);
-  --shadow-secondary: 0 10px 25px -5px rgba(225, 48, 108, 0.2);
+  /* Glow Effects */
+  --glow-primary: 0 0 20px rgba(96, 165, 250, 0.4);
+  --glow-secondary: 0 0 20px rgba(244, 114, 182, 0.4);
+  --glow-accent: 0 0 20px rgba(251, 191, 36, 0.4);
 
-  /* Transitions */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* Colored Shadows */
+  --shadow-primary: 0 10px 25px -5px rgba(96, 165, 250, 0.3);
+  --shadow-secondary: 0 10px 25px -5px rgba(244, 114, 182, 0.3);
+
+  /* Transitions - Snappier */
+  --transition-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 270ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout */
+  --max-content-width: 1100px;
 
   /* Z-index Scale */
   --z-dropdown: 1000;
@@ -108,21 +119,7 @@
   --z-tooltip: 1070;
 }
 
-/* Dark Mode Tokens */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: #0F172A;
-    --color-surface: #1E293B;
-    --color-surface-elevated: #334155;
-
-    --color-text-primary: #F1F5F9;
-    --color-text-secondary: #CBD5E1;
-    --color-text-tertiary: #94A3B8;
-
-    --color-border: #334155;
-    --color-border-hover: #475569;
-  }
-}
+/* Dark mode is now default - no media query needed */
 
 /* ============================================
    BASE STYLES
