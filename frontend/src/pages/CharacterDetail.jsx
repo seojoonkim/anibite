@@ -706,14 +706,9 @@ export default function CharacterDetail() {
       const currentLike = reviewLikes[reviewId] || { liked: false, count: 0 };
       const newLiked = !currentLike.liked;
 
-      // Always use activityLikeService for consistency
-      const activityType = 'character_rating';
-      const userId = review.user_id;
-      const itemId = review.character_id;
-
-      await import('../services/activityLikeService').then(module =>
-        module.activityLikeService.toggleLike(activityType, userId, itemId)
-      );
+      // Use activityService with activity_id
+      const { activityService } = await import('../services/activityService');
+      await activityService.toggleLike(reviewId);
 
       setReviewLikes(prev => ({
         ...prev,

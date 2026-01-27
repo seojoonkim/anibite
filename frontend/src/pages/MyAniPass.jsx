@@ -9,7 +9,7 @@ import { ratingService } from '../services/ratingService';
 import { followService } from '../services/followService';
 import { feedService } from '../services/feedService';
 import { activityCommentService } from '../services/activityCommentService';
-import { activityLikeService } from '../services/activityLikeService';
+import { activityService } from '../services/activityService';
 import { commentLikeService } from '../services/commentLikeService';
 import { userPostService } from '../services/userPostService';
 import * as ActivityUtils from '../utils/activityUtils';
@@ -1048,15 +1048,11 @@ export default function MyAniPass() {
 
   const handleToggleActivityLike = async (activity) => {
     try {
-      const result = await activityLikeService.toggleLike(
-        activity.activity_type,
-        activity.user_id,
-        activity.item_id
-      );
+      const result = await activityService.toggleLike(activity.id);
       const key = getActivityKey(activity);
       setActivityLikes(prev => ({
         ...prev,
-        [key]: { liked: result.liked, count: result.like_count }
+        [key]: { liked: result.liked, count: result.likes_count }
       }));
     } catch (err) {
       console.error('Failed to toggle activity like:', err);

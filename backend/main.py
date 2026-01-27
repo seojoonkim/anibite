@@ -19,7 +19,7 @@ from config import ALLOWED_ORIGINS, COVER_IMAGES_DIR
 import os
 
 # Import API routers
-from api import auth, anime, ratings, reviews, comments, users, series, characters, character_ratings, feed, follows, activity_comments, activity_likes, comment_likes, user_posts, character_reviews, notifications, activities, rating_pages, admin, admin_fix, admin_editor, debug_promotion, bookmarks
+from api import auth, anime, ratings, reviews, comments, users, series, characters, character_ratings, feed, follows, activity_comments, comment_likes, user_posts, character_reviews, notifications, activities, rating_pages, admin, admin_fix, admin_editor, debug_promotion, bookmarks
 
 # Try to import image_proxy router (may fail if dependencies missing)
 try:
@@ -377,7 +377,6 @@ app.include_router(characters.router, prefix="/api/characters", tags=["Character
 app.include_router(feed.router, prefix="/api/feed", tags=["Feed"])
 app.include_router(follows.router, prefix="/api/follows", tags=["Follows"])
 app.include_router(activity_comments.router, prefix="/api/activity-comments", tags=["Activity Comments"])
-app.include_router(activity_likes.router, prefix="/api/activity-likes", tags=["Activity Likes"])
 app.include_router(comment_likes.router, prefix="/api/comment-likes", tags=["Comment Likes"])
 app.include_router(user_posts.router, prefix="/api/user-posts", tags=["User Posts"])
 app.include_router(notifications.router, prefix="/api/notifications", tags=["Notifications"])
