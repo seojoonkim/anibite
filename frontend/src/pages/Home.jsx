@@ -114,7 +114,7 @@ export default function Home() {
     <div className="min-h-screen pt-16 bg-transparent">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Search and Filters */}
         <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 mb-8">
           <form onSubmit={handleSearch} className="mb-4">
