@@ -624,7 +624,7 @@ export default function AnimeDetail() {
   if (loading) {
     return (
       <div className="min-h-screen pt-12 md:pt-16 bg-transparent">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           <div className="flex flex-col lg:flex-row gap-8 animate-pulse">
             {/* Cover Image Skeleton */}
             <div className="lg:w-80 flex-shrink-0">
@@ -666,7 +666,7 @@ export default function AnimeDetail() {
   if (error || !anime) {
     return (
       <div className="min-h-screen pt-12 md:pt-16 bg-transparent">
-        <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="max-w-[1100px] mx-auto px-4 py-8">
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             {error || '애니메이션을 찾을 수 없습니다.'}
           </div>
@@ -684,7 +684,7 @@ export default function AnimeDetail() {
   return (
     <div className="min-h-screen pt-12 md:pt-16 bg-transparent">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Mobile Title - Show first on mobile */}
         <div className="lg:hidden mb-6">
           <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">

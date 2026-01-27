@@ -797,7 +797,7 @@ export default function CharacterDetail() {
   if (loading) {
     return (
       <div className="min-h-screen pt-12 md:pt-16 bg-transparent">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           <div className="flex flex-col lg:flex-row gap-8 animate-pulse">
             {/* Character Image Skeleton */}
             <div className="lg:w-80 flex-shrink-0">
@@ -839,7 +839,7 @@ export default function CharacterDetail() {
   if (error || !character) {
     return (
       <div className="min-h-screen pt-12 md:pt-16 bg-transparent">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="text-xl text-red-600 mb-4">{error || (language === 'ko' ? '캐릭터를 찾을 수 없습니다.' : language === 'ja' ? 'キャラクターが見つかりません。' : 'Character not found.')}</div>
             <button
@@ -857,7 +857,7 @@ export default function CharacterDetail() {
   return (
     <div className="min-h-screen pt-12 md:pt-16 bg-transparent">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Mobile Title - Show first on mobile */}
         <div className="lg:hidden mb-6">
           <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
