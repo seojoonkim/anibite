@@ -358,38 +358,7 @@ def health_check():
     return {"status": "ok", "timestamp": "2026-01-13"}
 
 
-# Image proxy for R2 (bypass CORS for local development)
-@app.get("/api/images/{path:path}")
-async def proxy_r2_image(path: str):
-    """
-    Proxy R2 images to bypass CORS restrictions in local development.
-    Usage: /api/images/characters/12345.jpg -> fetches from R2
-    """
-    import httpx
-    from fastapi.responses import Response
-
-    # Use images.anibite.com as default R2 URL
-    r2_base_url = os.getenv("R2_PUBLIC_URL", "https://images.anibite.com")
-    image_url = f"{r2_base_url}/images/{path}"
-
-    try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.get(image_url)
-
-            if response.status_code == 200:
-                content_type = response.headers.get("content-type", "image/jpeg")
-                return Response(
-                    content=response.content,
-                    media_type=content_type,
-                    headers={
-                        "Cache-Control": "public, max-age=86400",
-                        "Access-Control-Allow-Origin": "*"
-                    }
-                )
-            else:
-                raise HTTPException(status_code=response.status_code, detail="Image not found")
-    except httpx.RequestError as e:
-        raise HTTPException(status_code=502, detail=f"Failed to fetch image: {str(e)}")
+# Legacy image proxy removed - now using routers/image_proxy.py with auto-download functionality
 
 
 # Include API routers
