@@ -1305,13 +1305,13 @@ export default function MyAniPass() {
                 <img
                   src={getAvatarUrl(displayUser.avatar_url)}
                   alt={displayUser.display_name || displayUser.username}
-                  className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                  className="w-20 h-20 rounded-full object-cover border-2 border-border"
                   onError={(e) => {
                     e.target.style.display = 'none';
                   }}
                 />
               ) : (
-                <div className="w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold border-2 border-gray-200" style={{ background: getAvatarGradient(displayUser?.username) }}>
+                <div className="w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold border-2 border-border" style={{ background: getAvatarGradient(displayUser?.username) }}>
                   {(displayUser?.display_name || displayUser?.username || 'U')[0].toUpperCase()}
                 </div>
               )}
@@ -1341,14 +1341,14 @@ export default function MyAniPass() {
             </div>
 
             {/* Tabs - Real and Clickable */}
-            <div className="flex border-b border-gray-200 overflow-x-auto">
+            <div className="flex border-b border-border overflow-x-auto">
               <button
                 onClick={() => changeTab('feed')}
                 className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'feed'
                   ? 'border-b-2'
-                  : 'text-gray-600 hover:text-gray-800'
+                  : 'text-text-secondary hover:text-text-primary'
                   }`}
-                style={activeTab === 'feed' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
+                style={activeTab === 'feed' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '600' } : {}}
               >
                 {language === 'ko' ? '피드' : language === 'ja' ? 'フィード' : 'Feed'}
               </button>
@@ -1356,9 +1356,9 @@ export default function MyAniPass() {
                 onClick={() => changeTab('anipass')}
                 className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'anipass'
                   ? 'border-b-2'
-                  : 'text-gray-600 hover:text-gray-800'
+                  : 'text-text-secondary hover:text-text-primary'
                   }`}
-                style={activeTab === 'anipass' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
+                style={activeTab === 'anipass' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '600' } : {}}
               >
                 {language === 'ko' ? '애니바이트' : language === 'ja' ? 'AniBite' : 'AniBite'}
               </button>
@@ -1366,9 +1366,9 @@ export default function MyAniPass() {
                 onClick={() => changeTab('anime')}
                 className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'anime'
                   ? 'border-b-2'
-                  : 'text-gray-600 hover:text-gray-800'
+                  : 'text-text-secondary hover:text-text-primary'
                   }`}
-                style={activeTab === 'anime' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
+                style={activeTab === 'anime' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '600' } : {}}
               >
                 {language === 'ko' ? '애니' : language === 'ja' ? 'アニメ' : 'Anime'}
               </button>
@@ -1376,9 +1376,9 @@ export default function MyAniPass() {
                 onClick={() => changeTab('character')}
                 className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'character'
                   ? 'border-b-2'
-                  : 'text-gray-600 hover:text-gray-800'
+                  : 'text-text-secondary hover:text-text-primary'
                   }`}
-                style={activeTab === 'character' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
+                style={activeTab === 'character' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '600' } : {}}
               >
                 {language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character'}
               </button>
@@ -1387,7 +1387,7 @@ export default function MyAniPass() {
 
           {/* Loading Indicator */}
           <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           </div>
         </div>
       </div>
@@ -1399,25 +1399,25 @@ export default function MyAniPass() {
 
       <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
-        <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 mb-8">
+        <div className="bg-surface rounded-2xl shadow-lg border border-border p-6 mb-8">
           <div className="flex items-center gap-4 mb-6">
             {displayUser?.avatar_url ? (
               <img
                 src={getAvatarUrl(displayUser.avatar_url)}
                 alt={displayUser.display_name || displayUser.username}
-                className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                className="w-20 h-20 rounded-full object-cover border-2 border-border"
                 onError={(e) => {
                   e.target.style.display = 'none';
                 }}
               />
             ) : (
-              <div className="w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold border-2 border-gray-200" style={{ background: getAvatarGradient(displayUser?.username) }}>
+              <div className="w-20 h-20 rounded-full flex items-center justify-center text-text-primary text-3xl font-bold border-2 border-border" style={{ background: getAvatarGradient(displayUser?.username) }}>
                 {(displayUser?.display_name || displayUser?.username || 'U')[0].toUpperCase()}
               </div>
             )}
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl font-bold">
+                <h1 className="text-2xl font-bold text-text-primary">
                   {displayUser?.display_name || displayUser?.username}
                 </h1>
                 {stats && (
@@ -1425,7 +1425,7 @@ export default function MyAniPass() {
                     const levelInfo = getCurrentLevelInfo(stats.otaku_score || 0, language);
                     return (
                       <span className={`px-3 py-1 rounded-full text-sm font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}>
-                        <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span className="text-gray-700">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
+                        <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span className="text-text-secondary">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
                       </span>
                     );
                   })()
@@ -1434,15 +1434,15 @@ export default function MyAniPass() {
               <div className="flex items-center gap-4 mb-2">
                 <button
                   onClick={() => openFollowModal('followers')}
-                  className="text-sm hover:text-[#737373] transition-colors"
+                  className="text-sm text-text-secondary hover:text-primary transition-colors"
                 >
-                  <span className="font-bold">{followCounts.followers_count}</span> {language === 'ko' ? '팔로워' : language === 'ja' ? 'フォロワー' : 'Followers'}
+                  <span className="font-bold text-text-primary">{followCounts.followers_count}</span> {language === 'ko' ? '팔로워' : language === 'ja' ? 'フォロワー' : 'Followers'}
                 </button>
                 <button
                   onClick={() => openFollowModal('following')}
-                  className="text-sm hover:text-[#737373] transition-colors"
+                  className="text-sm text-text-secondary hover:text-primary transition-colors"
                 >
-                  <span className="font-bold">{followCounts.following_count}</span> {language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following'}
+                  <span className="font-bold text-text-primary">{followCounts.following_count}</span> {language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following'}
                 </button>
               </div>
             </div>
@@ -1450,10 +1450,10 @@ export default function MyAniPass() {
               <button
                 onClick={handleFollowToggle}
                 className={`ml-auto px-4 py-2 rounded-lg font-medium transition-colors ${isFollowing
-                  ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  : 'text-white'
+                  ? 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
+                  : 'text-text-primary'
                   }`}
-                style={!isFollowing ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                style={!isFollowing ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 onMouseEnter={(e) => !isFollowing && (e.target.style.backgroundColor = '#1877F2')}
                 onMouseLeave={(e) => !isFollowing && (e.target.style.backgroundColor = '#3797F0')}
               >
@@ -1463,14 +1463,14 @@ export default function MyAniPass() {
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-gray-200 overflow-x-auto">
+          <div className="flex border-b border-border overflow-x-auto">
             <button
               onClick={() => changeTab('feed')}
               className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'feed'
                 ? 'border-b-2'
-                : 'text-gray-600 hover:text-gray-800'
+                : 'text-text-secondary hover:text-text-primary'
                 }`}
-              style={activeTab === 'feed' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
+              style={activeTab === 'feed' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '600' } : {}}
             >
               {language === 'ko' ? '피드' : language === 'ja' ? 'フィード' : 'Feed'}
             </button>
@@ -1478,9 +1478,9 @@ export default function MyAniPass() {
               onClick={() => changeTab('anipass')}
               className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'anipass'
                 ? 'border-b-2'
-                : 'text-gray-600 hover:text-gray-800'
+                : 'text-text-secondary hover:text-text-primary'
                 }`}
-              style={activeTab === 'anipass' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
+              style={activeTab === 'anipass' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '600' } : {}}
             >
               {language === 'ko' ? '애니바이트' : language === 'ja' ? 'AniBite' : 'AniBite'}
             </button>
@@ -1488,9 +1488,9 @@ export default function MyAniPass() {
               onClick={() => changeTab('anime')}
               className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'anime'
                 ? 'border-b-2'
-                : 'text-gray-600 hover:text-gray-800'
+                : 'text-text-secondary hover:text-text-primary'
                 }`}
-              style={activeTab === 'anime' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
+              style={activeTab === 'anime' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '600' } : {}}
             >
               {language === 'ko' ? '애니' : language === 'ja' ? 'アニメ' : 'Anime'} {stats && <span className="text-xs sm:text-sm">({(stats.total_rated || 0) + (stats.total_want_to_watch || 0) + (stats.total_pass || 0)})</span>}
             </button>
@@ -1498,9 +1498,9 @@ export default function MyAniPass() {
               onClick={() => changeTab('character')}
               className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'character'
                 ? 'border-b-2'
-                : 'text-gray-600 hover:text-gray-800'
+                : 'text-text-secondary hover:text-text-primary'
                 }`}
-              style={activeTab === 'character' ? { color: '#000000', borderColor: '#000000', fontWeight: '600' } : {}}
+              style={activeTab === 'character' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '600' } : {}}
             >
               {language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character'} {stats && <span className="text-xs sm:text-sm">({stats.total_character_ratings || 0})</span>}
             </button>
@@ -1517,9 +1517,9 @@ export default function MyAniPass() {
                   onClick={() => setAnimeSubMenu('all')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === 'all'
                     ? ''
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                     }`}
-                  style={animeSubMenu === 'all' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                  style={animeSubMenu === 'all' ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 >
                   {language === 'ko' ? '모두' : language === 'ja' ? 'すべて' : 'All'}
                 </button>
@@ -1527,9 +1527,9 @@ export default function MyAniPass() {
                   onClick={() => setAnimeSubMenu('5')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === '5'
                     ? ''
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                     }`}
-                  style={animeSubMenu === '5' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                  style={animeSubMenu === '5' ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 >
                   ⭐ 5{language === 'ko' ? '점' : language === 'ja' ? '点' : ''}
                 </button>
@@ -1537,9 +1537,9 @@ export default function MyAniPass() {
                   onClick={() => setAnimeSubMenu('4')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === '4'
                     ? ''
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                     }`}
-                  style={animeSubMenu === '4' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                  style={animeSubMenu === '4' ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 >
                   ⭐ 4{language === 'ko' ? '점대' : language === 'ja' ? '点台' : '.0-4.5'}
                 </button>
@@ -1547,9 +1547,9 @@ export default function MyAniPass() {
                   onClick={() => setAnimeSubMenu('3')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === '3'
                     ? 'text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                     }`}
-                  style={animeSubMenu === '3' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                  style={animeSubMenu === '3' ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 >
                   ⭐ 3{language === 'ko' ? '점대' : language === 'ja' ? '点台' : '.0-3.5'}
                 </button>
@@ -1557,9 +1557,9 @@ export default function MyAniPass() {
                   onClick={() => setAnimeSubMenu('2')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === '2'
                     ? 'text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                     }`}
-                  style={animeSubMenu === '2' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                  style={animeSubMenu === '2' ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 >
                   ⭐ 2{language === 'ko' ? '점대' : language === 'ja' ? '点台' : '.0-2.5'}
                 </button>
@@ -1567,9 +1567,9 @@ export default function MyAniPass() {
                   onClick={() => setAnimeSubMenu('1')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === '1'
                     ? 'text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                     }`}
-                  style={animeSubMenu === '1' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                  style={animeSubMenu === '1' ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 >
                   ⭐ {language === 'ko' ? '1점대 이하' : language === 'ja' ? '≤1.5' : '≤1.5'}
                 </button>
@@ -1577,9 +1577,9 @@ export default function MyAniPass() {
                   onClick={() => setAnimeSubMenu('watchlist')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === 'watchlist'
                     ? 'text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                     }`}
-                  style={animeSubMenu === 'watchlist' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                  style={animeSubMenu === 'watchlist' ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 >
                   {language === 'ko' ? '보고싶어요' : language === 'ja' ? 'ウォッチリスト' : 'Watchlist'}
                 </button>
@@ -1587,9 +1587,9 @@ export default function MyAniPass() {
                   onClick={() => setAnimeSubMenu('pass')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${animeSubMenu === 'pass'
                     ? 'text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                     }`}
-                  style={animeSubMenu === 'pass' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                  style={animeSubMenu === 'pass' ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 >
                   {language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Pass'}
                 </button>
@@ -1601,9 +1601,9 @@ export default function MyAniPass() {
                   onClick={() => setCharacterSubMenu('all')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === 'all'
                     ? ''
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                     }`}
-                  style={characterSubMenu === 'all' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                  style={characterSubMenu === 'all' ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 >
                   {language === 'ko' ? '모두' : language === 'ja' ? 'すべて' : 'All'}
                 </button>
@@ -1611,9 +1611,9 @@ export default function MyAniPass() {
                   onClick={() => setCharacterSubMenu('5')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === '5'
                     ? ''
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                     }`}
-                  style={characterSubMenu === '5' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                  style={characterSubMenu === '5' ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 >
                   ⭐ 5{language === 'ko' ? '점' : language === 'ja' ? '点' : ''}
                 </button>
@@ -1621,9 +1621,9 @@ export default function MyAniPass() {
                   onClick={() => setCharacterSubMenu('4')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === '4'
                     ? ''
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                     }`}
-                  style={characterSubMenu === '4' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                  style={characterSubMenu === '4' ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 >
                   ⭐ 4{language === 'ko' ? '점대' : language === 'ja' ? '点台' : '.0-4.5'}
                 </button>
@@ -1631,9 +1631,9 @@ export default function MyAniPass() {
                   onClick={() => setCharacterSubMenu('3')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === '3'
                     ? 'text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                     }`}
-                  style={characterSubMenu === '3' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                  style={characterSubMenu === '3' ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 >
                   ⭐ 3{language === 'ko' ? '점대' : language === 'ja' ? '点台' : '.0-3.5'}
                 </button>
@@ -1641,9 +1641,9 @@ export default function MyAniPass() {
                   onClick={() => setCharacterSubMenu('2')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === '2'
                     ? 'text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                     }`}
-                  style={characterSubMenu === '2' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                  style={characterSubMenu === '2' ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 >
                   ⭐ 2{language === 'ko' ? '점대' : language === 'ja' ? '点台' : ''}
                 </button>
@@ -1651,9 +1651,9 @@ export default function MyAniPass() {
                   onClick={() => setCharacterSubMenu('1')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === '1'
                     ? 'text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                     }`}
-                  style={characterSubMenu === '1' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                  style={characterSubMenu === '1' ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 >
                   ⭐ {language === 'ko' ? '1점대 이하' : language === 'ja' ? '≤1.5' : '≤1.5'}
                 </button>
@@ -1661,9 +1661,9 @@ export default function MyAniPass() {
                   onClick={() => setCharacterSubMenu('want')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === 'want'
                     ? 'text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                     }`}
-                  style={characterSubMenu === 'want' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                  style={characterSubMenu === 'want' ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 >
                   {language === 'ko' ? '알고싶어요' : language === 'ja' ? '知りたい' : 'Want to Know'}
                 </button>
@@ -1671,9 +1671,9 @@ export default function MyAniPass() {
                   onClick={() => setCharacterSubMenu('pass')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${characterSubMenu === 'pass'
                     ? 'text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
                     }`}
-                  style={characterSubMenu === 'pass' ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                  style={characterSubMenu === 'pass' ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                 >
                   {language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Pass'}
                 </button>
@@ -1688,17 +1688,17 @@ export default function MyAniPass() {
             {/* Left Sidebar - Profile Summary - Show when stats loaded */}
             {stats && (
               <div className="hidden lg:block lg:col-span-1">
-                <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-6 sticky top-4">
+                <div className="bg-surface rounded-xl shadow-lg border border-border p-6 sticky top-4">
                   {/* Profile Picture */}
                   <div className="flex flex-col items-center mb-4">
                     {displayUser?.avatar_url ? (
                       <img
                         src={getAvatarUrl(displayUser.avatar_url)}
                         alt={displayUser?.display_name || displayUser?.username}
-                        className="w-24 h-24 rounded-full object-cover border-2 border-gray-200 mb-3"
+                        className="w-24 h-24 rounded-full object-cover border-2 border-border mb-3"
                       />
                     ) : (
-                      <div className="w-24 h-24 rounded-full flex items-center justify-center border-2 border-gray-200 mb-3" style={{ background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)' }}>
+                      <div className="w-24 h-24 rounded-full flex items-center justify-center border-2 border-border mb-3" style={{ background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)' }}>
                         <span className="text-white text-2xl font-bold">
                           {(displayUser?.display_name || displayUser?.username || '?').charAt(0).toUpperCase()}
                         </span>
@@ -1706,7 +1706,7 @@ export default function MyAniPass() {
                     )}
 
                     {/* Name */}
-                    <h3 className="text-lg font-bold text-gray-900 text-center">
+                    <h3 className="text-lg font-bold text-text-primary text-center">
                       {displayUser?.display_name || displayUser?.username}
                     </h3>
 
@@ -1715,38 +1715,38 @@ export default function MyAniPass() {
                       const levelInfo = getCurrentLevelInfo(stats.otaku_score || 0, language);
                       return (
                         <span className={`mt-2 text-sm px-3 py-1 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}>
-                          <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span className="text-gray-700">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
+                          <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span className="text-text-secondary">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
                         </span>
                       );
                     })()}
                   </div>
 
                   {/* Stats Summary */}
-                  <div className="space-y-3 pt-4 border-t border-gray-200">
+                  <div className="space-y-3 pt-4 border-t border-border">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{language === 'ko' ? '오타쿠 점수' : language === 'ja' ? 'オタクスコア' : 'Otaku Score'}</span>
-                      <span className="text-sm font-bold text-gray-900">{Math.round(stats.otaku_score)}</span>
+                      <span className="text-sm text-text-secondary">{language === 'ko' ? '오타쿠 점수' : language === 'ja' ? 'オタクスコア' : 'Otaku Score'}</span>
+                      <span className="text-sm font-bold text-text-primary">{Math.round(stats.otaku_score)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{language === 'ko' ? '평가한 애니' : language === 'ja' ? '評価済みアニメ' : 'Rated Anime'}</span>
-                      <span className="text-sm font-bold text-gray-900">{stats.total_rated}</span>
+                      <span className="text-sm text-text-secondary">{language === 'ko' ? '평가한 애니' : language === 'ja' ? '評価済みアニメ' : 'Rated Anime'}</span>
+                      <span className="text-sm font-bold text-text-primary">{stats.total_rated}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{language === 'ko' ? '평가한 캐릭터' : language === 'ja' ? '評価済みキャラ' : 'Rated Characters'}</span>
-                      <span className="text-sm font-bold text-gray-900">{stats.total_character_ratings || 0}</span>
+                      <span className="text-sm text-text-secondary">{language === 'ko' ? '평가한 캐릭터' : language === 'ja' ? '評価済みキャラ' : 'Rated Characters'}</span>
+                      <span className="text-sm font-bold text-text-primary">{stats.total_character_ratings || 0}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{language === 'ko' ? '작성한 리뷰' : language === 'ja' ? '作成レビュー' : 'Reviews Written'}</span>
-                      <span className="text-sm font-bold text-gray-900">{stats.total_reviews}</span>
+                      <span className="text-sm text-text-secondary">{language === 'ko' ? '작성한 리뷰' : language === 'ja' ? '作成レビュー' : 'Reviews Written'}</span>
+                      <span className="text-sm font-bold text-text-primary">{stats.total_reviews}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</span>
-                      <span className="text-sm font-bold text-gray-900">{stats.average_rating?.toFixed(1) || 'N/A'}</span>
+                      <span className="text-sm text-text-secondary">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</span>
+                      <span className="text-sm font-bold text-text-primary">{stats.average_rating?.toFixed(1) || 'N/A'}</span>
                     </div>
                     {displayUser?.created_at && (
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">{language === 'ko' ? '가입일' : language === 'ja' ? '登録日' : 'Joined'}</span>
-                        <span className="text-sm font-bold text-gray-900">
+                        <span className="text-sm text-text-secondary">{language === 'ko' ? '가입일' : language === 'ja' ? '登録日' : 'Joined'}</span>
+                        <span className="text-sm font-bold text-text-primary">
                           {new Date(displayUser.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : language === 'ja' ? 'ja-JP' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                         </span>
                       </div>
@@ -1754,21 +1754,21 @@ export default function MyAniPass() {
                   </div>
 
                   {/* Follow Stats */}
-                  <div className="flex gap-4 justify-center pt-4 border-t border-gray-200 mt-4">
+                  <div className="flex gap-4 justify-center pt-4 border-t border-border mt-4">
                     <button
                       onClick={() => openFollowModal('followers')}
                       className="flex flex-col items-center hover:text-[#737373] transition-colors"
                     >
-                      <span className="text-lg font-bold text-gray-900">{followCounts.followers_count}</span>
-                      <span className="text-xs text-gray-600">{language === 'ko' ? '팔로워' : language === 'ja' ? 'フォロワー' : 'Followers'}</span>
+                      <span className="text-lg font-bold text-text-primary">{followCounts.followers_count}</span>
+                      <span className="text-xs text-text-secondary">{language === 'ko' ? '팔로워' : language === 'ja' ? 'フォロワー' : 'Followers'}</span>
                     </button>
                     <div className="w-px bg-gray-200"></div>
                     <button
                       onClick={() => openFollowModal('following')}
                       className="flex flex-col items-center hover:text-[#737373] transition-colors"
                     >
-                      <span className="text-lg font-bold text-gray-900">{followCounts.following_count}</span>
-                      <span className="text-xs text-gray-600">{language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following'}</span>
+                      <span className="text-lg font-bold text-text-primary">{followCounts.following_count}</span>
+                      <span className="text-xs text-text-secondary">{language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following'}</span>
                     </button>
                   </div>
                 </div>
@@ -1779,16 +1779,16 @@ export default function MyAniPass() {
             <div className={stats ? "lg:col-span-3" : "lg:col-span-4"}>
               {/* Post Composer - Show immediately for own profile */}
               {isOwnProfile && displayUser && (
-                <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 mb-6">
+                <div className="bg-surface rounded-xl shadow-lg border border-border p-4 mb-6">
                   <div className="flex gap-3">
                     {displayUser?.avatar_url ? (
                       <img
                         src={getAvatarUrl(displayUser.avatar_url)}
                         alt={displayUser.display_name || displayUser.username}
-                        className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                        className="w-10 h-10 rounded-full object-cover border border-border"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center border border-gray-200" style={{ background: getAvatarGradient(displayUser?.username) }}>
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center border border-border" style={{ background: getAvatarGradient(displayUser?.username) }}>
                         <span className="text-white text-sm font-bold">
                           {(displayUser?.display_name || displayUser?.username || '?').charAt(0).toUpperCase()}
                         </span>
@@ -1799,7 +1799,7 @@ export default function MyAniPass() {
                         value={newPostContent}
                         onChange={(e) => setNewPostContent(e.target.value)}
                         placeholder={language === 'ko' ? '무슨 생각을 하고 계신가요?' : language === 'ja' ? '今何を考えていますか？' : "What's on your mind?"}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                        className="w-full px-4 py-2 border border-border rounded-lg bg-input focus:outline-none focus:ring-1 focus:ring-primary focus:bg-input-focus text-text-primary resize-none"
                         rows="3"
                       />
                       <div className="flex justify-end mt-2">
@@ -1807,7 +1807,7 @@ export default function MyAniPass() {
                           onClick={handleCreatePost}
                           disabled={!newPostContent.trim()}
                           className="px-4 py-2 text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-                          style={newPostContent.trim() ? { backgroundColor: '#3797F0', color: 'white', fontWeight: '600' } : {}}
+                          style={newPostContent.trim() ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
                           onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#1877F2')}
                           onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#3797F0')}
                         >
@@ -1822,7 +1822,7 @@ export default function MyAniPass() {
               {/* Feed Activities */}
               {loading ? (
                 <div className="flex justify-center items-center h-64">
-                  <div className="text-xl text-gray-600">{language === 'ko' ? '피드 로딩 중...' : language === 'ja' ? 'フィード読込中...' : 'Loading feed...'}</div>
+                  <div className="text-xl text-text-secondary">{language === 'ko' ? '피드 로딩 중...' : language === 'ja' ? 'フィード読込中...' : 'Loading feed...'}</div>
                 </div>
               ) : userActivities.length > 0 ? (
                 <div className="space-y-4">
@@ -1849,7 +1849,7 @@ export default function MyAniPass() {
                   })}
                 </div>
               ) : (
-                <div className="text-center py-12 text-gray-600">
+                <div className="text-center py-12 text-text-secondary">
                   {language === 'ko' ? '아직 활동이 없습니다.' : language === 'ja' ? 'まだ活動がありません' : 'No activity yet.'}
                 </div>
               )}
@@ -1859,7 +1859,7 @@ export default function MyAniPass() {
 
         {loading && activeTab !== 'feed' ? (
           <div className="flex justify-center items-center h-64">
-            <div className="text-xl text-gray-600">{language === 'ko' ? '로딩 중...' : language === 'ja' ? '読込中...' : 'Loading...'}</div>
+            <div className="text-xl text-text-secondary">{language === 'ko' ? '로딩 중...' : language === 'ja' ? '読込中...' : 'Loading...'}</div>
           </div>
         ) : activeTab !== 'feed' && (
           <div className={tabLoading ? 'opacity-50 pointer-events-none' : ''}>
@@ -1875,51 +1875,51 @@ export default function MyAniPass() {
                   {/* 통계 */}
                   <div className="w-full">
                     {stats && (
-                      <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-6 h-full">
+                      <div className="bg-surface rounded-xl shadow-lg border border-border p-6 h-full">
                         <div className="space-y-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#8EC5FC] to-[#638CCC] flex items-center justify-center text-white text-xl flex-shrink-0">
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-text-primary text-xl flex-shrink-0">
                               📺
                             </div>
                             <div className="flex-1">
-                              <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '평가한 애니' : language === 'ja' ? '評価済みアニメ' : 'Rated Anime'}</div>
-                              <div className="text-2xl font-bold text-[#638CCC]">
+                              <div className="text-xs font-semibold text-text-secondary uppercase tracking-wide mb-0.5">{language === 'ko' ? '평가한 애니' : language === 'ja' ? '評価済みアニメ' : 'Rated Anime'}</div>
+                              <div className="text-2xl font-bold text-primary">
                                 {stats.total_rated || 0}
                               </div>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#90B2E4] to-[#8EC5FC] flex items-center justify-center text-white text-xl flex-shrink-0">
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-secondary to-secondary-dark flex items-center justify-center text-text-primary text-xl flex-shrink-0">
                               ⭐
                             </div>
                             <div className="flex-1">
-                              <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '보고싶어요' : language === 'ja' ? 'ウォッチリスト' : 'Watchlist'}</div>
-                              <div className="text-2xl font-bold text-[#638CCC]">
+                              <div className="text-xs font-semibold text-text-secondary uppercase tracking-wide mb-0.5">{language === 'ko' ? '보고싶어요' : language === 'ja' ? 'ウォッチリスト' : 'Watchlist'}</div>
+                              <div className="text-2xl font-bold text-secondary">
                                 {stats.total_want_to_watch || 0}
                               </div>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-yellow-400 flex items-center justify-center text-white text-xl flex-shrink-0">
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-accent to-accent-dark flex items-center justify-center text-text-primary text-xl flex-shrink-0">
                               ✨
                             </div>
                             <div className="flex-1">
-                              <div className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-0.5">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</div>
-                              <div className="text-2xl font-bold text-amber-600">
+                              <div className="text-xs font-semibold text-text-secondary uppercase tracking-wide mb-0.5">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</div>
+                              <div className="text-2xl font-bold text-accent">
                                 {stats.average_rating ? `★ ${stats.average_rating.toFixed(1)}` : '-'}
                               </div>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#638CCC] to-purple-400 flex items-center justify-center text-white text-xl flex-shrink-0">
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-tertiary to-tertiary-dark flex items-center justify-center text-text-primary text-xl flex-shrink-0">
                               ⏱️
                             </div>
                             <div className="flex-1">
-                              <div className="text-xs font-semibold text-[#638CCC] uppercase tracking-wide mb-0.5">{language === 'ko' ? '시청 시간' : language === 'ja' ? '視聴時間' : 'Watch Time'}</div>
-                              <div className="text-2xl font-bold text-[#638CCC]">
+                              <div className="text-xs font-semibold text-text-secondary uppercase tracking-wide mb-0.5">{language === 'ko' ? '시청 시간' : language === 'ja' ? '視聴時間' : 'Watch Time'}</div>
+                              <div className="text-2xl font-bold text-tertiary">
                                 {formatWatchTime(watchTime?.total_minutes)}
                               </div>
                             </div>
@@ -1978,7 +1978,7 @@ export default function MyAniPass() {
                 {/* Anime Grid */}
                 {!loadedTabs.anime ? (
                   <div className="flex justify-center items-center py-20">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                   </div>
                 ) : displayedAnime.length > 0 ? (
                   ['all', '4', '3', '2', '1'].includes(animeSubMenu) ? (
@@ -2047,7 +2047,7 @@ export default function MyAniPass() {
                     </div>
                   )
                 ) : (
-                  <div className="text-center py-12 text-gray-600">
+                  <div className="text-center py-12 text-text-secondary">
                     {language === 'ko' ? '아직 애니가 없습니다.' : language === 'ja' ? 'まだアニメがありません' : 'No anime yet.'}
                   </div>
                 )}
@@ -2059,7 +2059,7 @@ export default function MyAniPass() {
                 {/* Character Grid */}
                 {!loadedTabs.character ? (
                   <div className="flex justify-center items-center py-20">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                   </div>
                 ) : displayedCharacters.length > 0 ? (
                   ['all', '4', '3', '2', '1'].includes(characterSubMenu) ? (
@@ -2136,7 +2136,7 @@ export default function MyAniPass() {
                     </div>
                   )
                 ) : (
-                  <div className="text-center py-12 text-gray-600">
+                  <div className="text-center py-12 text-text-secondary">
                     {language === 'ko' ? '아직 캐릭터가 없습니다.' : language === 'ja' ? 'まだキャラクターがいません' : 'No characters yet.'}
                   </div>
                 )}
@@ -2156,7 +2156,7 @@ export default function MyAniPass() {
                 </h2>
                 <button
                   onClick={() => setShowFollowModal(false)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-500 hover:text-text-secondary"
                 >
                   ✕
                 </button>
@@ -2175,17 +2175,17 @@ export default function MyAniPass() {
                         <img
                           src={getAvatarUrl(follower.avatar_url)}
                           alt={follower.display_name || follower.username}
-                          className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                          className="w-12 h-12 rounded-full object-cover border border-border"
                         />
                       ) : (
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center border border-gray-200" style={{ background: getAvatarGradient(follower.username) }}>
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center border border-border" style={{ background: getAvatarGradient(follower.username) }}>
                           <span className="text-white text-lg font-bold">
                             {(follower.display_name || follower.username || '?')[0].toUpperCase()}
                           </span>
                         </div>
                       )}
                       <div>
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-text-primary">
                           {follower.display_name || follower.username}
                         </div>
                         <div className="text-sm text-gray-500">@{follower.username}</div>
@@ -2194,7 +2194,7 @@ export default function MyAniPass() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-600">
+                <div className="text-center py-8 text-text-secondary">
                   {followModalType === 'followers'
                     ? (language === 'ko' ? '팔로워가 없습니다.' : language === 'ja' ? 'フォロワーがいません' : 'No followers yet.')
                     : (language === 'ko' ? '팔로잉하는 사용자가 없습니다.' : language === 'ja' ? 'フォロー中のユーザーがいません' : 'Not following anyone yet.')}
@@ -2212,12 +2212,12 @@ export default function MyAniPass() {
             onClick={() => setShowDeleteModal(false)}
           >
             <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-              <h3 className="text-xl font-bold mb-2 text-gray-900">
+              <h3 className="text-xl font-bold mb-2 text-text-primary">
                 {language === 'ko' ? '삭제 옵션' : language === 'ja' ? '削除オプション' : 'Delete Options'}
               </h3>
 
               {/* Show what's being deleted */}
-              <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 flex gap-3">
+              <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-border flex gap-3">
                 {activityToDelete.item_image && (
                   <img
                     src={getImageUrl(activityToDelete.item_image)}
@@ -2229,18 +2229,18 @@ export default function MyAniPass() {
                   />
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 mb-1">
+                  <p className="text-sm font-semibold text-text-primary mb-1">
                     {activityToDelete.activity_type === 'character_rating' ? (
                       <>
                         {activityToDelete.item_title}{' '}
-                        <span className="text-gray-600">({activityToDelete.item_title_korean})</span>
+                        <span className="text-text-secondary">({activityToDelete.item_title_korean})</span>
                       </>
                     ) : (
                       activityToDelete.item_title_korean || activityToDelete.item_title
                     )}
                   </p>
                   {activityToDelete.activity_type === 'character_rating' && activityToDelete.anime_title && (
-                    <p className="text-xs text-gray-600 mb-1">
+                    <p className="text-xs text-text-secondary mb-1">
                       from: {activityToDelete.anime_title_korean || activityToDelete.anime_title}
                     </p>
                   )}
@@ -2254,7 +2254,7 @@ export default function MyAniPass() {
 
               {activityToDelete.review_content && activityToDelete.review_content.trim() ? (
                 <>
-                  <p className="text-sm text-gray-700 mb-6">
+                  <p className="text-sm text-text-secondary mb-6">
                     {language === 'ko'
                       ? '이 평가에는 리뷰가 포함되어 있습니다. 어떻게 삭제하시겠습니까?'
                       : 'This rating includes a review. How would you like to delete it?'}
@@ -2274,7 +2274,7 @@ export default function MyAniPass() {
                     </button>
                     <button
                       onClick={() => setShowDeleteModal(false)}
-                      className="w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
+                      className="w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 text-text-secondary rounded-lg font-medium transition-colors"
                     >
                       {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                     </button>
@@ -2282,7 +2282,7 @@ export default function MyAniPass() {
                 </>
               ) : (
                 <>
-                  <p className="text-sm text-gray-700 mb-6">
+                  <p className="text-sm text-text-secondary mb-6">
                     {language === 'ko'
                       ? '이 평가를 삭제하시겠습니까?'
                       : 'Are you sure you want to delete this rating?'}
@@ -2296,7 +2296,7 @@ export default function MyAniPass() {
                     </button>
                     <button
                       onClick={() => setShowDeleteModal(false)}
-                      className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
+                      className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-text-secondary rounded-lg font-medium transition-colors"
                     >
                       {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                     </button>
