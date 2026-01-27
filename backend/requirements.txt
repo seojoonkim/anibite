@@ -30,4 +30,7 @@ email-validator==2.2.0
 # Cloud Storage (Cloudflare R2 / S3)
 boto3==1.35.94
 
-# Updated: 2026-01-16 - Feed service improvements
+# HTTP Client (for image proxy)
+requests==2.32.3
+
+# Updated: 2026-01-27 - Image proxy auto-download
