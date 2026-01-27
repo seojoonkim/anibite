@@ -351,11 +351,25 @@ export function useActivityPagination(filters = {}, pageSize = 50, skip = false)
     }
   }, [skip]); // skip이 변경되면 다시 체크
 
+  // Reset function to reload from beginning
+  const reset = useCallback(() => {
+    console.log('[useActivityPagination] Reset called');
+    filtersStringRef.current = ''; // Force reload on next effect
+    loadInitial(filters);
+  }, [filters, loadInitial]);
+
+  // Remove activity from list (optimistic UI)
+  const removeActivity = useCallback((activityId) => {
+    setAllActivities(prev => prev.filter(a => a.id !== activityId));
+  }, []);
+
   return {
     activities: isResettingRef.current ? [] : allActivities,
     loading: loading || isResettingRef.current,
     loadingMore,
     hasMore,
-    loadMore
+    loadMore,
+    reset,
+    removeActivity
   };
 }

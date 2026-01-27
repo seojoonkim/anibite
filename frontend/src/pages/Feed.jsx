@@ -60,7 +60,8 @@ export default function Feed() {
     loadingMore,
     hasMore,
     loadMore,
-    reset: resetActivities
+    reset: resetActivities,
+    removeActivity
   } = useActivityPagination(paginationFilters, 10, skipPagination);
 
   // Cache disabled - was causing inconsistent data on tab switching
@@ -390,11 +391,8 @@ export default function Feed() {
         }
       }
 
-      // Refresh activities: reset and reload
+      // Refresh activities
       resetActivities();
-      // Wait a bit for reset to complete, then reload
-      await new Promise(resolve => setTimeout(resolve, 100));
-      await loadMore(false);
     } catch (err) {
       console.error('Failed to save:', err);
       throw err;
@@ -409,30 +407,35 @@ export default function Feed() {
   const handleDeleteContent = async (deleteType) => {
     if (!activityToDelete) return;
 
-    try {
-      const activity = activityToDelete;
-      const isAnime = activity.activity_type === 'anime_rating';
-      const isUserPost = activity.activity_type === 'user_post';
-      const hasReview = activity.review_content && activity.review_content.trim();
+    const activity = activityToDelete;
+    const activityId = activity.id;
+    const isAnime = activity.activity_type === 'anime_rating';
+    const isUserPost = activity.activity_type === 'user_post';
+    const hasReview = activity.review_content && activity.review_content.trim();
 
+    // Optimistic UI - 즉시 화면에서 제거
+    removeActivity(activityId);
+    setShowDeleteModal(false);
+    setActivityToDelete(null);
+
+    try {
       if (isUserPost) {
         // 일반 포스트 삭제
-        // user_post의 ID는 review_id 또는 item_id에 있을 수 있음
         const postId = activity.review_id || activity.item_id;
         if (postId) {
-          // If we have the post ID, use userPostService
           await userPostService.deletePost(postId);
         } else {
-          // If no post ID, use activityService with activity.id
-          await activityService.deleteActivity(activity.id);
+          await activityService.deleteActivity(activityId);
         }
       } else if (deleteType === 'review_only' && hasReview) {
-        // 리뷰만 삭제 (별점은 유지) - item_id로 삭제
+        // 리뷰만 삭제 (별점은 유지) - 피드 새로고침 필요
         if (isAnime) {
           await reviewService.deleteMyReview(activity.item_id);
         } else {
           await characterReviewService.deleteMyReview(activity.item_id);
         }
+        // 리뷰만 삭제 시 activity가 남아있으므로 새로고침
+        resetActivities();
       } else {
         // 별점까지 모두 삭제
         if (isAnime) {
@@ -441,23 +444,15 @@ export default function Feed() {
           await characterService.deleteCharacterRating(activity.item_id);
         }
       }
-
-      // 삭제 성공 - 모달 닫기
-      setShowDeleteModal(false);
-      setActivityToDelete(null);
-
-      // Refresh activities: reset and reload (에러 발생해도 삭제는 이미 완료됨)
-      try {
-        resetActivities();
-        await new Promise(resolve => setTimeout(resolve, 100));
-        await loadMore(false);
-      } catch (refreshErr) {
-        console.error('Failed to refresh after delete:', refreshErr);
-        // 새로고침 실패해도 삭제는 성공했으므로 에러 표시 안함
-      }
     } catch (err) {
+      // 404 = 이미 삭제됨 -> 무시
+      if (err.response?.status === 404) {
+        console.log('Already deleted');
+        return;
+      }
       console.error('Failed to delete:', err);
-      alert(language === 'ko' ? '삭제에 실패했습니다.' : language === 'ja' ? '削除に失敗しました' : 'Failed to delete.');
+      // 실패 시 새로고침하여 원래 상태로
+      resetActivities();
     }
   };
 
@@ -738,8 +733,8 @@ export default function Feed() {
           style={{ zIndex: 9999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
           onClick={() => setShowDeleteModal(false)}
         >
-          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold mb-2 text-gray-900">
+          <div className="bg-surface rounded-xl p-6 max-w-md w-full mx-4 border border-border" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold mb-2 text-text-primary">
               {activityToDelete.activity_type === 'user_post'
                 ? (language === 'ko' ? '포스트 삭제' : language === 'ja' ? '投稿を削除' : 'Delete Post')
                 : (language === 'ko' ? '삭제 옵션' : language === 'ja' ? '削除オプション' : 'Delete Options')}
@@ -747,7 +742,7 @@ export default function Feed() {
 
             {activityToDelete.activity_type === 'user_post' ? (
               <>
-                <p className="text-sm text-gray-700 mb-6">
+                <p className="text-sm text-text-secondary mb-6">
                   {language === 'ko'
                     ? '이 포스트를 삭제하시겠습니까?'
                     : language === 'ja'
@@ -763,7 +758,7 @@ export default function Feed() {
                   </button>
                   <button
                     onClick={() => setShowDeleteModal(false)}
-                    className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
+                    className="flex-1 px-4 py-2 bg-surface-hover hover:bg-surface-hover/80 text-text-secondary rounded-lg font-medium transition-colors"
                   >
                     {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                   </button>
@@ -772,7 +767,7 @@ export default function Feed() {
             ) : (
               <>
                 {/* Show what's being deleted */}
-                <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 flex gap-3">
+                <div className="mb-4 p-3 bg-surface-hover rounded-lg border border-border flex gap-3">
                   {activityToDelete.item_image && (
                     <img
                       src={getItemImageUrl(activityToDelete.item_image)}
@@ -784,22 +779,22 @@ export default function Feed() {
                     />
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 mb-1">
+                    <p className="text-sm font-semibold text-text-primary mb-1">
                       {activityToDelete.activity_type === 'character_rating' ? (
                         <>
                           {activityToDelete.item_title}{' '}
-                          <span className="text-gray-600">({activityToDelete.item_title_korean})</span>
+                          <span className="text-text-secondary">({activityToDelete.item_title_korean})</span>
                         </>
                       ) : (
                         activityToDelete.item_title_korean || activityToDelete.item_title
                       )}
                     </p>
                     {activityToDelete.activity_type === 'character_rating' && activityToDelete.anime_title && (
-                      <p className="text-xs text-gray-600 mb-1">
+                      <p className="text-xs text-text-secondary mb-1">
                         from: {activityToDelete.anime_title_korean || activityToDelete.anime_title}
                       </p>
                     )}
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-text-tertiary">
                       {activityToDelete.activity_type === 'character_rating'
                         ? (language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character')
                         : (language === 'ko' ? '애니메이션' : language === 'ja' ? 'アニメーション' : 'Anime')}
@@ -809,7 +804,7 @@ export default function Feed() {
 
                 {activityToDelete.review_content && activityToDelete.review_content.trim() ? (
                   <>
-                    <p className="text-sm text-gray-700 mb-6">
+                    <p className="text-sm text-text-secondary mb-6">
                       {language === 'ko'
                         ? '이 평가에는 리뷰가 포함되어 있습니다. 어떻게 삭제하시겠습니까?'
                         : language === 'ja'
@@ -831,7 +826,7 @@ export default function Feed() {
                       </button>
                       <button
                         onClick={() => setShowDeleteModal(false)}
-                        className="w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
+                        className="w-full px-4 py-3 bg-surface-hover hover:bg-surface-hover/80 text-text-secondary rounded-lg font-medium transition-colors"
                       >
                         {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                       </button>
@@ -839,7 +834,7 @@ export default function Feed() {
                   </>
                 ) : (
                   <>
-                    <p className="text-sm text-gray-700 mb-6">
+                    <p className="text-sm text-text-secondary mb-6">
                       {language === 'ko'
                         ? '이 평가를 삭제하시겠습니까?'
                         : language === 'ja'
@@ -855,7 +850,7 @@ export default function Feed() {
                       </button>
                       <button
                         onClick={() => setShowDeleteModal(false)}
-                        className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
+                        className="flex-1 px-4 py-2 bg-surface-hover hover:bg-surface-hover/80 text-text-secondary rounded-lg font-medium transition-colors"
                       >
                         {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                       </button>
