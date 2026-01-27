@@ -100,10 +100,20 @@ export const getAvatarUrl = (avatarUrl, characterId = null) => {
 
   // 외부 URL(AniList 등)은 사용하지 않음 - R2만 사용
   if (avatarUrl.startsWith('http')) {
-    // If we have character ID, use R2
+    // If we have character ID parameter, use R2
     if (characterId) {
       return `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
     }
+
+    // Try to extract character ID from AniList URL
+    if (avatarUrl.includes('anilist.co') && avatarUrl.includes('/character/')) {
+      const match = avatarUrl.match(/\/b(\d+)-/);
+      if (match && match[1]) {
+        const extractedCharacterId = match[1];
+        return `${IMAGE_BASE_URL}/images/characters/${extractedCharacterId}.jpg`;
+      }
+    }
+
     // External URL without character ID - return null (will show gradient placeholder)
     return null;
   }
