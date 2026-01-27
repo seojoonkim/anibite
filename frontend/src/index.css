@@ -170,40 +170,6 @@ body {
 }
 
 /* ============================================
-   DARK MODE OVERRIDES - Force dark theme
-   ============================================ */
-.bg-white {
-  background-color: var(--color-surface) !important;
-}
-
-.bg-gray-50 {
-  background-color: var(--color-background) !important;
-}
-
-.bg-gray-100 {
-  background-color: var(--color-surface) !important;
-}
-
-.text-gray-900,
-.text-gray-800 {
-  color: var(--color-text-primary) !important;
-}
-
-.text-gray-700,
-.text-gray-600 {
-  color: var(--color-text-secondary) !important;
-}
-
-.text-gray-500 {
-  color: var(--color-text-tertiary) !important;
-}
-
-.border-gray-200,
-.border-gray-300 {
-  border-color: var(--color-border) !important;
-}
-
-/* ============================================
    UTILITY CLASSES
    ============================================ */
 
