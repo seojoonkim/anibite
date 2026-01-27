@@ -80,8 +80,8 @@ export default function Home() {
           const title = language === 'ko'
             ? (randomAnime.title_korean || randomAnime.title_romaji || randomAnime.title_english)
             : language === 'ja'
-            ? (randomAnime.title_japanese || randomAnime.title_romaji || randomAnime.title_english)
-            : (randomAnime.title_romaji || randomAnime.title_english);
+              ? (randomAnime.title_japanese || randomAnime.title_romaji || randomAnime.title_english)
+              : (randomAnime.title_romaji || randomAnime.title_english);
 
           const placeholderText = language === 'ko' ? `예: ${title}` : language === 'ja' ? `例: ${title}` : `e.g., ${title}`;
           console.log('Setting placeholder to:', placeholderText);
@@ -207,11 +207,21 @@ export default function Home() {
         {/* Anime Grid */}
         {loading && animeList.length === 0 ? (
           <div className="flex justify-center items-center h-64">
-            <div className="text-xl text-gray-600">{language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...'}</div>
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-12 h-12 border-4 rounded-full animate-spin" style={{
+                borderColor: 'var(--color-border)',
+                borderTopColor: 'var(--color-primary)'
+              }} />
+              <div className="text-lg" style={{ color: 'var(--color-text-secondary)' }}>
+                {language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...'}
+              </div>
+            </div>
           </div>
         ) : animeList.length === 0 ? (
           <div className="flex justify-center items-center h-64">
-            <div className="text-xl text-gray-600">{language === 'ko' ? '검색 결과가 없습니다.' : language === 'ja' ? '検索結果が見つかりません。' : 'No results found.'}</div>
+            <div className="text-xl" style={{ color: 'var(--color-text-secondary)' }}>
+              {language === 'ko' ? '검색 결과가 없습니다.' : language === 'ja' ? '検索結果が見つかりません。' : 'No results found.'}
+            </div>
           </div>
         ) : (
           <>
@@ -227,7 +237,26 @@ export default function Home() {
                 <button
                   onClick={handleLoadMore}
                   disabled={loading}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-medium disabled:opacity-50"
+                  className="px-8 py-3 rounded-lg font-medium text-white transition-all disabled:opacity-50"
+                  style={{
+                    backgroundColor: loading ? 'var(--color-border)' : 'var(--color-primary)',
+                    boxShadow: loading ? 'none' : 'var(--shadow-md)',
+                    cursor: loading ? 'not-allowed' : 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!loading) {
+                      e.target.style.backgroundColor = 'var(--color-primary-dark)';
+                      e.target.style.boxShadow = 'var(--shadow-lg)';
+                      e.target.style.transform = 'translateY(-2px)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!loading) {
+                      e.target.style.backgroundColor = 'var(--color-primary)';
+                      e.target.style.boxShadow = 'var(--shadow-md)';
+                      e.target.style.transform = 'translateY(0)';
+                    }
+                  }}
                 >
                   {loading ? (language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...') : (language === 'ko' ? '더 보기' : language === 'ja' ? 'もっと見る' : 'Load More')}
                 </button>
