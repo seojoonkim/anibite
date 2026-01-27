@@ -137,48 +137,57 @@ export default function RateCharacters() {
   const handleRatingChange = async (characterId, rating) => {
     if (!rating || rating === 0) return;
 
-    try {
-      // Add animation effect - use functional updates to avoid stale closure
-      setCharacters(prev => prev.map(char =>
-        char.id === characterId ? { ...char, _animating: true } : char
-      ));
-      setTimeout(() => {
-        setCharacters(prev => prev.map(char =>
-          char.id === characterId ? { ...char, _animating: false } : char
-        ));
-      }, 600);
+    // Save previous state for rollback
+    const prevCharacter = characters.find(c => c.id === characterId);
+    const prevRating = prevCharacter?.my_rating;
+    const prevStatus = prevCharacter?.my_status;
 
+    // Optimistic UI update - show success immediately
+    setCharacters(prev => prev.map(char =>
+      char.id === characterId ? { ...char, my_rating: rating, my_status: 'RATED', _animating: true } : char
+    ));
+    setAllCharacters(prev => prev.map(char =>
+      char.id === characterId ? { ...char, my_rating: rating, my_status: 'RATED' } : char
+    ));
+    setCharacterStatuses(prev => ({
+      ...prev,
+      [characterId]: 'RATED'
+    }));
+
+    // Clear animation after delay
+    setTimeout(() => {
+      setCharacters(prev => prev.map(char =>
+        char.id === characterId ? { ...char, _animating: false } : char
+      ));
+    }, 600);
+
+    try {
       const response = await characterService.rateCharacter(characterId, { rating, status: 'RATED' });
 
       // Update cached otaku_score if provided
       if (response && response.otaku_score !== undefined) {
         localStorage.setItem('cached_otaku_score', response.otaku_score.toString());
-        // Trigger a storage event to update Navbar
         window.dispatchEvent(new Event('storage'));
       }
-
-      // Update the character in both lists for immediate UI update - use functional updates
-      setCharacters(prev => prev.map(char =>
-        char.id === characterId ? { ...char, my_rating: rating, my_status: 'RATED' } : char
-      ));
-      setAllCharacters(prev => prev.map(char =>
-        char.id === characterId ? { ...char, my_rating: rating, my_status: 'RATED' } : char
-      ));
-
-      // Clear any previous status when rated
-      setCharacterStatuses(prev => ({
-        ...prev,
-        [characterId]: 'RATED'
-      }));
 
       // Reload stats
       loadStats();
     } catch (err) {
       console.error('Failed to rate character:', err);
-      console.error('Error response:', err.response?.data);
-      console.error('Error status:', err.response?.status);
 
-      // Show detailed error message
+      // Rollback on failure
+      setCharacters(prev => prev.map(char =>
+        char.id === characterId ? { ...char, my_rating: prevRating, my_status: prevStatus } : char
+      ));
+      setAllCharacters(prev => prev.map(char =>
+        char.id === characterId ? { ...char, my_rating: prevRating, my_status: prevStatus } : char
+      ));
+      setCharacterStatuses(prev => ({
+        ...prev,
+        [characterId]: prevStatus
+      }));
+
+      // Show error only after all retries failed
       const errorDetail = err.response?.data?.detail || err.message || 'Unknown error';
       const errorStatus = err.response?.status ? ` (${err.response.status})` : '';
 
@@ -193,48 +202,61 @@ export default function RateCharacters() {
   };
 
   const handleStatusChange = async (characterId, status) => {
-    try {
-      // Add animation effect - use functional updates to avoid stale closure
+    // Save previous state for rollback
+    const prevCharacter = characters.find(c => c.id === characterId);
+    const prevRating = prevCharacter?.my_rating;
+    const prevStatusValue = prevCharacter?.my_status;
+    const prevStatusState = characterStatuses[characterId];
+
+    // Check if status is already set (toggle off)
+    const currentStatus = characterStatuses[characterId];
+    const newStatus = currentStatus === status ? null : status;
+
+    // Optimistic UI update
+    setCharacters(prev => prev.map(char =>
+      char.id === characterId ? { ...char, my_status: newStatus, my_rating: 0, _animating: true } : char
+    ));
+    setAllCharacters(prev => prev.map(char =>
+      char.id === characterId ? { ...char, my_status: newStatus, my_rating: 0 } : char
+    ));
+    setCharacterStatuses(prev => ({
+      ...prev,
+      [characterId]: newStatus
+    }));
+
+    // Clear animation after delay
+    setTimeout(() => {
       setCharacters(prev => prev.map(char =>
-        char.id === characterId ? { ...char, _animating: true } : char
+        char.id === characterId ? { ...char, _animating: false } : char
       ));
-      setTimeout(() => {
-        setCharacters(prev => prev.map(char =>
-          char.id === characterId ? { ...char, _animating: false } : char
-        ));
-      }, 600);
+    }, 600);
 
-      // Check if status is already set
-      const currentStatus = characterStatuses[characterId];
-      const newStatus = currentStatus === status ? null : status;
-
+    try {
       const response = await characterService.rateCharacter(characterId, { status: newStatus });
 
       // Update cached otaku_score if provided
       if (response && response.otaku_score !== undefined) {
         localStorage.setItem('cached_otaku_score', response.otaku_score.toString());
-        // Trigger a storage event to update Navbar
         window.dispatchEvent(new Event('storage'));
       }
-
-      // Update the status in state for immediate UI update
-      setCharacterStatuses(prev => ({
-        ...prev,
-        [characterId]: newStatus
-      }));
-
-      // Update my_status and clear rating in both character lists - use functional updates
-      setCharacters(prev => prev.map(char =>
-        char.id === characterId ? { ...char, my_status: newStatus, my_rating: 0 } : char
-      ));
-      setAllCharacters(prev => prev.map(char =>
-        char.id === characterId ? { ...char, my_status: newStatus, my_rating: 0 } : char
-      ));
 
       // Reload stats
       loadStats();
     } catch (err) {
       console.error('Failed to change status:', err);
+
+      // Rollback on failure
+      setCharacters(prev => prev.map(char =>
+        char.id === characterId ? { ...char, my_status: prevStatusValue, my_rating: prevRating } : char
+      ));
+      setAllCharacters(prev => prev.map(char =>
+        char.id === characterId ? { ...char, my_status: prevStatusValue, my_rating: prevRating } : char
+      ));
+      setCharacterStatuses(prev => ({
+        ...prev,
+        [characterId]: prevStatusState
+      }));
+
       alert(language === 'ko' ? '상태 변경에 실패했습니다.' : language === 'ja' ? 'ステータス変更に失敗しました。' : 'Failed to change status.');
     }
   };

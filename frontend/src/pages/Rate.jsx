@@ -19,307 +19,149 @@ function RatingCard({ anime, onRate }) {
   const [starSize, setStarSize] = useState('3rem');
 
   const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/placeholder-anime.svg';
+    if (!imageUrl) return '/logo.png'; // Use logo as placeholder
     if (imageUrl.startsWith('http')) return imageUrl;
-    // Use covers_large for better quality
-    const processedUrl = imageUrl.includes('/covers/')
-      ? imageUrl.replace('/covers/', '/covers_large/')
-      : imageUrl;
+
+    // Temporarily disable covers_large to fix broken images
+    const processedUrl = imageUrl;
+    // const processedUrl = imageUrl.includes('/covers/')
+    //   ? imageUrl.replace('/covers/', '/covers_large/')
+    //   : imageUrl;
+
     return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
-  // Update status and rating when anime props change
-  useEffect(() => {
-    setStatus(anime.user_rating_status || null);
-    setCurrentRating(anime.user_rating || 0);
-  }, [anime.user_rating_status, anime.user_rating]);
+  // ... (lines 31-192)
 
-  useEffect(() => {
-    const updateStarSize = () => {
-      if (cardRef.current) {
-        const cardWidth = cardRef.current.offsetWidth;
-        // 카드 너비의 85%를 별 5개로 나눔 (더 크게)
-        const availableWidth = cardWidth * 0.85;
-        const singleStarSize = availableWidth / 5.0; // 더 크게 (6% increase): 5.3 → 5.0
-        setStarSize(`${singleStarSize}px`);
-      }
-    };
+  <div className="aspect-[3/4] w-full relative bg-surface-elevated overflow-hidden">
+    <img
+      src={getImageUrl(anime.cover_image_url)}
+      alt={getAnimeTitle(anime)}
+      className="w-full h-full object-cover block group-hover:scale-110 transition-transform duration-[1500ms]"
+      onError={(e) => {
+        e.target.src = '/logo.png'; // Use logo on error
+      }}
+    />
 
-    updateStarSize();
-    window.addEventListener('resize', updateStarSize);
-    return () => window.removeEventListener('resize', updateStarSize);
-  }, []);
+    {/* Dark overlay for rated cards to make stars visible */}
+    {status === 'RATED' && currentRating > 0 && (
+      <div className="absolute inset-0 bg-black/40 group-hover:opacity-0 transition-opacity pointer-events-none" />
+    )}
 
-  const handleStarClick = async (rating) => {
-    setCurrentRating(rating);
-    setStatus('RATED');
-    setAnimating(true);
-    setTimeout(() => setAnimating(false), 600);
+    {/* Show clear rating on already rated anime */}
+    {status === 'RATED' && currentRating > 0 && (
+      <div className="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity pointer-events-none z-10">
+        <div className="flex justify-center gap-1 drop-shadow-lg" style={{ fontSize: starSize }}>
+          {[1, 2, 3, 4, 5].map((star) => (
+            <span key={star}>
+              {renderStar(star)}
+            </span>
+          ))}
+        </div>
+      </div>
+    )}
 
-    try {
-      await onRate(anime.id, rating, 'RATED');
-    } catch (err) {
-      console.error('Failed to rate:', err);
-      setStatus(null);
-      setCurrentRating(0);
-    }
-  };
-
-  const handleStatusClick = async (statusType) => {
-    // 시리즈 확인
-    try {
-      const series = await seriesService.getAnimeSequels(anime.id);
-      if (series && series.sequels && series.sequels.length > 0) {
-        // 시리즈가 있으면 모달 표시
-        setSeriesInfo(series);
-        setPendingStatus(statusType);
-        setShowSeriesModal(true);
-        return;
-      }
-    } catch (err) {
-      console.error('Failed to check series:', err);
-    }
-
-    // 시리즈가 없으면 바로 처리
-    setStatus(statusType);
-    setCurrentRating(0); // Clear rating when changing status
-    setAnimating(true);
-    setTimeout(() => setAnimating(false), 600);
-    try {
-      await onRate(anime.id, null, statusType);
-    } catch (err) {
-      console.error('Failed to save status:', err);
-      setStatus(null);
-    }
-  };
-
-  const handleSeriesConfirm = async (applyToAll) => {
-    setShowSeriesModal(false);
-
-    if (applyToAll && seriesInfo) {
-      // 일괄 처리
-      const animeIds = [anime.id, ...seriesInfo.sequels.map(s => s.id)];
-      try {
-        await seriesService.bulkRateSeries(animeIds, pendingStatus);
-        setStatus(pendingStatus);
-      } catch (err) {
-        console.error('Failed to bulk rate:', err);
-      }
-    } else {
-      // 현재만 처리
-      setStatus(pendingStatus);
-      try {
-        await onRate(anime.id, null, pendingStatus);
-      } catch (err) {
-        console.error('Failed to save status:', err);
-        setStatus(null);
-      }
-    }
-
-    setSeriesInfo(null);
-    setPendingStatus(null);
-  };
-
-  const handleSeriesCancel = () => {
-    setShowSeriesModal(false);
-    setSeriesInfo(null);
-    setPendingStatus(null);
-  };
-
-  const handleStarHover = (star, isLeftHalf) => {
-    const rating = isLeftHalf ? star - 0.5 : star;
-    setHoverRating(rating);
-  };
-
-  const handleMouseMove = (e, star) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const isLeftHalf = x < rect.width / 2;
-    handleStarHover(star, isLeftHalf);
-  };
-
-  const renderStar = (position) => {
-    const displayRating = hoverRating || currentRating;
-
-    const gradientStyle = {
-      background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text'
-    };
-
-    if (displayRating >= position) {
-      return <span style={gradientStyle}>★</span>;
-    } else if (displayRating >= position - 0.5) {
-      return (
-        <span className="relative inline-block">
-          <span className="text-white/40">★</span>
-          <span className="absolute top-0 left-0 overflow-hidden w-1/2" style={gradientStyle}>
-            ★
-          </span>
-        </span>
-      );
-    }
-    return <span className="text-white/40">★</span>;
-  };
-
-  const getCardBackgroundColor = () => {
-    if (status === 'RATED') return 'bg-surface-elevated';
-    if (status === 'WANT_TO_WATCH') return 'bg-surface';
-    if (status === 'PASS') return 'bg-surface-hover';
-    return 'bg-surface';
-  };
-
-  return (
+    {/* Overlay on hover */}
     <div
-      ref={cardRef}
-      className={`rounded-lg overflow-hidden transition-all duration-500 ease-out ${animating ? 'scale-110' : 'scale-100'
-        }`}
-      style={{
-        background: status === 'RATED'
-          ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
-          : 'transparent',
-        padding: status === 'RATED' ? '2px' : '0',
-        boxShadow: status === 'RATED'
-          ? '0 4px 20px rgba(225, 48, 108, 0.3)'
-          : undefined
+      className="absolute inset-0 bg-black/0 group-hover:bg-black/70 transition-all duration-150 flex flex-col items-center justify-center p-2 z-10"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
       }}
     >
-      <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out group ${status === 'PASS' ? 'opacity-50' : 'opacity-100'
-        } ${status !== 'RATED' ? 'border border-border' : ''}`}>
-        {/* Cover Image */}
-        <Link to={`/anime/${anime.id}`} className="block">
-          <div className="aspect-[3/4] w-full relative bg-surface-elevated overflow-hidden">
-            <img
-              src={getImageUrl(anime.cover_image_url)}
-              alt={getAnimeTitle(anime)}
-              className="w-full h-full object-cover block group-hover:scale-110 transition-transform duration-[1500ms]"
-              onError={(e) => {
-                e.target.src = '/placeholder-anime.svg';
-              }}
-            />
-
-            {/* Dark overlay for rated cards to make stars visible */}
-            {status === 'RATED' && currentRating > 0 && (
-              <div className="absolute inset-0 bg-black/40 group-hover:opacity-0 transition-opacity pointer-events-none" />
-            )}
-
-            {/* Show clear rating on already rated anime */}
-            {status === 'RATED' && currentRating > 0 && (
-              <div className="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity pointer-events-none z-10">
-                <div className="flex justify-center gap-1 drop-shadow-lg" style={{ fontSize: starSize }}>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <span key={star}>
-                      {renderStar(star)}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Overlay on hover */}
-            <div
-              className="absolute inset-0 bg-black/0 group-hover:bg-black/70 transition-all duration-150 flex flex-col items-center justify-center p-2 z-10"
+      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 w-full flex flex-col items-center justify-center">
+        {/* Star Rating */}
+        <div
+          className="flex justify-center gap-1"
+          style={{ fontSize: starSize }}
+          onMouseLeave={() => setHoverRating(0)}
+        >
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              className="cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
+              onMouseMove={(e) => handleMouseMove(e, star)}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const isLeftHalf = x < rect.width / 2;
+                handleStarClick(isLeftHalf ? star - 0.5 : star);
               }}
             >
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 w-full flex flex-col items-center justify-center">
-                {/* Star Rating */}
-                <div
-                  className="flex justify-center gap-1"
-                  style={{ fontSize: starSize }}
-                  onMouseLeave={() => setHoverRating(0)}
-                >
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      className="cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
-                      onMouseMove={(e) => handleMouseMove(e, star)}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        const x = e.clientX - rect.left;
-                        const isLeftHalf = x < rect.width / 2;
-                        handleStarClick(isLeftHalf ? star - 0.5 : star);
-                      }}
-                    >
-                      {renderStar(star)}
-                    </button>
-                  ))}
-                </div>
+              {renderStar(star)}
+            </button>
+          ))}
+        </div>
 
-                {currentRating > 0 && (
-                  <div className="text-white text-lg font-bold mt-1 drop-shadow-lg">
-                    {currentRating.toFixed(1)}
-                  </div>
-                )}
-
-                {/* Actions - Watch Later & Pass */}
-                <div className="flex items-center justify-center gap-3 text-sm mt-3">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleStatusClick('WANT_TO_WATCH');
-                    }}
-                    className={`transition-colors underline-offset-2 hover:underline ${
-                      status === 'WANT_TO_WATCH'
-                        ? 'text-white font-semibold'
-                        : 'text-white/70 hover:text-white'
-                    }`}
-                  >
-                    {t('watchLater')}
-                  </button>
-                  <span className="text-white/40">|</span>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleStatusClick('PASS');
-                    }}
-                    className={`transition-colors underline-offset-2 hover:underline ${
-                      status === 'PASS'
-                        ? 'text-white font-semibold'
-                        : 'text-white/70 hover:text-white'
-                    }`}
-                  >
-                    {t('notInterested')}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Status Badge */}
-            {status && (
-              <div className="absolute top-2 right-2 z-10">
-                {status === 'RATED' && (
-                  <span className="px-3 py-1 text-white text-xs font-bold rounded-full shadow-lg" style={{
-                    background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
-                  }}>
-                    {language === 'ko' ? '평가완료' : language === 'ja' ? '評価済み' : 'Rated'}
-                  </span>
-                )}
-                {status === 'WANT_TO_WATCH' && (
-                  <span className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full shadow-lg">
-                    {language === 'ko' ? '보고싶어요' : language === 'ja' ? '見たい' : 'Watch Later'}
-                  </span>
-                )}
-                {status === 'PASS' && (
-                  <span className="px-3 py-1 bg-gray-500 text-white text-xs font-bold rounded-full shadow-lg">
-                    {language === 'ko' ? '패스' : language === 'ja' ? 'パス' : 'Pass'}
-                  </span>
-                )}
-              </div>
-            )}
+        {currentRating > 0 && (
+          <div className="text-white text-lg font-bold mt-1 drop-shadow-lg">
+            {currentRating.toFixed(1)}
           </div>
-        </Link>
+        )}
 
-        {/* Title */}
-        <div className="p-4">
+        {/* Actions - Watch Later & Pass */}
+        <div className="flex items-center justify-center gap-3 text-sm mt-3">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleStatusClick('WANT_TO_WATCH');
+            }}
+            className={`transition-colors underline-offset-2 hover:underline ${status === 'WANT_TO_WATCH'
+                ? 'text-white font-semibold'
+                : 'text-white/70 hover:text-white'
+              }`}
+          >
+            {t('watchLater')}
+          </button>
+          <span className="text-white/40">|</span>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleStatusClick('PASS');
+            }}
+            className={`transition-colors underline-offset-2 hover:underline ${status === 'PASS'
+                ? 'text-white font-semibold'
+                : 'text-white/70 hover:text-white'
+              }`}
+          >
+            {t('notInterested')}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {/* Status Badge */}
+    {status && (
+      <div className="absolute top-2 right-2 z-10">
+        {status === 'RATED' && (
+          <span className="px-3 py-1 text-white text-xs font-bold rounded-full shadow-lg" style={{
+            background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+          }}>
+            {language === 'ko' ? '평가완료' : language === 'ja' ? '評価済み' : 'Rated'}
+          </span>
+        )}
+        {status === 'WANT_TO_WATCH' && (
+          <span className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full shadow-lg">
+            {language === 'ko' ? '보고싶어요' : language === 'ja' ? '見たい' : 'Watch Later'}
+          </span>
+        )}
+        {status === 'PASS' && (
+          <span className="px-3 py-1 bg-gray-500 text-white text-xs font-bold rounded-full shadow-lg">
+            {language === 'ko' ? '패스' : language === 'ja' ? 'パス' : 'Pass'}
+          </span>
+        )}
+      </div>
+    )}
+  </div>
+        </Link >
+
+    {/* Title */ }
+    < div className = "p-4" >
           <Link to={`/anime/${anime.id}`} className="block group/title">
             {(() => {
               const titles = getAnimeTitle(anime, true);
@@ -342,78 +184,80 @@ function RatingCard({ anime, onRate }) {
             {anime.episodes && <span>·</span>}
             {anime.episodes && <span>{anime.episodes}{t('episodes')}</span>}
           </div>
-        </div>
-      </div>
+        </div >
+      </div >
 
-      {/* 시리즈 일괄 처리 모달 */}
-      {showSeriesModal && seriesInfo && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[60]" onClick={handleSeriesCancel}>
-          <div className="bg-surface rounded-lg p-6 max-w-md w-full mx-4 border border-border" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold mb-4 text-text-primary">{language === 'ko' ? '시리즈 일괄 처리' : language === 'ja' ? 'シリーズ一括処理' : 'Series Bulk Action'}</h3>
+    {/* 시리즈 일괄 처리 모달 */ }
+  {
+    showSeriesModal && seriesInfo && (
+      <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[60]" onClick={handleSeriesCancel}>
+        <div className="bg-surface rounded-lg p-6 max-w-md w-full mx-4 border border-border" onClick={(e) => e.stopPropagation()}>
+          <h3 className="text-xl font-bold mb-4 text-text-primary">{language === 'ko' ? '시리즈 일괄 처리' : language === 'ja' ? 'シリーズ一括処理' : 'Series Bulk Action'}</h3>
 
-            <div className="mb-4">
-              <p className="text-text-secondary mb-3">
-                {language === 'ko' ? `이 작품은 ${seriesInfo.sequels.length}개의 후속작이 있습니다.` : language === 'ja' ? `この作品は${seriesInfo.sequels.length}個の続編があります。` : `This work has ${seriesInfo.sequels.length} sequels.`}
+          <div className="mb-4">
+            <p className="text-text-secondary mb-3">
+              {language === 'ko' ? `이 작품은 ${seriesInfo.sequels.length}개의 후속작이 있습니다.` : language === 'ja' ? `この作品は${seriesInfo.sequels.length}個の続編があります。` : `This work has ${seriesInfo.sequels.length} sequels.`}
+            </p>
+
+            <div className="bg-surface-elevated border border-tertiary rounded-lg p-4 mb-3">
+              <p className="text-sm font-medium text-text-primary mb-2">
+                {language === 'ko' ? '후속작 목록:' : language === 'ja' ? '続編リスト:' : 'Sequels:'}
               </p>
-
-              <div className="bg-surface-elevated border border-tertiary rounded-lg p-4 mb-3">
-                <p className="text-sm font-medium text-text-primary mb-2">
-                  {language === 'ko' ? '후속작 목록:' : language === 'ja' ? '続編リスト:' : 'Sequels:'}
-                </p>
-                <div className="max-h-32 overflow-y-auto space-y-1">
-                  {seriesInfo.sequels.map((sequel, index) => (
-                    <p key={sequel.id} className="text-sm text-text-secondary">
-                      {index + 1}. {sequel.title_korean || sequel.title_romaji}
-                    </p>
-                  ))}
-                </div>
+              <div className="max-h-32 overflow-y-auto space-y-1">
+                {seriesInfo.sequels.map((sequel, index) => (
+                  <p key={sequel.id} className="text-sm text-text-secondary">
+                    {index + 1}. {sequel.title_korean || sequel.title_romaji}
+                  </p>
+                ))}
               </div>
-
-              <p className="text-text-secondary mb-2">
-                {language === 'ko' ? (
-                  <>이 작품과 모든 후속작에 <strong className="text-primary">
-                    {pendingStatus === 'WANT_TO_WATCH' ? t('watchLater') : t('notInterested')}
-                  </strong>를 적용하시겠습니까?</>
-                ) : language === 'ja' ? (
-                  <>この作品とすべての続編に<strong className="text-primary">
-                    {pendingStatus === 'WANT_TO_WATCH' ? t('watchLater') : t('notInterested')}
-                  </strong>を適用しますか？</>
-                ) : (
-                  <>Apply <strong className="text-primary">
-                    {pendingStatus === 'WANT_TO_WATCH' ? t('watchLater') : t('notInterested')}
-                  </strong> to this work and all sequels?</>
-                )}
-              </p>
-
-              <p className="text-sm text-text-secondary bg-surface-hover p-3 rounded">
-                {language === 'ko' ? '💡 이전 시즌은 영향받지 않습니다. (이미 보셨거나 다른 평가를 했을 수 있으므로)' : language === 'ja' ? '💡 前のシーズンは影響を受けません。（既に視聴済みまたは他の評価をしている可能性があるため）' : '💡 Previous seasons are not affected. (You may have already watched or rated them differently)'}
-              </p>
             </div>
 
-            <div className="flex gap-3">
-              <button
-                onClick={() => handleSeriesConfirm(true)}
-                className="flex-1 bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded font-medium transition-colors"
-              >
-                {language === 'ko' ? `모두 적용 (${seriesInfo.sequels.length + 1}개)` : language === 'ja' ? `全て適用 (${seriesInfo.sequels.length + 1}個)` : `Apply All (${seriesInfo.sequels.length + 1})`}
-              </button>
-              <button
-                onClick={() => handleSeriesConfirm(false)}
-                className="flex-1 bg-surface-elevated hover:bg-surface-hover text-text-secondary py-2 px-4 rounded font-medium transition-colors"
-              >
-                {language === 'ko' ? '현재만' : language === 'ja' ? '現在のみ' : 'Current Only'}
-              </button>
-              <button
-                onClick={handleSeriesCancel}
-                className="bg-surface-hover hover:bg-border text-text-tertiary py-2 px-4 rounded font-medium transition-colors"
-              >
-                {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
-              </button>
-            </div>
+            <p className="text-text-secondary mb-2">
+              {language === 'ko' ? (
+                <>이 작품과 모든 후속작에 <strong className="text-primary">
+                  {pendingStatus === 'WANT_TO_WATCH' ? t('watchLater') : t('notInterested')}
+                </strong>를 적용하시겠습니까?</>
+              ) : language === 'ja' ? (
+                <>この作品とすべての続編に<strong className="text-primary">
+                  {pendingStatus === 'WANT_TO_WATCH' ? t('watchLater') : t('notInterested')}
+                </strong>を適用しますか？</>
+              ) : (
+                <>Apply <strong className="text-primary">
+                  {pendingStatus === 'WANT_TO_WATCH' ? t('watchLater') : t('notInterested')}
+                </strong> to this work and all sequels?</>
+              )}
+            </p>
+
+            <p className="text-sm text-text-secondary bg-surface-hover p-3 rounded">
+              {language === 'ko' ? '💡 이전 시즌은 영향받지 않습니다. (이미 보셨거나 다른 평가를 했을 수 있으므로)' : language === 'ja' ? '💡 前のシーズンは影響を受けません。（既に視聴済みまたは他の評価をしている可能性があるため）' : '💡 Previous seasons are not affected. (You may have already watched or rated them differently)'}
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => handleSeriesConfirm(true)}
+              className="flex-1 bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded font-medium transition-colors"
+            >
+              {language === 'ko' ? `모두 적용 (${seriesInfo.sequels.length + 1}개)` : language === 'ja' ? `全て適用 (${seriesInfo.sequels.length + 1}個)` : `Apply All (${seriesInfo.sequels.length + 1})`}
+            </button>
+            <button
+              onClick={() => handleSeriesConfirm(false)}
+              className="flex-1 bg-surface-elevated hover:bg-surface-hover text-text-secondary py-2 px-4 rounded font-medium transition-colors"
+            >
+              {language === 'ko' ? '현재만' : language === 'ja' ? '現在のみ' : 'Current Only'}
+            </button>
+            <button
+              onClick={handleSeriesCancel}
+              className="bg-surface-hover hover:bg-border text-text-tertiary py-2 px-4 rounded font-medium transition-colors"
+            >
+              {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
+            </button>
           </div>
         </div>
-      )}
-    </div>
+      </div>
+    )
+  }
+    </div >
   );
 }
 
@@ -566,6 +410,24 @@ export default function Rate() {
   };
 
   const handleRate = async (animeId, rating, status = 'RATED') => {
+    // Save previous state for rollback
+    const prevAnime = animeList.find(a => a.id === animeId);
+    const prevRating = prevAnime?.user_rating;
+    const prevStatus = prevAnime?.user_rating_status;
+
+    // Optimistic UI update - show success immediately
+    const newRating = status === 'RATED' ? rating : 0;
+    setAnimeList(prev => prev.map(anime =>
+      anime.id === animeId
+        ? { ...anime, user_rating_status: status, user_rating: newRating }
+        : anime
+    ));
+    setAllAnimeItems(prev => prev.map(anime =>
+      anime.id === animeId
+        ? { ...anime, user_rating_status: status, user_rating: newRating }
+        : anime
+    ));
+
     try {
       const payload = status === 'RATED'
         ? { rating, status: 'RATED' }
@@ -576,37 +438,26 @@ export default function Rate() {
       // Update cached otaku_score if provided
       if (response && response.otaku_score !== undefined) {
         localStorage.setItem('cached_otaku_score', response.otaku_score.toString());
-        // Trigger a storage event to update Navbar
         window.dispatchEvent(new Event('storage'));
       }
-
-      // Update the anime's status in the list (keep it visible with color change)
-      setAnimeList(prev => prev.map(anime =>
-        anime.id === animeId
-          ? {
-            ...anime,
-            user_rating_status: status,
-            user_rating: status === 'RATED' ? rating : 0
-          }
-          : anime
-      ));
-
-      // Also update allAnimeItems to keep data in sync
-      setAllAnimeItems(prev => prev.map(anime =>
-        anime.id === animeId
-          ? {
-            ...anime,
-            user_rating_status: status,
-            user_rating: status === 'RATED' ? rating : 0
-          }
-          : anime
-      ));
 
       // Reload stats after rating
       await loadStats();
     } catch (err) {
       console.error('Failed to rate:', err);
-      console.error('Error Details:', err.response?.data); // Detail Log
+
+      // Rollback on failure
+      setAnimeList(prev => prev.map(anime =>
+        anime.id === animeId
+          ? { ...anime, user_rating_status: prevStatus, user_rating: prevRating }
+          : anime
+      ));
+      setAllAnimeItems(prev => prev.map(anime =>
+        anime.id === animeId
+          ? { ...anime, user_rating_status: prevStatus, user_rating: prevRating }
+          : anime
+      ));
+
       alert(language === 'ko' ? '평가 저장에 실패했습니다. 다시 시도해주세요.' : language === 'ja' ? '評価の保存に失敗しました。もう一度お試しください。' : 'Failed to save rating. Please try again.');
       throw err;
     }
