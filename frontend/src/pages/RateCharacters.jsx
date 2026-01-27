@@ -253,8 +253,11 @@ export default function RateCharacters() {
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.svg';
     if (imageUrl.startsWith('http')) return imageUrl;
-    // Use original path
-    return `${IMAGE_BASE_URL}${imageUrl}`;
+    // Use covers_large for better quality
+    const processedUrl = imageUrl.includes('/covers/')
+      ? imageUrl.replace('/covers/', '/covers_large/')
+      : imageUrl;
+    return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
   const getCurrentRating = (character) => {
