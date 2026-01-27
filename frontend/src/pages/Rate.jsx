@@ -19,13 +19,21 @@ function RatingCard({ anime, onRate }) {
   const [starSize, setStarSize] = useState('3rem');
 
   const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/placeholder-anime.svg';
-    if (imageUrl.startsWith('http')) return imageUrl;
+    if (!imageUrl) {
+      console.log('[Rate] No imageUrl provided');
+      return '/placeholder-anime.svg';
+    }
+    if (imageUrl.startsWith('http')) {
+      console.log('[Rate] Using http URL:', imageUrl);
+      return imageUrl;
+    }
     // Use covers_large for better quality
     const processedUrl = imageUrl.includes('/covers/')
       ? imageUrl.replace('/covers/', '/covers_large/')
       : imageUrl;
-    return `${IMAGE_BASE_URL}${processedUrl}`;
+    const finalUrl = `${IMAGE_BASE_URL}${processedUrl}`;
+    console.log('[Rate] Generated URL:', finalUrl, 'from:', imageUrl);
+    return finalUrl;
   };
 
   // Update status and rating when anime props change
@@ -192,12 +200,15 @@ function RatingCard({ anime, onRate }) {
         } ${status !== 'RATED' ? 'border border-border' : ''}`}>
         {/* Cover Image */}
         <Link to={`/anime/${anime.id}`} className="block">
-          <div className="aspect-[3/4] bg-surface-elevated relative overflow-hidden">
+          <div className="aspect-[3/4] bg-red-500 relative overflow-hidden" style={{ minHeight: '200px' }}>
             <img
               src={getImageUrl(anime.cover_image_url)}
               alt={getAnimeTitle(anime)}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms]"
+              style={{ border: '3px solid lime' }}
+              onLoad={(e) => console.log('[Rate] Image loaded:', e.target.src)}
               onError={(e) => {
+                console.log('[Rate] Image error:', e.target.src);
                 e.target.src = '/placeholder-anime.svg';
               }}
             />
