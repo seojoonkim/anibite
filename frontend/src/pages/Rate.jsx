@@ -173,9 +173,8 @@ function RatingCard({ anime, onRate }) {
   return (
     <div
       ref={cardRef}
-      className={`rounded-lg overflow-hidden transition-all duration-500 ease-out ${
-        animating ? 'scale-110' : 'scale-100'
-      }`}
+      className={`rounded-lg overflow-hidden transition-all duration-500 ease-out ${animating ? 'scale-110' : 'scale-100'
+        }`}
       style={{
         background: status === 'RATED'
           ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
@@ -186,16 +185,16 @@ function RatingCard({ anime, onRate }) {
           : undefined
       }}
     >
-      <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out group ${
-        status === 'PASS' ? 'opacity-50' : 'opacity-100'
-      } ${status !== 'RATED' ? 'border border-border' : ''}`}>
+      <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out group ${status === 'PASS' ? 'opacity-50' : 'opacity-100'
+        } ${status !== 'RATED' ? 'border border-border' : ''}`}>
         {/* Cover Image */}
         <Link to={`/anime/${anime.id}`} className="block">
-          <div className="aspect-[3/4] bg-surface-elevated relative overflow-hidden">
+          <div style={{ aspectRatio: '3/4', width: '100%', position: 'relative', backgroundColor: 'var(--color-surface-elevated)', overflow: 'hidden' }}>
             <img
               src={getImageUrl(anime.cover_image_url)}
               alt={getAnimeTitle(anime)}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms]"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              className="group-hover:scale-110 transition-transform duration-[1500ms]"
               onError={(e) => {
                 e.target.src = '/placeholder-anime.svg';
               }}
@@ -222,87 +221,87 @@ function RatingCard({ anime, onRate }) {
                 e.stopPropagation();
               }}
             >
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 text-center w-full flex flex-col justify-center h-full">
-              {/* Star Rating */}
-              <div
-                className="flex justify-center gap-1"
-                style={{ fontSize: starSize }}
-                onMouseLeave={() => setHoverRating(0)}
-              >
-                {[1, 2, 3, 4, 5].map((star) => (
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 text-center w-full flex flex-col justify-center h-full">
+                {/* Star Rating */}
+                <div
+                  className="flex justify-center gap-1"
+                  style={{ fontSize: starSize }}
+                  onMouseLeave={() => setHoverRating(0)}
+                >
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      className="cursor-pointer hover:scale-125 transition-transform"
+                      onMouseMove={(e) => handleMouseMove(e, star)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const isLeftHalf = x < rect.width / 2;
+                        handleStarClick(isLeftHalf ? star - 0.5 : star);
+                      }}
+                    >
+                      {renderStar(star)}
+                    </button>
+                  ))}
+                </div>
+
+                {currentRating > 0 && (
+                  <div className="text-white text-lg font-semibold mb-6">
+                    {currentRating.toFixed(1)}
+                  </div>
+                )}
+
+                {/* Actions - Watch Later & Pass */}
+                <div className="flex items-center justify-center gap-4 text-white text-sm">
                   <button
-                    key={star}
-                    className="cursor-pointer hover:scale-125 transition-transform"
-                    onMouseMove={(e) => handleMouseMove(e, star)}
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const x = e.clientX - rect.left;
-                      const isLeftHalf = x < rect.width / 2;
-                      handleStarClick(isLeftHalf ? star - 0.5 : star);
+                      handleStatusClick('WANT_TO_WATCH');
                     }}
+                    className="hover:text-[#3797F0] transition-colors underline-offset-2 hover:underline"
                   >
-                    {renderStar(star)}
+                    {t('watchLater')}
                   </button>
-                ))}
-              </div>
-
-              {currentRating > 0 && (
-                <div className="text-white text-lg font-semibold mb-6">
-                  {currentRating.toFixed(1)}
+                  <span className="text-gray-400">|</span>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleStatusClick('PASS');
+                    }}
+                    className="text-gray-300 hover:text-gray-100 transition-colors underline-offset-2 hover:underline"
+                  >
+                    {t('notInterested')}
+                  </button>
                 </div>
-              )}
-
-              {/* Actions - Watch Later & Pass */}
-              <div className="flex items-center justify-center gap-4 text-white text-sm">
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleStatusClick('WANT_TO_WATCH');
-                  }}
-                  className="hover:text-[#3797F0] transition-colors underline-offset-2 hover:underline"
-                >
-                  {t('watchLater')}
-                </button>
-                <span className="text-gray-400">|</span>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleStatusClick('PASS');
-                  }}
-                  className="text-gray-300 hover:text-gray-100 transition-colors underline-offset-2 hover:underline"
-                >
-                  {t('notInterested')}
-                </button>
               </div>
             </div>
-          </div>
 
-          {/* Status Badge */}
-          {status && (
-            <div className="absolute top-2 right-2 z-10">
-              {status === 'RATED' && (
-                <span className="px-3 py-1 text-white text-xs font-bold rounded-full shadow-lg" style={{
-                  background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
-                }}>
-                  {language === 'ko' ? '평가완료' : language === 'ja' ? '評価済み' : 'Rated'}
-                </span>
-              )}
-              {status === 'WANT_TO_WATCH' && (
-                <span className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full shadow-lg">
-                  {language === 'ko' ? '보고싶어요' : language === 'ja' ? '見たい' : 'Watch Later'}
-                </span>
-              )}
-              {status === 'PASS' && (
-                <span className="px-3 py-1 bg-gray-500 text-white text-xs font-bold rounded-full shadow-lg">
-                  {language === 'ko' ? '패스' : language === 'ja' ? 'パス' : 'Pass'}
-                </span>
-              )}
-            </div>
-          )}
+            {/* Status Badge */}
+            {status && (
+              <div className="absolute top-2 right-2 z-10">
+                {status === 'RATED' && (
+                  <span className="px-3 py-1 text-white text-xs font-bold rounded-full shadow-lg" style={{
+                    background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+                  }}>
+                    {language === 'ko' ? '평가완료' : language === 'ja' ? '評価済み' : 'Rated'}
+                  </span>
+                )}
+                {status === 'WANT_TO_WATCH' && (
+                  <span className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full shadow-lg">
+                    {language === 'ko' ? '보고싶어요' : language === 'ja' ? '見たい' : 'Watch Later'}
+                  </span>
+                )}
+                {status === 'PASS' && (
+                  <span className="px-3 py-1 bg-gray-500 text-white text-xs font-bold rounded-full shadow-lg">
+                    {language === 'ko' ? '패스' : language === 'ja' ? 'パス' : 'Pass'}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </Link>
 
@@ -410,7 +409,7 @@ export default function Rate() {
   const [animeList, setAnimeList] = useState([]);
   const [allAnimeItems, setAllAnimeItems] = useState([]); // All loaded items
   const [displayedCount, setDisplayedCount] = useState(0); // How many are displayed
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Fix: Start with loading true
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [stats, setStats] = useState({
@@ -509,10 +508,14 @@ export default function Rate() {
   const loadAnime = async () => {
     try {
       setLoading(true);
+      console.log('[Rate] Loading initial anime list...'); // Debug Log
+
       // Load 100 items at once, paginate on frontend
       const data = await animeService.getAnimeForRating({
         limit: 100
       });
+
+      console.log('[Rate] Loaded anime:', data?.items?.length); // Debug Log
 
       const allItems = data.items || [];
       // Show first 20 items immediately
@@ -530,7 +533,7 @@ export default function Rate() {
 
   const loadMore = async () => {
     if (loading || !hasMore) {
-      console.log('Skip loadMore:', { loading, hasMore });
+      // console.log('Skip loadMore:', { loading, hasMore });
       return;
     }
 
@@ -568,10 +571,10 @@ export default function Rate() {
       setAnimeList(prev => prev.map(anime =>
         anime.id === animeId
           ? {
-              ...anime,
-              user_rating_status: status,
-              user_rating: status === 'RATED' ? rating : 0
-            }
+            ...anime,
+            user_rating_status: status,
+            user_rating: status === 'RATED' ? rating : 0
+          }
           : anime
       ));
 
@@ -579,10 +582,10 @@ export default function Rate() {
       setAllAnimeItems(prev => prev.map(anime =>
         anime.id === animeId
           ? {
-              ...anime,
-              user_rating_status: status,
-              user_rating: status === 'RATED' ? rating : 0
-            }
+            ...anime,
+            user_rating_status: status,
+            user_rating: status === 'RATED' ? rating : 0
+          }
           : anime
       ));
 
@@ -590,6 +593,7 @@ export default function Rate() {
       await loadStats();
     } catch (err) {
       console.error('Failed to rate:', err);
+      console.error('Error Details:', err.response?.data); // Detail Log
       alert(language === 'ko' ? '평가 저장에 실패했습니다. 다시 시도해주세요.' : language === 'ja' ? '評価の保存に失敗しました。もう一度お試しください。' : 'Failed to save rating. Please try again.');
       throw err;
     }
@@ -599,6 +603,7 @@ export default function Rate() {
   const filteredAnimeList = useMemo(() => {
     return animeList;
   }, [animeList]);
+
 
   return (
     <div className="min-h-screen pt-12 md:pt-16 bg-transparent">
@@ -639,7 +644,7 @@ export default function Rate() {
         {/* Anime Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-6">
           {loading && animeList.length === 0 ? (
-            // Skeleton cards during initial load
+            // Skeleton cards during initial load (Show 8 skeletons)
             Array.from({ length: 8 }).map((_, index) => (
               <div key={`skeleton-${index}`} className="bg-surface rounded-lg shadow-md overflow-hidden animate-pulse border border-border">
                 {/* Skeleton Image */}
@@ -651,10 +656,20 @@ export default function Rate() {
                 </div>
               </div>
             ))
-          ) : (
+          ) : filteredAnimeList.length > 0 ? (
             filteredAnimeList.map((anime) => (
               <RatingCard key={anime.id} anime={anime} onRate={handleRate} />
             ))
+          ) : (
+            // Fix: Empty state when not loading and no items
+            <div className="col-span-full text-center py-12">
+              <div className="text-xl text-text-secondary mb-4">
+                {language === 'ko' ? '평가할 애니메이션이 없습니다' : language === 'ja' ? '評価するアニメがありません' : 'No anime to rate'}
+              </div>
+              <p className="text-text-tertiary">
+                {language === 'ko' ? '모든 애니메이션을 평가하셨거나 데이터를 불러올 수 없습니다.' : language === 'ja' ? 'すべてのアニメを評価したか、データを読み込めませんでした。' : 'You have rated all anime or data could not be loaded.'}
+              </p>
+            </div>
           )}
         </div>
 
