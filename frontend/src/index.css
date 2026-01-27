@@ -15,33 +15,33 @@
   --color-primary: #3797F0;
   --color-primary-dark: #2563EB;
   --color-primary-light: #60A5FA;
-  
+
   --color-secondary: #E1306C;
   --color-secondary-dark: #C13584;
   --color-secondary-light: #F77737;
-  
+
   --color-accent: #FCAF45;
   --color-accent-dark: #F59E0B;
   --color-accent-light: #FCD34D;
-  
+
   /* Neutrals */
   --color-background: #F5F5F7;
   --color-surface: #FFFFFF;
   --color-surface-elevated: #FFFFFF;
-  
+
   --color-text-primary: #1A1A1A;
   --color-text-secondary: #6B7280;
   --color-text-tertiary: #9CA3AF;
-  
+
   --color-border: #E5E7EB;
   --color-border-hover: #D1D5DB;
-  
+
   /* Semantic Colors */
   --color-success: #10B981;
   --color-warning: #F59E0B;
   --color-error: #EF4444;
   --color-info: #3B82F6;
-  
+
   /* Spacing Scale (4px base) */
   --space-xs: 4px;
   --space-sm: 8px;
@@ -50,22 +50,30 @@
   --space-xl: 32px;
   --space-2xl: 48px;
   --space-3xl: 64px;
-  
+
   /* Typography Scale */
-  --font-size-xs: 0.75rem;    /* 12px */
-  --font-size-sm: 0.875rem;   /* 14px */
-  --font-size-base: 1rem;     /* 16px */
-  --font-size-lg: 1.125rem;   /* 18px */
-  --font-size-xl: 1.25rem;    /* 20px */
-  --font-size-2xl: 1.5rem;    /* 24px */
-  --font-size-3xl: 1.875rem;  /* 30px */
-  --font-size-4xl: 2.25rem;   /* 36px */
-  
+  --font-size-xs: 0.75rem;
+  /* 12px */
+  --font-size-sm: 0.875rem;
+  /* 14px */
+  --font-size-base: 1rem;
+  /* 16px */
+  --font-size-lg: 1.125rem;
+  /* 18px */
+  --font-size-xl: 1.25rem;
+  /* 20px */
+  --font-size-2xl: 1.5rem;
+  /* 24px */
+  --font-size-3xl: 1.875rem;
+  /* 30px */
+  --font-size-4xl: 2.25rem;
+  /* 36px */
+
   /* Line Heights */
   --line-height-tight: 1.25;
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.75;
-  
+
   /* Border Radius */
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -73,23 +81,23 @@
   --radius-xl: 16px;
   --radius-2xl: 24px;
   --radius-full: 9999px;
-  
+
   /* Shadows - Multi-layer for depth */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  
+
   /* Colored Shadows for Cards */
   --shadow-primary: 0 10px 25px -5px rgba(55, 151, 240, 0.2);
   --shadow-secondary: 0 10px 25px -5px rgba(225, 48, 108, 0.2);
-  
+
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   /* Z-index Scale */
   --z-dropdown: 1000;
   --z-sticky: 1020;
@@ -106,11 +114,11 @@
     --color-background: #0F172A;
     --color-surface: #1E293B;
     --color-surface-elevated: #334155;
-    
+
     --color-text-primary: #F1F5F9;
     --color-text-secondary: #CBD5E1;
     --color-text-tertiary: #94A3B8;
-    
+
     --color-border: #334155;
     --color-border-hover: #475569;
   }
@@ -174,6 +182,7 @@ body {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -185,6 +194,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -195,6 +205,7 @@ body {
   0% {
     background-position: -1000px 0;
   }
+
   100% {
     background-position: 1000px 0;
   }
@@ -271,28 +282,14 @@ img {
   outline-offset: 2px;
 }
 
-/* Skeleton Loading with Shimmer */
+/* Skeleton Loading with Shimmer - Dark Mode */
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    #f0f0f0 0px,
-    #f8f8f8 40px,
-    #f0f0f0 80px
-  );
+  background: linear-gradient(90deg,
+      #1A2332 0px,
+      #1F2937 40px,
+      #1A2332 80px);
   background-size: 1000px 100%;
   animation: shimmer 2s infinite linear;
-}
-
-@media (prefers-color-scheme: dark) {
-  .skeleton {
-    background: linear-gradient(
-      90deg,
-      #1e293b 0px,
-      #334155 40px,
-      #1e293b 80px
-    );
-    background-size: 1000px 100%;
-  }
 }
 
 /* Gradient Text */
@@ -303,18 +300,10 @@ img {
   background-clip: text;
 }
 
-/* Glass Morphism */
+/* Glass Morphism - Dark Mode */
 .glass {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(26, 35, 50, 0.7);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
-
-@media (prefers-color-scheme: dark) {
-  .glass {
-    background: rgba(30, 41, 59, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-}
-
