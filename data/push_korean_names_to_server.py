@@ -14,7 +14,7 @@ from pathlib import Path
 PROGRESS_FILE = Path(__file__).parent / "update_all_korean_progress.json"
 
 # 기본 서버 URL
-DEFAULT_SERVER_URL = "https://anipass.io"
+DEFAULT_SERVER_URL = "https://anibite.com"
 
 
 def load_updated_names():

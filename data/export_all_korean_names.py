@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(
 from database import db
 
 # 기본 서버 URL
-DEFAULT_SERVER_URL = "https://anipass.io"
+DEFAULT_SERVER_URL = "https://anibite.com"
 
 
 def extract_all_korean_names():

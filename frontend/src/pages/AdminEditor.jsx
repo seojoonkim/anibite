@@ -141,7 +141,7 @@ export default function AdminEditor() {
       const imageField = selectedType === 'anime' ? 'cover_image' : 'image_large';
       const oldImageUrl = editData[imageField];
 
-      if (oldImageUrl && oldImageUrl.includes('images.anipass.io')) {
+      if (oldImageUrl && oldImageUrl.includes('images.anibite.com')) {
         try {
           await api.delete('/api/admin/editor/delete-image', {
             data: { image_url: oldImageUrl }

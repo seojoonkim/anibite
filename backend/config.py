@@ -25,7 +25,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 
 # CORS Settings - Allow frontend domains
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS",
-    "http://localhost:3000,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://127.0.0.1:3000,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175,http://127.0.0.1:5176,https://anipass.io,https://www.anipass.io"
+    "http://localhost:3000,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://127.0.0.1:3000,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175,http://127.0.0.1:5176,https://anibite.com,https://www.anibite.com"
 ).split(",")
 
 # Add production origins if set
@@ -62,4 +62,4 @@ COVER_IMAGES_DIR = DATA_DIR / "images" / "covers"
 IMAGE_BASE_URL = os.getenv("IMAGE_BASE_URL", "http://localhost:8000/images")
 
 # Cloudflare R2 Settings (Production)
-# Set IMAGE_BASE_URL=https://images.anipass.io in production environment
+# Set IMAGE_BASE_URL=https://images.anibite.com in production environment

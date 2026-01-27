@@ -13,7 +13,7 @@ R2_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID")
 R2_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY")
 R2_BUCKET_NAME = os.getenv("R2_BUCKET_NAME", "anipass-images")
 R2_ENDPOINT_URL = os.getenv("R2_ENDPOINT_URL")
-R2_PUBLIC_URL = os.getenv("IMAGE_BASE_URL", "https://images.anipass.io")
+R2_PUBLIC_URL = os.getenv("IMAGE_BASE_URL", "https://images.anibite.com")
 
 # Debug: Print R2 configuration on startup
 print(f"[R2 Storage] Configuration loaded:")
@@ -145,7 +145,7 @@ def extract_object_key_from_url(url: str) -> Optional[str]:
     Extract R2 object key from public URL
 
     Args:
-        url: Full URL (e.g., "https://images.anipass.io/admin/anime/123.jpg")
+        url: Full URL (e.g., "https://images.anibite.com/admin/anime/123.jpg")
 
     Returns:
         Object key (e.g., "admin/anime/123.jpg") or None
