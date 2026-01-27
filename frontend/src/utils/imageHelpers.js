@@ -79,7 +79,12 @@ export const getCharacterImageFallback = (imageUrl, currentSrc = null) => {
         return currentSrc.replace(/\.[a-z]+$/i, `.${nextExt}`);
       }
 
-      // All extensions tried, use placeholder (no AniList fallback)
+      // All extensions tried, fallback to original AniList URL if available
+      if (imageUrl && imageUrl.startsWith('http')) {
+        return imageUrl;
+      }
+
+      // No original URL, use placeholder
       return '/placeholder-anime.svg';
     }
   }
@@ -136,9 +141,15 @@ export const getAvatarUrl = (avatarUrl, characterId = null) => {
  * Get avatar fallback URL
  * Used in onError handler
  * @param {string|null} avatarUrl - Original avatar URL
+ * @param {string|null} currentSrc - Current src that failed
  * @returns {string|null} Fallback URL or null for gradient placeholder
  */
-export const getAvatarFallback = (avatarUrl) => {
+export const getAvatarFallback = (avatarUrl, currentSrc = null) => {
+  // If R2 URL failed and we have original AniList URL, use it
+  if (currentSrc && currentSrc.includes('/images/characters/') && avatarUrl && avatarUrl.startsWith('http')) {
+    return avatarUrl;
+  }
+
   // No external URL fallback - use gradient placeholder
   return null;
 };
