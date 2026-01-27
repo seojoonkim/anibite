@@ -235,19 +235,13 @@ export default function Navbar() {
   return (
     <>
       {/* Desktop & Mobile Top Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 h-11 md:h-16" style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 9999,
-        backgroundColor: '#FFFFFF',
-        borderBottom: '1px solid #DBDBDB',
-        transform: 'scale(0.9)',
-        transformOrigin: 'top center',
-        width: '111.11%',
-        marginLeft: '-5.555%'
-      }}>
+      <nav
+        className="fixed top-0 left-0 right-0 z-50 h-12 md:h-16 bg-white"
+        style={{
+          borderBottom: '1px solid var(--color-border)',
+          boxShadow: 'var(--shadow-sm)'
+        }}
+      >
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 items-center h-11 md:h-16 md:gap-6 pb-2 md:pb-0">
             {/* Logo and Mobile User Menu */}
