@@ -359,7 +359,7 @@ export default function Navbar() {
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                           </svg>
-                          <span>{language === 'ko' ? '내 애니패스' : language === 'ja' ? 'マイAniPass' : 'My AniPass'}</span>
+                          <span>{language === 'ko' ? '내 애니바이트' : language === 'ja' ? 'マイAniBite' : 'My AniBite'}</span>
                         </div>
                       </button>
                       <button
@@ -399,8 +399,8 @@ export default function Navbar() {
                     key={item.path}
                     to={item.path}
                     className={`px-3 py-2 rounded-md text-sm font-normal transition-colors whitespace-nowrap ${isActive(item.path)
-                        ? 'bg-[#3797F0] text-white'
-                        : 'text-black hover:text-gray-500 hover:bg-gray-100'
+                      ? 'bg-[#3797F0] text-white'
+                      : 'text-black hover:text-gray-500 hover:bg-gray-100'
                       }`}
                   >
                     {item.labelKo ? (language === 'ko' ? item.labelKo : language === 'ja' ? item.labelJa : item.labelEn) : item.label}
@@ -495,7 +495,7 @@ export default function Navbar() {
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                             </svg>
-                            <span>{language === 'ko' ? '내 애니패스' : language === 'ja' ? 'マイAniPass' : 'My AniPass'}</span>
+                            <span>{language === 'ko' ? '내 애니바이트' : language === 'ja' ? 'マイAniBite' : 'My AniBite'}</span>
                           </div>
                         </button>
                         <button
@@ -539,8 +539,8 @@ export default function Navbar() {
               key={item.path}
               to={item.path}
               className={`flex flex-col items-center justify-center gap-0.5 transition-colors py-1 ${isActive(item.path)
-                  ? 'bg-[#3797F0] text-white'
-                  : 'text-gray-600 hover:text-gray-800'
+                ? 'bg-[#3797F0] text-white'
+                : 'text-gray-600 hover:text-gray-800'
                 }`}
             >
               <div className="scale-90">{item.icon}</div>
