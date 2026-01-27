@@ -175,7 +175,20 @@ export default function RateCharacters() {
       loadStats();
     } catch (err) {
       console.error('Failed to rate character:', err);
-      alert(language === 'ko' ? '평가를 저장하는데 실패했습니다.' : language === 'ja' ? '評価の保存に失敗しました。' : 'Failed to save rating.');
+      console.error('Error response:', err.response?.data);
+      console.error('Error status:', err.response?.status);
+
+      // Show detailed error message
+      const errorDetail = err.response?.data?.detail || err.message || 'Unknown error';
+      const errorStatus = err.response?.status ? ` (${err.response.status})` : '';
+
+      alert(
+        language === 'ko'
+          ? `평가를 저장하는데 실패했습니다${errorStatus}\n${errorDetail}`
+          : language === 'ja'
+            ? `評価の保存に失敗しました${errorStatus}\n${errorDetail}`
+            : `Failed to save rating${errorStatus}\n${errorDetail}`
+      );
     }
   };
 
@@ -317,259 +330,254 @@ export default function RateCharacters() {
               const isCompleted = hasRated || status === 'WANT_TO_KNOW' || status === 'NOT_INTERESTED';
 
               return (
-              <div
-                key={character.id}
-                ref={(el) => {
-                  if (el) cardRefs.current[character.id] = el;
-                }}
-                className={`rounded-lg overflow-hidden transition-all duration-500 ease-out ${
-                  character._animating ? 'scale-110' : 'scale-100'
-                }`}
-                style={{
-                  background: hasRated
-                    ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
-                    : 'transparent',
-                  padding: hasRated ? '2px' : '0',
-                  boxShadow: hasRated
-                    ? '0 4px 20px rgba(225, 48, 108, 0.3)'
-                    : undefined
-                }}
-                onMouseEnter={() => setHoveredCharacter(character.id)}
-                onMouseLeave={() => setHoveredCharacter(null)}
-              >
-                <div className={`${getCardBackgroundColor(character.id)} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out group ${
-                  status === 'NOT_INTERESTED' ? 'opacity-50' : 'opacity-100'
-                } ${!hasRated ? 'border border-gray-200' : ''}`}>
-                {/* Character Image */}
-                <Link to={`/character/${character.id}`} className="block">
-                  <div className="aspect-[3/4] bg-gray-200 relative overflow-hidden cursor-pointer">
-                    <img
-                      src={getImageUrl(character.image_url)}
-                      alt={character.name_full}
-                      loading="lazy"
-                      decoding="async"
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms]"
-                      onError={(e) => {
-                        e.target.src = '/placeholder-anime.svg';
-                      }}
-                    />
+                <div
+                  key={character.id}
+                  ref={(el) => {
+                    if (el) cardRefs.current[character.id] = el;
+                  }}
+                  className={`rounded-lg overflow-hidden transition-all duration-500 ease-out ${character._animating ? 'scale-110' : 'scale-100'
+                    }`}
+                  style={{
+                    background: hasRated
+                      ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+                      : 'transparent',
+                    padding: hasRated ? '2px' : '0',
+                    boxShadow: hasRated
+                      ? '0 4px 20px rgba(225, 48, 108, 0.3)'
+                      : undefined
+                  }}
+                  onMouseEnter={() => setHoveredCharacter(character.id)}
+                  onMouseLeave={() => setHoveredCharacter(null)}
+                >
+                  <div className={`${getCardBackgroundColor(character.id)} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out group ${status === 'NOT_INTERESTED' ? 'opacity-50' : 'opacity-100'
+                    } ${!hasRated ? 'border border-gray-200' : ''}`}>
+                    {/* Character Image */}
+                    <Link to={`/character/${character.id}`} className="block">
+                      <div className="aspect-[3/4] bg-gray-200 relative overflow-hidden cursor-pointer">
+                        <img
+                          src={getImageUrl(character.image_url)}
+                          alt={character.name_full}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms]"
+                          onError={(e) => {
+                            e.target.src = '/placeholder-anime.svg';
+                          }}
+                        />
 
-                  {/* Role Badge */}
-                  {character.role && (
-                    <div className={`absolute top-2 left-2 px-2 py-1 rounded text-xs font-bold text-white`} style={{
-                      backgroundColor: character.role === 'MAIN'
-                        ? '#3797F0'  // 주연: 파란색 (테마색)
-                        : character.role === 'SUPPORTING'
-                        ? '#F59E0B'  // 조연: 주황색 (파란색과 대비)
-                        : '#9CA3AF',  // 엑스트라: 회색
-                      color: 'white'
-                    }}>
-                      {character.role === 'MAIN'
-                        ? (language === 'ko' ? '주연' : language === 'ja' ? '主役' : 'Main')
-                        : character.role === 'SUPPORTING'
-                        ? (language === 'ko' ? '조연' : language === 'ja' ? '助演' : 'Supporting')
-                        : (language === 'ko' ? '엑스트라' : language === 'ja' ? 'エキストラ' : 'Extra')}
-                    </div>
-                  )}
+                        {/* Role Badge */}
+                        {character.role && (
+                          <div className={`absolute top-2 left-2 px-2 py-1 rounded text-xs font-bold text-white`} style={{
+                            backgroundColor: character.role === 'MAIN'
+                              ? '#3797F0'  // 주연: 파란색 (테마색)
+                              : character.role === 'SUPPORTING'
+                                ? '#F59E0B'  // 조연: 주황색 (파란색과 대비)
+                                : '#9CA3AF',  // 엑스트라: 회색
+                            color: 'white'
+                          }}>
+                            {character.role === 'MAIN'
+                              ? (language === 'ko' ? '주연' : language === 'ja' ? '主役' : 'Main')
+                              : character.role === 'SUPPORTING'
+                                ? (language === 'ko' ? '조연' : language === 'ja' ? '助演' : 'Supporting')
+                                : (language === 'ko' ? '엑스트라' : language === 'ja' ? 'エキストラ' : 'Extra')}
+                          </div>
+                        )}
 
-                  {/* Status Badge */}
-                  {(hasRated || characterStatuses[character.id]) && (
-                    <div className="absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold text-white shadow-lg" style={{
-                      background: (hasRated || characterStatuses[character.id] === 'RATED')
-                        ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
-                        : characterStatuses[character.id] === 'WANT_TO_KNOW'
-                        ? '#3B82F6'
-                        : '#6B7280'
-                    }}>
-                      {(hasRated || characterStatuses[character.id] === 'RATED')
-                        ? (language === 'ko' ? '평가완료' : language === 'ja' ? '評価済み' : 'Rated')
-                        : characterStatuses[character.id] === 'WANT_TO_KNOW'
-                        ? (language === 'ko' ? '알고싶어요' : language === 'ja' ? '知りたい' : 'Want to Know')
-                        : (language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Not Interested')}
-                    </div>
-                  )}
+                        {/* Status Badge */}
+                        {(hasRated || characterStatuses[character.id]) && (
+                          <div className="absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold text-white shadow-lg" style={{
+                            background: (hasRated || characterStatuses[character.id] === 'RATED')
+                              ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+                              : characterStatuses[character.id] === 'WANT_TO_KNOW'
+                                ? '#3B82F6'
+                                : '#6B7280'
+                          }}>
+                            {(hasRated || characterStatuses[character.id] === 'RATED')
+                              ? (language === 'ko' ? '평가완료' : language === 'ja' ? '評価済み' : 'Rated')
+                              : characterStatuses[character.id] === 'WANT_TO_KNOW'
+                                ? (language === 'ko' ? '알고싶어요' : language === 'ja' ? '知りたい' : 'Want to Know')
+                                : (language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Not Interested')}
+                          </div>
+                        )}
 
-                  {/* Show rating stars on rated characters */}
-                  {hasRated && hoveredCharacter !== character.id && starSizes[character.id] && character.my_rating && character.my_rating > 0 && (
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                      <div className="flex gap-1" style={{ fontSize: starSizes[character.id] }}>
-                        {[1, 2, 3, 4, 5].map((position) => {
-                          const rating = character.my_rating;
-                          const gradientStyle = {
-                            background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            backgroundClip: 'text'
-                          };
+                        {/* Show rating stars on rated characters */}
+                        {hasRated && hoveredCharacter !== character.id && starSizes[character.id] && character.my_rating && character.my_rating > 0 && (
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                            <div className="flex gap-1" style={{ fontSize: starSizes[character.id] }}>
+                              {[1, 2, 3, 4, 5].map((position) => {
+                                const rating = character.my_rating;
+                                const gradientStyle = {
+                                  background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)',
+                                  WebkitBackgroundClip: 'text',
+                                  WebkitTextFillColor: 'transparent',
+                                  backgroundClip: 'text'
+                                };
 
-                          if (rating >= position) {
-                            return <span key={position} style={gradientStyle}>★</span>;
-                          } else if (rating >= position - 0.5) {
-                            return (
-                              <span key={position} className="relative inline-block">
-                                <span className="text-gray-300">★</span>
-                                <span className="absolute top-0 left-0 overflow-hidden w-1/2" style={gradientStyle}>★</span>
-                              </span>
-                            );
-                          }
-                          return <span key={position} className="text-gray-300">★</span>;
-                        })}
-                      </div>
-                    </div>
-                  )}
+                                if (rating >= position) {
+                                  return <span key={position} style={gradientStyle}>★</span>;
+                                } else if (rating >= position - 0.5) {
+                                  return (
+                                    <span key={position} className="relative inline-block">
+                                      <span className="text-gray-300">★</span>
+                                      <span className="absolute top-0 left-0 overflow-hidden w-1/2" style={gradientStyle}>★</span>
+                                    </span>
+                                  );
+                                }
+                                return <span key={position} className="text-gray-300">★</span>;
+                              })}
+                            </div>
+                          </div>
+                        )}
 
-                  {/* Rating Overlay */}
-                  {starSizes[character.id] && (
-                    <div
-                      className={`absolute inset-0 bg-black flex items-center justify-center px-2 py-2 z-10 transition-opacity duration-150 ${
-                        hoveredCharacter === character.id ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                      }`}
-                      style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}
-                      onMouseLeave={() => setHoverRating(prev => ({ ...prev, [character.id]: 0 }))}
-                    >
-                      <div className="w-full flex flex-col items-center justify-center">
-                        <div className="flex gap-1" style={{
-                          fontSize: starSizes[character.id]
-                        }}>
-                          {[1, 2, 3, 4, 5].map((position) => {
-                            const currentRating = getCurrentRating(character);
-                            const displayRating = hoverRating[character.id] || currentRating;
-
-                            const gradientStyle = {
-                              background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)',
-                              WebkitBackgroundClip: 'text',
-                              WebkitTextFillColor: 'transparent',
-                              backgroundClip: 'text'
-                            };
-
-                            let starContent;
-                            if (displayRating >= position) {
-                              starContent = <span style={gradientStyle}>★</span>;
-                            } else if (displayRating >= position - 0.5) {
-                              starContent = (
-                                <span className="relative inline-block">
-                                  <span className="text-gray-300">★</span>
-                                  <span className="absolute top-0 left-0 overflow-hidden w-1/2" style={gradientStyle}>★</span>
-                                </span>
-                              );
-                            } else {
-                              starContent = <span className="text-gray-300">★</span>;
-                            }
-
-                            return (
-                              <button
-                                key={position}
-                                type="button"
-                                className="cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
-                                onMouseMove={(e) => {
-                                  const rect = e.currentTarget.getBoundingClientRect();
-                                  const x = e.clientX - rect.left;
-                                  const isLeftHalf = x < rect.width / 2;
-                                  setHoverRating(prev => ({
-                                    ...prev,
-                                    [character.id]: isLeftHalf ? position - 0.5 : position
-                                  }));
-                                }}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  const rect = e.currentTarget.getBoundingClientRect();
-                                  const x = e.clientX - rect.left;
-                                  const isLeftHalf = x < rect.width / 2;
-                                  handleRatingChange(character.id, isLeftHalf ? position - 0.5 : position);
-                                }}
-                              >
-                                {starContent}
-                              </button>
-                            );
-                          })}
-                        </div>
-
-                        {/* Status Buttons in Overlay */}
-                        <div className="flex items-center justify-center gap-3 text-white text-sm mt-3">
-                          <button
+                        {/* Rating Overlay */}
+                        {starSizes[character.id] && (
+                          <div
+                            className={`absolute inset-0 bg-black flex items-center justify-center px-2 py-2 z-10 transition-opacity duration-150 ${hoveredCharacter === character.id ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                              }`}
+                            style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              handleStatusChange(character.id, 'WANT_TO_KNOW');
                             }}
-                            className={`transition-colors underline-offset-2 hover:underline ${
-                              characterStatuses[character.id] === 'WANT_TO_KNOW'
-                                ? 'font-semibold'
-                                : 'text-gray-300 hover:text-gray-100'
-                            }`}
+                            onMouseLeave={() => setHoverRating(prev => ({ ...prev, [character.id]: 0 }))}
                           >
-                            {language === 'ko' ? '알고싶어요' : language === 'ja' ? '知りたい' : 'Want to Know'}
-                          </button>
-                          <span className="text-gray-400">|</span>
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleStatusChange(character.id, 'NOT_INTERESTED');
-                            }}
-                            className={`transition-colors underline-offset-2 hover:underline ${
-                              characterStatuses[character.id] === 'NOT_INTERESTED'
-                                ? 'font-semibold'
-                                : 'text-gray-300 hover:text-gray-100'
-                            }`}
-                          >
-                            {language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Not Interested'}
-                          </button>
-                        </div>
+                            <div className="w-full flex flex-col items-center justify-center">
+                              <div className="flex gap-1" style={{
+                                fontSize: starSizes[character.id]
+                              }}>
+                                {[1, 2, 3, 4, 5].map((position) => {
+                                  const currentRating = getCurrentRating(character);
+                                  const displayRating = hoverRating[character.id] || currentRating;
+
+                                  const gradientStyle = {
+                                    background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    backgroundClip: 'text'
+                                  };
+
+                                  let starContent;
+                                  if (displayRating >= position) {
+                                    starContent = <span style={gradientStyle}>★</span>;
+                                  } else if (displayRating >= position - 0.5) {
+                                    starContent = (
+                                      <span className="relative inline-block">
+                                        <span className="text-gray-300">★</span>
+                                        <span className="absolute top-0 left-0 overflow-hidden w-1/2" style={gradientStyle}>★</span>
+                                      </span>
+                                    );
+                                  } else {
+                                    starContent = <span className="text-gray-300">★</span>;
+                                  }
+
+                                  return (
+                                    <button
+                                      key={position}
+                                      type="button"
+                                      className="cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
+                                      onMouseMove={(e) => {
+                                        const rect = e.currentTarget.getBoundingClientRect();
+                                        const x = e.clientX - rect.left;
+                                        const isLeftHalf = x < rect.width / 2;
+                                        setHoverRating(prev => ({
+                                          ...prev,
+                                          [character.id]: isLeftHalf ? position - 0.5 : position
+                                        }));
+                                      }}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        const rect = e.currentTarget.getBoundingClientRect();
+                                        const x = e.clientX - rect.left;
+                                        const isLeftHalf = x < rect.width / 2;
+                                        handleRatingChange(character.id, isLeftHalf ? position - 0.5 : position);
+                                      }}
+                                    >
+                                      {starContent}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              {/* Status Buttons in Overlay */}
+                              <div className="flex items-center justify-center gap-3 text-white text-sm mt-3">
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleStatusChange(character.id, 'WANT_TO_KNOW');
+                                  }}
+                                  className={`transition-colors underline-offset-2 hover:underline ${characterStatuses[character.id] === 'WANT_TO_KNOW'
+                                      ? 'font-semibold'
+                                      : 'text-gray-300 hover:text-gray-100'
+                                    }`}
+                                >
+                                  {language === 'ko' ? '알고싶어요' : language === 'ja' ? '知りたい' : 'Want to Know'}
+                                </button>
+                                <span className="text-gray-400">|</span>
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleStatusChange(character.id, 'NOT_INTERESTED');
+                                  }}
+                                  className={`transition-colors underline-offset-2 hover:underline ${characterStatuses[character.id] === 'NOT_INTERESTED'
+                                      ? 'font-semibold'
+                                      : 'text-gray-300 hover:text-gray-100'
+                                    }`}
+                                >
+                                  {language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Not Interested'}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  )}
-                  </div>
-                </Link>
-
-                {/* Character Info */}
-                <div className="p-3">
-                  <Link to={`/character/${character.id}`} className="block group">
-                    <h3 className="font-bold text-[15px] line-clamp-2 mb-1 group-hover:text-[#3797F0] transition-colors cursor-pointer" title={language === 'ko' ? (character.name_korean || character.name_full) : language === 'ja' ? (character.name_native || character.name_full) : character.name_full}>
-                      {language === 'ko' ? (character.name_korean || character.name_full) : language === 'ja' ? (character.name_native || character.name_full) : character.name_full}
-                    </h3>
-                  </Link>
-                  {language === 'ko' && character.name_korean ? (
-                    <p className="text-xs text-gray-500 line-clamp-1 mb-2" title={character.name_full}>
-                      {character.name_full}
-                    </p>
-                  ) : language === 'ja' && character.name_native ? (
-                    <p className="text-xs text-gray-500 line-clamp-1 mb-2" title={character.name_full}>
-                      ({character.name_full})
-                    </p>
-                  ) : (
-                    character.name_native && character.name_native !== character.name_full && (
-                      <p className="text-xs text-gray-500 line-clamp-1 mb-2" title={character.name_native}>
-                        {character.name_native}
-                      </p>
-                    )
-                  )}
-
-                  {/* Anime Info */}
-                  <div className="text-xs text-gray-600 flex items-center gap-1 mb-3">
-                    <span>from</span>
-                    <Link
-                      to={`/anime/${character.anime_id}`}
-                      className="font-medium line-clamp-1 hover:text-[#3797F0] transition-colors cursor-pointer hover:underline"
-                      title={language === 'ko' ? (character.anime_title_korean || character.anime_title) : language === 'ja' ? (character.anime_title_native || character.anime_title) : character.anime_title}
-                    >
-                      {language === 'ko'
-                        ? (character.anime_title_korean || character.anime_title)
-                        : language === 'ja'
-                        ? (character.anime_title_native || character.anime_title)
-                        : character.anime_title}
                     </Link>
-                  </div>
 
+                    {/* Character Info */}
+                    <div className="p-3">
+                      <Link to={`/character/${character.id}`} className="block group">
+                        <h3 className="font-bold text-[15px] line-clamp-2 mb-1 group-hover:text-[#3797F0] transition-colors cursor-pointer" title={language === 'ko' ? (character.name_korean || character.name_full) : language === 'ja' ? (character.name_native || character.name_full) : character.name_full}>
+                          {language === 'ko' ? (character.name_korean || character.name_full) : language === 'ja' ? (character.name_native || character.name_full) : character.name_full}
+                        </h3>
+                      </Link>
+                      {language === 'ko' && character.name_korean ? (
+                        <p className="text-xs text-gray-500 line-clamp-1 mb-2" title={character.name_full}>
+                          {character.name_full}
+                        </p>
+                      ) : language === 'ja' && character.name_native ? (
+                        <p className="text-xs text-gray-500 line-clamp-1 mb-2" title={character.name_full}>
+                          ({character.name_full})
+                        </p>
+                      ) : (
+                        character.name_native && character.name_native !== character.name_full && (
+                          <p className="text-xs text-gray-500 line-clamp-1 mb-2" title={character.name_native}>
+                            {character.name_native}
+                          </p>
+                        )
+                      )}
+
+                      {/* Anime Info */}
+                      <div className="text-xs text-gray-600 flex items-center gap-1 mb-3">
+                        <span>from</span>
+                        <Link
+                          to={`/anime/${character.anime_id}`}
+                          className="font-medium line-clamp-1 hover:text-[#3797F0] transition-colors cursor-pointer hover:underline"
+                          title={language === 'ko' ? (character.anime_title_korean || character.anime_title) : language === 'ja' ? (character.anime_title_native || character.anime_title) : character.anime_title}
+                        >
+                          {language === 'ko'
+                            ? (character.anime_title_korean || character.anime_title)
+                            : language === 'ja'
+                              ? (character.anime_title_native || character.anime_title)
+                              : character.anime_title}
+                        </Link>
+                      </div>
+
+                    </div>
+                  </div>
                 </div>
-              </div>
-              </div>
-            );
+              );
             })}
           </div>
         ) : (

@@ -275,7 +275,19 @@ export default function CharacterDetail() {
       if (reviewData) processReviews(reviewData);
     } catch (err) {
       console.error('Failed to rate character:', err);
-      alert(language === 'ko' ? '평가를 저장하는데 실패했습니다.' : language === 'ja' ? '評価の保存に失敗しました。' : 'Failed to save rating.');
+      console.error('Error response:', err.response?.data);
+      console.error('Error status:', err.response?.status);
+
+      const errorDetail = err.response?.data?.detail || err.message || 'Unknown error';
+      const errorStatus = err.response?.status ? ` (${err.response.status})` : '';
+
+      alert(
+        language === 'ko'
+          ? `평가를 저장하는데 실패했습니다${errorStatus}\n${errorDetail}`
+          : language === 'ja'
+            ? `評価の保存に失敗しました${errorStatus}\n${errorDetail}`
+            : `Failed to save rating${errorStatus}\n${errorDetail}`
+      );
     }
   };
 
@@ -375,8 +387,8 @@ export default function CharacterDetail() {
         language === 'ko'
           ? err.response?.data?.detail || '리뷰 작성에 실패했습니다.'
           : language === 'ja'
-          ? err.response?.data?.detail || 'レビュー作成に失敗しました。'
-          : err.response?.data?.detail || 'Failed to submit review.'
+            ? err.response?.data?.detail || 'レビュー作成に失敗しました。'
+            : err.response?.data?.detail || 'Failed to submit review.'
       );
     }
   };
@@ -1126,11 +1138,10 @@ export default function CharacterDetail() {
                             }}
                           />
                           {/* Role Badge */}
-                          <div className={`absolute top-2 left-2 px-2 py-1 rounded text-xs font-bold ${
-                            anime.role === 'MAIN'
+                          <div className={`absolute top-2 left-2 px-2 py-1 rounded text-xs font-bold ${anime.role === 'MAIN'
                               ? 'bg-red-500 text-white'
                               : 'bg-blue-500 text-white'
-                          }`}>
+                            }`}>
                             {anime.role === 'MAIN' ? (language === 'ko' ? '메인' : language === 'ja' ? 'メイン' : 'Main') : (language === 'ko' ? '서브' : language === 'ja' ? 'サポート' : 'Supporting')}
                           </div>
                           {/* My Rating Badge */}
