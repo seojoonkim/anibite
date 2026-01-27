@@ -12,6 +12,11 @@ import logging
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+@router.get("/images/test")
+async def test_endpoint():
+    """Test endpoint to verify router is working"""
+    return {"status": "ok", "message": "Image proxy router is loaded"}
+
 @router.get("/images/characters/{character_id}.{ext}")
 async def get_character_image(character_id: int, ext: str):
     """
