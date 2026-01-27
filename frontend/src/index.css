@@ -11,39 +11,50 @@
    DESIGN TOKENS
    ============================================ */
 :root {
-  /* Dark Backgrounds - Navy Terminal Theme */
-  --color-background: #0B1120;
-  --color-surface: #131B2E;
-  --color-surface-elevated: #1A2332;
-  --color-surface-hover: #1F2937;
+  /* Dark Backgrounds - Antigravity Terminal Theme */
+  /* Stronger contrast between layers for better readability */
+  --color-background: #0a0e17;
+  --color-surface: #141a26;
+  --color-surface-elevated: #1e2736;
+  --color-surface-hover: #2a3444;
 
-  /* Text Colors */
-  --color-text-primary: #E2E8F0;
-  --color-text-secondary: #94A3B8;
-  --color-text-tertiary: #64748B;
+  /* Input fields - darker than surface for clear distinction */
+  --color-input: #0d1219;
+  --color-input-focus: #151c28;
 
-  /* Accent Colors */
-  --color-primary: #60A5FA;
-  --color-primary-dark: #3B82F6;
-  --color-primary-light: #93C5FD;
+  /* Text Colors - Higher contrast */
+  --color-text-primary: #f0f4f8;
+  --color-text-secondary: #a8b5c4;
+  --color-text-tertiary: #6b7a8c;
 
-  --color-secondary: #F472B6;
-  --color-secondary-dark: #EC4899;
-  --color-secondary-light: #F9A8D4;
+  /* Accent Colors - Neon Terminal Style */
+  --color-primary: #58a6ff;
+  --color-primary-dark: #388bfd;
+  --color-primary-light: #79c0ff;
 
-  --color-accent: #FBBF24;
-  --color-accent-dark: #F59E0B;
-  --color-accent-light: #FCD34D;
+  --color-secondary: #f778ba;
+  --color-secondary-dark: #db61a2;
+  --color-secondary-light: #ffa0d2;
 
-  /* Borders */
-  --color-border: #1E293B;
-  --color-border-hover: #334155;
+  --color-accent: #f0b429;
+  --color-accent-dark: #d29922;
+  --color-accent-light: #ffcf4a;
 
-  /* Semantic Colors */
-  --color-success: #10B981;
-  --color-warning: #F59E0B;
-  --color-error: #EF4444;
-  --color-info: #3B82F6;
+  /* Tertiary accent - Cyan/Teal for variety */
+  --color-tertiary: #3fb950;
+  --color-tertiary-dark: #2ea043;
+  --color-tertiary-light: #56d364;
+
+  /* Borders - More visible */
+  --color-border: #2d3748;
+  --color-border-hover: #4a5568;
+  --color-border-focus: #58a6ff;
+
+  /* Semantic Colors - Brighter for dark mode */
+  --color-success: #3fb950;
+  --color-warning: #d29922;
+  --color-error: #f85149;
+  --color-info: #58a6ff;
 
   /* Spacing Scale - 10% SMALLER */
   --space-xs: 3.6px;
@@ -85,21 +96,23 @@
   --radius-2xl: 21.6px;
   --radius-full: 9999px;
 
-  /* Shadows - Darker for dark mode */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -2px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 10px 10px -5px rgba(0, 0, 0, 0.6);
-  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
+  /* Shadows - Enhanced for dark mode with subtle glow */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.7), 0 2px 4px -1px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  --shadow-lg: 0 12px 20px -4px rgba(0, 0, 0, 0.8), 0 4px 8px -2px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --shadow-xl: 0 24px 32px -6px rgba(0, 0, 0, 0.85), 0 12px 16px -6px rgba(0, 0, 0, 0.7);
+  --shadow-2xl: 0 32px 48px -12px rgba(0, 0, 0, 0.9);
 
-  /* Glow Effects */
-  --glow-primary: 0 0 20px rgba(96, 165, 250, 0.4);
-  --glow-secondary: 0 0 20px rgba(244, 114, 182, 0.4);
-  --glow-accent: 0 0 20px rgba(251, 191, 36, 0.4);
+  /* Glow Effects - Neon style */
+  --glow-primary: 0 0 20px rgba(88, 166, 255, 0.5), 0 0 40px rgba(88, 166, 255, 0.2);
+  --glow-secondary: 0 0 20px rgba(247, 120, 186, 0.5), 0 0 40px rgba(247, 120, 186, 0.2);
+  --glow-accent: 0 0 20px rgba(240, 180, 41, 0.5), 0 0 40px rgba(240, 180, 41, 0.2);
+  --glow-success: 0 0 20px rgba(63, 185, 80, 0.5), 0 0 40px rgba(63, 185, 80, 0.2);
 
-  /* Colored Shadows */
-  --shadow-primary: 0 10px 25px -5px rgba(96, 165, 250, 0.3);
-  --shadow-secondary: 0 10px 25px -5px rgba(244, 114, 182, 0.3);
+  /* Colored Shadows - For cards and buttons */
+  --shadow-primary: 0 8px 24px -4px rgba(88, 166, 255, 0.35);
+  --shadow-secondary: 0 8px 24px -4px rgba(247, 120, 186, 0.35);
+  --shadow-accent: 0 8px 24px -4px rgba(240, 180, 41, 0.35);
 
   /* Transitions - Snappier */
   --transition-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -174,7 +187,7 @@ body {
    Force dark theme on ALL elements
    ============================================ */
 
-/* Form Elements - Force Dark */
+/* Form Elements - Force Dark with Clear Distinction */
 input,
 textarea,
 select,
@@ -188,23 +201,25 @@ input[type="url"],
 .input,
 .textarea,
 .form-control {
-  background-color: var(--color-surface) !important;
+  background-color: var(--color-input) !important;
   color: var(--color-text-primary) !important;
-  border-color: var(--color-border) !important;
+  border: 1px solid var(--color-border) !important;
+  transition: all 0.15s ease !important;
 }
 
 input::placeholder,
 textarea::placeholder {
   color: var(--color-text-tertiary) !important;
-  opacity: 0.6;
+  opacity: 0.8;
 }
 
 input:focus,
 textarea:focus,
 select:focus {
-  outline: 2px solid var(--color-primary) !important;
-  outline-offset: 2px;
-  border-color: var(--color-primary) !important;
+  background-color: var(--color-input-focus) !important;
+  outline: none !important;
+  border-color: var(--color-border-focus) !important;
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15) !important;
 }
 
 /* Override ANY white backgrounds */

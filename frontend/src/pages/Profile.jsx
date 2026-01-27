@@ -48,7 +48,7 @@ export default function Profile() {
       <div className="min-h-screen pt-16 bg-transparent">
         <Navbar />
         <div className="flex justify-center items-center h-screen">
-          <div className="text-xl text-gray-600">로딩 중...</div>
+          <div className="text-xl text-text-secondary">로딩 중...</div>
         </div>
       </div>
     );
@@ -69,16 +69,16 @@ export default function Profile() {
 
       <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* User Info Header */}
-        <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-6 mb-6">
+        <div className="bg-surface rounded-xl shadow-lg border border-border p-6 mb-6">
           <div className="flex items-center gap-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-gray-800 to-gray-600 rounded-full flex items-center justify-center text-white text-xl font-semibold">
+            <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-text-primary text-xl font-semibold">
               {(user?.display_name || user?.username || 'U')[0].toUpperCase()}
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-text-primary">
                 {user?.display_name || user?.username}
               </h1>
-              <p className="text-base text-gray-500">{user?.email}</p>
+              <p className="text-base text-text-secondary">{user?.email}</p>
             </div>
           </div>
         </div>
@@ -87,35 +87,35 @@ export default function Profile() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Stats Box */}
           {stats && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">통계</h3>
+            <div className="bg-surface rounded-xl shadow-lg border border-border p-6 flex flex-col">
+              <h3 className="text-lg font-semibold text-text-primary mb-4">통계</h3>
               <div className="grid grid-cols-2 gap-4 flex-1">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-2xl font-bold text-primary">
                     {stats.total_rated || 0}
                   </div>
-                  <div className="text-sm text-gray-500 mt-1">평가한 애니</div>
+                  <div className="text-sm text-text-secondary mt-1">평가한 애니</div>
                 </div>
 
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-2xl font-bold text-secondary">
                     {stats.total_want_to_watch || 0}
                   </div>
-                  <div className="text-sm text-gray-500 mt-1">{language === 'ko' ? '보고싶어요' : language === 'ja' ? 'ウォッチリスト' : 'Watchlist'}</div>
+                  <div className="text-sm text-text-secondary mt-1">{language === 'ko' ? '보고싶어요' : language === 'ja' ? 'ウォッチリスト' : 'Watchlist'}</div>
                 </div>
 
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-2xl font-bold text-accent">
                     {stats.average_rating ? stats.average_rating.toFixed(1) : '-'}
                   </div>
-                  <div className="text-sm text-gray-500 mt-1">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</div>
+                  <div className="text-sm text-text-secondary mt-1">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</div>
                 </div>
 
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-2xl font-bold text-tertiary">
                     {formatWatchTime(watchTime?.total_minutes)}
                   </div>
-                  <div className="text-sm text-gray-500 mt-1">시청 시간</div>
+                  <div className="text-sm text-text-secondary mt-1">시청 시간</div>
                 </div>
               </div>
             </div>
