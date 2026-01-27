@@ -308,7 +308,7 @@ export default function Feed() {
 
   const filteredActivities = getFilteredActivities();
   const isLoading = feedFilter === 'notifications' ? notificationsLoading :
-                   feedFilter === 'saved' ? savedLoading : loading;
+    feedFilter === 'saved' ? savedLoading : loading;
 
   // Edit modal handlers
   const handleEditContent = (activity, mode = 'edit') => {
@@ -464,7 +464,7 @@ export default function Feed() {
   return (
     <div className="min-h-screen pt-12 md:pt-16 bg-transparent">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+      <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Left Sidebar - Filter Menu */}
           <aside className="hidden md:block md:col-span-1">
@@ -473,11 +473,10 @@ export default function Feed() {
                 <div className="flex flex-col gap-2">
                   <button
                     onClick={() => setSearchParams({ filter: 'all' })}
-                    className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3 ${
-                      feedFilter === 'all'
+                    className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3 ${feedFilter === 'all'
                         ? 'bg-[#3797F0] text-white font-semibold'
                         : 'text-gray-600 hover:text-black hover:bg-gray-100'
-                    }`}
+                      }`}
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect x="3" y="3" width="7" height="7"></rect>
@@ -490,11 +489,10 @@ export default function Feed() {
 
                   <button
                     onClick={() => setSearchParams({ filter: 'following' })}
-                    className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3 ${
-                      feedFilter === 'following'
+                    className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3 ${feedFilter === 'following'
                         ? 'bg-[#3797F0] text-white font-semibold'
                         : 'text-gray-600 hover:text-black hover:bg-gray-100'
-                    }`}
+                      }`}
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -507,11 +505,10 @@ export default function Feed() {
 
                   <button
                     onClick={() => setSearchParams({ filter: 'notifications' })}
-                    className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3 ${
-                      feedFilter === 'notifications'
+                    className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3 ${feedFilter === 'notifications'
                         ? 'bg-[#3797F0] text-white font-semibold'
                         : 'text-gray-600 hover:text-black hover:bg-gray-100'
-                    }`}
+                      }`}
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -522,11 +519,10 @@ export default function Feed() {
 
                   <button
                     onClick={() => setSearchParams({ filter: 'saved' })}
-                    className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3 ${
-                      feedFilter === 'saved'
+                    className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3 ${feedFilter === 'saved'
                         ? 'bg-[#3797F0] text-white font-semibold'
                         : 'text-gray-600 hover:text-black hover:bg-gray-100'
-                    }`}
+                      }`}
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
@@ -618,8 +614,8 @@ export default function Feed() {
                       {language === 'ko'
                         ? '다른 사용자가 회원님의 평가에 좋아요를 누르거나 댓글을 남기면 여기에 표시됩니다'
                         : language === 'ja'
-                        ? '他のユーザーがあなたの評価にいいねやコメントをすると、ここに表示されます'
-                        : 'When someone likes or comments on your ratings, you\'ll see it here'}
+                          ? '他のユーザーがあなたの評価にいいねやコメントをすると、ここに表示されます'
+                          : 'When someone likes or comments on your ratings, you\'ll see it here'}
                     </p>
                   </>
                 ) : feedFilter === 'saved' ? (
@@ -634,8 +630,8 @@ export default function Feed() {
                       {language === 'ko'
                         ? '활동 카드의 북마크 아이콘을 클릭하여 나중에 보고 싶은 활동을 저장하세요'
                         : language === 'ja'
-                        ? 'アクティビティカードのブックマークアイコンをクリックして、後で見たいアクティビティを保存してください'
-                        : 'Click the bookmark icon on activity cards to save them for later'}
+                          ? 'アクティビティカードのブックマークアイコンをクリックして、後で見たいアクティビティを保存してください'
+                          : 'Click the bookmark icon on activity cards to save them for later'}
                     </p>
                   </>
                 ) : (
@@ -755,8 +751,8 @@ export default function Feed() {
                   {language === 'ko'
                     ? '이 포스트를 삭제하시겠습니까?'
                     : language === 'ja'
-                    ? 'この投稿を削除してもよろしいですか？'
-                    : 'Are you sure you want to delete this post?'}
+                      ? 'この投稿を削除してもよろしいですか？'
+                      : 'Are you sure you want to delete this post?'}
                 </p>
                 <div className="flex gap-3">
                   <button
@@ -812,61 +808,61 @@ export default function Feed() {
                 </div>
 
                 {activityToDelete.review_content && activityToDelete.review_content.trim() ? (
-              <>
-                <p className="text-sm text-gray-700 mb-6">
-                  {language === 'ko'
-                    ? '이 평가에는 리뷰가 포함되어 있습니다. 어떻게 삭제하시겠습니까?'
-                    : language === 'ja'
-                    ? 'この評価にはレビューが含まれています。どのように削除しますか？'
-                    : 'This rating includes a review. How would you like to delete it?'}
-                </p>
-                <div className="flex flex-col gap-3">
-                  <button
-                    onClick={() => handleDeleteContent('review_only')}
-                    className="w-full px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
-                  >
-                    {language === 'ko' ? '리뷰만 삭제 (별점 유지)' : language === 'ja' ? 'レビューのみ削除 (評価は保持)' : 'Delete review only (Keep rating)'}
-                  </button>
-                  <button
-                    onClick={() => handleDeleteContent('all')}
-                    className="w-full px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
-                  >
-                    {language === 'ko' ? '별점까지 모두 삭제' : language === 'ja' ? '評価とレビューを削除' : 'Delete rating and review'}
-                  </button>
-                  <button
-                    onClick={() => setShowDeleteModal(false)}
-                    className="w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
-                  >
-                    {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
-                  </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm text-gray-700 mb-6">
-                    {language === 'ko'
-                      ? '이 평가를 삭제하시겠습니까?'
-                      : language === 'ja'
-                      ? 'この評価を削除してもよろしいですか？'
-                      : 'Are you sure you want to delete this rating?'}
-                  </p>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => handleDeleteContent('all')}
-                      className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
-                    >
-                      {language === 'ko' ? '삭제' : language === 'ja' ? '削除' : 'Delete'}
-                    </button>
-                    <button
-                      onClick={() => setShowDeleteModal(false)}
-                      className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
-                    >
-                      {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
-                    </button>
-                  </div>
-                </>
-              )}
-            </>
+                  <>
+                    <p className="text-sm text-gray-700 mb-6">
+                      {language === 'ko'
+                        ? '이 평가에는 리뷰가 포함되어 있습니다. 어떻게 삭제하시겠습니까?'
+                        : language === 'ja'
+                          ? 'この評価にはレビューが含まれています。どのように削除しますか？'
+                          : 'This rating includes a review. How would you like to delete it?'}
+                    </p>
+                    <div className="flex flex-col gap-3">
+                      <button
+                        onClick={() => handleDeleteContent('review_only')}
+                        className="w-full px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+                      >
+                        {language === 'ko' ? '리뷰만 삭제 (별점 유지)' : language === 'ja' ? 'レビューのみ削除 (評価は保持)' : 'Delete review only (Keep rating)'}
+                      </button>
+                      <button
+                        onClick={() => handleDeleteContent('all')}
+                        className="w-full px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
+                      >
+                        {language === 'ko' ? '별점까지 모두 삭제' : language === 'ja' ? '評価とレビューを削除' : 'Delete rating and review'}
+                      </button>
+                      <button
+                        onClick={() => setShowDeleteModal(false)}
+                        className="w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
+                      >
+                        {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-gray-700 mb-6">
+                      {language === 'ko'
+                        ? '이 평가를 삭제하시겠습니까?'
+                        : language === 'ja'
+                          ? 'この評価を削除してもよろしいですか？'
+                          : 'Are you sure you want to delete this rating?'}
+                    </p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => handleDeleteContent('all')}
+                        className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
+                      >
+                        {language === 'ko' ? '삭제' : language === 'ja' ? '削除' : 'Delete'}
+                      </button>
+                      <button
+                        onClick={() => setShowDeleteModal(false)}
+                        className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
+                      >
+                        {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </>
             )}
           </div>
         </div>,

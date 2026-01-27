@@ -242,7 +242,7 @@ export default function Navbar() {
           boxShadow: 'var(--shadow-sm)'
         }}
       >
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="max-w-[1100px] mx-auto px-3 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 items-center h-11 md:h-16 md:gap-6 pb-2 md:pb-0">
             {/* Logo and Mobile User Menu */}
             <div className="flex items-center justify-between md:col-span-1">
