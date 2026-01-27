@@ -236,73 +236,24 @@ export default function Navbar() {
     <>
       {/* Desktop & Mobile Top Nav */}
       <nav
-        className="fixed top-0 left-0 right-0 z-50 h-12 md:h-16 bg-surface"
+        className="fixed top-0 left-0 right-0 z-50 h-10 md:h-12 bg-surface"
         style={{
           borderBottom: '1px solid var(--color-border)',
           boxShadow: 'var(--shadow-sm)'
         }}
       >
         <div className="max-w-[1100px] mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 items-center h-11 md:h-16 md:gap-6 pb-2 md:pb-0">
+          <div className="grid grid-cols-1 md:grid-cols-4 items-center h-9 md:h-12 md:gap-4 pb-1 md:pb-0">
             {/* Logo and Mobile User Menu */}
             <div className="flex items-center justify-between md:col-span-1">
-              <Link to="/feed" className="flex items-center gap-1.5 md:gap-2 text-xl md:text-2xl font-bold text-text-primary hover:opacity-60 transition-opacity group">
+              <Link to="/feed" className="flex items-center gap-1 md:gap-1.5 text-lg md:text-xl font-bold text-text-primary hover:opacity-60 transition-opacity group">
                 {/* AniPass Logo Icon */}
                 <div className="relative">
-                  <svg className="w-9 h-9 md:w-11 md:h-11" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                      <linearGradient id="instagramGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style={{ stopColor: '#833AB4' }} />
-                        <stop offset="40%" style={{ stopColor: '#E1306C' }} />
-                        <stop offset="70%" style={{ stopColor: '#F77737' }} />
-                        <stop offset="100%" style={{ stopColor: '#FCAF45' }} />
-                      </linearGradient>
-                    </defs>
-                    {/* Card Background with gradient */}
-                    <rect x="2" y="6" width="40" height="32" rx="4" fill="url(#instagramGradient)" className="group-hover:opacity-90 transition-opacity" />
-
-                    {/* Border */}
-                    <rect x="2" y="6" width="40" height="32" rx="4" stroke="white" strokeWidth="1.5" opacity="0.4" />
-
-                    {/* Letter A - Bubble/Rounded Style */}
-                    {/* Left side - very rounded */}
-                    <path
-                      d="M 10 35 Q 12 34 14 31 Q 16 27 17 24 Q 18 20 19 17 Q 20 14 22 12"
-                      stroke="white"
-                      strokeWidth="5"
-                      strokeLinecap="round"
-                      fill="none"
-                      className=""
-                    />
-                    {/* Right side - very rounded */}
-                    <path
-                      d="M 22 12 Q 24 14 25 17 Q 26 20 27 24 Q 28 27 30 31 Q 32 34 34 35"
-                      stroke="white"
-                      strokeWidth="5"
-                      strokeLinecap="round"
-                      fill="none"
-                      className=""
-                    />
-                    {/* Cross bar - bubble style */}
-                    <ellipse
-                      cx="22" cy="26"
-                      rx="8" ry="3"
-                      fill="white"
-                      className=""
-                    />
-
-                    {/* Star Icon - Simple & Cute */}
-                    <g className="group-hover:scale-110 transition-transform origin-center">
-                      <path
-                        d="M 22 4.5 L 24.5 10 L 30 11 L 26 15 L 27 20.5 L 22 17.5 L 17 20.5 L 18 15 L 14 11 L 19.5 10 Z"
-                        fill="#FCAF45"
-                        stroke="white"
-                        strokeWidth="1.2"
-                        strokeLinejoin="round"
-                        className=""
-                      />
-                    </g>
-                  </svg>
+                  <img
+                    src="/logo.png"
+                    alt="AniBite Logo"
+                    className="w-7 h-7 md:w-8 md:h-8 object-contain rounded-md"
+                  />
                 </div>
                 <span className="">AniBite</span>
               </Link>
