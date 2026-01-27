@@ -21,14 +21,14 @@ export const getCharacterImageUrl = (characterId, imageUrl = null) => {
   // Priority 2: characterId가 있으면 백엔드 API 사용 (자동 다운로드 & 캐싱)
   else if (characterId) {
     // 백엔드 API 엔드포인트 사용 - R2에 없으면 자동으로 AniList에서 다운로드
-    finalUrl = `${API_BASE_URL}/images/characters/${characterId}.jpg`;
+    finalUrl = `${API_BASE_URL}/api/images/characters/${characterId}.jpg`;
   }
   // Priority 3: imageUrl이 AniList URL이면 character ID 추출 후 백엔드 API 사용
   else if (imageUrl && imageUrl.includes('anilist.co') && imageUrl.includes('/character/')) {
     const match = imageUrl.match(/\/b(\d+)-/);
     if (match && match[1]) {
       const extractedId = match[1];
-      finalUrl = `${API_BASE_URL}/images/characters/${extractedId}.jpg`;
+      finalUrl = `${API_BASE_URL}/api/images/characters/${extractedId}.jpg`;
     } else {
       // ID 추출 실패 - placeholder 사용
       finalUrl = null;
@@ -98,7 +98,7 @@ export const getAvatarUrl = (avatarUrl, characterId = null) => {
   if (avatarUrl.startsWith('http')) {
     // If we have character ID parameter, use backend API
     if (characterId) {
-      return `${API_BASE_URL}/images/characters/${characterId}.jpg`;
+      return `${API_BASE_URL}/api/images/characters/${characterId}.jpg`;
     }
 
     // Try to extract character ID from AniList URL
@@ -106,7 +106,7 @@ export const getAvatarUrl = (avatarUrl, characterId = null) => {
       const match = avatarUrl.match(/\/b(\d+)-/);
       if (match && match[1]) {
         const extractedCharacterId = match[1];
-        return `${API_BASE_URL}/images/characters/${extractedCharacterId}.jpg`;
+        return `${API_BASE_URL}/api/images/characters/${extractedCharacterId}.jpg`;
       }
     }
 
