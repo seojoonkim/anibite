@@ -8,6 +8,7 @@ import { ratingPageService } from '../services/ratingPageService';
 import { useLanguage } from '../context/LanguageContext';
 import StarRating from '../components/common/StarRating';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
+import { getCharacterImageUrl } from '../utils/imageHelpers';
 
 export default function WriteReviews() {
   const { getAnimeTitle, language } = useLanguage();
@@ -409,8 +410,15 @@ export default function WriteReviews() {
     setEditRating(0);
   };
 
-  const getImageUrl = (imageUrl) => {
+  const getImageUrl = (imageUrl, itemType = 'anime', characterId = null) => {
     if (!imageUrl) return '/placeholder-anime.svg';
+
+    // For character images, use the character image helper
+    if (itemType === 'character') {
+      return getCharacterImageUrl(characterId, imageUrl);
+    }
+
+    // For anime images
     if (imageUrl.startsWith('http')) return imageUrl;
     // Use covers_large for better quality
     const processedUrl = imageUrl.includes('/covers/')
@@ -461,31 +469,28 @@ export default function WriteReviews() {
           <div className="flex gap-2 w-fit">
             <button
               onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                filter === 'all'
-                  ? 'bg-[#3797F0] text-white font-semibold'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filter === 'all'
+                ? 'bg-[#3797F0] text-white font-semibold'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
             >
               {language === 'ko' ? '모두' : language === 'ja' ? 'すべて' : 'All'}
             </button>
             <button
               onClick={() => setFilter('anime')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                filter === 'anime'
-                  ? 'bg-[#3797F0] text-white font-semibold'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filter === 'anime'
+                ? 'bg-[#3797F0] text-white font-semibold'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
             >
               {language === 'ko' ? '애니' : language === 'ja' ? 'アニメ' : 'Anime'}
             </button>
             <button
               onClick={() => setFilter('character')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                filter === 'character'
-                  ? 'bg-[#3797F0] text-white font-semibold'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filter === 'character'
+                ? 'bg-[#3797F0] text-white font-semibold'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
             >
               {language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character'}
             </button>
@@ -535,278 +540,280 @@ export default function WriteReviews() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-max items-start">
-          {filteredItems.map((item) => {
-            const hasReview = reviews[item.id];
-            const isEditing = editingId === item.id;
-            const isJustCompleted = justCompleted.has(item.id);
+            {filteredItems.map((item) => {
+              const hasReview = reviews[item.id];
+              const isEditing = editingId === item.id;
+              const isJustCompleted = justCompleted.has(item.id);
 
-            return (
-              <div
-                key={item.id}
-                className="rounded-xl transition-all duration-500 ease-out self-start"
-                style={{
-                  background: isJustCompleted
-                    ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
-                    : 'transparent',
-                  padding: isJustCompleted ? '2px' : '0',
-                  boxShadow: isJustCompleted
-                    ? '0 4px 20px rgba(225, 48, 108, 0.3)'
-                    : undefined
-                }}
-              >
-                <div className={`bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out overflow-hidden relative group ${
-                  !isJustCompleted ? 'border border-gray-200' : ''
-                }`}>
-                  <div className="flex items-start relative">
-                    {/* 작성완료 뱃지 */}
-                    {isJustCompleted && (
-                      <div className="absolute top-2 right-2 z-10">
-                        <span className="px-3 py-1 text-white text-xs font-bold rounded-full shadow-lg" style={{
-                          background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
-                        }}>
-                          {language === 'ko' ? '작성완료' : language === 'ja' ? '作成完了' : 'Completed'}
-                        </span>
-                      </div>
-                    )}
+              return (
+                <div
+                  key={item.id}
+                  className="rounded-xl transition-all duration-500 ease-out self-start"
+                  style={{
+                    background: isJustCompleted
+                      ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+                      : 'transparent',
+                    padding: isJustCompleted ? '2px' : '0',
+                    boxShadow: isJustCompleted
+                      ? '0 4px 20px rgba(225, 48, 108, 0.3)'
+                      : undefined
+                  }}
+                >
+                  <div className={`bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out overflow-hidden relative group ${!isJustCompleted ? 'border border-gray-200' : ''
+                    }`}>
+                    <div className="flex items-start relative">
+                      {/* 작성완료 뱃지 */}
+                      {isJustCompleted && (
+                        <div className="absolute top-2 right-2 z-10">
+                          <span className="px-3 py-1 text-white text-xs font-bold rounded-full shadow-lg" style={{
+                            background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+                          }}>
+                            {language === 'ko' ? '작성완료' : language === 'ja' ? '作成完了' : 'Completed'}
+                          </span>
+                        </div>
+                      )}
 
-                  <Link
-                    to={item.type === 'anime' ? `/anime/${item.itemId}` : `/character/${item.itemId}`}
-                    className="flex-shrink-0 cursor-pointer overflow-hidden"
-                  >
-                    <img
-                      src={getImageUrl(item.type === 'anime' ? item.image_url : item.character_image)}
-                      alt={item.type === 'anime' ? getAnimeTitle(item) : (language === 'ko' && item.character_name_native ? item.character_name_native : item.character_name)}
-                      className="w-32 h-48 object-cover object-top group-hover:scale-110 transition-transform duration-[1500ms]"
-                      onError={(e) => {
-                        e.target.src = '/placeholder-anime.svg';
-                      }}
-                    />
-                  </Link>
-
-                  <div className="flex-1 min-w-0 p-6 flex flex-col transition-all duration-500 ease-in-out">
-                    {/* Title with Badge */}
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-lg">
-                        <Link
-                          to={item.type === 'anime' ? `/anime/${item.itemId}` : `/character/${item.itemId}`}
-                          className="text-gray-900 hover:text-[#3797F0] transition-colors hover:underline cursor-pointer"
-                        >
-                          {item.type === 'anime' ? (
-                            language === 'ko' ? (
-                              <span>
-                                {item.title_korean || item.title_romaji || item.title_english}
-                                {item.title_korean && (item.title_romaji || item.title_english) && (
-                                  <span className="text-xs text-gray-400 font-normal ml-1.5">({item.title_romaji || item.title_english})</span>
-                                )}
-                              </span>
-                            ) : language === 'ja' ? (
-                              <span>
-                                {item.title_native || item.title_romaji || item.title_english}
-                                {item.title_native && (item.title_romaji || item.title_english) && (
-                                  <span className="text-xs text-gray-400 font-normal ml-1.5">({item.title_romaji || item.title_english})</span>
-                                )}
-                              </span>
-                            ) : (
-                              item.title_romaji || item.title_english || item.title_korean
-                            )
-                          ) : language === 'ko' ? (
-                            <span>
-                              {item.character_name_korean || item.character_name_native || item.character_name}
-                              {(item.character_name_korean || item.character_name_native) && item.character_name && (
-                                <span className="text-xs text-gray-400 font-normal ml-1.5">({item.character_name})</span>
-                              )}
-                            </span>
-                          ) : language === 'ja' ? (
-                            <span>
-                              {item.character_name_native || item.character_name}
-                              {item.character_name_native && item.character_name && (
-                                <span className="text-xs text-gray-400 font-normal ml-1.5">({item.character_name})</span>
-                              )}
-                            </span>
-                          ) : (
-                            item.character_name || item.character_name_native
+                      <Link
+                        to={item.type === 'anime' ? `/anime/${item.itemId}` : `/character/${item.itemId}`}
+                        className="flex-shrink-0 cursor-pointer overflow-hidden"
+                      >
+                        <img
+                          src={getImageUrl(
+                            item.type === 'anime' ? item.image_url : item.character_image,
+                            item.type,
+                            item.type === 'character' ? item.character_id : null
                           )}
-                        </Link>
-                      </h3>
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium flex-shrink-0 ${
-                        item.type === 'anime'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-pink-100 text-pink-800'
-                      }`}>
-                        {item.type === 'anime' ? (language === 'ko' ? '애니' : language === 'ja' ? 'アニメ' : 'Anime') : (language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character')}
-                      </span>
-                    </div>
+                          alt={item.type === 'anime' ? getAnimeTitle(item) : (language === 'ko' && item.character_name_native ? item.character_name_native : item.character_name)}
+                          className="w-32 h-48 object-cover object-top group-hover:scale-110 transition-transform duration-[1500ms]"
+                          onError={(e) => {
+                            e.target.src = '/placeholder-anime.svg';
+                          }}
+                        />
+                      </Link>
 
-                    {/* Character's Anime */}
-                    {item.type === 'character' && (item.anime_title_korean || item.anime_title_native || item.anime_title) && (
-                      <p className="text-xs text-gray-500 mb-1">
-                        from:{' '}
-                        {item.anime_id ? (
-                          <Link
-                            to={`/anime/${item.anime_id}`}
-                            className="hover:text-[#3797F0] hover:underline transition-colors"
-                          >
-                            {language === 'ko' ? (
-                              <>
-                                {item.anime_title_korean || item.anime_title}
-                                {item.anime_title_korean && item.anime_title && (
-                                  <span className="text-[10px] text-gray-400 font-normal ml-1">({item.anime_title})</span>
+                      <div className="flex-1 min-w-0 p-6 flex flex-col transition-all duration-500 ease-in-out">
+                        {/* Title with Badge */}
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-lg">
+                            <Link
+                              to={item.type === 'anime' ? `/anime/${item.itemId}` : `/character/${item.itemId}`}
+                              className="text-gray-900 hover:text-[#3797F0] transition-colors hover:underline cursor-pointer"
+                            >
+                              {item.type === 'anime' ? (
+                                language === 'ko' ? (
+                                  <span>
+                                    {item.title_korean || item.title_romaji || item.title_english}
+                                    {item.title_korean && (item.title_romaji || item.title_english) && (
+                                      <span className="text-xs text-gray-400 font-normal ml-1.5">({item.title_romaji || item.title_english})</span>
+                                    )}
+                                  </span>
+                                ) : language === 'ja' ? (
+                                  <span>
+                                    {item.title_native || item.title_romaji || item.title_english}
+                                    {item.title_native && (item.title_romaji || item.title_english) && (
+                                      <span className="text-xs text-gray-400 font-normal ml-1.5">({item.title_romaji || item.title_english})</span>
+                                    )}
+                                  </span>
+                                ) : (
+                                  item.title_romaji || item.title_english || item.title_korean
+                                )
+                              ) : language === 'ko' ? (
+                                <span>
+                                  {item.character_name_korean || item.character_name_native || item.character_name}
+                                  {(item.character_name_korean || item.character_name_native) && item.character_name && (
+                                    <span className="text-xs text-gray-400 font-normal ml-1.5">({item.character_name})</span>
+                                  )}
+                                </span>
+                              ) : language === 'ja' ? (
+                                <span>
+                                  {item.character_name_native || item.character_name}
+                                  {item.character_name_native && item.character_name && (
+                                    <span className="text-xs text-gray-400 font-normal ml-1.5">({item.character_name})</span>
+                                  )}
+                                </span>
+                              ) : (
+                                item.character_name || item.character_name_native
+                              )}
+                            </Link>
+                          </h3>
+                          <span className={`px-2 py-0.5 rounded text-xs font-medium flex-shrink-0 ${item.type === 'anime'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-pink-100 text-pink-800'
+                            }`}>
+                            {item.type === 'anime' ? (language === 'ko' ? '애니' : language === 'ja' ? 'アニメ' : 'Anime') : (language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character')}
+                          </span>
+                        </div>
+
+                        {/* Character's Anime */}
+                        {item.type === 'character' && (item.anime_title_korean || item.anime_title_native || item.anime_title) && (
+                          <p className="text-xs text-gray-500 mb-1">
+                            from:{' '}
+                            {item.anime_id ? (
+                              <Link
+                                to={`/anime/${item.anime_id}`}
+                                className="hover:text-[#3797F0] hover:underline transition-colors"
+                              >
+                                {language === 'ko' ? (
+                                  <>
+                                    {item.anime_title_korean || item.anime_title}
+                                    {item.anime_title_korean && item.anime_title && (
+                                      <span className="text-[10px] text-gray-400 font-normal ml-1">({item.anime_title})</span>
+                                    )}
+                                  </>
+                                ) : language === 'ja' ? (
+                                  <>
+                                    {item.anime_title_native || item.anime_title}
+                                    {item.anime_title_native && item.anime_title && (
+                                      <span className="text-[10px] text-gray-400 font-normal ml-1">({item.anime_title})</span>
+                                    )}
+                                  </>
+                                ) : (
+                                  item.anime_title
                                 )}
-                              </>
-                            ) : language === 'ja' ? (
+                              </Link>
+                            ) : (
+                              language === 'ko' ? (
+                                <>
+                                  {item.anime_title_korean || item.anime_title}
+                                  {item.anime_title_korean && item.anime_title && (
+                                    <span className="text-[10px] text-gray-400 font-normal ml-1">({item.anime_title})</span>
+                                  )}
+                                </>
+                              ) : language === 'ja' ? (
+                                <>
+                                  {item.anime_title_native || item.anime_title}
+                                  {item.anime_title_native && item.anime_title && (
+                                    <span className="text-[10px] text-gray-400 font-normal ml-1">({item.anime_title})</span>
+                                  )}
+                                </>
+                              ) : (
+                                item.anime_title
+                              )
+                            )}
+                          </p>
+                        )}
+
+                        {!isEditing ? (
+                          <div className="transition-all duration-300 ease-in-out">
+                            <div className="flex items-center gap-3 text-sm text-gray-500 mb-3">
+                              <div className="flex items-center">
+                                <StarRating rating={item.rating || 0} readonly size="sm" showNumber={false} />
+                              </div>
+                              {item.type === 'anime' && item.year && <span>• {item.year}</span>}
+                            </div>
+                            {hasReview ? (
                               <>
-                                {item.anime_title_native || item.anime_title}
-                                {item.anime_title_native && item.anime_title && (
-                                  <span className="text-[10px] text-gray-400 font-normal ml-1">({item.anime_title})</span>
-                                )}
+                                <p className="text-sm text-gray-700 mb-3 line-clamp-2">
+                                  {hasReview.content}
+                                </p>
+                                <button
+                                  onClick={() => handleStartEdit(item, hasReview.content, item.rating)}
+                                  className="text-sm text-[#3797F0] hover:text-[#2C7CB8]"
+                                >
+                                  {language === 'ko' ? '수정' : language === 'ja' ? '編集' : 'Edit'}
+                                </button>
                               </>
                             ) : (
-                              item.anime_title
+                              <button
+                                onClick={() => handleStartEdit(item, '', item.rating)}
+                                className="text-sm text-gray-500 hover:text-gray-700 border border-gray-300 px-4 py-2 rounded hover:border-gray-400 transition-all group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-300"
+                              >
+                                {language === 'ko' ? '리뷰 작성하기' : language === 'ja' ? 'レビュー作成' : 'Write Review'}
+                              </button>
                             )}
-                          </Link>
-                        ) : (
-                          language === 'ko' ? (
-                            <>
-                              {item.anime_title_korean || item.anime_title}
-                              {item.anime_title_korean && item.anime_title && (
-                                <span className="text-[10px] text-gray-400 font-normal ml-1">({item.anime_title})</span>
-                              )}
-                            </>
-                          ) : language === 'ja' ? (
-                            <>
-                              {item.anime_title_native || item.anime_title}
-                              {item.anime_title_native && item.anime_title && (
-                                <span className="text-[10px] text-gray-400 font-normal ml-1">({item.anime_title})</span>
-                              )}
-                            </>
-                          ) : (
-                            item.anime_title
-                          )
-                        )}
-                      </p>
-                    )}
-
-                    {!isEditing ? (
-                      <div className="transition-all duration-300 ease-in-out">
-                        <div className="flex items-center gap-3 text-sm text-gray-500 mb-3">
-                          <div className="flex items-center">
-                            <StarRating rating={item.rating || 0} readonly size="sm" showNumber={false} />
                           </div>
-                          {item.type === 'anime' && item.year && <span>• {item.year}</span>}
-                        </div>
-                        {hasReview ? (
-                          <>
-                            <p className="text-sm text-gray-700 mb-3 line-clamp-2">
-                              {hasReview.content}
-                            </p>
-                            <button
-                              onClick={() => handleStartEdit(item, hasReview.content, item.rating)}
-                              className="text-sm text-[#3797F0] hover:text-[#2C7CB8]"
-                            >
-                              {language === 'ko' ? '수정' : language === 'ja' ? '編集' : 'Edit'}
-                            </button>
-                          </>
                         ) : (
-                          <button
-                            onClick={() => handleStartEdit(item, '', item.rating)}
-                            className="text-sm text-gray-500 hover:text-gray-700 border border-gray-300 px-4 py-2 rounded hover:border-gray-400 transition-all group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-300"
-                          >
-                            {language === 'ko' ? '리뷰 작성하기' : language === 'ja' ? 'レビュー作成' : 'Write Review'}
-                          </button>
+                          <div className="space-y-3 animate-fadeIn">
+                            {/* 평점 선택 */}
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                {language === 'ko' ? '평점 (클릭하여 수정 가능)' : language === 'ja' ? '評価 (クリックして変更)' : 'Rating (Click to edit)'}
+                              </label>
+                              <StarRating
+                                rating={editRating}
+                                onRatingChange={setEditRating}
+                                readonly={false}
+                                size="lg"
+                                showNumber={true}
+                              />
+                            </div>
+
+                            {/* 리뷰 입력 */}
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                {language === 'ko' ? '리뷰' : language === 'ja' ? 'レビュー' : 'Review'}
+                              </label>
+                              <textarea
+                                value={editContent}
+                                onChange={(e) => setEditContent(e.target.value)}
+                                placeholder={language === 'ko' ? '리뷰를 작성하세요...' : language === 'ja' ? 'レビューを作成...' : 'Write your review...'}
+                                className="w-full text-sm border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500 resize-none"
+                                rows="4"
+                                autoFocus
+                              />
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleSaveReview(item)}
+                                disabled={!editContent.trim() || !editRating}
+                                className="text-sm px-4 py-2 rounded disabled:opacity-50 transition-colors"
+                                style={{ backgroundColor: '#3797F0', color: 'white', fontWeight: '600' }}
+                                onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#1877F2')}
+                                onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#3797F0')}
+                              >
+                                {language === 'ko' ? '저장' : language === 'ja' ? '保存' : 'Save'}
+                              </button>
+                              <button
+                                onClick={handleCancel}
+                                className="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded transition-colors"
+                              >
+                                {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
+                              </button>
+                            </div>
+                          </div>
                         )}
                       </div>
-                    ) : (
-                      <div className="space-y-3 animate-fadeIn">
-                        {/* 평점 선택 */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            {language === 'ko' ? '평점 (클릭하여 수정 가능)' : language === 'ja' ? '評価 (クリックして変更)' : 'Rating (Click to edit)'}
-                          </label>
-                          <StarRating
-                            rating={editRating}
-                            onRatingChange={setEditRating}
-                            readonly={false}
-                            size="lg"
-                            showNumber={true}
-                          />
-                        </div>
-
-                        {/* 리뷰 입력 */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            {language === 'ko' ? '리뷰' : language === 'ja' ? 'レビュー' : 'Review'}
-                          </label>
-                          <textarea
-                            value={editContent}
-                            onChange={(e) => setEditContent(e.target.value)}
-                            placeholder={language === 'ko' ? '리뷰를 작성하세요...' : language === 'ja' ? 'レビューを作成...' : 'Write your review...'}
-                            className="w-full text-sm border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500 resize-none"
-                            rows="4"
-                            autoFocus
-                          />
-                        </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleSaveReview(item)}
-                            disabled={!editContent.trim() || !editRating}
-                            className="text-sm px-4 py-2 rounded disabled:opacity-50 transition-colors"
-                            style={{ backgroundColor: '#3797F0', color: 'white', fontWeight: '600' }}
-                            onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#1877F2')}
-                            onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#3797F0')}
-                          >
-                            {language === 'ko' ? '저장' : language === 'ja' ? '保存' : 'Save'}
-                          </button>
-                          <button
-                            onClick={handleCancel}
-                            className="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded transition-colors"
-                          >
-                            {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                    </div>
                   </div>
                 </div>
+              );
+            })}
+
+            {/* Loading more indicator */}
+            {loadingMore && (
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <p className="text-gray-500 mt-2">{language === 'ko' ? '더 불러오는 중...' : language === 'ja' ? '読み込み中...' : 'Loading more...'}</p>
               </div>
-            );
-          })}
+            )}
 
-          {/* Loading more indicator */}
-          {loadingMore && (
-            <div className="text-center py-8">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-              <p className="text-gray-500 mt-2">{language === 'ko' ? '더 불러오는 중...' : language === 'ja' ? '読み込み中...' : 'Loading more...'}</p>
-            </div>
-          )}
+            {/* No more items */}
+            {!hasMore && filteredItems.length > 0 && (
+              <div className="text-center py-8 text-gray-500">
+                {language === 'ko' ? '모든 항목을 불러왔습니다' : language === 'ja' ? 'すべての項目を読み込みました' : 'All items loaded'}
+              </div>
+            )}
 
-          {/* No more items */}
-          {!hasMore && filteredItems.length > 0 && (
-            <div className="text-center py-8 text-gray-500">
-              {language === 'ko' ? '모든 항목을 불러왔습니다' : language === 'ja' ? 'すべての項目を読み込みました' : 'All items loaded'}
-            </div>
-          )}
-
-          {filteredItems.length === 0 && !loading && (
-            <div className="text-center py-16">
-              <p className="text-gray-600">
-                {filter === 'all'
-                  ? (language === 'ko' ? '아직 평가한 애니나 캐릭터가 없습니다.' : language === 'ja' ? 'まだ評価したアニメやキャラクターがありません。' : 'No rated anime or characters yet.')
-                  : filter === 'anime'
-                  ? (language === 'ko' ? '아직 평가한 애니가 없습니다.' : language === 'ja' ? 'まだ評価したアニメがありません。' : 'No rated anime yet.')
-                  : (language === 'ko' ? '아직 평가한 캐릭터가 없습니다.' : language === 'ja' ? 'まだ評価したキャラクターがありません。' : 'No rated characters yet.')
-                }
-              </p>
-              <p className="text-sm text-gray-500 mt-2">
-                {filter === 'all'
-                  ? (language === 'ko' ? '애니나 캐릭터를 평가하면 리뷰를 작성할 수 있습니다.' : language === 'ja' ? 'アニメやキャラクターを評価するとレビューを作成できます。' : 'Rate anime or characters to write reviews.')
-                  : filter === 'anime'
-                  ? (language === 'ko' ? '애니를 평가하면 리뷰를 작성할 수 있습니다.' : language === 'ja' ? 'アニメを評価するとレビューを作成できます。' : 'Rate anime to write reviews.')
-                  : (language === 'ko' ? '캐릭터를 평가하면 리뷰를 작성할 수 있습니다.' : language === 'ja' ? 'キャラクターを評価するとレビューを作成できます。' : 'Rate characters to write reviews.')
-                }
-              </p>
-            </div>
-          )}
+            {filteredItems.length === 0 && !loading && (
+              <div className="text-center py-16">
+                <p className="text-gray-600">
+                  {filter === 'all'
+                    ? (language === 'ko' ? '아직 평가한 애니나 캐릭터가 없습니다.' : language === 'ja' ? 'まだ評価したアニメやキャラクターがありません。' : 'No rated anime or characters yet.')
+                    : filter === 'anime'
+                      ? (language === 'ko' ? '아직 평가한 애니가 없습니다.' : language === 'ja' ? 'まだ評価したアニメがありません。' : 'No rated anime yet.')
+                      : (language === 'ko' ? '아직 평가한 캐릭터가 없습니다.' : language === 'ja' ? 'まだ評価したキャラクターがありません。' : 'No rated characters yet.')
+                  }
+                </p>
+                <p className="text-sm text-gray-500 mt-2">
+                  {filter === 'all'
+                    ? (language === 'ko' ? '애니나 캐릭터를 평가하면 리뷰를 작성할 수 있습니다.' : language === 'ja' ? 'アニメやキャラクターを評価するとレビューを作成できます。' : 'Rate anime or characters to write reviews.')
+                    : filter === 'anime'
+                      ? (language === 'ko' ? '애니를 평가하면 리뷰를 작성할 수 있습니다.' : language === 'ja' ? 'アニメを評価するとレビューを作成できます。' : 'Rate anime to write reviews.')
+                      : (language === 'ko' ? '캐릭터를 평가하면 리뷰를 작성할 수 있습니다.' : language === 'ja' ? 'キャラクターを評価するとレビューを作成できます。' : 'Rate characters to write reviews.')
+                  }
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
