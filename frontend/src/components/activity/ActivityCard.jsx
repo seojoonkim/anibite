@@ -519,7 +519,7 @@ const ActivityCard = forwardRef(({
               <div className="flex items-center gap-2 flex-wrap">
                 <Link
                   to={`/user/${activity.user_id}`}
-                  className="text-sm font-semibold text-gray-800 hover:text-[#3797F0] transition-colors"
+                  className="text-sm font-semibold text-gray-800 hover:text-primary transition-colors"
                 >
                   {activity.display_name || activity.username}
                 </Link>
@@ -574,7 +574,7 @@ const ActivityCard = forwardRef(({
               alt={activity.item_title || ''}
               loading="lazy"
               decoding="async"
-              className="w-16 h-24 object-cover rounded border-2 border-transparent hover:border-[#A8E6CF] transition-all"
+              className="w-16 h-24 object-cover rounded border-2 border-transparent hover:border-primary transition-all"
               onError={handleItemImageError}
             />
           </Link>
@@ -587,7 +587,7 @@ const ActivityCard = forwardRef(({
             <div className="mb-2">
               <Link
                 to={getActivityLink()}
-                className="block text-base font-semibold text-gray-800 hover:text-[#3797F0] transition-colors"
+                className="block text-base font-semibold text-gray-800 hover:text-primary transition-colors"
               >
                 {language === 'ko' ? (
                   <>
@@ -612,7 +612,7 @@ const ActivityCard = forwardRef(({
               {activity.activity_type === 'character_rating' && (activity.anime_title || activity.anime_title_korean) && (
                 <Link
                   to={`/anime/${activity.anime_id}`}
-                  className="text-xs text-gray-500 mt-0.5 hover:text-[#3797F0] transition-colors block"
+                  className="text-xs text-gray-500 mt-0.5 hover:text-primary transition-colors block"
                 >
                   from: {language === 'ko' ? (
                     <>
@@ -650,7 +650,7 @@ const ActivityCard = forwardRef(({
             }
 
             return (
-              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4 mb-3">
+              <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 mb-3">
                 {metadata && metadata.old_rank && metadata.new_rank ? (
                   <>
                     <div className="flex items-center justify-center gap-3">
@@ -789,7 +789,7 @@ const ActivityCard = forwardRef(({
               {/* Comment Button */}
               <button
                 onClick={() => setShowComments(!showComments)}
-                className="flex items-center gap-1.5 transition-all hover:scale-110 text-gray-600 hover:text-[#8EC5FC]"
+                className="flex items-center gap-1.5 transition-all hover:scale-110 text-gray-600 hover:text-primary-light"
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
