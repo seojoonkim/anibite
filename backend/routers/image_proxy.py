@@ -5,7 +5,7 @@ Image Proxy Router
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import RedirectResponse, Response
 import requests
-from utils.r2_storage import upload_to_r2, check_r2_object_exists, get_r2_presigned_url
+from utils.r2_storage import upload_to_r2, check_r2_object_exists
 from database import db
 import logging
 
