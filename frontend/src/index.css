@@ -315,7 +315,6 @@ button[style*="background"],
 
 /* Image Optimization */
 img {
-  content-visibility: auto;
   transform: translateZ(0);
   backface-visibility: hidden;
 }
