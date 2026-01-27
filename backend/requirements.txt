@@ -32,5 +32,6 @@ boto3==1.35.94
 
 # HTTP Client (for image proxy)
 requests==2.32.3
+httpx==0.27.0
 
 # Updated: 2026-01-27 - Image proxy auto-download

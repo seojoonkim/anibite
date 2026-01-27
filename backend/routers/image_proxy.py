@@ -55,7 +55,7 @@ async def get_character_image(character_id: int, ext: str):
         upload_to_r2(response.content, r2_path, content_type)
         
         # Update database with local path
-        db.execute_query(
+        db.execute_update(
             "UPDATE character SET image_local = ? WHERE id = ?",
             (r2_path, character_id)
         )
