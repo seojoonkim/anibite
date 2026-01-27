@@ -21,8 +21,11 @@ function RatingCard({ anime, onRate }) {
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.svg';
     if (imageUrl.startsWith('http')) return imageUrl;
-    // Use original path - covers_large may not exist on new domain
-    return `${IMAGE_BASE_URL}${imageUrl}`;
+    // Use covers_large for better quality
+    const processedUrl = imageUrl.includes('/covers/')
+      ? imageUrl.replace('/covers/', '/covers_large/')
+      : imageUrl;
+    return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
   // Update status and rating when anime props change
