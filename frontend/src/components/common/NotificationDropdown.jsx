@@ -244,21 +244,21 @@ export default function NotificationDropdown({
       {/* Desktop Dropdown */}
       <div
         ref={dropdownRef}
-        className="hidden md:block absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-50 overflow-hidden transition-all duration-200 ease-out opacity-100 translate-y-0"
+        className="hidden md:block absolute right-0 mt-2 w-96 bg-surface rounded-lg shadow-2xl border border-border z-50 overflow-hidden transition-all duration-200 ease-out opacity-100 translate-y-0"
         style={{
           maxHeight: '500px',
           animation: 'slideDown 0.2s ease-out'
         }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gradient-to-r from-[#A8E6CF] to-[#8EC5FC]">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-gradient-to-r from-primary/80 to-secondary/80">
           <h3 className="text-white font-semibold flex items-center gap-2">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
             </svg>
             {language === 'ko' ? '알림' : language === 'ja' ? '通知' : 'Notifications'}
             {unreadCount > 0 && (
-              <span className="bg-[#FFB6C1] text-white text-xs px-2 py-0.5 rounded-full font-bold">
+              <span className="bg-secondary text-white text-xs px-2 py-0.5 rounded-full font-bold">
                 {unreadCount}
               </span>
             )}
@@ -276,17 +276,17 @@ export default function NotificationDropdown({
         {/* Content */}
         <div className="overflow-y-auto" style={{ maxHeight: '400px' }}>
           {loading ? (
-            <div className="p-8 text-center text-gray-500">
-              <div className="animate-spin w-8 h-8 border-4 border-[#A8E6CF] border-t-transparent rounded-full mx-auto mb-2"></div>
+            <div className="p-8 text-center text-text-secondary">
+              <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
               {language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...'}
             </div>
           ) : (notifications.length === 0 || unreadCount === 0) ? (
             // 빈 상태
             <div className="p-8 text-center">
-              <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-16 h-16 mx-auto text-text-tertiary mb-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
               </svg>
-              <p className="text-gray-600 font-medium">
+              <p className="text-text-secondary font-medium">
                 {language === 'ko' ? '새로운 알림이 없습니다' : language === 'ja' ? '新しい通知はありません' : 'No new notifications'}
               </p>
             </div>
@@ -297,8 +297,8 @@ export default function NotificationDropdown({
                 key={`${notification.type}-${notification.actor_user_id}-${notification.time}-${index}`}
                 ref={el => notificationRefs.current[index] = el}
                 onClick={() => handleNotificationClick(notification)}
-                className={`w-full px-4 py-3 flex gap-3 hover:bg-gray-50 transition-colors border-b border-gray-100 text-left ${
-                  selectedIndex === index ? 'bg-blue-50' : ''
+                className={`w-full px-4 py-3 flex gap-3 hover:bg-surface-hover transition-colors border-b border-border text-left ${
+                  selectedIndex === index ? 'bg-primary/10' : ''
                 }`}
               >
                 {/* Avatar */}
@@ -306,27 +306,27 @@ export default function NotificationDropdown({
                   <img
                     src={getAvatarUrl(notification.actor_avatar_url)}
                     alt={notification.actor_display_name || notification.actor_username}
-                    className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                    className="w-10 h-10 rounded-full object-cover border border-border"
                   />
                   {/* Icon Badge */}
-                  <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
+                  <div className="absolute -bottom-1 -right-1 bg-surface rounded-full p-0.5">
                     {getNotificationIcon(notification)}
                   </div>
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-800 mb-1 line-clamp-2">
+                  <p className="text-sm text-text-primary mb-1 line-clamp-2">
                     {getNotificationText(notification)}
                   </p>
                   {notification.item_title && (
-                    <p className="text-xs text-gray-500 mb-1">
+                    <p className="text-xs text-text-secondary mb-1">
                       {language === 'ko' && notification.item_title_korean
                         ? notification.item_title_korean
                         : notification.item_title}
                     </p>
                   )}
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-text-tertiary">
                     {getTimeAgo(notification.time)}
                   </p>
                 </div>
@@ -337,7 +337,7 @@ export default function NotificationDropdown({
                     <img
                       src={getImageUrl(notification.item_image)}
                       alt=""
-                      className="w-12 h-16 object-cover rounded border border-gray-200"
+                      className="w-12 h-16 object-cover rounded border border-border"
                     />
                   </div>
                 )}
@@ -345,7 +345,7 @@ export default function NotificationDropdown({
                 {/* Unread indicator */}
                 {isUnread(notification) && (
                   <div className="flex-shrink-0 self-center">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
                   </div>
                 )}
               </button>
@@ -355,10 +355,10 @@ export default function NotificationDropdown({
 
         {/* Footer */}
         {notifications.length > 0 && (
-          <div className="border-t border-gray-200 bg-gray-50">
+          <div className="border-t border-border bg-surface-elevated">
             <button
               onClick={handleViewAll}
-              className="w-full py-3 text-center text-[#A8E6CF] hover:text-[#8EC5FC] font-medium text-sm transition-colors"
+              className="w-full py-3 text-center text-primary hover:text-primary-light font-medium text-sm transition-colors"
             >
               {language === 'ko' ? '알림 모두보기 →' : language === 'ja' ? 'すべての通知を見る →' : 'View all notifications →'}
             </button>
@@ -377,7 +377,7 @@ export default function NotificationDropdown({
 
         {/* Bottom Sheet */}
         <div
-          className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl z-50 transition-transform duration-300"
+          className="fixed bottom-0 left-0 right-0 bg-surface rounded-t-3xl shadow-2xl z-50 transition-transform duration-300 border-t border-border"
           style={{
             maxHeight: '70vh',
             animation: 'slideUp 0.3s ease-out'
@@ -385,18 +385,18 @@ export default function NotificationDropdown({
         >
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-2">
-            <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
+            <div className="w-12 h-1 bg-text-tertiary rounded-full"></div>
           </div>
 
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-            <h3 className="text-gray-900 font-semibold flex items-center gap-2">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+            <h3 className="text-text-primary font-semibold flex items-center gap-2">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
               </svg>
               {language === 'ko' ? '알림' : language === 'ja' ? '通知' : 'Notifications'}
               {unreadCount > 0 && (
-                <span className="bg-[#FFB6C1] text-white text-xs px-2 py-0.5 rounded-full font-bold">
+                <span className="bg-secondary text-white text-xs px-2 py-0.5 rounded-full font-bold">
                   {unreadCount}
                 </span>
               )}
@@ -404,7 +404,7 @@ export default function NotificationDropdown({
             {notifications.length > 0 && (
               <button
                 onClick={handleMarkAllRead}
-                className="text-[#A8E6CF] text-sm hover:text-[#8EC5FC] font-medium"
+                className="text-primary text-sm hover:text-primary-light font-medium"
               >
                 {language === 'ko' ? '모두 읽음' : language === 'ja' ? 'すべて既読' : 'Mark all read'}
               </button>
@@ -414,16 +414,16 @@ export default function NotificationDropdown({
           {/* Content (same as desktop) */}
           <div className="overflow-y-auto pb-20" style={{ maxHeight: 'calc(70vh - 120px)' }}>
             {loading ? (
-              <div className="p-8 text-center text-gray-500">
-                <div className="animate-spin w-8 h-8 border-4 border-[#A8E6CF] border-t-transparent rounded-full mx-auto mb-2"></div>
+              <div className="p-8 text-center text-text-secondary">
+                <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
                 {language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...'}
               </div>
             ) : (notifications.length === 0 || unreadCount === 0) ? (
               <div className="p-8 text-center">
-                <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-16 h-16 mx-auto text-text-tertiary mb-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
-                <p className="text-gray-600 font-medium">
+                <p className="text-text-secondary font-medium">
                   {language === 'ko' ? '새로운 알림이 없습니다' : language === 'ja' ? '新しい通知はありません' : 'No new notifications'}
                 </p>
               </div>
@@ -432,31 +432,31 @@ export default function NotificationDropdown({
                 <button
                   key={`${notification.type}-${notification.actor_user_id}-${notification.time}-${index}`}
                   onClick={() => handleNotificationClick(notification)}
-                  className="w-full px-4 py-3 flex gap-3 active:bg-gray-100 transition-colors border-b border-gray-100 text-left"
+                  className="w-full px-4 py-3 flex gap-3 active:bg-surface-hover transition-colors border-b border-border text-left"
                 >
                   <div className="flex-shrink-0 relative">
                     <img
                       src={getAvatarUrl(notification.actor_avatar_url)}
                       alt={notification.actor_display_name || notification.actor_username}
-                      className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                      className="w-10 h-10 rounded-full object-cover border border-border"
                     />
-                    <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
+                    <div className="absolute -bottom-1 -right-1 bg-surface rounded-full p-0.5">
                       {getNotificationIcon(notification)}
                     </div>
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-800 mb-1 line-clamp-2">
+                    <p className="text-sm text-text-primary mb-1 line-clamp-2">
                       {getNotificationText(notification)}
                     </p>
                     {notification.item_title && (
-                      <p className="text-xs text-gray-500 mb-1">
+                      <p className="text-xs text-text-secondary mb-1">
                         {language === 'ko' && notification.item_title_korean
                           ? notification.item_title_korean
                           : notification.item_title}
                       </p>
                     )}
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-text-tertiary">
                       {getTimeAgo(notification.time)}
                     </p>
                   </div>
@@ -466,14 +466,14 @@ export default function NotificationDropdown({
                       <img
                         src={getImageUrl(notification.item_image)}
                         alt=""
-                        className="w-12 h-16 object-cover rounded border border-gray-200"
+                        className="w-12 h-16 object-cover rounded border border-border"
                       />
                     </div>
                   )}
 
                   {isUnread(notification) && (
                     <div className="flex-shrink-0 self-center">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
                     </div>
                   )}
                 </button>
@@ -483,10 +483,10 @@ export default function NotificationDropdown({
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 bg-white rounded-b-3xl">
+            <div className="absolute bottom-0 left-0 right-0 border-t border-border bg-surface rounded-b-3xl">
               <button
                 onClick={handleViewAll}
-                className="w-full py-4 text-center text-[#A8E6CF] font-medium text-sm"
+                className="w-full py-4 text-center text-primary font-medium text-sm"
               >
                 {language === 'ko' ? '알림 모두보기 →' : language === 'ja' ? 'すべての通知を見る →' : 'View all notifications →'}
               </button>

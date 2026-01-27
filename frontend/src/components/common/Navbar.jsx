@@ -236,7 +236,7 @@ export default function Navbar() {
     <>
       {/* Desktop & Mobile Top Nav */}
       <nav
-        className="fixed top-0 left-0 right-0 z-50 h-12 md:h-16 bg-white"
+        className="fixed top-0 left-0 right-0 z-50 h-12 md:h-16 bg-surface"
         style={{
           borderBottom: '1px solid var(--color-border)',
           boxShadow: 'var(--shadow-sm)'
@@ -246,7 +246,7 @@ export default function Navbar() {
           <div className="grid grid-cols-1 md:grid-cols-4 items-center h-11 md:h-16 md:gap-6 pb-2 md:pb-0">
             {/* Logo and Mobile User Menu */}
             <div className="flex items-center justify-between md:col-span-1">
-              <Link to="/feed" className="flex items-center gap-1.5 md:gap-2 text-xl md:text-2xl font-bold text-black hover:opacity-60 transition-opacity group">
+              <Link to="/feed" className="flex items-center gap-1.5 md:gap-2 text-xl md:text-2xl font-bold text-text-primary hover:opacity-60 transition-opacity group">
                 {/* AniPass Logo Icon */}
                 <div className="relative">
                   <svg className="w-9 h-9 md:w-11 md:h-11" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -312,20 +312,20 @@ export default function Navbar() {
                 <div className="md:hidden relative" ref={mobileUserMenuRef}>
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="text-[#262626] hover:bg-gray-100 text-sm font-medium px-1.5 py-0.5 rounded-md transition-colors flex items-center gap-1.5"
+                    className="text-text-primary hover:bg-surface-hover text-sm font-medium px-1.5 py-0.5 rounded-md transition-colors flex items-center gap-1.5"
                   >
                     {user.avatar_url ? (
                       <img
                         src={getAvatarUrl(user.avatar_url)}
                         alt={user.display_name || user.username}
-                        className="w-8 h-8 rounded-full object-cover border border-[#DBDBDB]"
+                        className="w-8 h-8 rounded-full object-cover border border-border"
                         onError={(e) => {
                           e.target.style.display = 'none';
                         }}
                       />
                     ) : (
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center border border-[#DBDBDB]" style={{ backgroundColor: '#FAFAFA' }}>
-                        <span className="text-[#262626] text-sm font-bold">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center border border-border bg-surface-elevated">
+                        <span className="text-text-primary text-sm font-bold">
                           {(user.display_name || user.username || '?').charAt(0).toUpperCase()}
                         </span>
                       </div>
@@ -337,17 +337,10 @@ export default function Navbar() {
                   </button>
 
                   {showUserMenu && (
-                    <div className="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-[0_4px_16px_rgba(0,0,0,0.12)] z-50" style={{ borderColor: '#DBDBDB', borderWidth: '1px' }}>
+                    <div className="absolute right-0 mt-2 w-52 bg-surface rounded-md shadow-lg z-50 border border-border">
                       <button
                         onClick={handleMyAnipass}
-                        className="block w-full text-left px-4 py-3 text-sm font-medium rounded-t-md transition-colors"
-                        style={{
-                          backgroundColor: '#FAFAFA',
-                          color: '#262626',
-                          borderBottom: '1px solid #DBDBDB'
-                        }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = '#F0F0F0'}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = '#FAFAFA'}
+                        className="block w-full text-left px-4 py-3 text-sm font-medium rounded-t-md transition-colors bg-surface-elevated text-text-primary border-b border-border hover:bg-surface-hover"
                       >
                         <div className="flex items-center gap-2">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -358,7 +351,7 @@ export default function Navbar() {
                       </button>
                       <button
                         onClick={handleSettings}
-                        className="block w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 transition-colors"
+                        className="block w-full text-left px-4 py-2 text-xs text-text-secondary hover:bg-surface-hover transition-colors"
                       >
                         <div className="flex items-center gap-2">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -370,7 +363,7 @@ export default function Navbar() {
                       </button>
                       <button
                         onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-md transition-colors"
+                        className="block w-full text-left px-4 py-2 text-sm text-error hover:bg-surface-hover rounded-b-md transition-colors"
                       >
                         <div className="flex items-center gap-2">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -393,8 +386,8 @@ export default function Navbar() {
                     key={item.path}
                     to={item.path}
                     className={`px-3 py-2 rounded-md text-sm font-normal transition-colors whitespace-nowrap ${isActive(item.path)
-                      ? 'bg-[#3797F0] text-white'
-                      : 'text-black hover:text-gray-500 hover:bg-gray-100'
+                      ? 'bg-primary text-white'
+                      : 'text-text-primary hover:text-text-secondary hover:bg-surface-hover'
                       }`}
                   >
                     {item.labelKo ? (language === 'ko' ? item.labelKo : language === 'ja' ? item.labelJa : item.labelEn) : item.label}
@@ -409,7 +402,7 @@ export default function Navbar() {
                   <div className="relative" ref={notificationRef}>
                     <button
                       onClick={handleNotificationClick}
-                      className={`relative text-[#262626] hover:bg-gray-100 p-2 rounded-md transition-colors flex items-center ${showNotificationDropdown ? 'bg-gray-100' : ''
+                      className={`relative text-text-primary hover:bg-surface-hover p-2 rounded-md transition-colors flex items-center ${showNotificationDropdown ? 'bg-surface-hover' : ''
                         }`}
                       style={{ minWidth: '40px' }}
                     >
@@ -417,7 +410,7 @@ export default function Navbar() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                       </svg>
                       {unreadCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-[#FF3040] text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1 animate-pulse">
+                        <span className="absolute -top-1 -right-1 bg-error text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1 animate-pulse">
                           {unreadCount > 99 ? '99+' : unreadCount}
                         </span>
                       )}
@@ -438,21 +431,21 @@ export default function Navbar() {
                   <div className="relative" ref={userMenuRef}>
                     <button
                       onClick={() => setShowUserMenu(!showUserMenu)}
-                      className="text-[#262626] hover:text-black hover:bg-gray-100 text-sm font-medium px-3 py-2 rounded-md transition-colors flex items-center gap-2"
+                      className="text-text-primary hover:text-text-secondary hover:bg-surface-hover text-sm font-medium px-3 py-2 rounded-md transition-colors flex items-center gap-2"
                       style={{ minWidth: '160px' }}
                     >
                       {user.avatar_url ? (
                         <img
                           src={getAvatarUrl(user.avatar_url)}
                           alt={user.display_name || user.username}
-                          className="w-8 h-8 rounded-full object-cover border border-[#DBDBDB]"
+                          className="w-8 h-8 rounded-full object-cover border border-border"
                           onError={(e) => {
                             e.target.style.display = 'none';
                           }}
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center border border-[#DBDBDB]" style={{ backgroundColor: '#FAFAFA' }}>
-                          <span className="text-[#262626] text-sm font-bold">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center border border-border bg-surface-elevated">
+                          <span className="text-text-primary text-sm font-bold">
                             {(user.display_name || user.username || '?').charAt(0).toUpperCase()}
                           </span>
                         </div>
@@ -463,7 +456,7 @@ export default function Navbar() {
                         return (
                           <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor} hidden sm:inline-flex`}>
                             <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span>
-                            <span className="text-gray-700">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
+                            <span className="text-text-secondary">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
                           </span>
                         );
                       })()}
@@ -473,17 +466,10 @@ export default function Navbar() {
                     </button>
 
                     {showUserMenu && (
-                      <div className="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-[0_4px_16px_rgba(0,0,0,0.12)] z-50" style={{ borderColor: '#DBDBDB', borderWidth: '1px' }}>
+                      <div className="absolute right-0 mt-2 w-52 bg-surface rounded-md shadow-lg z-50 border border-border">
                         <button
                           onClick={handleMyAnipass}
-                          className="block w-full text-left px-4 py-3 text-sm font-medium rounded-t-md transition-colors"
-                          style={{
-                            backgroundColor: '#FAFAFA',
-                            color: '#262626',
-                            borderBottom: '1px solid #DBDBDB'
-                          }}
-                          onMouseEnter={(e) => e.target.style.backgroundColor = '#F0F0F0'}
-                          onMouseLeave={(e) => e.target.style.backgroundColor = '#FAFAFA'}
+                          className="block w-full text-left px-4 py-3 text-sm font-medium rounded-t-md transition-colors bg-surface-elevated text-text-primary border-b border-border hover:bg-surface-hover"
                         >
                           <div className="flex items-center gap-2">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -526,15 +512,15 @@ export default function Navbar() {
       </nav>
 
       {/* Mobile Bottom Navigation - Only visible on mobile */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_4px_16px_rgba(0,0,0,0.12)] z-50">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-border shadow-lg z-50">
         <div className="grid grid-cols-6 h-14">
           {menuItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
               className={`flex flex-col items-center justify-center gap-0.5 transition-colors py-1 ${isActive(item.path)
-                ? 'bg-[#3797F0] text-white'
-                : 'text-gray-600 hover:text-gray-800'
+                ? 'bg-primary text-white'
+                : 'text-text-secondary hover:text-text-primary'
                 }`}
             >
               <div className="scale-90">{item.icon}</div>

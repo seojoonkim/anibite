@@ -55,6 +55,24 @@ export default {
         warning: 'var(--color-warning)',
         error: 'var(--color-error)',
         info: 'var(--color-info)',
+
+        // Override default colors for dark mode
+        // This allows existing bg-white, text-gray-* classes to work in dark mode
+        white: 'var(--color-surface)',
+        black: 'var(--color-text-primary)',
+        gray: {
+          50: 'var(--color-surface-elevated)',
+          100: 'var(--color-surface-elevated)',
+          200: 'var(--color-surface-hover)',
+          300: 'var(--color-border-hover)',
+          400: 'var(--color-text-tertiary)',
+          500: 'var(--color-text-tertiary)',
+          600: 'var(--color-text-secondary)',
+          700: 'var(--color-text-secondary)',
+          800: 'var(--color-text-primary)',
+          900: 'var(--color-text-primary)',
+          950: 'var(--color-text-primary)',
+        },
       },
     },
   },

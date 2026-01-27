@@ -5,11 +5,11 @@ import { IMAGE_BASE_URL } from '../../config/api';
 export default function AnimeCard({ anime }) {
   const getStatusColor = (status) => {
     const colors = {
-      'Currently Airing': 'bg-green-100 text-green-800',
-      'Finished Airing': 'bg-blue-100 text-blue-800',
-      'Not yet aired': 'bg-yellow-100 text-yellow-800',
+      'Currently Airing': 'bg-success/20 text-success',
+      'Finished Airing': 'bg-primary/20 text-primary',
+      'Not yet aired': 'bg-warning/20 text-warning',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'bg-surface-elevated text-text-secondary';
   };
 
   const getImageUrl = (imageUrl) => {
@@ -24,8 +24,8 @@ export default function AnimeCard({ anime }) {
 
   return (
     <Link to={`/anime/${anime.id}`} className="group">
-      <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-        <div className="relative aspect-[3/4] overflow-hidden bg-gray-200">
+      <div className="bg-surface rounded-xl shadow-md overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-border">
+        <div className="relative aspect-[3/4] overflow-hidden bg-surface-elevated">
           <img
             src={getImageUrl(anime.cover_image_url)}
             alt={anime.title}
@@ -44,12 +44,12 @@ export default function AnimeCard({ anime }) {
         </div>
 
         <div className="p-4">
-          <h3 className="font-bold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+          <h3 className="font-bold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors text-text-primary">
             {anime.title}
           </h3>
 
           {anime.title_english && anime.title_english !== anime.title && (
-            <p className="text-sm text-gray-500 mb-2 line-clamp-1">
+            <p className="text-sm text-text-secondary mb-2 line-clamp-1">
               {anime.title_english}
             </p>
           )}
@@ -60,11 +60,11 @@ export default function AnimeCard({ anime }) {
                 <StarRating rating={anime.average_rating} readonly size="sm" />
               </div>
             ) : (
-              <span className="text-sm text-gray-400">평점 없음</span>
+              <span className="text-sm text-text-tertiary">평점 없음</span>
             )}
           </div>
 
-          <div className="flex items-center justify-between text-sm text-gray-600">
+          <div className="flex items-center justify-between text-sm text-text-secondary">
             {anime.aired_from && (
               <span>{new Date(anime.aired_from).getFullYear()}</span>
             )}
@@ -78,7 +78,7 @@ export default function AnimeCard({ anime }) {
               {anime.genres.slice(0, 3).map((genre) => (
                 <span
                   key={genre}
-                  className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
+                  className="text-xs bg-surface-elevated text-text-secondary px-2 py-1 rounded"
                 >
                   {genre}
                 </span>
