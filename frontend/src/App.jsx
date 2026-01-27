@@ -39,7 +39,7 @@ const ProtectedRoute = ({ children }) => {
 
 // Loading component for Suspense fallback - only shows below navbar
 const PageLoader = () => (
-  <div className="pt-16 flex items-center justify-center" style={{ minHeight: 'calc(100vh - 4rem)' }}>
+  <div className="pt-12 flex items-center justify-center" style={{ minHeight: 'calc(100vh - 3rem)' }}>
     <div className="text-xl text-gray-600">Loading...</div>
   </div>
 );

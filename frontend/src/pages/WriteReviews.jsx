@@ -460,7 +460,7 @@ export default function WriteReviews() {
   const hasStats = stats.total.reviewed !== undefined;
 
   return (
-    <div className="min-h-screen pt-12 md:pt-16 bg-transparent">
+    <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
 
       <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Filter Toggle and Stats - Always visible */}

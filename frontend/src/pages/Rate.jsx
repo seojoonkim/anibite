@@ -626,35 +626,35 @@ export default function Rate() {
 
 
   return (
-    <div className="min-h-screen pt-12 md:pt-16 bg-transparent">
+    <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
 
-      <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1100px] mx-auto px-3 sm:px-4 lg:px-6 py-4">
         {/* Header with Stats */}
-        <div className="flex justify-center items-center mb-8">
+        <div className="flex justify-center items-center mb-4">
           {/* Stats */}
-          <div className="flex gap-3 items-center flex-wrap justify-center">
+          <div className="flex gap-2 items-center flex-wrap justify-center">
             {/* Rated */}
-            <div className="bg-surface px-4 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-shadow min-w-[100px] border border-border">
-              <div className="text-xs text-text-secondary mb-0.5 text-center">{language === 'ko' ? '평가했어요' : language === 'ja' ? '評価済み' : 'Rated'}</div>
-              <div className="text-lg font-bold text-primary text-center tabular-nums">{stats.rated.toLocaleString()}</div>
+            <div className="bg-surface px-3 py-1.5 rounded-md shadow-sm hover:shadow-md transition-shadow min-w-[80px] border border-border">
+              <div className="text-xs text-text-secondary text-center">{language === 'ko' ? '평가했어요' : language === 'ja' ? '評価済み' : 'Rated'}</div>
+              <div className="text-base font-bold text-primary text-center tabular-nums">{stats.rated.toLocaleString()}</div>
             </div>
 
             {/* Watch Later */}
-            <div className="bg-surface px-4 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-shadow min-w-[100px] border border-border">
-              <div className="text-xs text-text-secondary mb-0.5 text-center">{language === 'ko' ? '보고싶어요' : language === 'ja' ? '見たい' : 'Later'}</div>
-              <div className="text-lg font-bold text-secondary text-center tabular-nums">{stats.watchLater.toLocaleString()}</div>
+            <div className="bg-surface px-3 py-1.5 rounded-md shadow-sm hover:shadow-md transition-shadow min-w-[80px] border border-border">
+              <div className="text-xs text-text-secondary text-center">{language === 'ko' ? '보고싶어요' : language === 'ja' ? '見たい' : 'Later'}</div>
+              <div className="text-base font-bold text-secondary text-center tabular-nums">{stats.watchLater.toLocaleString()}</div>
             </div>
 
             {/* Pass */}
-            <div className="bg-surface px-4 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-shadow min-w-[100px] border border-border">
-              <div className="text-xs text-text-secondary mb-0.5 text-center">{language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Pass'}</div>
-              <div className="text-lg font-bold text-text-tertiary text-center tabular-nums">{stats.pass.toLocaleString()}</div>
+            <div className="bg-surface px-3 py-1.5 rounded-md shadow-sm hover:shadow-md transition-shadow min-w-[80px] border border-border">
+              <div className="text-xs text-text-secondary text-center">{language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Pass'}</div>
+              <div className="text-base font-bold text-text-tertiary text-center tabular-nums">{stats.pass.toLocaleString()}</div>
             </div>
 
             {/* Average Rating - Always show */}
-            <div className="bg-surface px-4 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-shadow min-w-[100px] border border-border">
-              <div className="text-xs text-text-secondary mb-0.5 text-center">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</div>
-              <div className="text-lg font-bold text-accent text-center tabular-nums">
+            <div className="bg-surface px-3 py-1.5 rounded-md shadow-sm hover:shadow-md transition-shadow min-w-[80px] border border-border">
+              <div className="text-xs text-text-secondary text-center">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</div>
+              <div className="text-base font-bold text-accent text-center tabular-nums">
                 {stats.averageRating > 0 ? `★ ${stats.averageRating.toFixed(1)}` : '-'}
               </div>
             </div>
@@ -662,7 +662,7 @@ export default function Rate() {
         </div>
 
         {/* Anime Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
           {loading && animeList.length === 0 ? (
             // Skeleton cards during initial load (Show 8 skeletons)
             Array.from({ length: 8 }).map((_, index) => (

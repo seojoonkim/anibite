@@ -56,14 +56,14 @@
   --color-error: #f85149;
   --color-info: #58a6ff;
 
-  /* Spacing Scale - 10% SMALLER */
-  --space-xs: 3.6px;
-  --space-sm: 7.2px;
-  --space-md: 14.4px;
-  --space-lg: 21.6px;
-  --space-xl: 28.8px;
-  --space-2xl: 43.2px;
-  --space-3xl: 57.6px;
+  /* Spacing Scale - 25% SMALLER (compact) */
+  --space-xs: 3px;
+  --space-sm: 6px;
+  --space-md: 12px;
+  --space-lg: 18px;
+  --space-xl: 24px;
+  --space-2xl: 36px;
+  --space-3xl: 48px;
 
   /* Typography Scale - 10% SMALLER */
   --font-size-xs: 0.675rem;
