@@ -89,7 +89,7 @@ export default function VerifyEmail() {
                 strokeLinejoin="round"
               />
             </svg>
-            <h1 className="text-3xl font-bold text-gray-900">AniPass</h1>
+            <h1 className="text-3xl font-bold text-gray-900">AniBite</h1>
           </div>
         </div>
 

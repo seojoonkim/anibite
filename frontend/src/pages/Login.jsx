@@ -45,7 +45,7 @@ export default function Login() {
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
           <div className="flex items-center gap-2 mb-3">
-            {/* AniPass Logo Icon */}
+            {/* AniBite Logo Icon */}
             <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="instagramGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -94,7 +94,7 @@ export default function Login() {
                 strokeLinejoin="round"
               />
             </svg>
-            <h1 className="text-3xl font-bold text-gray-900">AniPass</h1>
+            <h1 className="text-3xl font-bold text-gray-900">AniBite</h1>
           </div>
           <p className="text-gray-600 text-center">Your Anime Journey</p>
         </div>
@@ -102,11 +102,10 @@ export default function Login() {
         <h2 className="text-xl font-semibold text-center mb-6 text-gray-800">Login</h2>
 
         {error && (
-          <div className={`px-4 py-3 rounded mb-4 ${
-            emailNotVerified
+          <div className={`px-4 py-3 rounded mb-4 ${emailNotVerified
               ? 'bg-yellow-100 border border-yellow-400 text-yellow-800'
               : 'bg-red-100 border border-red-400 text-red-700'
-          }`}>
+            }`}>
             <p className="mb-2">{error}</p>
             {emailNotVerified && (
               <button

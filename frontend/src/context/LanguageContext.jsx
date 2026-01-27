@@ -3,13 +3,13 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const translations = {
   ko: {
     // Navbar
-    appName: 'AniPass',
+    appName: 'AniBite',
     rate: '애니 평가',
     rateCharacter: '캐릭터 평가',
     writeReview: '리뷰 작성',
     browse: '애니 검색',
     leaderboard: '리더보드',
-    myAnipass: '내 애니패스',
+    myAnipass: '내 애니바이트',
     logout: '로그아웃',
 
     // Rate page
@@ -51,7 +51,7 @@ const translations = {
     noRating: '평점 없음',
 
     // My AniPass
-    myAnipassTitle: '내 애니패스',
+    myAnipassTitle: '내 애니바이트',
     summary: '요약',
     ratedAnime: '평가한 애니',
     watchlist: '관심 목록',
@@ -79,13 +79,13 @@ const translations = {
   },
   en: {
     // Navbar
-    appName: 'AniPass',
+    appName: 'AniBite',
     rate: 'Rate Anime',
     rateCharacter: 'Rate Characters',
     writeReview: 'Write Review',
     browse: 'Search',
     leaderboard: 'Leaderboard',
-    myAnipass: 'My AniPass',
+    myAnipass: 'My AniBite',
     logout: 'Logout',
 
     // Rate page
@@ -127,7 +127,7 @@ const translations = {
     noRating: 'No rating',
 
     // My AniPass
-    myAnipassTitle: 'My AniPass',
+    myAnipassTitle: 'My AniBite',
     summary: 'Summary',
     ratedAnime: 'Rated',
     watchlist: 'Watchlist',
@@ -155,13 +155,13 @@ const translations = {
   },
   ja: {
     // Navbar
-    appName: 'AniPass',
+    appName: 'AniBite',
     rate: 'アニメ評価',
     rateCharacter: 'キャラ評価',
     writeReview: 'レビュー作成',
     browse: 'アニメ検索',
     leaderboard: 'ランキング',
-    myAnipass: 'マイAniPass',
+    myAnipass: 'マイAniBite',
     logout: 'ログアウト',
 
     // Rate page
@@ -203,7 +203,7 @@ const translations = {
     noRating: '評価なし',
 
     // My AniPass
-    myAnipassTitle: 'マイAniPass',
+    myAnipassTitle: 'マイAniBite',
     summary: '概要',
     ratedAnime: '評価済み',
     watchlist: 'ウォッチリスト',

@@ -89,7 +89,7 @@ export default function Navbar() {
         setShowNotificationDropdown(false);
       }
       if (userMenuRef.current && !userMenuRef.current.contains(event.target) &&
-          mobileUserMenuRef.current && !mobileUserMenuRef.current.contains(event.target)) {
+        mobileUserMenuRef.current && !mobileUserMenuRef.current.contains(event.target)) {
         setShowUserMenu(false);
       }
     };
@@ -310,7 +310,7 @@ export default function Navbar() {
                     </g>
                   </svg>
                 </div>
-                <span className="">AniPass</span>
+                <span className="">AniBite</span>
               </Link>
 
               {/* Mobile User Menu - Only visible on mobile */}
@@ -398,11 +398,10 @@ export default function Navbar() {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`px-3 py-2 rounded-md text-sm font-normal transition-colors whitespace-nowrap ${
-                      isActive(item.path)
+                    className={`px-3 py-2 rounded-md text-sm font-normal transition-colors whitespace-nowrap ${isActive(item.path)
                         ? 'bg-[#3797F0] text-white'
                         : 'text-black hover:text-gray-500 hover:bg-gray-100'
-                    }`}
+                      }`}
                   >
                     {item.labelKo ? (language === 'ko' ? item.labelKo : language === 'ja' ? item.labelJa : item.labelEn) : item.label}
                   </Link>
@@ -411,122 +410,121 @@ export default function Navbar() {
 
               {/* Right Side - User */}
               <div className="flex items-center space-x-2">
-              {/* Notification Bell */}
-              {user && (
-                <div className="relative" ref={notificationRef}>
-                  <button
-                    onClick={handleNotificationClick}
-                    className={`relative text-[#262626] hover:bg-gray-100 p-2 rounded-md transition-colors flex items-center ${
-                      showNotificationDropdown ? 'bg-gray-100' : ''
-                    }`}
-                    style={{ minWidth: '40px' }}
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                    </svg>
-                    {unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-[#FF3040] text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1 animate-pulse">
-                        {unreadCount > 99 ? '99+' : unreadCount}
-                      </span>
-                    )}
-                  </button>
-
-                  {/* Notification Dropdown */}
-                  <NotificationDropdown
-                    isOpen={showNotificationDropdown}
-                    onClose={() => setShowNotificationDropdown(false)}
-                    unreadCount={unreadCount}
-                    onMarkAllRead={handleMarkAllRead}
-                    lastCheckTime={lastCheckTime}
-                  />
-                </div>
-              )}
-
-              {user && (
-                <div className="relative" ref={userMenuRef}>
-                  <button
-                    onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="text-[#262626] hover:text-black hover:bg-gray-100 text-sm font-medium px-3 py-2 rounded-md transition-colors flex items-center gap-2"
-                    style={{ minWidth: '160px' }}
-                  >
-                    {user.avatar_url ? (
-                      <img
-                        src={getAvatarUrl(user.avatar_url)}
-                        alt={user.display_name || user.username}
-                        className="w-8 h-8 rounded-full object-cover border border-[#DBDBDB]"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center border border-[#DBDBDB]" style={{ backgroundColor: '#FAFAFA' }}>
-                        <span className="text-[#262626] text-sm font-bold">
-                          {(user.display_name || user.username || '?').charAt(0).toUpperCase()}
+                {/* Notification Bell */}
+                {user && (
+                  <div className="relative" ref={notificationRef}>
+                    <button
+                      onClick={handleNotificationClick}
+                      className={`relative text-[#262626] hover:bg-gray-100 p-2 rounded-md transition-colors flex items-center ${showNotificationDropdown ? 'bg-gray-100' : ''
+                        }`}
+                      style={{ minWidth: '40px' }}
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                      </svg>
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-[#FF3040] text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1 animate-pulse">
+                          {unreadCount > 99 ? '99+' : unreadCount}
                         </span>
+                      )}
+                    </button>
+
+                    {/* Notification Dropdown */}
+                    <NotificationDropdown
+                      isOpen={showNotificationDropdown}
+                      onClose={() => setShowNotificationDropdown(false)}
+                      unreadCount={unreadCount}
+                      onMarkAllRead={handleMarkAllRead}
+                      lastCheckTime={lastCheckTime}
+                    />
+                  </div>
+                )}
+
+                {user && (
+                  <div className="relative" ref={userMenuRef}>
+                    <button
+                      onClick={() => setShowUserMenu(!showUserMenu)}
+                      className="text-[#262626] hover:text-black hover:bg-gray-100 text-sm font-medium px-3 py-2 rounded-md transition-colors flex items-center gap-2"
+                      style={{ minWidth: '160px' }}
+                    >
+                      {user.avatar_url ? (
+                        <img
+                          src={getAvatarUrl(user.avatar_url)}
+                          alt={user.display_name || user.username}
+                          className="w-8 h-8 rounded-full object-cover border border-[#DBDBDB]"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center border border-[#DBDBDB]" style={{ backgroundColor: '#FAFAFA' }}>
+                          <span className="text-[#262626] text-sm font-bold">
+                            {(user.display_name || user.username || '?').charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                      <span className="text-sm font-medium">{user.display_name || user.username}</span>
+                      {(() => {
+                        const levelInfo = getCurrentLevelInfo(otakuScore, language);
+                        return (
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor} hidden sm:inline-flex`}>
+                            <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span>
+                            <span className="text-gray-700">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
+                          </span>
+                        );
+                      })()}
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    {showUserMenu && (
+                      <div className="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-[0_4px_16px_rgba(0,0,0,0.12)] z-50" style={{ borderColor: '#DBDBDB', borderWidth: '1px' }}>
+                        <button
+                          onClick={handleMyAnipass}
+                          className="block w-full text-left px-4 py-3 text-sm font-medium rounded-t-md transition-colors"
+                          style={{
+                            backgroundColor: '#FAFAFA',
+                            color: '#262626',
+                            borderBottom: '1px solid #DBDBDB'
+                          }}
+                          onMouseEnter={(e) => e.target.style.backgroundColor = '#F0F0F0'}
+                          onMouseLeave={(e) => e.target.style.backgroundColor = '#FAFAFA'}
+                        >
+                          <div className="flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            <span>{language === 'ko' ? '내 애니패스' : language === 'ja' ? 'マイAniPass' : 'My AniPass'}</span>
+                          </div>
+                        </button>
+                        <button
+                          onClick={handleSettings}
+                          className="block w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                          <div className="flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span>{language === 'ko' ? '설정' : language === 'ja' ? '設定' : 'Settings'}</span>
+                          </div>
+                        </button>
+                        <button
+                          onClick={handleLogout}
+                          className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-md transition-colors"
+                        >
+                          <div className="flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            <span>{language === 'ko' ? '로그아웃' : language === 'ja' ? 'ログアウト' : 'Logout'}</span>
+                          </div>
+                        </button>
                       </div>
                     )}
-                    <span className="text-sm font-medium">{user.display_name || user.username}</span>
-                    {(() => {
-                      const levelInfo = getCurrentLevelInfo(otakuScore, language);
-                      return (
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor} hidden sm:inline-flex`}>
-                          <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span>
-                          <span className="text-gray-700">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
-                        </span>
-                      );
-                    })()}
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-
-                  {showUserMenu && (
-                    <div className="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-[0_4px_16px_rgba(0,0,0,0.12)] z-50" style={{ borderColor: '#DBDBDB', borderWidth: '1px' }}>
-                      <button
-                        onClick={handleMyAnipass}
-                        className="block w-full text-left px-4 py-3 text-sm font-medium rounded-t-md transition-colors"
-                        style={{
-                          backgroundColor: '#FAFAFA',
-                          color: '#262626',
-                          borderBottom: '1px solid #DBDBDB'
-                        }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = '#F0F0F0'}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = '#FAFAFA'}
-                      >
-                        <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                          </svg>
-                          <span>{language === 'ko' ? '내 애니패스' : language === 'ja' ? 'マイAniPass' : 'My AniPass'}</span>
-                        </div>
-                      </button>
-                      <button
-                        onClick={handleSettings}
-                        className="block w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 transition-colors"
-                      >
-                        <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          <span>{language === 'ko' ? '설정' : language === 'ja' ? '設定' : 'Settings'}</span>
-                        </div>
-                      </button>
-                      <button
-                        onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-md transition-colors"
-                      >
-                        <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                          </svg>
-                          <span>{language === 'ko' ? '로그아웃' : language === 'ja' ? 'ログアウト' : 'Logout'}</span>
-                        </div>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -540,11 +538,10 @@ export default function Navbar() {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex flex-col items-center justify-center gap-0.5 transition-colors py-1 ${
-                isActive(item.path)
+              className={`flex flex-col items-center justify-center gap-0.5 transition-colors py-1 ${isActive(item.path)
                   ? 'bg-[#3797F0] text-white'
                   : 'text-gray-600 hover:text-gray-800'
-              }`}
+                }`}
             >
               <div className="scale-90">{item.icon}</div>
               <span className="text-[9px] font-medium">

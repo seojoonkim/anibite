@@ -65,7 +65,7 @@ export default function Register() {
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
           <div className="flex items-center gap-2 mb-3">
-            {/* AniPass Logo Icon */}
+            {/* AniBite Logo Icon */}
             <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="instagramGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -114,7 +114,7 @@ export default function Register() {
                 strokeLinejoin="round"
               />
             </svg>
-            <h1 className="text-3xl font-bold text-gray-900">AniPass</h1>
+            <h1 className="text-3xl font-bold text-gray-900">AniBite</h1>
           </div>
           <p className="text-gray-600 text-center">Your Anime Journey</p>
         </div>
@@ -181,33 +181,30 @@ export default function Register() {
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, preferred_language: 'ko' })}
-                className={`flex-1 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all ${
-                  formData.preferred_language === 'ko'
+                className={`flex-1 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all ${formData.preferred_language === 'ko'
                     ? 'bg-[#3797F0] text-white shadow-sm'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
-                }`}
+                  }`}
               >
                 🇰🇷 한국어
               </button>
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, preferred_language: 'en' })}
-                className={`flex-1 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all ${
-                  formData.preferred_language === 'en'
+                className={`flex-1 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all ${formData.preferred_language === 'en'
                     ? 'bg-[#3797F0] text-white shadow-sm'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
-                }`}
+                  }`}
               >
                 🇺🇸 English
               </button>
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, preferred_language: 'ja' })}
-                className={`flex-1 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all ${
-                  formData.preferred_language === 'ja'
+                className={`flex-1 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all ${formData.preferred_language === 'ja'
                     ? 'bg-[#3797F0] text-white shadow-sm'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
-                }`}
+                  }`}
               >
                 🇯🇵 日本語
               </button>
