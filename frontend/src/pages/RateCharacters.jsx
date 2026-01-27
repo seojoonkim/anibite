@@ -244,20 +244,17 @@ export default function RateCharacters() {
     const status = characterStatuses[characterId];
     const hasRating = characters.find(c => c.id === characterId)?.my_rating;
 
-    if (hasRating) return 'bg-[#F5F5F5]'; // RATED
-    if (status === 'WANT_TO_KNOW') return 'bg-[#F5F5F5]';
-    if (status === 'NOT_INTERESTED') return 'bg-gray-200';
-    return 'bg-white';
+    if (hasRating) return 'bg-surface-elevated'; // RATED
+    if (status === 'WANT_TO_KNOW') return 'bg-surface-elevated';
+    if (status === 'NOT_INTERESTED') return 'bg-surface-hover';
+    return 'bg-surface';
   };
 
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.svg';
     if (imageUrl.startsWith('http')) return imageUrl;
-    // Use covers_large for better quality
-    const processedUrl = imageUrl.includes('/covers/')
-      ? imageUrl.replace('/covers/', '/covers_large/')
-      : imageUrl;
-    return `${IMAGE_BASE_URL}${processedUrl}`;
+    // Use original path
+    return `${IMAGE_BASE_URL}${imageUrl}`;
   };
 
   const getCurrentRating = (character) => {
@@ -357,10 +354,10 @@ export default function RateCharacters() {
                   onMouseLeave={() => setHoveredCharacter(null)}
                 >
                   <div className={`${getCardBackgroundColor(character.id)} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out group ${status === 'NOT_INTERESTED' ? 'opacity-50' : 'opacity-100'
-                    } ${!hasRated ? 'border border-gray-200' : ''}`}>
+                    } ${!hasRated ? 'border border-border' : ''}`}>
                     {/* Character Image */}
                     <Link to={`/character/${character.id}`} className="block">
-                      <div className="aspect-[3/4] bg-gray-200 relative overflow-hidden cursor-pointer">
+                      <div className="aspect-[3/4] bg-surface-elevated relative overflow-hidden cursor-pointer">
                         <img
                           src={getImageUrl(character.image_url)}
                           alt={character.name_full}

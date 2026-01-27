@@ -21,11 +21,8 @@ function RatingCard({ anime, onRate }) {
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.svg';
     if (imageUrl.startsWith('http')) return imageUrl;
-    // Use covers_large for better quality
-    const processedUrl = imageUrl.includes('/covers/')
-      ? imageUrl.replace('/covers/', '/covers_large/')
-      : imageUrl;
-    return `${IMAGE_BASE_URL}${processedUrl}`;
+    // Use original path - covers_large may not exist on new domain
+    return `${IMAGE_BASE_URL}${imageUrl}`;
   };
 
   // Update status and rating when anime props change
@@ -164,10 +161,10 @@ function RatingCard({ anime, onRate }) {
   };
 
   const getCardBackgroundColor = () => {
-    if (status === 'RATED') return 'bg-[#F5F5F5]';
-    if (status === 'WANT_TO_WATCH') return 'bg-white';
-    if (status === 'PASS') return 'bg-gray-200';
-    return 'bg-white';
+    if (status === 'RATED') return 'bg-surface-elevated';
+    if (status === 'WANT_TO_WATCH') return 'bg-surface';
+    if (status === 'PASS') return 'bg-surface-hover';
+    return 'bg-surface';
   };
 
   return (
@@ -189,9 +186,9 @@ function RatingCard({ anime, onRate }) {
       >
         <div className={`${getCardBackgroundColor()} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out group ${
           status === 'PASS' ? 'opacity-50' : 'opacity-100'
-        } ${status !== 'RATED' ? 'border border-gray-200' : ''}`}>
+        } ${status !== 'RATED' ? 'border border-border' : ''}`}>
         {/* Cover Image */}
-        <Link to={`/anime/${anime.id}`} className="block relative aspect-[3/4] bg-gray-200 overflow-hidden">
+        <Link to={`/anime/${anime.id}`} className="block relative aspect-[3/4] bg-surface-elevated overflow-hidden">
           <img
             src={getImageUrl(anime.cover_image_url)}
             alt={getAnimeTitle(anime)}
