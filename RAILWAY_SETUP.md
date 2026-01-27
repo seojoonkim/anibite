@@ -26,15 +26,15 @@ Railway 프로젝트 Settings → Variables에서 다음 환경 변수를 추가
 SECRET_KEY=your-generated-secret-key-here
 
 # 프론트엔드 URL (CORS 설정)
-PRODUCTION_ORIGIN=https://anipass.io
+PRODUCTION_ORIGIN=https://anibite.com
 ```
 
 ### 선택 환경 변수
 
 ```bash
 # Cloudflare R2 이미지 URL
-# R2 버킷을 anipass.io 도메인에 연결한 경우:
-IMAGE_BASE_URL=https://images.anipass.io
+# R2 버킷을 anibite.com 도메인에 연결한 경우:
+IMAGE_BASE_URL=https://images.anibite.com
 # 또는 R2 public URL: https://pub-xxxxx.r2.dev
 
 # 커스텀 데이터베이스 경로 (기본값: /app/data/anime.db)

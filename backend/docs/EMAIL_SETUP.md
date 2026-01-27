@@ -27,8 +27,8 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
 SMTP_PASSWORD=your-16-digit-app-password
-FROM_EMAIL=noreply@anipass.io
-FRONTEND_URL=https://anipass.io
+FROM_EMAIL=noreply@anibite.com
+FRONTEND_URL=https://anibite.com
 ```
 
 ⚠️ **중요**: `SMTP_PASSWORD`는 Gmail 로그인 비밀번호가 아닌 **앱 비밀번호**를 사용해야 합니다.
@@ -41,7 +41,7 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
 SMTP_PASSWORD=your-app-password
-FROM_EMAIL=noreply@anipass.io
+FROM_EMAIL=noreply@anibite.com
 FRONTEND_URL=http://localhost:5176
 ```
 
@@ -153,7 +153,7 @@ if not user_dict.get('is_verified', False):
 #### 배포 전
 - [ ] Railway 환경 변수 모두 설정
 - [ ] `SMTP_PASSWORD`가 앱 비밀번호인지 확인
-- [ ] `FRONTEND_URL`이 `https://anipass.io`인지 확인
+- [ ] `FRONTEND_URL`이 `https://anibite.com`인지 확인
 - [ ] `FROM_EMAIL` 설정 확인
 - [ ] 로컬에서 이메일 전송 테스트 완료
 
@@ -212,7 +212,7 @@ Gmail 대신 SendGrid를 사용하면 더 높은 전달률과 상세한 분석�
 4. 환경 변수:
    ```
    SENDGRID_API_KEY=SG.xxx...xxx
-   FROM_EMAIL=noreply@anipass.io
+   FROM_EMAIL=noreply@anibite.com
    ```
 
 ### 코드 수정 필요

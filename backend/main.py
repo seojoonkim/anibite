@@ -357,8 +357,8 @@ async def proxy_r2_image(path: str):
     import httpx
     from fastapi.responses import Response
 
-    # Use direct R2 URL for local development (bypasses custom domain SSL issues)
-    r2_base_url = os.getenv("R2_PUBLIC_URL", "https://pub-103c1284d0084911a8c4825b890455e2.r2.dev")
+    # Use images.anibite.com as default R2 URL
+    r2_base_url = os.getenv("R2_PUBLIC_URL", "https://images.anibite.com")
     image_url = f"{r2_base_url}/images/{path}"
 
     try:
