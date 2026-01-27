@@ -199,14 +199,14 @@ function RatingCard({ anime, onRate }) {
               }}
             />
 
-            {/* Dark overlay for rated cards to make stars visible */}
+            {/* Dark overlay for rated cards - persists always */}
             {status === 'RATED' && currentRating > 0 && (
-              <div className="absolute inset-0 bg-black/40 group-hover:opacity-0 transition-opacity pointer-events-none" />
+              <div className="absolute inset-0 bg-black/50 transition-opacity pointer-events-none" />
             )}
 
-            {/* Show clear rating on already rated anime */}
+            {/* Show clear rating on already rated anime - persists always */}
             {status === 'RATED' && currentRating > 0 && (
-              <div className="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity pointer-events-none z-10">
+              <div className="absolute inset-0 flex items-center justify-center transition-opacity pointer-events-none z-10">
                 <div className="flex justify-center gap-1 drop-shadow-lg" style={{ fontSize: starSize }}>
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span key={star}>

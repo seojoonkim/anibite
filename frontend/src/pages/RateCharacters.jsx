@@ -429,13 +429,13 @@ export default function RateCharacters() {
                           </div>
                         )}
 
-                        {/* Dark overlay for rated cards */}
-                        {hasRated && hoveredCharacter !== character.id && (
-                          <div className="absolute inset-0 bg-black/40 pointer-events-none" />
+                        {/* Dark overlay for rated cards - persists always */}
+                        {hasRated && (
+                          <div className="absolute inset-0 bg-black/50 pointer-events-none" />
                         )}
 
-                        {/* Show rating stars on rated characters */}
-                        {hasRated && hoveredCharacter !== character.id && starSizes[character.id] && character.my_rating && character.my_rating > 0 && (
+                        {/* Show rating stars on rated characters - persists always */}
+                        {hasRated && starSizes[character.id] && character.my_rating && character.my_rating > 0 && (
                           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
                             <div className="flex gap-1 drop-shadow-lg" style={{ fontSize: starSizes[character.id] }}>
                               {[1, 2, 3, 4, 5].map((position) => {
