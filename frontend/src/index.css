@@ -170,6 +170,81 @@ body {
 }
 
 /* ============================================
+   COMPREHENSIVE DARK MODE OVERRIDES
+   Force dark theme on ALL elements
+   ============================================ */
+
+/* Form Elements - Force Dark */
+input,
+textarea,
+select,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+.input,
+.textarea,
+.form-control {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-text-tertiary) !important;
+  opacity: 0.6;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid var(--color-primary) !important;
+  outline-offset: 2px;
+  border-color: var(--color-primary) !important;
+}
+
+/* Override ANY white backgrounds */
+[style*="background: white"],
+[style*="background-color: white"],
+[style*="background: #fff"],
+[style*="background-color: #fff"],
+[style*="background: #FFF"],
+[style*="background-color: #FFF"],
+[style*="background:white"],
+[style*="background-color:white"] {
+  background-color: var(--color-surface) !important;
+}
+
+/* Buttons with white backgrounds */
+button[style*="background"],
+.btn-white,
+.button-white {
+  background-color: var(--color-surface-elevated) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Cards and containers */
+.card,
+.panel,
+.box,
+[class*="card"],
+[class*="panel"] {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Ensure text is always readable */
+[style*="color: black"],
+[style*="color: #000"],
+[style*="color:#000"] {
+  color: var(--color-text-primary) !important;
+}
+
+/* ============================================
    UTILITY CLASSES
    ============================================ */
 
