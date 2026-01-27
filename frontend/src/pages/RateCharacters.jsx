@@ -272,7 +272,7 @@ export default function RateCharacters() {
   return (
     <div className="min-h-screen pt-12 md:pt-16 bg-transparent">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header with Stats - Always show 4 boxes from first render */}
         <div className="mb-8 flex justify-center items-center">
           {/* Stats */}
