@@ -5,11 +5,27 @@ import ImageCropModal from '../components/ImageCropModal';
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 // 이미지 URL 처리 헬퍼 함수 (어드민용 - 항상 캐시 우회)
-const getImageUrl = (imagePath) => {
+const getImageUrl = (imagePath, characterId = null) => {
   if (!imagePath) return null;
 
   let url;
-  if (imagePath.startsWith('http')) {
+
+  // AniList character URL - use auto-download API
+  if (imagePath.startsWith('http') && imagePath.includes('anilist.co') && imagePath.includes('/character/')) {
+    // Extract character ID from AniList URL
+    const match = imagePath.match(/\/b(\d+)-/);
+    if (match && match[1]) {
+      const extractedId = match[1];
+      url = `${API_BASE_URL}/api/images/characters/${extractedId}.jpg`;
+    } else if (characterId) {
+      // Use provided character ID
+      url = `${API_BASE_URL}/api/images/characters/${characterId}.jpg`;
+    } else {
+      // Fallback to direct URL
+      url = imagePath;
+    }
+  } else if (imagePath.startsWith('http')) {
+    // Other HTTP URLs (R2, etc.)
     url = imagePath;
   } else if (imagePath.startsWith('/')) {
     url = `${API_BASE_URL}${imagePath}`;
@@ -234,7 +250,7 @@ export default function AdminEditor() {
       console.log('[Admin Editor] Save response:', response.data);
       setMessage('✅ 저장 완료!');
       // 검색 결과 갱신
-      handleSearch({ preventDefault: () => {} });
+      handleSearch({ preventDefault: () => { } });
     } catch (error) {
       console.error('저장 실패:', error);
       console.error('Error response:', error.response?.data);
@@ -300,11 +316,10 @@ export default function AdminEditor() {
                     <button
                       key={anime.id}
                       onClick={() => selectItem(anime.id, 'anime')}
-                      className={`w-full text-left p-3 rounded-lg transition ${
-                        selectedItem?.id === anime.id && selectedType === 'anime'
-                          ? 'bg-blue-700'
-                          : 'bg-gray-700 hover:bg-gray-600'
-                      }`}
+                      className={`w-full text-left p-3 rounded-lg transition ${selectedItem?.id === anime.id && selectedType === 'anime'
+                        ? 'bg-blue-700'
+                        : 'bg-gray-700 hover:bg-gray-600'
+                        }`}
                     >
                       <div className="flex gap-3">
                         {anime.cover_image && (
@@ -336,16 +351,15 @@ export default function AdminEditor() {
                     <button
                       key={char.id}
                       onClick={() => selectItem(char.id, 'character')}
-                      className={`w-full text-left p-3 rounded-lg transition ${
-                        selectedItem?.id === char.id && selectedType === 'character'
-                          ? 'bg-green-700'
-                          : 'bg-gray-700 hover:bg-gray-600'
-                      }`}
+                      className={`w-full text-left p-3 rounded-lg transition ${selectedItem?.id === char.id && selectedType === 'character'
+                        ? 'bg-green-700'
+                        : 'bg-gray-700 hover:bg-gray-600'
+                        }`}
                     >
                       <div className="flex gap-3">
                         {char.image_large && (
                           <img
-                            src={getImageUrl(char.image_large)}
+                            src={getImageUrl(char.image_large, char.id)}
                             alt={char.name_korean || char.name_full}
                             className="w-12 h-16 object-cover rounded"
                             onError={(e) => { e.target.style.display = 'none'; }}
@@ -396,11 +410,10 @@ export default function AdminEditor() {
                         onDragOver={handleDragOver}
                         onDragLeave={handleDragLeave}
                         onDrop={handleDrop}
-                        className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                          isDragging
-                            ? 'border-purple-500 bg-purple-900 bg-opacity-20'
-                            : 'border-gray-600 bg-gray-700'
-                        } ${uploadingImage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                        className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${isDragging
+                          ? 'border-purple-500 bg-purple-900 bg-opacity-20'
+                          : 'border-gray-600 bg-gray-700'
+                          } ${uploadingImage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                       >
                         <input
                           type="file"
@@ -521,11 +534,10 @@ export default function AdminEditor() {
                 <button
                   onClick={handleSave}
                   disabled={isLoading}
-                  className={`w-full px-6 py-4 rounded-lg font-bold text-lg ${
-                    selectedType === 'anime'
-                      ? 'bg-blue-600 hover:bg-blue-700'
-                      : 'bg-green-600 hover:bg-green-700'
-                  } disabled:opacity-50 transition`}
+                  className={`w-full px-6 py-4 rounded-lg font-bold text-lg ${selectedType === 'anime'
+                    ? 'bg-blue-600 hover:bg-blue-700'
+                    : 'bg-green-600 hover:bg-green-700'
+                    } disabled:opacity-50 transition`}
                 >
                   {isLoading ? '저장 중...' : '💾 저장'}
                 </button>
@@ -548,7 +560,7 @@ export default function AdminEditor() {
             setShowCropModal(false);
             setSelectedImageFile(null);
           }}
-          aspectRatio={3/4}
+          aspectRatio={3 / 4}
         />
       )}
     </div>
