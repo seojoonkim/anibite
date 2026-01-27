@@ -29,8 +29,8 @@
 
 ### 1. 저장소 클론
 ```bash
-git clone https://github.com/YOUR_USERNAME/anipass.git
-cd anipass
+git clone https://github.com/YOUR_USERNAME/anibite.git
+cd anibite
 ```
 
 ### 2. Backend 설정
