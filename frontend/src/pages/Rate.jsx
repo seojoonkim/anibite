@@ -189,12 +189,11 @@ function RatingCard({ anime, onRate }) {
         } ${status !== 'RATED' ? 'border border-border' : ''}`}>
         {/* Cover Image */}
         <Link to={`/anime/${anime.id}`} className="block">
-          <div style={{ aspectRatio: '3/4', width: '100%', position: 'relative', backgroundColor: 'var(--color-surface-elevated)', overflow: 'hidden' }}>
+          <div className="aspect-[3/4] w-full relative bg-surface-elevated overflow-hidden">
             <img
               src={getImageUrl(anime.cover_image_url)}
               alt={getAnimeTitle(anime)}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-              className="group-hover:scale-110 transition-transform duration-[1500ms]"
+              className="w-full h-full object-cover block group-hover:scale-110 transition-transform duration-[1500ms]"
               onError={(e) => {
                 e.target.src = '/placeholder-anime.svg';
               }}
@@ -215,13 +214,13 @@ function RatingCard({ anime, onRate }) {
 
             {/* Overlay on hover */}
             <div
-              className="absolute inset-0 bg-black/0 group-hover:bg-black/75 transition-all duration-150 flex flex-col items-center justify-center p-4"
+              className="absolute inset-0 bg-black/0 group-hover:bg-black/70 transition-all duration-150 flex flex-col items-center justify-center p-2 z-10"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
               }}
             >
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 text-center w-full flex flex-col justify-center h-full">
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 w-full flex flex-col items-center justify-center">
                 {/* Star Rating */}
                 <div
                   className="flex justify-center gap-1"
@@ -231,7 +230,8 @@ function RatingCard({ anime, onRate }) {
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       key={star}
-                      className="cursor-pointer hover:scale-125 transition-transform"
+                      type="button"
+                      className="cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
                       onMouseMove={(e) => handleMouseMove(e, star)}
                       onClick={(e) => {
                         e.preventDefault();
@@ -248,31 +248,39 @@ function RatingCard({ anime, onRate }) {
                 </div>
 
                 {currentRating > 0 && (
-                  <div className="text-white text-lg font-semibold mb-6">
+                  <div className="text-white text-lg font-bold mt-1 drop-shadow-lg">
                     {currentRating.toFixed(1)}
                   </div>
                 )}
 
                 {/* Actions - Watch Later & Pass */}
-                <div className="flex items-center justify-center gap-4 text-white text-sm">
+                <div className="flex items-center justify-center gap-3 text-sm mt-3">
                   <button
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       handleStatusClick('WANT_TO_WATCH');
                     }}
-                    className="hover:text-[#3797F0] transition-colors underline-offset-2 hover:underline"
+                    className={`transition-colors underline-offset-2 hover:underline ${
+                      status === 'WANT_TO_WATCH'
+                        ? 'text-white font-semibold'
+                        : 'text-white/80 hover:text-white'
+                    }`}
                   >
                     {t('watchLater')}
                   </button>
-                  <span className="text-gray-400">|</span>
+                  <span className="text-white/40">|</span>
                   <button
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       handleStatusClick('PASS');
                     }}
-                    className="text-gray-300 hover:text-gray-100 transition-colors underline-offset-2 hover:underline"
+                    className={`transition-colors underline-offset-2 hover:underline ${
+                      status === 'PASS'
+                        ? 'text-white font-semibold'
+                        : 'text-white/60 hover:text-white/90'
+                    }`}
                   >
                     {t('notInterested')}
                   </button>

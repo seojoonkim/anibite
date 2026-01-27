@@ -276,29 +276,29 @@ export default function RateCharacters() {
         {/* Header with Stats - Always show 4 boxes from first render */}
         <div className="mb-8 flex justify-center items-center">
           {/* Stats */}
-          <div className="flex gap-3 items-center">
+          <div className="flex gap-3 items-center flex-wrap justify-center">
             {/* Rated Characters */}
-            <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '평가했어요' : language === 'ja' ? '評価済み' : 'Rated'}</div>
-              <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{(stats.rated || 0).toLocaleString()}</div>
+            <div className="bg-surface px-4 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-shadow min-w-[100px] border border-border">
+              <div className="text-xs text-text-secondary mb-0.5 text-center">{language === 'ko' ? '평가했어요' : language === 'ja' ? '評価済み' : 'Rated'}</div>
+              <div className="text-lg font-bold text-primary text-center tabular-nums">{(stats.rated || 0).toLocaleString()}</div>
             </div>
 
             {/* Want to Know */}
-            <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '알고싶어요' : language === 'ja' ? '知りたい' : 'Want to Know'}</div>
-              <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{(stats.wantToKnow || 0).toLocaleString()}</div>
+            <div className="bg-surface px-4 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-shadow min-w-[100px] border border-border">
+              <div className="text-xs text-text-secondary mb-0.5 text-center">{language === 'ko' ? '알고싶어요' : language === 'ja' ? '知りたい' : 'Want to Know'}</div>
+              <div className="text-lg font-bold text-secondary text-center tabular-nums">{(stats.wantToKnow || 0).toLocaleString()}</div>
             </div>
 
             {/* Not Interested */}
-            <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Not Interested'}</div>
-              <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{(stats.notInterested || 0).toLocaleString()}</div>
+            <div className="bg-surface px-4 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-shadow min-w-[100px] border border-border">
+              <div className="text-xs text-text-secondary mb-0.5 text-center">{language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Not Interested'}</div>
+              <div className="text-lg font-bold text-text-tertiary text-center tabular-nums">{(stats.notInterested || 0).toLocaleString()}</div>
             </div>
 
             {/* Average Rating - Always show */}
-            <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-              <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</div>
-              <div className="text-lg font-bold text-gray-800 text-center tabular-nums">
+            <div className="bg-surface px-4 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-shadow min-w-[100px] border border-border">
+              <div className="text-xs text-text-secondary mb-0.5 text-center">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</div>
+              <div className="text-lg font-bold text-accent text-center tabular-nums">
                 {stats.averageRating > 0 ? `★ ${stats.averageRating.toFixed(1)}` : '-'}
               </div>
             </div>
@@ -312,7 +312,7 @@ export default function RateCharacters() {
             {Array.from({ length: 10 }).map((_, index) => (
               <div
                 key={`skeleton-${index}`}
-                className="bg-white rounded-lg overflow-hidden"
+                className="bg-surface rounded-lg overflow-hidden border border-border"
                 style={{
                   boxShadow: 'var(--shadow-md)',
                   animation: `slideUp var(--transition-slow) ease-out ${index * 50}ms`
@@ -507,7 +507,7 @@ export default function RateCharacters() {
                               </div>
 
                               {/* Status Buttons in Overlay */}
-                              <div className="flex items-center justify-center gap-3 text-white text-sm mt-3">
+                              <div className="flex items-center justify-center gap-3 text-sm mt-3">
                                 <button
                                   onClick={(e) => {
                                     e.preventDefault();
@@ -515,13 +515,13 @@ export default function RateCharacters() {
                                     handleStatusChange(character.id, 'WANT_TO_KNOW');
                                   }}
                                   className={`transition-colors underline-offset-2 hover:underline ${characterStatuses[character.id] === 'WANT_TO_KNOW'
-                                    ? 'font-semibold'
-                                    : 'text-gray-300 hover:text-gray-100'
+                                    ? 'text-white font-semibold'
+                                    : 'text-white/80 hover:text-white'
                                     }`}
                                 >
                                   {language === 'ko' ? '알고싶어요' : language === 'ja' ? '知りたい' : 'Want to Know'}
                                 </button>
-                                <span className="text-gray-400">|</span>
+                                <span className="text-white/40">|</span>
                                 <button
                                   onClick={(e) => {
                                     e.preventDefault();
@@ -529,8 +529,8 @@ export default function RateCharacters() {
                                     handleStatusChange(character.id, 'NOT_INTERESTED');
                                   }}
                                   className={`transition-colors underline-offset-2 hover:underline ${characterStatuses[character.id] === 'NOT_INTERESTED'
-                                    ? 'font-semibold'
-                                    : 'text-gray-300 hover:text-gray-100'
+                                    ? 'text-white font-semibold'
+                                    : 'text-white/60 hover:text-white/90'
                                     }`}
                                 >
                                   {language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Not Interested'}
@@ -545,32 +545,32 @@ export default function RateCharacters() {
                     {/* Character Info */}
                     <div className="p-3">
                       <Link to={`/character/${character.id}`} className="block group">
-                        <h3 className="font-bold text-[15px] line-clamp-2 mb-1 group-hover:text-[#3797F0] transition-colors cursor-pointer" title={language === 'ko' ? (character.name_korean || character.name_full) : language === 'ja' ? (character.name_native || character.name_full) : character.name_full}>
+                        <h3 className="font-bold text-[15px] line-clamp-2 mb-1 text-text-primary group-hover:text-primary transition-colors cursor-pointer" title={language === 'ko' ? (character.name_korean || character.name_full) : language === 'ja' ? (character.name_native || character.name_full) : character.name_full}>
                           {language === 'ko' ? (character.name_korean || character.name_full) : language === 'ja' ? (character.name_native || character.name_full) : character.name_full}
                         </h3>
                       </Link>
                       {language === 'ko' && character.name_korean ? (
-                        <p className="text-xs text-gray-500 line-clamp-1 mb-2" title={character.name_full}>
+                        <p className="text-xs text-text-tertiary line-clamp-1 mb-2" title={character.name_full}>
                           {character.name_full}
                         </p>
                       ) : language === 'ja' && character.name_native ? (
-                        <p className="text-xs text-gray-500 line-clamp-1 mb-2" title={character.name_full}>
+                        <p className="text-xs text-text-tertiary line-clamp-1 mb-2" title={character.name_full}>
                           ({character.name_full})
                         </p>
                       ) : (
                         character.name_native && character.name_native !== character.name_full && (
-                          <p className="text-xs text-gray-500 line-clamp-1 mb-2" title={character.name_native}>
+                          <p className="text-xs text-text-tertiary line-clamp-1 mb-2" title={character.name_native}>
                             {character.name_native}
                           </p>
                         )
                       )}
 
                       {/* Anime Info */}
-                      <div className="text-xs text-gray-600 flex items-center gap-1 mb-3">
+                      <div className="text-xs text-text-secondary flex items-center gap-1 mb-3">
                         <span>from</span>
                         <Link
                           to={`/anime/${character.anime_id}`}
-                          className="font-medium line-clamp-1 hover:text-[#3797F0] transition-colors cursor-pointer hover:underline"
+                          className="font-medium line-clamp-1 hover:text-primary transition-colors cursor-pointer hover:underline"
                           title={language === 'ko' ? (character.anime_title_korean || character.anime_title) : language === 'ja' ? (character.anime_title_native || character.anime_title) : character.anime_title}
                         >
                           {language === 'ko'
@@ -589,10 +589,10 @@ export default function RateCharacters() {
           </div>
         ) : (
           <div className="text-center py-12">
-            <div className="text-xl text-gray-600 mb-4">
+            <div className="text-xl text-text-secondary mb-4">
               {language === 'ko' ? '평가한 애니메이션이 없습니다' : language === 'ja' ? '評価済みのアニメがありません' : 'No rated anime'}
             </div>
-            <p className="text-gray-500">
+            <p className="text-text-tertiary">
               {language === 'ko' ? '먼저 애니메이션을 평가하면 캐릭터를 평가할 수 있습니다.' : language === 'ja' ? 'まずアニメを評価すると、キャラクターを評価できます。' : 'Rate anime first to rate characters.'}
             </p>
           </div>
@@ -601,7 +601,7 @@ export default function RateCharacters() {
         {/* Loading More Indicator */}
         {loadingMore && characters.length > 0 && (
           <div className="text-center py-8">
-            <div className="text-gray-600">{t('loading')}</div>
+            <div className="text-text-secondary">{t('loading')}</div>
           </div>
         )}
 
@@ -612,7 +612,7 @@ export default function RateCharacters() {
 
         {/* All Loaded Message */}
         {!hasMore && characters.length > 0 && (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-text-tertiary">
             {t('allLoaded')}
           </div>
         )}
