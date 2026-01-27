@@ -434,9 +434,9 @@ export default function RateCharacters() {
                           <div className="absolute inset-0 bg-black/50 pointer-events-none" />
                         )}
 
-                        {/* Show rating stars on rated characters - persists always */}
+                        {/* Show rating stars on rated characters - hide on hover */}
                         {hasRated && starSizes[character.id] && character.my_rating && character.my_rating > 0 && (
-                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                          <div className={`absolute inset-0 flex items-center justify-center pointer-events-none z-10 transition-opacity duration-150 ${hoveredCharacter === character.id ? 'opacity-0' : 'opacity-100'}`}>
                             <div className="flex gap-1 drop-shadow-lg" style={{ fontSize: starSizes[character.id] }}>
                               {[1, 2, 3, 4, 5].map((position) => {
                                 const rating = character.my_rating;
