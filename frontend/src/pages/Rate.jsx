@@ -191,37 +191,38 @@ function RatingCard({ anime, onRate }) {
           status === 'PASS' ? 'opacity-50' : 'opacity-100'
         } ${status !== 'RATED' ? 'border border-border' : ''}`}>
         {/* Cover Image */}
-        <Link to={`/anime/${anime.id}`} className="block relative aspect-[3/4] bg-surface-elevated overflow-hidden">
-          <img
-            src={getImageUrl(anime.cover_image_url)}
-            alt={getAnimeTitle(anime)}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms]"
-            onError={(e) => {
-              e.target.src = '/placeholder-anime.svg';
-            }}
-          />
+        <Link to={`/anime/${anime.id}`} className="block">
+          <div className="aspect-[3/4] bg-surface-elevated relative overflow-hidden">
+            <img
+              src={getImageUrl(anime.cover_image_url)}
+              alt={getAnimeTitle(anime)}
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms]"
+              onError={(e) => {
+                e.target.src = '/placeholder-anime.svg';
+              }}
+            />
 
-          {/* Show clear rating on already rated anime */}
-          {status === 'RATED' && currentRating > 0 && (
-            <div className="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity pointer-events-none z-10">
-              <div className="flex justify-center gap-1" style={{ fontSize: starSize }}>
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <span key={star}>
-                    {renderStar(star)}
-                  </span>
-                ))}
+            {/* Show clear rating on already rated anime */}
+            {status === 'RATED' && currentRating > 0 && (
+              <div className="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity pointer-events-none z-10">
+                <div className="flex justify-center gap-1" style={{ fontSize: starSize }}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span key={star}>
+                      {renderStar(star)}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Overlay on hover */}
-          <div
-            className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-75 transition-all duration-150 flex flex-col items-center justify-center p-4"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          >
+            {/* Overlay on hover */}
+            <div
+              className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-75 transition-all duration-150 flex flex-col items-center justify-center p-4"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            >
             <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 text-center w-full flex flex-col justify-center h-full">
               {/* Star Rating */}
               <div
@@ -303,6 +304,7 @@ function RatingCard({ anime, onRate }) {
               )}
             </div>
           )}
+          </div>
         </Link>
 
         {/* Title */}
