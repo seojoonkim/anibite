@@ -121,19 +121,40 @@ export default function RatingStatsCard({ stats }) {
             <div className="text-xs text-text-secondary mb-1">
               {language === 'ko' ? '평균' : language === 'ja' ? '平均' : 'Average'}
             </div>
-            <div className="text-lg font-bold text-text-primary">★ {stats.mean_rating.toFixed(1)}</div>
+            <div className="text-lg font-bold text-text-primary">
+              <span style={{
+                background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>★</span> {stats.mean_rating.toFixed(1)}
+            </div>
           </div>
           <div className="text-center">
             <div className="text-xs text-text-secondary mb-1">
               {language === 'ko' ? '최고' : language === 'ja' ? '最高' : 'Highest'}
             </div>
-            <div className="text-lg font-bold text-accent">★ {stats.max_rating.toFixed(1)}</div>
+            <div className="text-lg font-bold text-accent">
+              <span style={{
+                background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>★</span> {stats.max_rating.toFixed(1)}
+            </div>
           </div>
           <div className="text-center">
             <div className="text-xs text-text-secondary mb-1">
               {language === 'ko' ? '최저' : language === 'ja' ? '最低' : 'Lowest'}
             </div>
-            <div className="text-lg font-bold text-primary">★ {stats.min_rating.toFixed(1)}</div>
+            <div className="text-lg font-bold text-primary">
+              <span style={{
+                background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>★</span> {stats.min_rating.toFixed(1)}
+            </div>
           </div>
         </div>
       </div>
