@@ -14,6 +14,7 @@ def follow_user(follower_id: int, following_id: int) -> bool:
         return False
 
     try:
+        print(f"[DEBUG] follow_user: follower_id={follower_id}, following_id={following_id}")
         db.execute_insert(
             """
             INSERT INTO user_follows (follower_id, following_id)
@@ -21,10 +22,20 @@ def follow_user(follower_id: int, following_id: int) -> bool:
             """,
             (follower_id, following_id)
         )
+        print(f"[DEBUG] follow_user: SUCCESS - inserted into user_follows")
+
+        # Verify insertion
+        verify = db.execute_query(
+            "SELECT COUNT(*) as cnt FROM user_follows WHERE follower_id = ? AND following_id = ?",
+            (follower_id, following_id),
+            fetch_one=True
+        )
+        print(f"[DEBUG] follow_user: verification count={verify['cnt'] if verify else 0}")
+
         return True
     except Exception as e:
         # Already following or other error
-        print(f"Follow error: {e}")
+        print(f"[DEBUG] Follow error: {e}")
         return False
 
 
