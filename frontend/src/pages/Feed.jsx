@@ -488,7 +488,7 @@ export default function Feed() {
               <button
                 onClick={() => setSearchParams({ filter: 'all' })}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'all'
-                  ? 'bg-[#3797F0] text-white font-medium'
+                  ? 'bg-[#3797F0] text-white font-semibold'
                   : 'text-gray-600 hover:text-black hover:bg-gray-100 font-normal'
                   }`}
               >
@@ -504,7 +504,7 @@ export default function Feed() {
               <button
                 onClick={() => setSearchParams({ filter: 'following' })}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'following'
-                  ? 'bg-[#3797F0] text-white font-medium'
+                  ? 'bg-[#3797F0] text-white font-semibold'
                   : 'text-gray-600 hover:text-black hover:bg-gray-100 font-normal'
                   }`}
               >
@@ -520,7 +520,7 @@ export default function Feed() {
               <button
                 onClick={() => setSearchParams({ filter: 'notifications' })}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'notifications'
-                  ? 'bg-[#3797F0] text-white font-medium'
+                  ? 'bg-[#3797F0] text-white font-semibold'
                   : 'text-gray-600 hover:text-black hover:bg-gray-100 font-normal'
                   }`}
               >
@@ -534,7 +534,7 @@ export default function Feed() {
               <button
                 onClick={() => setSearchParams({ filter: 'saved' })}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'saved'
-                  ? 'bg-[#3797F0] text-white font-medium'
+                  ? 'bg-[#3797F0] text-white font-semibold'
                   : 'text-gray-600 hover:text-black hover:bg-gray-100 font-normal'
                   }`}
               >
