@@ -3,13 +3,13 @@ Unified Search API - Public search for anime and characters
 통합 검색 API - 애니메이션과 캐릭터 동시 검색
 """
 from fastapi import APIRouter, Query
-from typing import Optional
 from database import db
+import sqlite3
 
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("")
 def unified_search(
     q: str = Query(..., min_length=1, description="검색어"),
     sort: str = Query("popularity_desc", description="정렬 기준"),
@@ -56,29 +56,31 @@ def unified_search(
         ORDER BY {anime_order}
         LIMIT ?
     """
-    anime_results = db.execute_query(
-        anime_query,
-        (pattern, pattern, pattern, pattern, limit)
-    )
-
-    results["anime"] = [
-        {
-            "id": row[0],
-            "title_korean": row[1],
-            "title_romaji": row[2],
-            "title_english": row[3],
-            "title_native": row[4],
-            "cover_image": row[5],
-            "format": row[6],
-            "episodes": row[7],
-            "status": row[8],
-            "season_year": row[9],
-            "rating": row[10],
-            "rating_count": row[11],
-            "popularity": row[12]
-        }
-        for row in anime_results
-    ]
+    try:
+        anime_results = db.execute_query(
+            anime_query,
+            (pattern, pattern, pattern, pattern, limit)
+        )
+        results["anime"] = [
+            {
+                "id": row[0],
+                "title_korean": row[1],
+                "title_romaji": row[2],
+                "title_english": row[3],
+                "title_native": row[4],
+                "cover_image": row[5],
+                "format": row[6],
+                "episodes": row[7],
+                "status": row[8],
+                "season_year": row[9],
+                "rating": row[10],
+                "rating_count": row[11],
+                "popularity": row[12]
+            }
+            for row in anime_results
+        ]
+    except sqlite3.OperationalError:
+        pass  # Table doesn't exist in local dev
 
     # 캐릭터 검색 (with site ratings calculated via subquery)
     char_order = {
@@ -110,26 +112,28 @@ def unified_search(
         ORDER BY {char_order}
         LIMIT ?
     """
-    char_results = db.execute_query(
-        char_query,
-        (pattern, pattern, pattern, limit)
-    )
-
-    results["characters"] = [
-        {
-            "id": row[0],
-            "name_korean": row[1],
-            "name_full": row[2],
-            "name_native": row[3],
-            "image_large": row[4],
-            "favourites": row[5],
-            "rating": row[6],
-            "rating_count": row[7],
-            "anime_id": row[8],
-            "anime_title_korean": row[9],
-            "anime_title_romaji": row[10]
-        }
-        for row in char_results
-    ]
+    try:
+        char_results = db.execute_query(
+            char_query,
+            (pattern, pattern, pattern, limit)
+        )
+        results["characters"] = [
+            {
+                "id": row[0],
+                "name_korean": row[1],
+                "name_full": row[2],
+                "name_native": row[3],
+                "image_large": row[4],
+                "favourites": row[5],
+                "rating": row[6],
+                "rating_count": row[7],
+                "anime_id": row[8],
+                "anime_title_korean": row[9],
+                "anime_title_romaji": row[10]
+            }
+            for row in char_results
+        ]
+    except sqlite3.OperationalError:
+        pass  # Table doesn't exist in local dev
 
     return results
