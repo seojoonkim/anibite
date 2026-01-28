@@ -1937,3 +1937,179 @@ def force_clean_duplicates():
     except Exception as e:
         import traceback
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
+
+
+@router.get("/find-duplicate-characters-by-name")
+def find_duplicate_characters_by_name():
+    """
+    Find characters with the same Korean name but different IDs
+    (same character appearing in multiple anime with different character IDs)
+    """
+    try:
+        # Find characters with same Korean name
+        query = """
+        SELECT
+            c1.id as id1, c1.name_full as name1, c1.name_korean,
+            c2.id as id2, c2.name_full as name2,
+            GROUP_CONCAT(DISTINCT a1.title_korean || ' (' || a1.id || ')') as anime1,
+            GROUP_CONCAT(DISTINCT a2.title_korean || ' (' || a2.id || ')') as anime2
+        FROM character c1
+        JOIN character c2 ON c1.name_korean = c2.name_korean AND c1.id < c2.id
+        LEFT JOIN anime_character ac1 ON ac1.character_id = c1.id
+        LEFT JOIN anime a1 ON ac1.anime_id = a1.id
+        LEFT JOIN anime_character ac2 ON ac2.character_id = c2.id
+        LEFT JOIN anime a2 ON ac2.anime_id = a2.id
+        WHERE c1.name_korean IS NOT NULL AND c1.name_korean != ''
+        GROUP BY c1.id, c2.id
+        ORDER BY c1.name_korean
+        """
+
+        duplicates = db.execute_query(query)
+
+        if not duplicates:
+            return {
+                "success": True,
+                "message": "No duplicate characters found",
+                "duplicates": []
+            }
+
+        result = []
+        for dup in duplicates:
+            result.append({
+                "name_korean": dup['name_korean'],
+                "character1": {
+                    "id": dup['id1'],
+                    "name_full": dup['name1'],
+                    "anime": dup['anime1']
+                },
+                "character2": {
+                    "id": dup['id2'],
+                    "name_full": dup['name2'],
+                    "anime": dup['anime2']
+                }
+            })
+
+        return {
+            "success": True,
+            "duplicates_count": len(result),
+            "duplicates": result
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
+
+
+@router.post("/clean-duplicate-character-ratings-by-name")
+def clean_duplicate_character_ratings_by_name(dry_run: bool = True):
+    """
+    Clean up duplicate character ratings where the same character has different IDs
+    across different anime (e.g., 채치수 in Slam Dunk vs The First Slam Dunk)
+
+    - Keeps the rating with the lower character_id as canonical
+    - If user rated both, keeps the higher rating
+    - Deletes the duplicate rating and related activities
+    """
+    try:
+        # First find duplicate character pairs
+        duplicates_query = """
+        SELECT DISTINCT
+            c1.id as id1, c1.name_korean,
+            c2.id as id2
+        FROM character c1
+        JOIN character c2 ON c1.name_korean = c2.name_korean AND c1.id < c2.id
+        WHERE c1.name_korean IS NOT NULL AND c1.name_korean != ''
+        """
+
+        duplicate_pairs = db.execute_query(duplicates_query)
+
+        if not duplicate_pairs:
+            return {
+                "success": True,
+                "message": "No duplicate characters found",
+                "affected_users": []
+            }
+
+        # Find users who rated both characters in duplicate pairs
+        affected_users = []
+        total_cleaned = 0
+
+        for dup in duplicate_pairs:
+            id1, name_korean, id2 = dup['id1'], dup['name_korean'], dup['id2']
+
+            # Find users who have ratings for both character IDs
+            users_query = """
+            SELECT
+                u.id as user_id, u.username,
+                cr1.rating as rating1, cr1.id as rating_id1,
+                cr2.rating as rating2, cr2.id as rating_id2
+            FROM character_ratings cr1
+            JOIN character_ratings cr2 ON cr1.user_id = cr2.user_id
+            JOIN users u ON cr1.user_id = u.id
+            WHERE cr1.character_id = ? AND cr2.character_id = ?
+            """
+
+            users = db.execute_query(users_query, (id1, id2))
+
+            for user in users:
+                user_id = user['user_id']
+                username = user['username']
+                rating1 = user['rating1']
+                rating2 = user['rating2']
+
+                # Keep the lower character_id as canonical
+                canonical_id = min(id1, id2)
+                remove_id = max(id1, id2)
+
+                # Determine which rating to keep (higher one)
+                if rating1 is None:
+                    keep_rating = rating2
+                elif rating2 is None:
+                    keep_rating = rating1
+                else:
+                    keep_rating = max(rating1, rating2)
+
+                affected_users.append({
+                    "user_id": user_id,
+                    "username": username,
+                    "character_name": name_korean,
+                    "canonical_id": canonical_id,
+                    "remove_id": remove_id,
+                    "kept_rating": keep_rating,
+                    "original_ratings": {"id1": rating1, "id2": rating2}
+                })
+
+                if not dry_run:
+                    # Update canonical rating if needed
+                    if keep_rating:
+                        db.execute_update(
+                            "UPDATE character_ratings SET rating = ? WHERE user_id = ? AND character_id = ?",
+                            (keep_rating, user_id, canonical_id)
+                        )
+
+                    # Delete duplicate rating
+                    db.execute_update(
+                        "DELETE FROM character_ratings WHERE user_id = ? AND character_id = ?",
+                        (user_id, remove_id)
+                    )
+
+                    # Clean up activities
+                    db.execute_update(
+                        "DELETE FROM activities WHERE user_id = ? AND activity_type = 'character_rating' AND item_id = ?",
+                        (user_id, remove_id)
+                    )
+
+                    total_cleaned += 1
+
+        return {
+            "success": True,
+            "dry_run": dry_run,
+            "affected_users_count": len(affected_users),
+            "total_cleaned": total_cleaned if not dry_run else 0,
+            "affected_users": affected_users,
+            "message": "This was a DRY RUN. No changes made." if dry_run else f"Cleaned {total_cleaned} duplicate ratings."
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
