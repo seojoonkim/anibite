@@ -355,13 +355,16 @@ def get_global_feed(limit: int = 50, offset: int = 0) -> List[Dict]:
         LEFT JOIN anime an ON a.activity_type IN ('anime_rating', 'anime_review') AND a.item_id = an.id
         -- JOIN character for character activities
         LEFT JOIN character ch ON a.activity_type IN ('character_rating', 'character_review') AND a.item_id = ch.id
-        -- JOIN anime for character (only ONE anime per character using subquery)
+        -- JOIN anime for character (only ONE anime per character using subquery with ROW_NUMBER)
         LEFT JOIN (
-            SELECT ac.character_id, a.id, a.title_romaji, a.title_korean, a.title_native
-            FROM anime_character ac
-            JOIN anime a ON ac.anime_id = a.id
-            WHERE ac.role = 'MAIN'
-            GROUP BY ac.character_id
+            SELECT character_id, id, title_romaji, title_korean, title_native
+            FROM (
+                SELECT ac.character_id, a.id, a.title_romaji, a.title_korean, a.title_native,
+                       ROW_NUMBER() OVER (PARTITION BY ac.character_id ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.popularity DESC) as rn
+                FROM anime_character ac
+                JOIN anime a ON ac.anime_id = a.id
+            )
+            WHERE rn = 1
         ) char_anime ON ch.id = char_anime.character_id
         ORDER BY a.activity_time DESC,
                  CASE a.activity_type
@@ -567,13 +570,16 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
         LEFT JOIN anime an ON a.activity_type IN ('anime_rating', 'anime_review') AND a.item_id = an.id
         -- JOIN character for character activities
         LEFT JOIN character ch ON a.activity_type IN ('character_rating', 'character_review') AND a.item_id = ch.id
-        -- JOIN anime for character (only ONE anime per character using subquery)
+        -- JOIN anime for character (only ONE anime per character using subquery with ROW_NUMBER)
         LEFT JOIN (
-            SELECT ac.character_id, a.id, a.title_romaji, a.title_korean, a.title_native
-            FROM anime_character ac
-            JOIN anime a ON ac.anime_id = a.id
-            WHERE ac.role = 'MAIN'
-            GROUP BY ac.character_id
+            SELECT character_id, id, title_romaji, title_korean, title_native
+            FROM (
+                SELECT ac.character_id, a.id, a.title_romaji, a.title_korean, a.title_native,
+                       ROW_NUMBER() OVER (PARTITION BY ac.character_id ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END, a.popularity DESC) as rn
+                FROM anime_character ac
+                JOIN anime a ON ac.anime_id = a.id
+            )
+            WHERE rn = 1
         ) char_anime ON ch.id = char_anime.character_id
         WHERE a.user_id = ?
         ORDER BY a.activity_time DESC,
