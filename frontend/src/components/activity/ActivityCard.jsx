@@ -84,8 +84,8 @@ const ActivityCard = forwardRef(({
   const preset = CONTEXT_PRESETS[context] || CONTEXT_PRESETS.feed;
   const finalShowOptions = { ...preset, ...showOptions };
 
-  // State
-  const [showComments, setShowComments] = useState(activity.comments_count > 0);
+  // State - Always show comments in notification context
+  const [showComments, setShowComments] = useState(context === 'notification' || activity.comments_count > 0);
   const [newCommentText, setNewCommentText] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState('');
