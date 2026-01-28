@@ -775,7 +775,7 @@ const ActivityCard = forwardRef(({
           {/* Like Button */}
           <button
             onClick={handleLikeClick}
-            className="flex items-center gap-1 transition-all hover:scale-105"
+            className="flex items-center gap-1.5 transition-all hover:scale-105"
             style={{
               color: liked ? '#DC2626' : '#6B7280'
             }}
@@ -791,45 +791,52 @@ const ActivityCard = forwardRef(({
             )}
             <span className="text-xs font-medium">
               {language === 'ko' ? '좋아요' : language === 'ja' ? 'いいね' : 'Like'}
-              {likesCount > 0 && <> {likesCount}</>}
             </span>
+            {likesCount > 0 && (
+              <span className="text-xs font-medium">{likesCount}</span>
+            )}
           </button>
 
           {/* Comment Button */}
           <button
             onClick={() => setShowComments(!showComments)}
-            className="flex items-center gap-1 transition-all hover:scale-105 text-gray-600 hover:text-primary-light"
+            className="flex items-center gap-1.5 transition-all hover:scale-105"
+            style={{
+              color: '#6B7280'
+            }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
             <span className="text-xs font-medium">
               {language === 'ko' ? '댓글' : language === 'ja' ? 'コメント' : 'Comment'}
-              {activity.comments_count > 0 && <> {activity.comments_count}</>}
             </span>
+            {activity.comments_count > 0 && (
+              <span className="text-xs font-medium">{activity.comments_count}</span>
+            )}
           </button>
         </div>
 
         {/* Bookmark Button */}
         <button
           onClick={handleBookmarkClick}
-          className="transition-all hover:scale-105"
+          className="flex items-center gap-1.5 transition-all hover:scale-105"
+          style={{
+            color: bookmarked ? '#DC2626' : '#6B7280'
+          }}
         >
           {bookmarked ? (
-            <svg width="18" height="18" viewBox="0 0 24 24">
-              <defs>
-                <linearGradient id="bookmark-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style={{ stopColor: '#FF6B6B', stopOpacity: 1 }} />
-                  <stop offset="100%" style={{ stopColor: '#FF4757', stopOpacity: 1 }} />
-                </linearGradient>
-              </defs>
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" fill="url(#bookmark-gradient)" />
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
             </svg>
           ) : (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
             </svg>
           )}
+          <span className="text-xs font-medium">
+            {language === 'ko' ? '저장' : language === 'ja' ? '保存' : 'Save'}
+          </span>
         </button>
       </div>
 
