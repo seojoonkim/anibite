@@ -105,13 +105,13 @@ export default function RatingWidget({ animeId, currentRating, onRate, onStatusC
           <StarRating
             rating={tempRating}
             onRatingChange={handleRatingChange}
-            size="xl"
+            size="widget"
             align="center"
             showNumber={false}
           />
         </div>
         {tempRating > 0 && (
-          <div className="mt-2 text-lg text-gray-600">
+          <div className="mt-3 text-xl text-gray-700 font-medium">
             {tempRating.toFixed(1)}
           </div>
         )}

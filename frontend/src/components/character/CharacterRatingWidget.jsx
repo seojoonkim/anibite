@@ -25,14 +25,21 @@ export default function CharacterRatingWidget({ characterId, currentRating, onRa
       </h3>
 
       {/* Rating Display/Input */}
-      <div className="mb-6">
-        <StarRating
-          rating={tempRating}
-          onRatingChange={handleRatingChange}
-          size="xl"
-          align="center"
-          showNumber={true}
-        />
+      <div className="mb-6 flex flex-col items-center w-full">
+        <div className="flex justify-center">
+          <StarRating
+            rating={tempRating}
+            onRatingChange={handleRatingChange}
+            size="widget"
+            align="center"
+            showNumber={false}
+          />
+        </div>
+        {tempRating > 0 && (
+          <div className="mt-3 text-xl text-gray-700 font-medium">
+            {tempRating.toFixed(1)}
+          </div>
+        )}
 
         {!currentRating?.rating && (
           <p className="text-sm text-gray-500 text-center mt-2">
