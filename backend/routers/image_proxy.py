@@ -76,3 +76,64 @@ async def get_character_image(character_id: int, ext: str):
     except Exception as e:
         logger.error(f"Failed to upload to R2: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to cache image: {str(e)}")
+
+
+@router.get("/images/staff/{staff_id}.{ext}")
+async def get_staff_image(staff_id: int, ext: str):
+    """
+    Get staff image - auto-download from AniList if not in R2
+    성우/스태프 이미지 가져오기 - R2에 없으면 AniList에서 자동 다운로드
+    """
+    r2_path = f"images/staff/{staff_id}.{ext}"
+
+    # Check if image exists in R2
+    if check_r2_object_exists(r2_path):
+        # Redirect to R2 public URL
+        from config import IMAGE_BASE_URL
+        return RedirectResponse(url=f"{IMAGE_BASE_URL}/{r2_path}")
+
+    # Also check without images/ prefix (legacy upload path)
+    legacy_r2_path = f"staff/{staff_id}.{ext}"
+    if check_r2_object_exists(legacy_r2_path):
+        from config import IMAGE_BASE_URL
+        return RedirectResponse(url=f"{IMAGE_BASE_URL}/{legacy_r2_path}")
+
+    # Image not in R2, try to download from AniList
+    logger.info(f"Staff image not found in R2: {r2_path}, attempting to download from AniList")
+
+    # Get staff's AniList image URL from database
+    staff = db.execute_query(
+        "SELECT image_url FROM staff WHERE id = ?",
+        (staff_id,),
+        fetch_one=True
+    )
+
+    if not staff or not staff['image_url']:
+        raise HTTPException(status_code=404, detail="Staff not found or no image URL")
+
+    anilist_url = staff['image_url']
+
+    try:
+        # Download from AniList
+        logger.info(f"Downloading staff image from AniList: {anilist_url}")
+        response = requests.get(anilist_url, timeout=10)
+        response.raise_for_status()
+
+        # Determine content type
+        content_type = response.headers.get('content-type', f'image/{ext}')
+
+        # Upload to R2
+        logger.info(f"Uploading staff image to R2: {r2_path}")
+        upload_to_r2(response.content, r2_path, content_type)
+
+        logger.info(f"Successfully cached staff image: {r2_path}")
+
+        # Return the image directly
+        return Response(content=response.content, media_type=content_type)
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Failed to download staff image from AniList: {e}")
+        raise HTTPException(status_code=502, detail=f"Failed to download image from AniList: {str(e)}")
+    except Exception as e:
+        logger.error(f"Failed to upload staff image to R2: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to cache image: {str(e)}")
