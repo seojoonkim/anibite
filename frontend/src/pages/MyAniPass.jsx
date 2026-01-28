@@ -1398,8 +1398,11 @@ export default function MyAniPass() {
                   (() => {
                     const levelInfo = getCurrentLevelInfo(stats.otaku_score || 0, language);
                     return (
-                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}>
-                        <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span className="text-text-secondary">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
+                      <span
+                        className="px-3 py-1 rounded-full text-xs font-semibold"
+                        style={{ backgroundColor: levelInfo.bgColor, border: `1px solid ${levelInfo.borderColorHex}` }}
+                      >
+                        <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span style={{ color: levelInfo.color }}>{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
                       </span>
                     );
                   })()
@@ -1688,8 +1691,11 @@ export default function MyAniPass() {
                     {(() => {
                       const levelInfo = getCurrentLevelInfo(stats.otaku_score || 0, language);
                       return (
-                        <span className={`mt-2 text-sm px-3 py-1 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}>
-                          <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span className="text-text-secondary">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
+                        <span
+                          className="mt-2 text-xs px-3 py-1 rounded-full font-semibold"
+                          style={{ backgroundColor: levelInfo.bgColor, border: `1px solid ${levelInfo.borderColorHex}` }}
+                        >
+                          <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span style={{ color: levelInfo.color }}>{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
                         </span>
                       );
                     })()}

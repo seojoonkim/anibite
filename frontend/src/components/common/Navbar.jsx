@@ -408,9 +408,12 @@ export default function Navbar() {
                       {(() => {
                         const levelInfo = getCurrentLevelInfo(otakuScore, language);
                         return (
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor} hidden sm:inline-flex`}>
+                          <span
+                            className="text-[10px] px-2 py-0.5 rounded-full font-semibold hidden sm:inline-flex"
+                            style={{ backgroundColor: levelInfo.bgColor, border: `1px solid ${levelInfo.borderColorHex}` }}
+                          >
                             <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span>
-                            <span className="text-text-secondary">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
+                            <span style={{ color: levelInfo.color }}>{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
                           </span>
                         );
                       })()}

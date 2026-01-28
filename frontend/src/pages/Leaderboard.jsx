@@ -132,8 +132,11 @@ export default function Leaderboard() {
 
                     {/* Level */}
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex text-xs px-2 py-0.5 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}>
-                        <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span className="text-text-secondary">{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
+                      <span
+                        className="inline-flex text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                        style={{ backgroundColor: levelInfo.bgColor, border: `1px solid ${levelInfo.borderColorHex}` }}
+                      >
+                        <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span style={{ color: levelInfo.color }}>{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
                       </span>
                     </td>
 

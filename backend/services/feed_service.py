@@ -285,46 +285,81 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
 
 def get_global_feed(limit: int = 50, offset: int = 0) -> List[Dict]:
     """
-    전체 사용자의 최근 활동 피드 (activities 테이블 사용)
-    - 단일 테이블 조회로 극도로 빠른 성능
-    - 30개씩 로드해도 무리 없음
+    전체 사용자의 최근 활동 피드 (activities 테이블 + JOIN)
+    - 정규화: anime/character 테이블에서 타이틀 동적 조회
     """
 
-    # activities 테이블에서 직접 조회
-    # Note: For user_post, item_id contains the post ID
+    # activities 테이블 + JOIN으로 조회 (정규화)
     rows = db.execute_query(
         """
         SELECT
-            id,
-            activity_type,
-            user_id,
-            username,
-            display_name,
-            avatar_url,
-            otaku_score,
-            item_id,
-            item_title,
-            item_title_korean,
-            item_title_native,
-            item_image,
-            rating,
-            NULL as status,
-            activity_time,
-            anime_title,
-            anime_title_korean,
-            anime_title_native,
-            anime_id,
+            a.id,
+            a.activity_type,
+            a.user_id,
+            a.username,
+            a.display_name,
+            a.avatar_url,
+            a.otaku_score,
+            a.item_id,
+            -- Item title: JOIN으로 동적 조회
             CASE
-                WHEN activity_type = 'user_post' THEN item_id
+                WHEN a.activity_type IN ('anime_rating', 'anime_review') THEN an.title_romaji
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN ch.name_full
+                ELSE a.item_title
+            END as item_title,
+            CASE
+                WHEN a.activity_type IN ('anime_rating', 'anime_review') THEN an.title_korean
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN ch.name_korean
+                ELSE a.item_title_korean
+            END as item_title_korean,
+            CASE
+                WHEN a.activity_type IN ('anime_rating', 'anime_review') THEN an.title_native
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN ch.name_native
+                ELSE a.item_title_native
+            END as item_title_native,
+            CASE
+                WHEN a.activity_type IN ('anime_rating', 'anime_review') THEN COALESCE('/' || an.cover_image_local, an.cover_image_url)
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN COALESCE(ch.image_local, ch.image_url)
+                ELSE a.item_image
+            END as item_image,
+            a.rating,
+            NULL as status,
+            a.activity_time,
+            -- Anime title for character activities: JOIN으로 동적 조회
+            CASE
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.title_romaji
+                ELSE NULL
+            END as anime_title,
+            CASE
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.title_korean
+                ELSE NULL
+            END as anime_title_korean,
+            CASE
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.title_native
+                ELSE NULL
+            END as anime_title_native,
+            CASE
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.id
+                ELSE NULL
+            END as anime_id,
+            CASE
+                WHEN a.activity_type = 'user_post' THEN a.item_id
                 ELSE NULL
             END as review_id,
-            review_content,
-            review_content as post_content,
+            a.review_content,
+            a.review_content as post_content,
             0 as comments_count,
-            metadata
-        FROM activities
-        ORDER BY activity_time DESC,
-                 CASE activity_type
+            a.metadata
+        FROM activities a
+        -- JOIN anime for anime activities
+        LEFT JOIN anime an ON a.activity_type IN ('anime_rating', 'anime_review') AND a.item_id = an.id
+        -- JOIN character for character activities
+        LEFT JOIN character ch ON a.activity_type IN ('character_rating', 'character_review') AND a.item_id = ch.id
+        -- JOIN anime_character to get anime for character
+        LEFT JOIN anime_character ac ON ch.id = ac.character_id AND ac.role = 'MAIN'
+        LEFT JOIN anime char_anime ON ac.anime_id = char_anime.id
+        ORDER BY a.activity_time DESC,
+                 CASE a.activity_type
                      WHEN 'rank_promotion' THEN 1
                      ELSE 0
                  END ASC
@@ -417,12 +452,12 @@ def _enrich_comments_count(activities: List[Dict]):
 
 def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, offset: int = 0) -> List[Dict]:
     """
-    특정 사용자의 활동 피드 (activities 테이블 사용)
-    - 단일 테이블 조회로 극도로 빠른 성능
+    특정 사용자의 활동 피드 (activities 테이블 + JOIN)
+    - 정규화: anime/character 테이블에서 타이틀 동적 조회
     - 최근 30일 이내의 rank_promotion은 항상 포함
     """
 
-    # 먼저 최근 30일 이내의 rank_promotion 가져오기
+    # 먼저 최근 30일 이내의 rank_promotion 가져오기 (rank_promotion은 item이 없으므로 JOIN 불필요)
     recent_promotions = db.execute_query(
         """
         SELECT
@@ -434,21 +469,18 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
             a.avatar_url,
             COALESCE(us.otaku_score, a.otaku_score, 0) as otaku_score,
             a.item_id,
-            a.item_title,
-            a.item_title_korean,
-            a.item_title_native,
-            a.item_image,
+            NULL as item_title,
+            NULL as item_title_korean,
+            NULL as item_title_native,
+            NULL as item_image,
             a.rating,
             NULL as status,
             a.activity_time,
-            a.anime_title,
-            a.anime_title_korean,
-            a.anime_title_native,
-            a.anime_id,
-            CASE
-                WHEN a.activity_type = 'user_post' THEN a.item_id
-                ELSE NULL
-            END as review_id,
+            NULL as anime_title,
+            NULL as anime_title_korean,
+            NULL as anime_title_native,
+            NULL as anime_id,
+            NULL as review_id,
             a.review_content,
             a.review_content as post_content,
             0 as comments_count,
@@ -463,8 +495,7 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
         (user_id,)
     )
 
-    # activities 테이블에서 user_id로 필터링
-    # Note: For user_post, item_id contains the post ID
+    # activities 테이블 + JOIN으로 조회 (정규화)
     rows = db.execute_query(
         """
         SELECT
@@ -476,17 +507,47 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
             a.avatar_url,
             COALESCE(us.otaku_score, a.otaku_score, 0) as otaku_score,
             a.item_id,
-            a.item_title,
-            a.item_title_korean,
-            a.item_title_native,
-            a.item_image,
+            -- Item title: JOIN으로 동적 조회
+            CASE
+                WHEN a.activity_type IN ('anime_rating', 'anime_review') THEN an.title_romaji
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN ch.name_full
+                ELSE a.item_title
+            END as item_title,
+            CASE
+                WHEN a.activity_type IN ('anime_rating', 'anime_review') THEN an.title_korean
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN ch.name_korean
+                ELSE a.item_title_korean
+            END as item_title_korean,
+            CASE
+                WHEN a.activity_type IN ('anime_rating', 'anime_review') THEN an.title_native
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN ch.name_native
+                ELSE a.item_title_native
+            END as item_title_native,
+            CASE
+                WHEN a.activity_type IN ('anime_rating', 'anime_review') THEN COALESCE('/' || an.cover_image_local, an.cover_image_url)
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN COALESCE(ch.image_local, ch.image_url)
+                ELSE a.item_image
+            END as item_image,
             a.rating,
             NULL as status,
             a.activity_time,
-            a.anime_title,
-            a.anime_title_korean,
-            a.anime_title_native,
-            a.anime_id,
+            -- Anime title for character activities: JOIN으로 동적 조회
+            CASE
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.title_romaji
+                ELSE NULL
+            END as anime_title,
+            CASE
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.title_korean
+                ELSE NULL
+            END as anime_title_korean,
+            CASE
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.title_native
+                ELSE NULL
+            END as anime_title_native,
+            CASE
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.id
+                ELSE NULL
+            END as anime_id,
             CASE
                 WHEN a.activity_type = 'user_post' THEN a.item_id
                 ELSE NULL
@@ -497,6 +558,13 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
             a.metadata
         FROM activities a
         LEFT JOIN user_stats us ON a.user_id = us.user_id
+        -- JOIN anime for anime activities
+        LEFT JOIN anime an ON a.activity_type IN ('anime_rating', 'anime_review') AND a.item_id = an.id
+        -- JOIN character for character activities
+        LEFT JOIN character ch ON a.activity_type IN ('character_rating', 'character_review') AND a.item_id = ch.id
+        -- JOIN anime_character to get anime for character
+        LEFT JOIN anime_character ac ON ch.id = ac.character_id AND ac.role = 'MAIN'
+        LEFT JOIN anime char_anime ON ac.anime_id = char_anime.id
         WHERE a.user_id = ?
         ORDER BY a.activity_time DESC,
                  CASE a.activity_type
