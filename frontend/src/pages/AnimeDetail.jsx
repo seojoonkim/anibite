@@ -598,6 +598,20 @@ export default function AnimeDetail() {
     }
   };
 
+  // SVG Star icon component
+  const StarIcon = ({ className = "w-6 h-6", filled = true }) => (
+    <svg className={className} viewBox="0 0 20 20" fill={filled ? "url(#star-gradient-detail)" : "currentColor"}>
+      <defs>
+        <linearGradient id="star-gradient-detail" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style={{ stopColor: '#FFD700', stopOpacity: 1 }} />
+          <stop offset="50%" style={{ stopColor: '#FFA500', stopOpacity: 1 }} />
+          <stop offset="100%" style={{ stopColor: '#FF8C00', stopOpacity: 1 }} />
+        </linearGradient>
+      </defs>
+      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+    </svg>
+  );
+
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.svg';
 
@@ -774,7 +788,7 @@ export default function AnimeDetail() {
                     {language === 'ko' ? '종합 평점' : language === 'ja' ? '総合評価' : 'Overall Rating'}
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`text-6xl ${anime.site_rating_count > 0 ? 'text-yellow-500' : 'text-gray-300'}`}>★</span>
+                    <StarIcon className={`w-14 h-14 ${anime.site_rating_count > 0 ? '' : 'text-gray-300'}`} filled={anime.site_rating_count > 0} />
                     <div>
                       <div className="text-5xl font-bold">
                         {anime.site_rating_count > 0 ? anime.site_average_rating?.toFixed(1) : '--'}
@@ -798,8 +812,9 @@ export default function AnimeDetail() {
 
                     return (
                       <div key={star} className="flex items-center gap-1.5 text-xs">
-                        <span className={`w-10 text-right font-medium ${anime.site_rating_count > 0 ? 'text-yellow-500' : 'text-gray-400'}`}>
-                          ★{star.toFixed(1)}
+                        <span className={`w-12 text-right font-medium flex items-center justify-end gap-0.5 ${anime.site_rating_count > 0 ? '' : 'text-gray-400'}`}>
+                          <StarIcon className="w-3 h-3" filled={anime.site_rating_count > 0} />
+                          <span>{star.toFixed(1)}</span>
                         </span>
                         <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
                           <div
@@ -919,7 +934,7 @@ export default function AnimeDetail() {
                     {language === 'ko' ? '종합 평점' : language === 'ja' ? '総合評価' : 'Overall Rating'}
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`text-6xl ${anime.site_rating_count > 0 ? 'text-yellow-500' : 'text-gray-300'}`}>★</span>
+                    <StarIcon className={`w-14 h-14 ${anime.site_rating_count > 0 ? '' : 'text-gray-300'}`} filled={anime.site_rating_count > 0} />
                     <div>
                       <div className="text-5xl font-bold">
                         {anime.site_rating_count > 0 ? anime.site_average_rating?.toFixed(1) : '--'}
@@ -943,8 +958,9 @@ export default function AnimeDetail() {
 
                     return (
                       <div key={star} className="flex items-center gap-1.5 text-xs">
-                        <span className={`w-10 text-right font-medium ${anime.site_rating_count > 0 ? 'text-yellow-500' : 'text-gray-400'}`}>
-                          ★{star.toFixed(1)}
+                        <span className={`w-12 text-right font-medium flex items-center justify-end gap-0.5 ${anime.site_rating_count > 0 ? '' : 'text-gray-400'}`}>
+                          <StarIcon className="w-3 h-3" filled={anime.site_rating_count > 0} />
+                          <span>{star.toFixed(1)}</span>
                         </span>
                         <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
                           <div
@@ -1176,7 +1192,7 @@ export default function AnimeDetail() {
                       </h4>
                       {rec.site_rating_count > 0 && (
                         <div className="flex items-center gap-1 text-xs text-gray-600 mt-1">
-                          <span className="text-yellow-500">★</span>
+                          <StarIcon className="w-3 h-3" filled={true} />
                           <span>{rec.site_average_rating.toFixed(1)}</span>
                           <span className="text-gray-400">({rec.site_rating_count})</span>
                         </div>
