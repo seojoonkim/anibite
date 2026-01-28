@@ -1,0 +1,53 @@
+# Node modules
+node_modules/
+frontend/node_modules/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+backend/venv/
+
+# Environment files
+.env
+.env.local
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Git
+.git/
+.gitignore
+
+# Build outputs (frontend will be built separately)
+frontend/dist/
+frontend/build/
+
+# Database backups (but keep the main anime.db for initial copy)
+data/anime.db.backup*
+data/*.db.backup*
+
+# Images (too large, should be in volume or CDN)
+data/images/
+
+# Testing
+.pytest_cache/
+coverage/
+.coverage
+htmlcov/
+
+# Documentation (not needed in container)
+*.md
+!README.md
