@@ -542,19 +542,38 @@ export default function Rate() {
 
   const loadMore = async () => {
     if (loading || !hasMore) {
-      // console.log('Skip loadMore:', { loading, hasMore });
       return;
     }
 
     try {
       setLoading(true);
-      // Frontend pagination: show 20 more items from already loaded data
-      const newDisplayedCount = Math.min(displayedCount + 20, allAnimeItems.length);
-      setAnimeList(allAnimeItems.slice(0, newDisplayedCount));
-      setDisplayedCount(newDisplayedCount);
-      setHasMore(newDisplayedCount < allAnimeItems.length);
-      setPage(page + 1);
-      setLoading(false);
+
+      // If we have more frontend-cached items, show them first
+      if (displayedCount < allAnimeItems.length) {
+        const newDisplayedCount = Math.min(displayedCount + 20, allAnimeItems.length);
+        setAnimeList(allAnimeItems.slice(0, newDisplayedCount));
+        setDisplayedCount(newDisplayedCount);
+        setHasMore(true); // Always true for infinite scroll
+        setPage(page + 1);
+        setLoading(false);
+      } else {
+        // All frontend items shown, load more from backend
+        const data = await animeService.getAnimeForRating({
+          limit: 50,
+          offset: allAnimeItems.length
+        });
+
+        if (data.items && data.items.length > 0) {
+          const newAllItems = [...allAnimeItems, ...data.items];
+          setAllAnimeItems(newAllItems);
+          setAnimeList(newAllItems.slice(0, displayedCount + 20));
+          setDisplayedCount(displayedCount + 20);
+          setHasMore(true); // Keep loading
+        } else {
+          setHasMore(false); // No more items
+        }
+        setLoading(false);
+      }
     } catch (err) {
       console.error('Failed to load more:', err);
       setLoading(false);
