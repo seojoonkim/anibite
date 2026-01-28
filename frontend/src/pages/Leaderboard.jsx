@@ -96,14 +96,14 @@ export default function Leaderboard() {
                     } : {}}
                   >
                     {/* Rank */}
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 py-2 whitespace-nowrap">
                       <div className={`text-center ${isTopThree ? 'text-2xl' : 'text-lg font-bold text-text-secondary'}`}>
                         {rankEmoji || (index + 1)}
                       </div>
                     </td>
 
                     {/* User */}
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 py-2 whitespace-nowrap">
                       <Link to={`/user/${user.id}`} className="flex items-center gap-3 hover:text-primary transition-colors">
                         {user.avatar_url ? (
                           <img
@@ -131,7 +131,7 @@ export default function Leaderboard() {
                     </td>
 
                     {/* Level */}
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 py-2 whitespace-nowrap">
                       <span
                         className="inline-flex text-[10px] px-2 py-0.5 rounded-full font-semibold"
                         style={{ backgroundColor: levelInfo.bgColor, border: `1px solid ${levelInfo.borderColorHex}` }}
@@ -141,22 +141,22 @@ export default function Leaderboard() {
                     </td>
 
                     {/* Anime Rated */}
-                    <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-center text-sm text-text-primary">
+                    <td className="hidden md:table-cell px-4 py-2 whitespace-nowrap text-center text-sm text-text-primary">
                       {user.total_rated}
                     </td>
 
                     {/* Character Rated */}
-                    <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-center text-sm text-text-primary">
+                    <td className="hidden md:table-cell px-4 py-2 whitespace-nowrap text-center text-sm text-text-primary">
                       {user.total_character_ratings || 0}
                     </td>
 
                     {/* Reviews */}
-                    <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-center text-sm text-text-primary">
+                    <td className="hidden md:table-cell px-4 py-2 whitespace-nowrap text-center text-sm text-text-primary">
                       {user.total_reviews || 0}
                     </td>
 
                     {/* Otaku Score */}
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <td className="px-4 py-2 whitespace-nowrap text-right">
                       <div className={`font-bold ${isTopThree ? 'text-xl text-secondary' : 'text-lg text-text-primary'}`}>
                         {Math.round(user.otaku_score)}
                       </div>
