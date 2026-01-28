@@ -697,7 +697,7 @@ const ActivityCard = forwardRef(({
           {/* Rating */}
           {activity.rating && (
             <div className="flex items-center mb-2">
-              <div className="flex" style={{ gap: '-2px' }}>
+              <div className="flex" style={{ gap: '1px' }}>
                 {[...Array(5)].map((_, i) => {
                   const starValue = i + 1;
                   const fillPercentage =
@@ -708,9 +708,9 @@ const ActivityCard = forwardRef(({
                         : 0;
 
                   return (
-                    <div key={i} className="relative w-5 h-5" style={{ marginRight: '-2px' }}>
+                    <div key={i} className="relative w-[18px] h-[18px]">
                       <svg
-                        className="w-5 h-5 text-gray-200"
+                        className="w-[18px] h-[18px] text-gray-200"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -722,7 +722,7 @@ const ActivityCard = forwardRef(({
                           style={{ width: `${fillPercentage}%` }}
                         >
                           <svg
-                            className="w-5 h-5"
+                            className="w-[18px] h-[18px]"
                             fill="url(#star-gradient)"
                             viewBox="0 0 20 20"
                           >
@@ -741,7 +741,7 @@ const ActivityCard = forwardRef(({
                   );
                 })}
               </div>
-              <span className="ml-1.5 text-sm font-normal text-gray-600">
+              <span className="ml-1.5 text-sm font-medium text-gray-700">
                 {activity.rating.toFixed(1)}
               </span>
             </div>
