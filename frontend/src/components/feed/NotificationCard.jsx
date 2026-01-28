@@ -50,11 +50,11 @@ export default function NotificationCard({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-all">
       {/* Notification Headers - stacked */}
-      <div className="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <div className="border-b border-gray-200 dark:border-gray-700" style={{ backgroundColor: 'rgba(59, 130, 246, 0.08)' }}>
         {uniqueNotifications.map((notification, index) => (
-          <div key={index} className={`px-3 py-2 ${index > 0 ? 'border-t border-gray-200' : ''}`}>
+          <div key={index} className={`px-3 py-2 ${index > 0 ? 'border-t border-gray-200 dark:border-gray-700' : ''}`}>
             <div className="flex items-center gap-2">
               {/* Actor Avatar */}
               <Link to={`/user/${notification.actor_user_id}`} className="flex-shrink-0">
@@ -76,10 +76,10 @@ export default function NotificationCard({
 
               {/* Notification Text */}
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-gray-900">
+                <p className="text-xs font-medium text-gray-900 dark:text-gray-100">
                   {getNotificationText(notification)}
                 </p>
-                <p className="text-[10px] text-gray-500">
+                <p className="text-[10px] text-gray-500 dark:text-gray-400">
                   {getTimeAgo(notification.time)}
                 </p>
               </div>
@@ -100,8 +100,8 @@ export default function NotificationCard({
 
             {/* Show comment content if notification type is comment */}
             {notification.type === 'comment' && notification.comment_content && (
-              <div className="mt-1.5 ml-10 pl-2 border-l-2 border-blue-300">
-                <p className="text-xs text-gray-600 italic">"{notification.comment_content}"</p>
+              <div className="mt-1.5 ml-10 pl-2 border-l-2 border-blue-400 dark:border-blue-500">
+                <p className="text-xs text-gray-600 dark:text-gray-300 italic">"{notification.comment_content}"</p>
               </div>
             )}
           </div>
