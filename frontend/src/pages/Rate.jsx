@@ -222,8 +222,8 @@ function RatingCard({ anime, onRate }) {
 
             {/* Show clear rating on already rated anime - hide on hover */}
             {status === 'RATED' && currentRating > 0 && (
-              <div className="absolute inset-0 flex items-center justify-center transition-opacity pointer-events-none z-10 group-hover:opacity-0">
-                <div className="flex justify-center gap-1 drop-shadow-lg" style={{ fontSize: starSize }}>
+              <div className="absolute inset-0 flex items-center justify-center transition-opacity pointer-events-none z-10 group-hover:opacity-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}>
+                <div className="flex justify-center drop-shadow-lg" style={{ fontSize: starSize, gap: '2px' }}>
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span key={star}>
                       {renderStar(star)}
