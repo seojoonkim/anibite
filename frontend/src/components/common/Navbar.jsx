@@ -261,14 +261,14 @@ export default function Navbar() {
                     d="M4 8C4 5.79 5.79 4 8 4H18C18 4 18 6 20 8C22 10 24 10 24 10H24C26.21 10 28 11.79 28 14V24C28 26.21 26.21 28 24 28H8C5.79 28 4 26.21 4 24V8Z"
                     fill="url(#logo-gradient)"
                   />
-                  {/* Rounded A */}
+                  {/* Cute rounded A - Varela Round (very rounded, cute) */}
                   <text
                     x="50%"
-                    y="58%"
+                    y="60%"
                     dominantBaseline="middle"
                     textAnchor="middle"
                     fill="white"
-                    style={{ fontFamily: "'Nunito', sans-serif", fontSize: '15px', fontWeight: 800 }}
+                    style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '17px', fontWeight: 400 }}
                   >
                     A
                   </text>
