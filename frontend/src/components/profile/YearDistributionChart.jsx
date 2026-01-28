@@ -6,11 +6,13 @@ export default function YearDistributionChart({ distribution }) {
 
   if (!distribution || distribution.length === 0) {
     return (
-      <div className="bg-gradient-to-br from-white to-teal-50/30 rounded-xl shadow-md p-6 w-full h-full flex flex-col border border-teal-100/50">
-        <h3 className="text-xl font-bold mb-4 text-[#638CCC]">
-          {language === 'ko' ? '연도별 시청 분포' : language === 'ja' ? '年別視聴分布' : 'Year Distribution'}
-        </h3>
-        <p className="text-gray-600">
+      <div className="bg-surface rounded-xl shadow-lg border border-border p-6 w-full h-full flex flex-col">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-base font-semibold text-text-primary">
+            {language === 'ko' ? '연도별 시청 분포' : language === 'ja' ? '年別視聴分布' : 'Year Distribution'}
+          </h3>
+        </div>
+        <p className="text-text-secondary">
           {language === 'ko' ? '아직 평가한 애니메이션이 없습니다.' : language === 'ja' ? 'まだ評価したアニメがありません。' : 'No ratings yet.'}
         </p>
       </div>
@@ -53,10 +55,12 @@ export default function YearDistributionChart({ distribution }) {
   const sortedData = [...distribution].sort((a, b) => a.year - b.year);
 
   return (
-    <div className="bg-gradient-to-br from-white to-teal-50/30 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 w-full h-full flex flex-col border border-teal-100/50">
-      <h3 className="text-xl font-bold mb-4 text-[#638CCC]">
-        {language === 'ko' ? '연도별 시청 분포' : language === 'ja' ? '年別視聴分布' : 'Year Distribution'}
-      </h3>
+    <div className="bg-surface rounded-xl shadow-lg border border-border p-6 w-full h-full flex flex-col">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-base font-semibold text-text-primary">
+          {language === 'ko' ? '연도별 시청 분포' : language === 'ja' ? '年別視聴分布' : 'Year Distribution'}
+        </h3>
+      </div>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={sortedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -77,7 +81,7 @@ export default function YearDistributionChart({ distribution }) {
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-      <div className="mt-4 text-center text-sm text-gray-600">
+      <div className="mt-4 text-center text-sm text-text-secondary">
         {sortedData.length > 0 && (
           <>
             {Math.min(...sortedData.map(d => d.year))}{language === 'ko' ? '년' : language === 'ja' ? '年' : ''} ~ {Math.max(...sortedData.map(d => d.year))}{language === 'ko' ? '년' : language === 'ja' ? '年' : ''}

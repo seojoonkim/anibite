@@ -31,10 +31,12 @@ export default function SeasonStats({ seasons }) {
   };
 
   return (
-    <div className="bg-gradient-to-br from-white to-emerald-50/20 rounded-2xl shadow-md p-6 w-full h-full flex flex-col border border-emerald-100/40">
-      <h3 className="text-lg font-bold mb-4 text-[#638CCC]">
-        {language === 'ko' ? '시즌 선호도' : language === 'ja' ? 'シーズンの好み' : 'Season Preferences'}
-      </h3>
+    <div className="bg-surface rounded-xl shadow-lg border border-border p-6 w-full h-full flex flex-col">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-base font-semibold text-text-primary">
+          {language === 'ko' ? '시즌 선호도' : language === 'ja' ? 'シーズンの好み' : 'Season Preferences'}
+        </h3>
+      </div>
 
       <div className="space-y-3">
         {seasons.map((item) => {
@@ -46,25 +48,25 @@ export default function SeasonStats({ seasons }) {
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">{seasonEmojis[item.season]}</span>
-                  <span className="text-sm font-bold text-[#638CCC]">
+                  <span className="text-sm font-bold text-text-primary">
                     {seasonNames[item.season] || item.season}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600 font-medium">
+                  <span className="text-sm text-text-secondary font-medium">
                     {item.count}{language === 'ko' ? '개' : language === 'ja' ? '作品' : ' titles'}
                   </span>
-                  <span className="text-sm font-bold text-[#638CCC]">{percentage}%</span>
+                  <span className="text-sm font-bold text-primary">{percentage}%</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex-1 bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                <div className="flex-1 bg-surface-elevated rounded-full h-2.5 overflow-hidden">
                   <div
                     className="h-2.5 rounded-full transition-all duration-500 shadow-sm"
                     style={{ width: `${percentage}%`, background: gradient }}
                   />
                 </div>
-                <span className="text-xs text-amber-500 font-bold">★ {item.average_rating?.toFixed(1)}</span>
+                <span className="text-xs text-accent font-bold">★ {item.average_rating?.toFixed(1)}</span>
               </div>
             </div>
           );

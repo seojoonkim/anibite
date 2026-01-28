@@ -319,15 +319,6 @@ def update_character(
     if verify_result:
         print(f"[Admin Editor] After update - image_url: {verify_result[0][0]}, image_local: {verify_result[0][1]}")
 
-    # activities 테이블도 업데이트 (캐릭터 이름 변경 시)
-    if "name_korean" in updates:
-        db.execute_update("""
-            UPDATE activities
-            SET item_title_korean = ?
-            WHERE activity_type IN ('character_rating', 'character_review')
-              AND item_id = ?
-        """, (updates["name_korean"], character_id))
-
     return {"message": "Character updated successfully", "updated_fields": list(updates.keys())}
 
 

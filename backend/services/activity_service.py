@@ -3,9 +3,12 @@ Activity Service - Unified activity management
 
 Handles all user activities (anime ratings/reviews, character ratings/reviews, user posts)
 from a single 'activities' table.
+
+NORMALIZED: Item titles and images are fetched via JOIN, not stored in activities table.
 """
 from typing import List, Optional, Dict
 from database import Database, dict_from_row, db as default_db
+
 
 def get_activities(
     db: Database,
@@ -38,9 +41,9 @@ def get_activities(
     params = []
 
     # Build JOIN clause for following_only filter (more efficient than subquery)
-    join_clause = ""
+    follow_join = ""
     if following_only and current_user_id:
-        join_clause = "INNER JOIN user_follows uf ON uf.following_id = a.user_id AND uf.follower_id = ?"
+        follow_join = "INNER JOIN user_follows uf ON uf.following_id = a.user_id AND uf.follower_id = ?"
         params.append(current_user_id)
 
     if activity_type:
@@ -60,15 +63,14 @@ def get_activities(
     # Get total count
     count_params = params.copy()
     total_row = db.execute_query(
-        f"SELECT COUNT(*) as total FROM activities a {join_clause} WHERE {where_sql}",
+        f"SELECT COUNT(*) as total FROM activities a {follow_join} WHERE {where_sql}",
         tuple(count_params),
         fetch_one=True
     )
     total = total_row['total'] if total_row else 0
 
     # Get activities with engagement counts
-    # IMPORTANT: Parameters must be in the order they appear in the SQL!
-    # Placeholders in SELECT come before WHERE in the SQL text
+    # NORMALIZED: JOIN anime/character tables to get titles dynamically
     query_params = []
 
     # Add current_user_id twice for liked check (FIRST in SQL)
@@ -83,14 +85,76 @@ def get_activities(
     rows = db.execute_query(
         f"""
         SELECT
-            a.*,
+            a.id,
+            a.activity_type,
+            a.user_id,
+            a.username,
+            a.display_name,
+            a.avatar_url,
             COALESCE(us.otaku_score, a.otaku_score, 0) as otaku_score,
+            a.item_id,
+            -- Item title: from anime or character table based on activity_type
+            CASE
+                WHEN a.activity_type IN ('anime_rating', 'anime_review') THEN an.title_romaji
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN ch.name_full
+                ELSE a.item_title
+            END as item_title,
+            CASE
+                WHEN a.activity_type IN ('anime_rating', 'anime_review') THEN an.title_korean
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN ch.name_korean
+                ELSE a.item_title_korean
+            END as item_title_korean,
+            CASE
+                WHEN a.activity_type IN ('anime_rating', 'anime_review') THEN an.title_native
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN ch.name_native
+                ELSE a.item_title_native
+            END as item_title_native,
+            -- Item image: from anime or character table
+            CASE
+                WHEN a.activity_type IN ('anime_rating', 'anime_review') THEN COALESCE('/' || an.cover_image_local, an.cover_image_url)
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN COALESCE(ch.image_local, ch.image_url)
+                ELSE a.item_image
+            END as item_image,
+            a.rating,
+            a.review_title,
+            a.review_content,
+            a.is_spoiler,
+            -- For character activities: anime info from anime_character join
+            CASE
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.id
+                ELSE NULL
+            END as anime_id,
+            CASE
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.title_romaji
+                ELSE NULL
+            END as anime_title,
+            CASE
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.title_korean
+                ELSE NULL
+            END as anime_title_korean,
+            CASE
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.title_native
+                ELSE NULL
+            END as anime_title_native,
+            a.metadata,
             COALESCE(likes.count, 0) as likes_count,
             COALESCE(comments.count, 0) as comments_count,
-            CASE WHEN ? IS NOT NULL AND user_like.activity_id IS NOT NULL THEN 1 ELSE 0 END as user_liked
+            CASE WHEN ? IS NOT NULL AND user_like.activity_id IS NOT NULL THEN 1 ELSE 0 END as user_liked,
+            a.activity_time,
+            a.created_at,
+            a.updated_at
         FROM activities a
-        {join_clause}
+        {follow_join}
+        -- JOIN anime table for anime activities
+        LEFT JOIN anime an ON a.activity_type IN ('anime_rating', 'anime_review') AND a.item_id = an.id
+        -- JOIN character table for character activities
+        LEFT JOIN character ch ON a.activity_type IN ('character_rating', 'character_review') AND a.item_id = ch.id
+        -- JOIN anime_character to get the anime for character activities
+        LEFT JOIN anime_character ac ON ch.id = ac.character_id AND ac.role = 'MAIN'
+        LEFT JOIN anime char_anime ON ac.anime_id = char_anime.id
+        -- User stats
         LEFT JOIN user_stats us ON a.user_id = us.user_id
+        -- Engagement counts
         LEFT JOIN (
             SELECT activity_id, COUNT(*) as count
             FROM activity_likes
@@ -141,7 +205,7 @@ def get_activities(
 
 
 def get_activity_by_id(activity_id: int, current_user_id: Optional[int] = None, db: Database = None) -> Optional[Dict]:
-    """Get a single activity by ID"""
+    """Get a single activity by ID with normalized JOINs"""
 
     if db is None:
         db = default_db
@@ -152,13 +216,75 @@ def get_activity_by_id(activity_id: int, current_user_id: Optional[int] = None, 
     row = db.execute_query(
         """
         SELECT
-            a.*,
+            a.id,
+            a.activity_type,
+            a.user_id,
+            a.username,
+            a.display_name,
+            a.avatar_url,
             COALESCE(us.otaku_score, a.otaku_score, 0) as otaku_score,
+            a.item_id,
+            -- Item title: from anime or character table based on activity_type
+            CASE
+                WHEN a.activity_type IN ('anime_rating', 'anime_review') THEN an.title_romaji
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN ch.name_full
+                ELSE a.item_title
+            END as item_title,
+            CASE
+                WHEN a.activity_type IN ('anime_rating', 'anime_review') THEN an.title_korean
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN ch.name_korean
+                ELSE a.item_title_korean
+            END as item_title_korean,
+            CASE
+                WHEN a.activity_type IN ('anime_rating', 'anime_review') THEN an.title_native
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN ch.name_native
+                ELSE a.item_title_native
+            END as item_title_native,
+            -- Item image: from anime or character table
+            CASE
+                WHEN a.activity_type IN ('anime_rating', 'anime_review') THEN COALESCE('/' || an.cover_image_local, an.cover_image_url)
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN COALESCE(ch.image_local, ch.image_url)
+                ELSE a.item_image
+            END as item_image,
+            a.rating,
+            a.review_title,
+            a.review_content,
+            a.is_spoiler,
+            -- For character activities: anime info from anime_character join
+            CASE
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.id
+                ELSE NULL
+            END as anime_id,
+            CASE
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.title_romaji
+                ELSE NULL
+            END as anime_title,
+            CASE
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.title_korean
+                ELSE NULL
+            END as anime_title_korean,
+            CASE
+                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.title_native
+                ELSE NULL
+            END as anime_title_native,
+            a.metadata,
             COALESCE(likes.count, 0) as likes_count,
             COALESCE(comments.count, 0) as comments_count,
-            CASE WHEN ? IS NOT NULL AND user_like.activity_id IS NOT NULL THEN 1 ELSE 0 END as user_liked
+            CASE WHEN ? IS NOT NULL AND user_like.activity_id IS NOT NULL THEN 1 ELSE 0 END as user_liked,
+            a.activity_time,
+            a.created_at,
+            a.updated_at
         FROM activities a
+        -- JOIN anime table for anime activities
+        LEFT JOIN anime an ON a.activity_type IN ('anime_rating', 'anime_review') AND a.item_id = an.id
+        -- JOIN character table for character activities
+        LEFT JOIN character ch ON a.activity_type IN ('character_rating', 'character_review') AND a.item_id = ch.id
+        -- JOIN anime_character to get the anime for character activities
+        LEFT JOIN anime_character ac ON ch.id = ac.character_id AND ac.role = 'MAIN'
+        LEFT JOIN anime char_anime ON ac.anime_id = char_anime.id
+        -- User stats
         LEFT JOIN user_stats us ON a.user_id = us.user_id
+        -- Engagement counts
         LEFT JOIN (
             SELECT activity_id, COUNT(*) as count
             FROM activity_likes
@@ -233,7 +359,7 @@ def create_activity(
     if not user:
         raise ValueError(f"User {user_id} not found")
 
-    # Insert activity
+    # Insert activity (no item_title etc - they will be JOINed on read)
     activity_id = db.execute_insert(
         """
         INSERT INTO activities (

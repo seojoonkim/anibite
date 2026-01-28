@@ -26,6 +26,7 @@ import { characterService } from '../../services/characterService';
 import { userPostService } from '../../services/userPostService';
 import { activityService } from '../../services/activityService';
 import { bookmarkService } from '../../services/bookmarkService';
+import { getCharacterImageUrl, getCharacterImageFallback } from '../../utils/imageHelpers';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL || API_BASE_URL;
@@ -241,17 +242,28 @@ const ActivityCard = forwardRef(({
 
   const levelInfo = getCurrentLevelInfo(activity.otaku_score || 0, language);
 
-  // Calculate item image src with useMemo - try R2 first
+  // Calculate item image src with useMemo - use centralized helper for API proxy
   const itemImageSrc = useMemo(() => {
     const url = activity.item_image;
     if (!url) return null;
 
-    // If it's an AniList character image, try R2 first
+    // For character images, use the centralized helper (routes through API proxy)
     if (url.includes('anilist.co') && url.includes('/character/')) {
+      // Extract character ID from URL or use item_id if it's a character rating
       const match = url.match(/\/b(\d+)-/);
-      if (match && match[1]) {
-        const characterId = match[1];
-        return `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
+      const characterId = match && match[1] ? match[1] :
+        (activity.activity_type === 'character_rating' ? activity.item_id : null);
+      return getCharacterImageUrl(characterId, url);
+    }
+
+    // For character images from R2 paths, extract ID and use API proxy
+    if (url.startsWith('/images/characters/')) {
+      // Extract character ID from path like "/images/characters/8485.jpg"
+      const match = url.match(/\/images\/characters\/(\d+)\./);
+      const characterId = match && match[1] ? match[1] :
+        (activity.activity_type === 'character_rating' ? activity.item_id : null);
+      if (characterId) {
+        return `${API_BASE_URL}/api/images/characters/${characterId}.jpg`;
       }
     }
 
@@ -262,31 +274,16 @@ const ActivityCard = forwardRef(({
 
     // External URLs (AniList, etc) - use placeholder
     return '/placeholder-anime.svg';
-  }, [activity.item_image]);
+  }, [activity.item_image, activity.item_id, activity.activity_type]);
 
-  // Handle item image load error - try different R2 extensions
+  // Handle item image load error - use centralized fallback helper
   const handleItemImageError = (e) => {
-    const currentSrc = e.target.src;
-    const extensionOrder = ['jpg', 'png', 'jpeg', 'webp', 'gif'];
-
-    // If current src is R2 character image, try next extension
-    if (currentSrc && currentSrc.includes('/images/characters/')) {
-      const currentExtMatch = currentSrc.match(/\.([a-z]+)$/i);
-      if (currentExtMatch && currentExtMatch[1]) {
-        const currentExt = currentExtMatch[1].toLowerCase();
-        const currentIndex = extensionOrder.indexOf(currentExt);
-
-        // Try next extension in the order
-        if (currentIndex !== -1 && currentIndex < extensionOrder.length - 1) {
-          const nextExt = extensionOrder[currentIndex + 1];
-          e.target.src = currentSrc.replace(/\.[a-z]+$/i, `.${nextExt}`);
-          return;
-        }
-      }
+    const nextSrc = getCharacterImageFallback(activity.item_image, e.target.src);
+    if (nextSrc) {
+      e.target.src = nextSrc;
+    } else {
+      e.target.src = '/placeholder-anime.svg';
     }
-
-    // All extensions tried or not an R2 image - use placeholder
-    e.target.src = '/placeholder-anime.svg';
   };
 
   // Handlers
@@ -523,12 +520,13 @@ const ActivityCard = forwardRef(({
                   {activity.display_name || activity.username}
                 </Link>
                 <span
-                  className={`text-xs px-2 py-0.5 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}
+                  className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                  style={{ backgroundColor: levelInfo.bgColor, border: `1px solid ${levelInfo.borderColorHex}` }}
                 >
                   <span style={{ color: levelInfo.color }} className="font-bold">
                     {levelInfo.icon}
                   </span>{' '}
-                  <span className="text-gray-700">
+                  <span style={{ color: levelInfo.color }}>
                     {levelInfo.level} - {toRoman(levelInfo.rank)}
                   </span>
                 </span>
@@ -695,8 +693,8 @@ const ActivityCard = forwardRef(({
                   activity.rating >= starValue
                     ? 100
                     : activity.rating > i
-                    ? (activity.rating - i) * 100
-                    : 0;
+                      ? (activity.rating - i) * 100
+                      : 0;
 
                 return (
                   <div key={i} className="relative w-6 h-6">
@@ -761,66 +759,66 @@ const ActivityCard = forwardRef(({
 
       {/* Actions: Like, Comment, Bookmark */}
       <div className="mt-3 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {/* Like Button */}
-              <button
-                onClick={handleLikeClick}
-                className="flex items-center gap-1 transition-all hover:scale-105"
-                style={{
-                  color: liked ? '#DC2626' : '#6B7280'
-                }}
-              >
-                {liked ? (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
-                ) : (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
-                )}
-                <span className="text-xs font-medium">
-                  {language === 'ko' ? '좋아요' : language === 'ja' ? 'いいね' : 'Like'}
-                  {likesCount > 0 && <> {likesCount}</>}
-                </span>
-              </button>
+        <div className="flex items-center gap-4">
+          {/* Like Button */}
+          <button
+            onClick={handleLikeClick}
+            className="flex items-center gap-1 transition-all hover:scale-105"
+            style={{
+              color: liked ? '#DC2626' : '#6B7280'
+            }}
+          >
+            {liked ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+            )}
+            <span className="text-xs font-medium">
+              {language === 'ko' ? '좋아요' : language === 'ja' ? 'いいね' : 'Like'}
+              {likesCount > 0 && <> {likesCount}</>}
+            </span>
+          </button>
 
-              {/* Comment Button */}
-              <button
-                onClick={() => setShowComments(!showComments)}
-                className="flex items-center gap-1 transition-all hover:scale-105 text-gray-600 hover:text-primary-light"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
-                <span className="text-xs font-medium">
-                  {language === 'ko' ? '댓글' : language === 'ja' ? 'コメント' : 'Comment'}
-                  {activity.comments_count > 0 && <> {activity.comments_count}</>}
-                </span>
-              </button>
-            </div>
+          {/* Comment Button */}
+          <button
+            onClick={() => setShowComments(!showComments)}
+            className="flex items-center gap-1 transition-all hover:scale-105 text-gray-600 hover:text-primary-light"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span className="text-xs font-medium">
+              {language === 'ko' ? '댓글' : language === 'ja' ? 'コメント' : 'Comment'}
+              {activity.comments_count > 0 && <> {activity.comments_count}</>}
+            </span>
+          </button>
+        </div>
 
-            {/* Bookmark Button */}
-            <button
-              onClick={handleBookmarkClick}
-              className="transition-all hover:scale-105"
-            >
-              {bookmarked ? (
-                <svg width="18" height="18" viewBox="0 0 24 24">
-                  <defs>
-                    <linearGradient id="bookmark-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" style={{ stopColor: '#FF6B6B', stopOpacity: 1 }} />
-                      <stop offset="100%" style={{ stopColor: '#FF4757', stopOpacity: 1 }} />
-                    </linearGradient>
-                  </defs>
-                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" fill="url(#bookmark-gradient)" />
-                </svg>
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2">
-                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                </svg>
-              )}
-            </button>
+        {/* Bookmark Button */}
+        <button
+          onClick={handleBookmarkClick}
+          className="transition-all hover:scale-105"
+        >
+          {bookmarked ? (
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <defs>
+                <linearGradient id="bookmark-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{ stopColor: '#FF6B6B', stopOpacity: 1 }} />
+                  <stop offset="100%" style={{ stopColor: '#FF4757', stopOpacity: 1 }} />
+                </linearGradient>
+              </defs>
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" fill="url(#bookmark-gradient)" />
+            </svg>
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+            </svg>
+          )}
+        </button>
       </div>
 
       {/* Comments Section */}

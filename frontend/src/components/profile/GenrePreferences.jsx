@@ -6,9 +6,11 @@ export default function GenrePreferences({ preferences }) {
   if (!preferences || preferences.length === 0) {
     return (
       <div className="bg-surface rounded-xl shadow-lg border border-border p-6 w-full h-full flex flex-col">
-        <h3 className="text-lg font-bold text-primary mb-4">
-          {language === 'ko' ? '선호 장르' : language === 'ja' ? 'お気に入りのジャンル' : 'Favorite Genres'}
-        </h3>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-base font-semibold text-text-primary">
+            {language === 'ko' ? '선호 장르' : language === 'ja' ? 'お気に入りのジャンル' : 'Favorite Genres'}
+          </h3>
+        </div>
         <p className="text-sm text-text-secondary">
           {language === 'ko' ? '아직 충분한 데이터가 없습니다.' : language === 'ja' ? 'まだ十分なデータがありません。' : 'Not enough data yet.'}
         </p>
@@ -32,9 +34,11 @@ export default function GenrePreferences({ preferences }) {
 
   return (
     <div className="bg-surface rounded-xl shadow-lg border border-border p-6 w-full h-full flex flex-col">
-      <h3 className="text-lg font-bold text-primary mb-4">
-        {language === 'ko' ? '선호 장르 Top 5' : language === 'ja' ? 'お気に入りのジャンルTOP 5' : 'Top 5 Favorite Genres'}
-      </h3>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-base font-semibold text-text-primary">
+          {language === 'ko' ? '선호 장르 Top 5' : language === 'ja' ? 'お気に入りのジャンルTOP 5' : 'Top 5 Favorite Genres'}
+        </h3>
+      </div>
 
       <div className="space-y-3">
         {preferences.slice(0, 5).map((pref, index) => {

@@ -9,7 +9,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 // Retry configuration
 const MAX_RETRIES = 3;
 const RETRY_DELAY_BASE = 1000; // 1 second base delay
-const RETRYABLE_STATUS_CODES = [502, 503, 504];
+const RETRYABLE_STATUS_CODES = [0, 408, 429, 500, 502, 503, 504]; // Include timeout, rate limit, and server errors
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -44,10 +44,11 @@ api.interceptors.response.use(
     // Initialize retry count
     config.__retryCount = config.__retryCount || 0;
 
-    // Check if we should retry (502, 503, 504 or network error)
-    const shouldRetry =
-      config.__retryCount < MAX_RETRIES &&
-      (RETRYABLE_STATUS_CODES.includes(error.response?.status) || !error.response);
+    // Check if we should retry (network error, CORS error, or server error)
+    // CORS errors appear as network errors with no response
+    const isNetworkOrCorsError = !error.response || error.message?.includes('Network Error');
+    const isRetryableStatus = RETRYABLE_STATUS_CODES.includes(error.response?.status);
+    const shouldRetry = config.__retryCount < MAX_RETRIES && (isNetworkOrCorsError || isRetryableStatus);
 
     if (shouldRetry) {
       config.__retryCount += 1;

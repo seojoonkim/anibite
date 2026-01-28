@@ -120,7 +120,8 @@ export default function ActivityComments({
                         {comment.display_name || comment.username}
                       </Link>
                       <span
-                        className={`text-[11px] px-2 py-0.5 rounded-full font-semibold ${levelInfo.bgGradient} border ${levelInfo.borderColor}`}
+                        className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                        style={{ backgroundColor: levelInfo.bgColor, border: `1px solid ${levelInfo.borderColorHex}` }}
                       >
                         <span style={{ color: levelInfo.color }} className="font-bold">
                           {levelInfo.icon}
@@ -227,7 +228,8 @@ export default function ActivityComments({
                                     {reply.display_name || reply.username}
                                   </Link>
                                   <span
-                                    className={`text-[11px] px-2 py-0.5 rounded-full font-semibold ${replyLevelInfo.bgGradient} border ${replyLevelInfo.borderColor}`}
+                                    className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                                    style={{ backgroundColor: replyLevelInfo.bgColor, border: `1px solid ${replyLevelInfo.borderColorHex}` }}
                                   >
                                     <span style={{ color: replyLevelInfo.color }} className="font-bold">
                                       {replyLevelInfo.icon}

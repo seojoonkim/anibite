@@ -16,7 +16,7 @@ import ActivityCard from '../components/activity/ActivityCard';
 import NotificationCard from '../components/feed/NotificationCard';
 import EditReviewModal from '../components/common/EditReviewModal';
 import DefaultAvatar from '../components/common/DefaultAvatar';
-import { getAvatarUrl as getAvatarUrlHelper } from '../utils/imageHelpers';
+import { getAvatarUrl as getAvatarUrlHelper, getCharacterImageUrl, getCharacterImageFallback } from '../utils/imageHelpers';
 import { IMAGE_BASE_URL } from '../config/api';
 
 export default function Feed() {
@@ -240,16 +240,22 @@ export default function Feed() {
     return getAvatarUrlHelper(avatarUrl) || '/placeholder-avatar.png';
   };
 
-  const getItemImageUrl = (url) => {
+  const getItemImageUrl = (url, characterId = null) => {
     if (!url) return '/placeholder-anime.svg';
 
-    // If it's an AniList character image, try R2 first
-    if (url.includes('anilist.co') && url.includes('/character/')) {
-      const match = url.match(/\/b(\d+)-/);
-      if (match && match[1]) {
-        const characterId = match[1];
-        return `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
+    // For character images from R2 paths, extract ID and use API proxy
+    if (url.startsWith('/images/characters/')) {
+      // Extract character ID from path like "/images/characters/8485.jpg"
+      const match = url.match(/\/images\/characters\/(\d+)\./);
+      const extractedId = match && match[1] ? match[1] : characterId;
+      if (extractedId) {
+        return `${API_BASE_URL}/api/images/characters/${extractedId}.jpg`;
       }
+    }
+
+    // For character images from AniList URLs, use the centralized helper
+    if (url.includes('anilist.co') && url.includes('/character/')) {
+      return getCharacterImageUrl(characterId, url);
     }
 
     // If it's a relative path, use IMAGE_BASE_URL
@@ -470,8 +476,8 @@ export default function Feed() {
                   <button
                     onClick={() => setSearchParams({ filter: 'all' })}
                     className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3 ${feedFilter === 'all'
-                        ? 'bg-[#3797F0] text-white font-semibold'
-                        : 'text-gray-600 hover:text-black hover:bg-gray-100'
+                      ? 'bg-[#3797F0] text-white font-semibold'
+                      : 'text-gray-600 hover:text-black hover:bg-gray-100'
                       }`}
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -486,8 +492,8 @@ export default function Feed() {
                   <button
                     onClick={() => setSearchParams({ filter: 'following' })}
                     className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3 ${feedFilter === 'following'
-                        ? 'bg-[#3797F0] text-white font-semibold'
-                        : 'text-gray-600 hover:text-black hover:bg-gray-100'
+                      ? 'bg-[#3797F0] text-white font-semibold'
+                      : 'text-gray-600 hover:text-black hover:bg-gray-100'
                       }`}
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -502,8 +508,8 @@ export default function Feed() {
                   <button
                     onClick={() => setSearchParams({ filter: 'notifications' })}
                     className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3 ${feedFilter === 'notifications'
-                        ? 'bg-[#3797F0] text-white font-semibold'
-                        : 'text-gray-600 hover:text-black hover:bg-gray-100'
+                      ? 'bg-[#3797F0] text-white font-semibold'
+                      : 'text-gray-600 hover:text-black hover:bg-gray-100'
                       }`}
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -516,8 +522,8 @@ export default function Feed() {
                   <button
                     onClick={() => setSearchParams({ filter: 'saved' })}
                     className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3 ${feedFilter === 'saved'
-                        ? 'bg-[#3797F0] text-white font-semibold'
-                        : 'text-gray-600 hover:text-black hover:bg-gray-100'
+                      ? 'bg-[#3797F0] text-white font-semibold'
+                      : 'text-gray-600 hover:text-black hover:bg-gray-100'
                       }`}
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
