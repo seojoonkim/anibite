@@ -1860,7 +1860,7 @@ export default function MyAniPass() {
                   <div className="w-full">
                     {stats && (
                       <div className="bg-surface rounded-xl shadow-lg border border-border p-6 h-full">
-                        <h3 className="text-lg font-bold text-text-primary mb-4 pb-3 border-b border-border">
+                        <h3 className="text-base font-semibold text-text-primary mb-4">
                           {language === 'ko' ? '통계' : language === 'ja' ? '統計' : 'Statistics'}
                         </h3>
                         <div className="space-y-4">

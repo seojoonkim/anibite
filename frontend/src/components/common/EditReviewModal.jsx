@@ -195,12 +195,17 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               {language === 'ko' ? '별점' : language === 'ja' ? '評価' : 'Rating'} *
             </label>
-            <StarRating
-              rating={formData.rating}
-              onRatingChange={(rating) => setFormData({ ...formData, rating })}
-              size="lg"
-              showNumber={true}
-            />
+            <div className="flex items-center gap-4">
+              <StarRating
+                rating={formData.rating}
+                onRatingChange={(rating) => setFormData({ ...formData, rating })}
+                size="xl"
+                showNumber={false}
+              />
+              {formData.rating > 0 && (
+                <span className="text-2xl font-bold text-gray-700">{formData.rating.toFixed(1)}</span>
+              )}
+            </div>
           </div>
 
           {/* Review Content */}
