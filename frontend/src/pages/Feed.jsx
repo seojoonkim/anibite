@@ -43,6 +43,8 @@ export default function Feed() {
   // Scroll observer ref
   const observerRef = useRef(null);
   const loadMoreTriggerRef = useRef(null);
+  const sidebarRef = useRef(null);
+  const [sidebarFixed, setSidebarFixed] = useState(false);
 
   // Cache removed - was causing inconsistent data on tab switching
 
@@ -80,6 +82,22 @@ export default function Feed() {
   // This prevents flickering when switching tabs
 
   // No auto-load for 'saved' filter - we fetch bookmarked activities from server
+
+  // Sidebar scroll fix - force it to stay fixed
+  useEffect(() => {
+    const handleScroll = () => {
+      const navbar = document.querySelector('nav');
+      const navbarHeight = navbar ? navbar.offsetHeight : 48;
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+      setSidebarFixed(scrollTop > navbarHeight);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial check
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
@@ -480,11 +498,14 @@ export default function Feed() {
         <div className="flex flex-col md:flex-row gap-6 md:items-start">
           {/* Left Sidebar - Filter Menu */}
           <aside
-            className="hidden md:block md:w-64 flex-shrink-0 sticky"
+            ref={sidebarRef}
+            className="hidden md:block md:w-64 flex-shrink-0"
             style={{
-              top: '60px',
+              position: sidebarFixed ? 'fixed' : 'relative',
+              top: sidebarFixed ? '60px' : 'auto',
               maxHeight: 'calc(100vh - 80px)',
-              overflow: 'auto'
+              overflow: 'auto',
+              width: '256px'
             }}
           >
             <nav className="flex flex-col gap-2">
