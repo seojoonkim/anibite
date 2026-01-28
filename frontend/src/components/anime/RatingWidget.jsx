@@ -101,14 +101,13 @@ export default function RatingWidget({ animeId, currentRating, onRate, onStatusC
 
       {/* Rating Display/Input */}
       <div className="mb-6 flex flex-col items-center w-full">
-        <div className="w-full">
+        <div className="flex justify-center">
           <StarRating
             rating={tempRating}
             onRatingChange={handleRatingChange}
-            size="xl"
+            size="lg"
             align="center"
             showNumber={false}
-            dynamicSize={true}
           />
         </div>
         {tempRating > 0 && (
