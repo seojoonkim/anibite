@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { getCurrentLevelInfo } from '../../utils/otakuLevels';
+import DefaultAvatar from '../common/DefaultAvatar';
 
 export default function ActivityComments({
   comments,
@@ -46,17 +47,15 @@ export default function ActivityComments({
               <img
                 src={getAvatarUrl(currentUser.avatar_url)}
                 alt={currentUser.display_name || currentUser.username}
-                className="w-7 h-7 rounded-full object-cover flex-shrink-0"
+                className="w-7 h-7 rounded-full object-cover flex-shrink-0 border border-border"
               />
             ) : (
-              <div
-                className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ background: 'linear-gradient(to bottom right, #90B2E4, #638CCC)' }}
-              >
-                <span className="text-white text-[13px] font-bold">
-                  {(currentUser.display_name || currentUser.username || '?').charAt(0).toUpperCase()}
-                </span>
-              </div>
+              <DefaultAvatar
+                username={currentUser.username}
+                displayName={currentUser.display_name}
+                size="xs"
+                className="w-7 h-7 flex-shrink-0"
+              />
             )}
             <div className="flex-1 flex gap-2">
               <input
@@ -103,14 +102,12 @@ export default function ActivityComments({
                         className="w-6 h-6 rounded-full object-cover"
                       />
                     ) : (
-                      <div
-                        className="w-6 h-6 rounded-full flex items-center justify-center"
-                        style={{ background: 'linear-gradient(to bottom right, #90B2E4, #638CCC)' }}
-                      >
-                        <span className="text-white text-[13px] font-bold">
-                          {(comment.display_name || comment.username || '?').charAt(0).toUpperCase()}
-                        </span>
-                      </div>
+                      <DefaultAvatar
+                        username={comment.username}
+                        displayName={comment.display_name}
+                        size="xs"
+                        className="w-6 h-6"
+                      />
                     )}
                   </Link>
 
@@ -212,14 +209,12 @@ export default function ActivityComments({
                                     className="w-5 h-5 rounded-full object-cover"
                                   />
                                 ) : (
-                                  <div
-                                    className="w-5 h-5 rounded-full flex items-center justify-center"
-                                    style={{ background: 'linear-gradient(to bottom right, #90B2E4, #638CCC)' }}
-                                  >
-                                    <span className="text-white text-[11px] font-bold">
-                                      {(reply.display_name || reply.username || '?').charAt(0).toUpperCase()}
-                                    </span>
-                                  </div>
+                                  <DefaultAvatar
+                                    username={reply.username}
+                                    displayName={reply.display_name}
+                                    size="xs"
+                                    className="w-5 h-5"
+                                  />
                                 )}
                               </Link>
 

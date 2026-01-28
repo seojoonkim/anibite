@@ -15,6 +15,7 @@ import { bookmarkService } from '../services/bookmarkService';
 import ActivityCard from '../components/activity/ActivityCard';
 import NotificationCard from '../components/feed/NotificationCard';
 import EditReviewModal from '../components/common/EditReviewModal';
+import DefaultAvatar from '../components/common/DefaultAvatar';
 import { getAvatarUrl as getAvatarUrlHelper } from '../utils/imageHelpers';
 import { IMAGE_BASE_URL } from '../config/api';
 
@@ -542,11 +543,12 @@ export default function Feed() {
                       className="w-12 h-12 rounded-full object-cover border border-gray-200"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center border border-gray-200" style={{ backgroundColor: '#364F6B' }}>
-                      <span className="text-white text-base font-bold">
-                        {(user.display_name || user.username || '?').charAt(0).toUpperCase()}
-                      </span>
-                    </div>
+                    <DefaultAvatar
+                      username={user.username}
+                      displayName={user.display_name}
+                      size="lg"
+                      className="w-12 h-12"
+                    />
                   )}
                   <div className="flex-1">
                     <textarea
