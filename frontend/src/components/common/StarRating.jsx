@@ -144,7 +144,7 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
       ref={containerRef}
     >
       <div
-        className={`flex items-center ${gapClasses[size]} ${sizeClass}`}
+        className={`flex items-center ${gapClasses[size]} ${sizeClass} max-w-full`}
         style={finalSize ? { fontSize: finalSize } : {}}
         onMouseLeave={handleMouseLeave}
       >
@@ -157,7 +157,7 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
             disabled={readonly}
             className={`${sizeClasses[size]} ${
               readonly ? 'cursor-default' : 'cursor-pointer hover:scale-110'
-            } transition-transform flex-shrink-0`}
+            } transition-transform`}
             style={finalSize ? { width: finalSize, height: finalSize } : {}}
           >
             <StarIcon type={getStarType(position)} />
