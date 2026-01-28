@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { animeService } from '../services/animeService';
 import { useAuth } from '../context/AuthContext';
@@ -18,25 +18,35 @@ export default function Browse() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [sort, setSort] = useState('popularity_desc');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [searchMode, setSearchMode] = useState(false); // true when searching
+  const [searchMode, setSearchMode] = useState(false);
   const observerRef = useRef(null);
   const loadMoreTriggerRef = useRef(null);
 
-  // Load on mount and when sort changes
+  // Debounce search term (300ms delay)
   useEffect(() => {
-    if (searchTerm) {
-      performSearch();
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Perform search when debounced term or sort changes
+  useEffect(() => {
+    if (debouncedSearchTerm.trim()) {
+      performSearch(debouncedSearchTerm);
     } else {
       loadAnime(true);
     }
-  }, [sort]);
+  }, [debouncedSearchTerm, sort]);
 
   // Unified search function
-  const performSearch = async () => {
-    if (!searchTerm.trim()) {
+  const performSearch = async (query) => {
+    if (!query || !query.trim()) {
       setSearchMode(false);
       loadAnime(true);
       return;
@@ -48,16 +58,16 @@ export default function Browse() {
       setError('');
 
       const response = await api.get('/api/search', {
-        params: { q: searchTerm, sort, limit: 30 }
+        params: { q: query.trim(), sort, limit: 30 }
       });
 
       setAnimeList(response.data.anime || []);
       setCharacterList(response.data.characters || []);
-      setHasMore(false); // Unified search doesn't support pagination yet
+      setHasMore(false);
       setInitialLoading(false);
     } catch (err) {
       console.error('Search failed:', err);
-      setError('검색에 실패했습니다.');
+      setError(language === 'ko' ? '검색에 실패했습니다.' : language === 'ja' ? '検索に失敗しました。' : 'Search failed.');
       setInitialLoading(false);
     }
   };
@@ -124,15 +134,6 @@ export default function Browse() {
     }
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchTerm.trim()) {
-      performSearch();
-    } else {
-      loadAnime(true);
-    }
-  };
-
   const handleSortChange = (value) => {
     setSort(value);
     setPage(1);
@@ -140,9 +141,9 @@ export default function Browse() {
 
   const handleClearSearch = () => {
     setSearchTerm('');
+    setDebouncedSearchTerm('');
     setSearchMode(false);
     setCharacterList([]);
-    loadAnime(true);
   };
 
   const handleLoadMore = () => {
@@ -173,9 +174,9 @@ export default function Browse() {
     <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
 
       <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        {/* Search Bar - Sort on left, search input, search button */}
+        {/* Search Bar - Sort on left, search input (real-time search) */}
         <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-4 mb-6">
-          <form onSubmit={handleSearch} className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
             {/* Sort Dropdown */}
             <select
               value={sort}
@@ -188,14 +189,17 @@ export default function Browse() {
               <option value="title_asc">{t('sortTitle')}</option>
             </select>
 
-            {/* Search Input */}
+            {/* Search Input - Real-time search */}
             <div className="flex-1 relative">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={language === 'ko' ? '애니메이션, 캐릭터 검색...' : language === 'ja' ? 'アニメ、キャラクター検索...' : 'Search anime, characters...'}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
               />
               {searchTerm && (
                 <button
@@ -209,15 +213,7 @@ export default function Browse() {
                 </button>
               )}
             </div>
-
-            {/* Search Button */}
-            <button
-              type="submit"
-              className="bg-[#3797F0] hover:bg-[#2a7dc4] text-white px-5 py-2 rounded-lg font-medium shadow-sm hover:shadow-md transition-all text-sm whitespace-nowrap"
-            >
-              {t('search')}
-            </button>
-          </form>
+          </div>
         </div>
 
         {/* Error Message */}
