@@ -478,80 +478,73 @@ export default function Feed() {
     <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
 
       <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        <div className="flex flex-col md:flex-row gap-6 md:items-start">
+        <div className="flex flex-col md:flex-row gap-6">
           {/* Left Sidebar - Filter Menu */}
-          <div className="hidden md:block md:w-64 flex-shrink-0">
-            <aside
-              ref={sidebarRef}
-              className="md:sticky"
-              style={{
-                top: '60px',
-                maxHeight: 'calc(100vh - 80px)',
-                overflow: 'auto'
-              }}
-            >
+          <aside
+            ref={sidebarRef}
+            className="hidden md:block md:w-64 flex-shrink-0 sticky top-16 self-start"
+          >
             <nav className="flex flex-col gap-2">
-                  <button
-                    onClick={() => setSearchParams({ filter: 'all' })}
-                    className={`w-full text-left px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2.5 ${feedFilter === 'all'
-                      ? 'bg-[#3797F0] text-white font-semibold'
-                      : 'text-gray-600 hover:text-black hover:bg-gray-100'
-                      }`}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="3" y="3" width="7" height="7"></rect>
-                      <rect x="14" y="3" width="7" height="7"></rect>
-                      <rect x="14" y="14" width="7" height="7"></rect>
-                      <rect x="3" y="14" width="7" height="7"></rect>
-                    </svg>
-                    {language === 'ko' ? '전체 보기' : language === 'ja' ? '全て表示' : 'View All'}
-                  </button>
+              <button
+                onClick={() => setSearchParams({ filter: 'all' })}
+                className={`w-full text-left px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2.5 ${feedFilter === 'all'
+                  ? 'bg-[#3797F0] text-white font-semibold'
+                  : 'text-gray-600 hover:text-black hover:bg-gray-100'
+                  }`}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                {language === 'ko' ? '전체 보기' : language === 'ja' ? '全て表示' : 'View All'}
+              </button>
 
-                  <button
-                    onClick={() => setSearchParams({ filter: 'following' })}
-                    className={`w-full text-left px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2.5 ${feedFilter === 'following'
-                      ? 'bg-[#3797F0] text-white font-semibold'
-                      : 'text-gray-600 hover:text-black hover:bg-gray-100'
-                      }`}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="9" cy="7" r="4"></circle>
-                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    {language === 'ko' ? '팔로잉 보기' : language === 'ja' ? 'フォロー中' : 'Following'}
-                  </button>
+              <button
+                onClick={() => setSearchParams({ filter: 'following' })}
+                className={`w-full text-left px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2.5 ${feedFilter === 'following'
+                  ? 'bg-[#3797F0] text-white font-semibold'
+                  : 'text-gray-600 hover:text-black hover:bg-gray-100'
+                  }`}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                {language === 'ko' ? '팔로잉 보기' : language === 'ja' ? 'フォロー中' : 'Following'}
+              </button>
 
-                  <button
-                    onClick={() => setSearchParams({ filter: 'notifications' })}
-                    className={`w-full text-left px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2.5 ${feedFilter === 'notifications'
-                      ? 'bg-[#3797F0] text-white font-semibold'
-                      : 'text-gray-600 hover:text-black hover:bg-gray-100'
-                      }`}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                    </svg>
-                    {language === 'ko' ? '알림 보기' : language === 'ja' ? '通知' : 'Notifications'}
-                  </button>
+              <button
+                onClick={() => setSearchParams({ filter: 'notifications' })}
+                className={`w-full text-left px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2.5 ${feedFilter === 'notifications'
+                  ? 'bg-[#3797F0] text-white font-semibold'
+                  : 'text-gray-600 hover:text-black hover:bg-gray-100'
+                  }`}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                {language === 'ko' ? '알림 보기' : language === 'ja' ? '通知' : 'Notifications'}
+              </button>
 
-                  <button
-                    onClick={() => setSearchParams({ filter: 'saved' })}
-                    className={`w-full text-left px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2.5 ${feedFilter === 'saved'
-                      ? 'bg-[#3797F0] text-white font-semibold'
-                      : 'text-gray-600 hover:text-black hover:bg-gray-100'
-                      }`}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                    {language === 'ko' ? '저장한 피드' : language === 'ja' ? '保存済み' : 'Saved'}
-                  </button>
+              <button
+                onClick={() => setSearchParams({ filter: 'saved' })}
+                className={`w-full text-left px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2.5 ${feedFilter === 'saved'
+                  ? 'bg-[#3797F0] text-white font-semibold'
+                  : 'text-gray-600 hover:text-black hover:bg-gray-100'
+                  }`}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                </svg>
+                {language === 'ko' ? '저장한 피드' : language === 'ja' ? '保存済み' : 'Saved'}
+              </button>
             </nav>
           </aside>
-          </div>
 
           {/* Right Content - Feed */}
           <div className="flex-1 min-w-0">
