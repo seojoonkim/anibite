@@ -477,12 +477,11 @@ export default function Feed() {
     <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
 
       <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="flex flex-col md:flex-row gap-6">
           {/* Left Sidebar - Filter Menu */}
-          <aside className="hidden md:block md:col-span-1">
-            <div className="sticky top-20 z-40">
-              <nav>
-                <div className="flex flex-col gap-2">
+          <aside className="hidden md:block md:w-64 flex-shrink-0">
+            <nav className="sticky top-[52px] z-40">
+              <div className="flex flex-col gap-2">
                   <button
                     onClick={() => setSearchParams({ filter: 'all' })}
                     className={`w-full text-left px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2.5 ${feedFilter === 'all'
@@ -542,12 +541,11 @@ export default function Feed() {
                     {language === 'ko' ? '저장한 피드' : language === 'ja' ? '保存済み' : 'Saved'}
                   </button>
                 </div>
-              </nav>
-            </div>
+            </nav>
           </aside>
 
           {/* Right Content - Feed */}
-          <div className="md:col-span-3">
+          <div className="flex-1 min-w-0">
             {/* Post Composer */}
             {user && (
               <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 mb-6">

@@ -551,7 +551,7 @@ export default function WriteReviews() {
                   className="rounded-xl transition-all duration-500 ease-out self-start"
                   style={{
                     background: isJustCompleted
-                      ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+                      ? 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)'
                       : 'transparent',
                     padding: isJustCompleted ? '2px' : '0',
                     boxShadow: isJustCompleted
@@ -566,7 +566,7 @@ export default function WriteReviews() {
                       {isJustCompleted && (
                         <div className="absolute top-2 right-2 z-10">
                           <span className="px-3 py-1 text-white text-xs font-bold rounded-full shadow-lg" style={{
-                            background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+                            background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)'
                           }}>
                             {language === 'ko' ? '작성완료' : language === 'ja' ? '作成完了' : 'Completed'}
                           </span>

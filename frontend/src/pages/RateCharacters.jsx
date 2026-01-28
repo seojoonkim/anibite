@@ -392,7 +392,7 @@ export default function RateCharacters() {
                     }`}
                   style={{
                     background: hasRated
-                      ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+                      ? 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)'
                       : 'transparent',
                     padding: hasRated ? '2px' : '0',
                     boxShadow: hasRated
@@ -440,7 +440,7 @@ export default function RateCharacters() {
                         {(hasRated || characterStatuses[character.id]) && (
                           <div className="absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold text-white shadow-lg" style={{
                             background: (hasRated || characterStatuses[character.id] === 'RATED')
-                              ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+                              ? 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)'
                               : characterStatuses[character.id] === 'WANT_TO_KNOW'
                                 ? '#3B82F6'
                                 : '#6B7280'
@@ -465,7 +465,7 @@ export default function RateCharacters() {
                               {[1, 2, 3, 4, 5].map((position) => {
                                 const rating = character.my_rating;
                                 const gradientStyle = {
-                                  background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)',
+                                  background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)',
                                   WebkitBackgroundClip: 'text',
                                   WebkitTextFillColor: 'transparent',
                                   backgroundClip: 'text'
@@ -508,7 +508,7 @@ export default function RateCharacters() {
                                   const displayRating = hoverRating[character.id] || currentRating;
 
                                   const gradientStyle = {
-                                    background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)',
+                                    background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     backgroundClip: 'text'
