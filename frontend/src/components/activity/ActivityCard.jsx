@@ -11,7 +11,7 @@
  *   onUpdate={() => refetch()}
  * />
  */
-import { useState, useEffect, useMemo, forwardRef, useRef } from 'react';
+import { useState, useEffect, useMemo, forwardRef, useRef, memo } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
@@ -277,7 +277,12 @@ const ActivityCard = forwardRef(({
       return `${IMAGE_BASE_URL}${url}`;
     }
 
-    // External URLs (AniList anime covers, etc) - use directly
+    // External URLs (AniList anime covers, etc) - optimize size
+    if (url.includes('anilist.co') && url.includes('/large/')) {
+      // Use medium size for faster loading
+      return url.replace('/large/', '/medium/');
+    }
+
     return url;
   }, [activity.item_image, activity.item_id, activity.activity_type]);
 
@@ -891,4 +896,5 @@ const ActivityCard = forwardRef(({
 
 ActivityCard.displayName = 'ActivityCard';
 
-export default ActivityCard;
+// Memoize to prevent unnecessary re-renders
+export default memo(ActivityCard);

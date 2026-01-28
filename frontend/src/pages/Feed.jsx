@@ -63,7 +63,7 @@ export default function Feed() {
     loadMore,
     reset: resetActivities,
     removeActivity
-  } = useActivityPagination(paginationFilters, 10, skipPagination);
+  } = useActivityPagination(paginationFilters, 8, skipPagination);
 
   // Cache disabled - was causing inconsistent data on tab switching
   // Clear any existing cache on mount
@@ -268,7 +268,12 @@ export default function Feed() {
       return `${IMAGE_BASE_URL}${url}`;
     }
 
-    // External URLs (AniList anime covers, etc) - use directly
+    // External URLs (AniList anime covers, etc) - optimize size
+    if (url.includes('anilist.co') && url.includes('/large/')) {
+      // Use medium size for faster loading
+      return url.replace('/large/', '/medium/');
+    }
+
     return url;
   };
 
