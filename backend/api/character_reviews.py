@@ -2,6 +2,7 @@
 Character Review API Router
 캐릭터 리뷰 생성, 수정, 삭제, 조회, 좋아요
 """
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from models.character_review import (
     CharacterReviewCreate,
@@ -96,21 +97,16 @@ def get_review(review_id: int):
     return review
 
 
-@router.get("/character/{character_id}/my-review", response_model=CharacterReviewResponse)
+@router.get("/character/{character_id}/my-review", response_model=Optional[CharacterReviewResponse])
 def get_my_character_review_endpoint(
     character_id: int,
     current_user: UserResponse = Depends(get_current_user)
 ):
     """
     내가 작성한 특정 캐릭터의 리뷰 조회
+    리뷰가 없으면 null 반환
     """
-    review = get_my_character_review(current_user.id, character_id)
-    if review is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Review not found"
-        )
-    return review
+    return get_my_character_review(current_user.id, character_id)
 
 
 @router.get("/character/{character_id}", response_model=CharacterReviewListResponse)

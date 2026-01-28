@@ -2,6 +2,7 @@
 Review API Router
 리뷰 생성, 수정, 삭제, 조회, 좋아요
 """
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from models.review import ReviewCreate, ReviewUpdate, ReviewResponse, ReviewListResponse
 from models.user import UserResponse
@@ -92,21 +93,16 @@ def get_review(review_id: int):
     return review
 
 
-@router.get("/anime/{anime_id}/my-review", response_model=ReviewResponse)
+@router.get("/anime/{anime_id}/my-review", response_model=Optional[ReviewResponse])
 def get_my_anime_review(
     anime_id: int,
     current_user: UserResponse = Depends(get_current_user)
 ):
     """
     내가 작성한 특정 애니메이션의 리뷰 조회
+    리뷰가 없으면 null 반환
     """
-    review = get_my_review(current_user.id, anime_id)
-    if review is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Review not found"
-        )
-    return review
+    return get_my_review(current_user.id, anime_id)
 
 
 @router.get("/anime/{anime_id}", response_model=ReviewListResponse)
