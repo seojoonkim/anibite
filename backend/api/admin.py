@@ -1946,11 +1946,11 @@ def clean_all_duplicate_activities():
     모든 종류의 중복 활동 정리
     """
     try:
-        # Find all duplicates across all activity types
+        # Find all duplicates across all activity types (handle NULL item_id with COALESCE)
         duplicates = db.execute_query("""
-            SELECT user_id, item_id, activity_type, COUNT(*) as count
+            SELECT user_id, COALESCE(item_id, -1) as item_id, activity_type, COUNT(*) as count
             FROM activities
-            GROUP BY user_id, item_id, activity_type
+            GROUP BY user_id, COALESCE(item_id, -1), activity_type
             HAVING COUNT(*) > 1
         """)
 
@@ -1963,13 +1963,23 @@ def clean_all_duplicate_activities():
             activity_type = row['activity_type']
             count = row['count']
 
-            # Get all activities for this combination
-            all_activities = db.execute_query("""
-                SELECT id, activity_time
-                FROM activities
-                WHERE user_id = ? AND item_id = ? AND activity_type = ?
-                ORDER BY activity_time DESC
-            """, (user_id, item_id, activity_type))
+            # Handle NULL item_id (COALESCE returns -1 for NULL)
+            if item_id == -1:
+                # Get all activities where item_id IS NULL
+                all_activities = db.execute_query("""
+                    SELECT id, activity_time
+                    FROM activities
+                    WHERE user_id = ? AND item_id IS NULL AND activity_type = ?
+                    ORDER BY activity_time DESC
+                """, (user_id, activity_type))
+            else:
+                # Get all activities for this combination
+                all_activities = db.execute_query("""
+                    SELECT id, activity_time
+                    FROM activities
+                    WHERE user_id = ? AND item_id = ? AND activity_type = ?
+                    ORDER BY activity_time DESC
+                """, (user_id, item_id, activity_type))
 
             # Keep the most recent one, delete the rest
             if len(all_activities) > 1:
