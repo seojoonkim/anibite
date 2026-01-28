@@ -1272,41 +1272,41 @@ export default function MyAniPass() {
       <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
         <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           {/* Header with Real User Data */}
-          <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-4 mb-6">
-            <div className="flex items-center gap-3 mb-3">
+          <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-5 mb-6">
+            <div className="flex items-center gap-4 mb-4">
               {/* Real Avatar */}
               {displayUser?.avatar_url ? (
                 <img
                   src={getAvatarUrl(displayUser.avatar_url)}
                   alt={displayUser.display_name || displayUser.username}
-                  className="w-14 h-14 rounded-full object-cover border-2 border-border"
+                  className="w-16 h-16 rounded-full object-cover border-2 border-border"
                   onError={(e) => {
                     e.target.style.display = 'none';
                   }}
                 />
               ) : (
-                <div className="w-14 h-14 rounded-full flex items-center justify-center text-white text-2xl font-bold border-2 border-border" style={{ background: getAvatarGradient(displayUser?.username) }}>
+                <div className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold border-2 border-border" style={{ background: getAvatarGradient(displayUser?.username) }}>
                   {(displayUser?.display_name || displayUser?.username || 'U')[0].toUpperCase()}
                 </div>
               )}
               <div className="flex-1">
                 {/* Real Name */}
-                <div className="flex items-center gap-2 mb-0.5">
-                  <h1 className="text-xl font-bold">
+                <div className="flex items-center gap-2.5 mb-1">
+                  <h1 className="text-[22px] font-bold">
                     {displayUser?.display_name || displayUser?.username}
                   </h1>
                 </div>
                 {/* Real Follow Counts */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <button
                     onClick={() => openFollowModal('followers')}
-                    className="text-xs hover:text-[#737373] transition-colors"
+                    className="text-sm hover:text-[#737373] transition-colors"
                   >
                     <span className="font-semibold">{followCounts.followers_count}</span> {language === 'ko' ? '팔로워' : language === 'ja' ? 'フォロワー' : 'Followers'}
                   </button>
                   <button
                     onClick={() => openFollowModal('following')}
-                    className="text-xs hover:text-[#737373] transition-colors"
+                    className="text-sm hover:text-[#737373] transition-colors"
                   >
                     <span className="font-semibold">{followCounts.following_count}</span> {language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following'}
                   </button>
@@ -1373,25 +1373,25 @@ export default function MyAniPass() {
 
       <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
-        <div className="bg-surface rounded-2xl shadow-lg border border-border p-4 mb-6">
-          <div className="flex items-center gap-3 mb-3">
+        <div className="bg-surface rounded-2xl shadow-lg border border-border p-5 mb-6">
+          <div className="flex items-center gap-4 mb-4">
             {displayUser?.avatar_url ? (
               <img
                 src={getAvatarUrl(displayUser.avatar_url)}
                 alt={displayUser.display_name || displayUser.username}
-                className="w-14 h-14 rounded-full object-cover border-2 border-border"
+                className="w-16 h-16 rounded-full object-cover border-2 border-border"
                 onError={(e) => {
                   e.target.style.display = 'none';
                 }}
               />
             ) : (
-              <div className="w-14 h-14 rounded-full flex items-center justify-center text-text-primary text-2xl font-bold border-2 border-border" style={{ background: getAvatarGradient(displayUser?.username) }}>
+              <div className="w-16 h-16 rounded-full flex items-center justify-center text-text-primary text-2xl font-bold border-2 border-border" style={{ background: getAvatarGradient(displayUser?.username) }}>
                 {(displayUser?.display_name || displayUser?.username || 'U')[0].toUpperCase()}
               </div>
             )}
             <div>
-              <div className="flex items-center gap-2 mb-0.5">
-                <h1 className="text-xl font-bold text-text-primary">
+              <div className="flex items-center gap-2.5 mb-1">
+                <h1 className="text-[22px] font-bold text-text-primary">
                   {displayUser?.display_name || displayUser?.username}
                 </h1>
                 {stats && (
@@ -1399,7 +1399,7 @@ export default function MyAniPass() {
                     const levelInfo = getCurrentLevelInfo(stats.otaku_score || 0, language);
                     return (
                       <span
-                        className="px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                        className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
                         style={{ backgroundColor: levelInfo.bgColor, border: `1px solid ${levelInfo.borderColorHex}` }}
                       >
                         <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span style={{ color: levelInfo.color }}>{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
@@ -1408,16 +1408,16 @@ export default function MyAniPass() {
                   })()
                 )}
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <button
                   onClick={() => openFollowModal('followers')}
-                  className="text-xs text-text-secondary hover:text-primary transition-colors"
+                  className="text-sm text-text-secondary hover:text-primary transition-colors"
                 >
                   <span className="font-semibold text-text-primary">{followCounts.followers_count}</span> {language === 'ko' ? '팔로워' : language === 'ja' ? 'フォロワー' : 'Followers'}
                 </button>
                 <button
                   onClick={() => openFollowModal('following')}
-                  className="text-xs text-text-secondary hover:text-primary transition-colors"
+                  className="text-sm text-text-secondary hover:text-primary transition-colors"
                 >
                   <span className="font-semibold text-text-primary">{followCounts.following_count}</span> {language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following'}
                 </button>
