@@ -109,7 +109,7 @@ export default function RatingWidget({ animeId, currentRating, onRate, onStatusC
           showNumber={false}
         />
         {tempRating > 0 && (
-          <div className="mt-2 text-2xl sm:text-3xl font-bold text-gray-800">
+          <div className="mt-2 text-lg text-gray-600">
             {tempRating.toFixed(1)}
           </div>
         )}

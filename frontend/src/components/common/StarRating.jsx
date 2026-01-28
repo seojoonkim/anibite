@@ -140,7 +140,7 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
 
   return (
     <div
-      className={`flex items-center ${alignClasses[align]}`}
+      className={`flex items-center ${alignClasses[align]} ${align === 'center' ? 'w-full' : ''}`}
       ref={containerRef}
     >
       <div
