@@ -32,10 +32,20 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
 
     // If it's an AniList character image, try R2 first
     if (url.includes('anilist.co') && url.includes('/character/')) {
-      const match = url.match(/\/b(\d+)-/);
+      const match = url.match(/\/[bn](\d+)-/);
       if (match && match[1]) {
         const characterId = match[1];
         return `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
+      }
+    }
+
+    // If it's an AniList anime cover image, try R2 first
+    if (url.includes('anilist.co') && url.includes('/media/')) {
+      // Extract anime ID from URL patterns like /b123456- or /n123456-
+      const match = url.match(/\/[bn](\d+)-/);
+      if (match && match[1]) {
+        const animeId = match[1];
+        return `${IMAGE_BASE_URL}/images/covers_large/${animeId}.jpg`;
       }
     }
 
@@ -44,8 +54,8 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
       return `${IMAGE_BASE_URL}${url}`;
     }
 
-    // External URLs (AniList, etc) - use placeholder
-    return '/placeholder-anime.svg';
+    // External URLs - try to use them directly, fallback to placeholder on error
+    return url;
   };
 
   useEffect(() => {
