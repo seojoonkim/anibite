@@ -15,6 +15,7 @@ function RatingCard({ anime, onRate }) {
   const [seriesInfo, setSeriesInfo] = useState(null);
   const [pendingStatus, setPendingStatus] = useState(null);
   const [animating, setAnimating] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef(null);
   const [starSize, setStarSize] = useState('3rem');
 
@@ -210,11 +211,16 @@ function RatingCard({ anime, onRate }) {
         } ${status !== 'RATED' ? 'border border-border' : ''}`}>
         {/* Cover Image */}
         <Link to={`/anime/${anime.id}`} className="block">
-          <div className="aspect-[3/4] w-full relative bg-surface-elevated overflow-hidden">
+          <div
+            className="aspect-[3/4] w-full relative bg-surface-elevated overflow-hidden"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseMove={() => !isHovered && setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
             <img
               src={getImageUrl(anime.cover_image_url)}
               alt={getAnimeTitle(anime)}
-              className="w-full h-full object-cover block group-hover:scale-110 transition-transform duration-[1500ms]"
+              className={`w-full h-full object-cover block transition-transform duration-[1500ms] ${isHovered ? 'scale-110' : 'scale-100'}`}
               onError={(e) => {
                 e.target.src = '/placeholder-anime.svg';
               }}
@@ -222,7 +228,7 @@ function RatingCard({ anime, onRate }) {
 
             {/* Show clear rating on already rated anime - hide on hover */}
             {status === 'RATED' && currentRating > 0 && (
-              <div className="absolute inset-0 flex items-center justify-center transition-opacity pointer-events-none z-10 group-hover:opacity-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}>
+              <div className={`absolute inset-0 flex items-center justify-center transition-opacity pointer-events-none z-10 ${isHovered ? 'opacity-0' : 'opacity-100'}`} style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}>
                 <div className="flex justify-center drop-shadow-lg" style={{ gap: '2px' }}>
                   {[1, 2, 3, 4, 5].map((star) => (
                     <div key={star} style={{ width: starSize, height: starSize }}>
@@ -235,14 +241,14 @@ function RatingCard({ anime, onRate }) {
 
             {/* Dark overlay on hover - consistent with character cards */}
             <div
-              className="absolute inset-0 transition-all duration-500 flex flex-col items-center justify-center p-2 z-10 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
+              className={`absolute inset-0 transition-all duration-500 flex flex-col items-center justify-center p-2 z-10 ${isHovered ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
               style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
               }}
             >
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 w-full flex flex-col items-center justify-center">
+              <div className={`transition-opacity duration-150 w-full flex flex-col items-center justify-center ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
                 {/* Star Rating */}
                 <div
                   className="flex justify-center"
