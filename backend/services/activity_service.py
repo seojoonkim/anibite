@@ -8,6 +8,7 @@ NORMALIZED: Item titles and images are fetched via JOIN, not stored in activitie
 """
 from typing import List, Optional, Dict
 from database import Database, dict_from_row, db as default_db
+from api.notifications import create_notification, delete_notification_by_action
 
 
 def get_activities(
@@ -497,6 +498,8 @@ def like_activity(activity_id: int, user_id: int) -> bool:
             "DELETE FROM activity_likes WHERE activity_id = ? AND user_id = ?",
             (activity_id, user_id)
         )
+        # Delete notification
+        delete_notification_by_action(db, activity_user_id, user_id, 'like', activity_id)
         return False
     else:
         # Not liked, add like
@@ -506,6 +509,8 @@ def like_activity(activity_id: int, user_id: int) -> bool:
                VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)""",
             (activity_id, user_id, activity_type, activity_user_id, item_id)
         )
+        # Create notification
+        create_notification(db, activity_user_id, user_id, 'like', activity_id)
         return True
 
 
@@ -578,6 +583,9 @@ def create_activity_comment(
          activity['activity_type'], activity['user_id'], activity.get('item_id'))
     )
 
+    # Create notification for the activity owner
+    create_notification(db, activity['user_id'], user_id, 'comment', activity_id, comment_id, content)
+
     # Get created comment
     comment = db.execute_query(
         """
@@ -601,15 +609,18 @@ def delete_activity_comment(comment_id: int, user_id: int) -> bool:
     """Delete a comment (only by the author)"""
     db = default_db
 
-    # Verify comment exists and user is the author
+    # Verify comment exists and get activity info for notification deletion
     comment = db.execute_query(
-        "SELECT id FROM activity_comments WHERE id = ? AND user_id = ?",
+        "SELECT id, activity_id, activity_user_id FROM activity_comments WHERE id = ? AND user_id = ?",
         (comment_id, user_id),
         fetch_one=True
     )
 
     if not comment:
         return False
+
+    activity_id = comment[1]
+    activity_user_id = comment[2]
 
     # Delete replies first (cascade)
     db.execute_update(
@@ -622,5 +633,9 @@ def delete_activity_comment(comment_id: int, user_id: int) -> bool:
         "DELETE FROM activity_comments WHERE id = ? AND user_id = ?",
         (comment_id, user_id)
     )
+
+    # Delete notification
+    if rowcount > 0:
+        delete_notification_by_action(db, activity_user_id, user_id, 'comment', activity_id)
 
     return rowcount > 0
