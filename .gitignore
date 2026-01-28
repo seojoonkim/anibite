@@ -46,6 +46,11 @@ frontend/anime.db
 *.db-shm
 *.db-wal
 
+# Database backups (local backups should not be in git)
+backups/
+*.db.backup*
+*.db.downloaded
+
 # Images (3.1GB - too large for GitHub)
 data/images/characters/
 data/images/banners/
