@@ -41,7 +41,7 @@ export default function ActivityComments({
     <div className="mt-3 border-t pt-3">
       {/* New Comment Input */}
       {currentUser && (
-        <div className="mb-3">
+        <div className="mb-2">
           <div className="flex gap-2 items-start">
             {currentUser.avatar_url ? (
               <img
@@ -69,12 +69,12 @@ export default function ActivityComments({
                   }
                 }}
                 placeholder={language === 'ko' ? '댓글을 입력하세요...' : language === 'ja' ? 'コメントを入力してください...' : 'Write a comment...'}
-                className="flex-1 px-3 py-1.5 text-[15px] border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="flex-1 px-3 py-1.5 text-[14px] border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <button
                 onClick={onCommentSubmit}
                 disabled={!newCommentText.trim()}
-                className="px-3 py-1.5 text-[15px] font-semibold text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                className="px-3 py-1.5 text-[14px] font-semibold text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                 style={newCommentText.trim() ? { backgroundColor: '#3797F0' } : {}}
               >
                 {language === 'ko' ? '작성' : language === 'ja' ? '作成' : 'Post'}
@@ -172,12 +172,12 @@ export default function ActivityComments({
                             }
                           }}
                           placeholder={language === 'ko' ? '답글을 입력하세요...' : language === 'ja' ? '返信を入力してください...' : 'Write a reply...'}
-                          className="flex-1 px-2 py-1 text-[13px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="flex-1 px-2 py-1 text-[12px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                         />
                         <button
                           onClick={() => onReplySubmit(comment.id)}
                           disabled={!replyText.trim()}
-                          className="px-2 py-1 text-[13px] font-semibold text-white rounded transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                          className="px-2 py-1 text-[12px] font-semibold text-white rounded transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                           style={replyText.trim() ? { backgroundColor: '#3797F0' } : {}}
                         >
                           {language === 'ko' ? '작성' : language === 'ja' ? '作成' : 'Post'}
@@ -187,7 +187,7 @@ export default function ActivityComments({
                             setReplyingTo(null);
                             setReplyText('');
                           }}
-                          className="px-2 py-1 text-[13px] font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
+                          className="px-2 py-1 text-[12px] font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
                         >
                           {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                         </button>

@@ -571,14 +571,14 @@ export default function Feed() {
                       value={newPostContent}
                       onChange={(e) => setNewPostContent(e.target.value)}
                       placeholder={language === 'ko' ? '무슨 생각을 하고 계신가요?' : language === 'ja' ? '今何を考えていますか？' : "What's on your mind?"}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-                      rows="3"
+                      className="w-full px-4 py-2 text-[14px] border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                      rows="2"
                     />
-                    <div className="flex justify-end mt-2">
+                    <div className="flex justify-end mt-1.5">
                       <button
                         onClick={handleCreatePost}
                         disabled={!newPostContent.trim()}
-                        className="px-4 py-2 text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                        className="px-4 py-1.5 text-[14px] text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                         style={newPostContent.trim() ? { backgroundColor: '#3797F0', fontWeight: '600' } : {}}
                       >
                         {language === 'ko' ? '게시' : language === 'ja' ? '投稿' : 'Post'}
