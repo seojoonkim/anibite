@@ -247,7 +247,7 @@ export default function Navbar() {
           <div className="grid grid-cols-1 md:grid-cols-4 items-center h-9 md:h-12 md:gap-4 pb-1 md:pb-0">
             {/* Logo and Mobile User Menu */}
             <div className="flex items-center justify-between md:col-span-1">
-              <Link to="/feed" className="flex items-center gap-1.5 md:gap-2 hover:opacity-80 transition-opacity group">
+              <Link to="/feed" className="flex items-center gap-1 md:gap-1.5 hover:opacity-80 transition-opacity group">
                 {/* Logo Icon - Bitten top-right corner */}
                 <svg className="w-6 h-6 md:w-7 md:h-7" viewBox="0 0 32 32" fill="none">
                   <defs>
