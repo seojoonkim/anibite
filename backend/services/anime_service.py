@@ -252,7 +252,7 @@ def get_anime_by_id(anime_id: int) -> Optional[AnimeDetailResponse]:
             c.id as character_id,
             c.name_full as character_name,
             c.name_korean as character_name_korean,
-            c.image_url as character_image,
+            COALESCE('/' || c.image_local, c.image_url) as character_image,
             ac.role as character_role,
             s.id as voice_actor_id,
             s.name_full as voice_actor_name,

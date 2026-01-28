@@ -611,6 +611,15 @@ export default function AnimeDetail() {
       }
     }
 
+    // Handle AniList staff/voice actor images - convert to R2
+    if (imageUrl.includes('anilist.co') && imageUrl.includes('/staff/')) {
+      const match = imageUrl.match(/\/b(\d+)-/);
+      if (match && match[1]) {
+        const staffId = match[1];
+        return `${IMAGE_BASE_URL}/images/staff/${staffId}.jpg`;
+      }
+    }
+
     // External URLs (AniList, etc) - use placeholder
     if (imageUrl.startsWith('http')) return '/placeholder-anime.svg';
 
