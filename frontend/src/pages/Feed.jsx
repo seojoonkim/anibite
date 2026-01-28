@@ -480,7 +480,7 @@ export default function Feed() {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Left Sidebar - Filter Menu */}
           <aside className="hidden md:block md:w-64 flex-shrink-0">
-            <nav className="sticky top-[52px] z-40">
+            <nav className="sticky z-40" style={{ top: '80px' }}>
               <div className="flex flex-col gap-2">
                   <button
                     onClick={() => setSearchParams({ filter: 'all' })}
