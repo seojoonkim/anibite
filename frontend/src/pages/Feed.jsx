@@ -477,15 +477,14 @@ export default function Feed() {
     <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
 
       <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex flex-col md:flex-row gap-6 md:items-start">
           {/* Left Sidebar - Filter Menu */}
           <aside
-            className="hidden md:block md:w-64 flex-shrink-0"
+            className="hidden md:block md:w-64 flex-shrink-0 sticky"
             style={{
-              position: 'sticky',
-              top: '56px',
-              alignSelf: 'flex-start',
-              height: 'fit-content'
+              top: '60px',
+              maxHeight: 'calc(100vh - 80px)',
+              overflow: 'auto'
             }}
           >
             <nav className="flex flex-col gap-2">
