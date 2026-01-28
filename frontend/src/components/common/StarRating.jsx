@@ -127,7 +127,7 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
     feed: 'gap-px',
     md: 'gap-1',
     lg: 'gap-1 sm:gap-1.5',
-    xl: 'gap-0.5',
+    xl: 'gap-1 sm:gap-1.5',
   };
 
   const alignClasses = {
@@ -165,7 +165,11 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
         ))}
       </div>
       {showNumber && rating > 0 && (
-        <span className="ml-2 text-gray-700 font-medium">{rating.toFixed(1)}</span>
+        <span className={`ml-2 sm:ml-3 text-gray-700 font-semibold ${
+          size === 'xl' ? 'text-xl sm:text-2xl md:text-3xl' :
+          size === 'lg' ? 'text-lg sm:text-xl' :
+          size === 'md' ? 'text-base' : 'text-sm'
+        }`}>{rating.toFixed(1)}</span>
       )}
     </div>
   );

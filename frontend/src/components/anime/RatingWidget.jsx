@@ -100,14 +100,19 @@ export default function RatingWidget({ animeId, currentRating, onRate, onStatusC
       <h3 className="text-lg font-bold mb-4">내 평가</h3>
 
       {/* Rating Display/Input */}
-      <div className="mb-6">
+      <div className="mb-6 flex flex-col items-center">
         <StarRating
           rating={tempRating}
           onRatingChange={handleRatingChange}
           size="xl"
           align="center"
-          showNumber={true}
+          showNumber={false}
         />
+        {tempRating > 0 && (
+          <div className="mt-2 text-2xl sm:text-3xl font-bold text-gray-800">
+            {tempRating.toFixed(1)}
+          </div>
+        )}
 
         {!currentRating?.rating && (
           <p className="text-sm text-gray-500 text-center mt-2">
