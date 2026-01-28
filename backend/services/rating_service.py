@@ -687,6 +687,21 @@ def _update_user_stats(user_id: int, promotion_activity_time: Optional[str] = No
 
     # 등급이 변경되었으면 activities에 기록
     if (old_rank != new_rank) or (old_rank == new_rank and old_level < new_level):
+        # 중복 체크: 같은 승급이 이미 있는지 확인
+        existing_promotion = db.execute_query(
+            """
+            SELECT id FROM activities
+            WHERE user_id = ? AND activity_type = 'rank_promotion'
+            AND metadata LIKE ?
+            """,
+            (user_id, f'%"new_rank": "{new_rank}"%"new_level": {new_level}%'),
+            fetch_one=True
+        )
+
+        if existing_promotion:
+            # 이미 같은 승급 기록이 있으면 추가하지 않음
+            return
+
         # 사용자 정보 조회
         user_info = db.execute_query(
             "SELECT username, display_name, avatar_url FROM users WHERE id = ?",
