@@ -263,8 +263,8 @@ export default function Feed() {
       return `${IMAGE_BASE_URL}${url}`;
     }
 
-    // External URLs (AniList, etc) - use placeholder
-    return '/placeholder-anime.svg';
+    // External URLs (AniList anime covers, etc) - use directly
+    return url;
   };
 
   const getTimeAgo = (timestamp) => {

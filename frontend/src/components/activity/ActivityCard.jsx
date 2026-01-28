@@ -272,8 +272,8 @@ const ActivityCard = forwardRef(({
       return `${IMAGE_BASE_URL}${url}`;
     }
 
-    // External URLs (AniList, etc) - use placeholder
-    return '/placeholder-anime.svg';
+    // External URLs (AniList anime covers, etc) - use directly
+    return url;
   }, [activity.item_image, activity.item_id, activity.activity_type]);
 
   // Handle item image load error - use centralized fallback helper
