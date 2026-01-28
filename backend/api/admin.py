@@ -1784,6 +1784,99 @@ def check_character_duplicates(character_id: int):
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
 
 
+@router.post("/backfill-notifications")
+def backfill_notifications():
+    """
+    Backfill notifications for existing likes and comments
+    기존 좋아요와 댓글에 대한 알림 생성
+    """
+    try:
+        results = {
+            "likes_created": 0,
+            "likes_skipped": 0,
+            "comments_created": 0,
+            "comments_skipped": 0
+        }
+
+        # 1. Backfill like notifications
+        likes = db.execute_query("""
+            SELECT
+                al.activity_id,
+                al.user_id as liker_id,
+                a.user_id as activity_owner_id,
+                al.created_at
+            FROM activity_likes al
+            JOIN activities a ON al.activity_id = a.id
+            WHERE al.user_id != a.user_id
+            ORDER BY al.created_at DESC
+        """)
+
+        for like in likes:
+            activity_id, liker_id, owner_id, created_at = like
+
+            # Check if notification already exists
+            existing = db.execute_query("""
+                SELECT id FROM notifications
+                WHERE user_id = ? AND actor_id = ? AND activity_id = ? AND type = 'like'
+            """, (owner_id, liker_id, activity_id), fetch_one=True)
+
+            if existing:
+                results["likes_skipped"] += 1
+                continue
+
+            # Create notification
+            db.execute_insert("""
+                INSERT INTO notifications (user_id, actor_id, type, activity_id, created_at)
+                VALUES (?, ?, 'like', ?, ?)
+            """, (owner_id, liker_id, activity_id, created_at))
+            results["likes_created"] += 1
+
+        # 2. Backfill comment notifications
+        comments = db.execute_query("""
+            SELECT
+                ac.id as comment_id,
+                ac.activity_id,
+                ac.user_id as commenter_id,
+                a.user_id as activity_owner_id,
+                ac.content,
+                ac.created_at
+            FROM activity_comments ac
+            JOIN activities a ON ac.activity_id = a.id
+            WHERE ac.user_id != a.user_id
+            ORDER BY ac.created_at DESC
+        """)
+
+        for comment in comments:
+            comment_id, activity_id, commenter_id, owner_id, content, created_at = comment
+
+            # Check if notification already exists
+            existing = db.execute_query("""
+                SELECT id FROM notifications
+                WHERE user_id = ? AND actor_id = ? AND activity_id = ? AND type = 'comment'
+            """, (owner_id, commenter_id, activity_id), fetch_one=True)
+
+            if existing:
+                results["comments_skipped"] += 1
+                continue
+
+            # Create notification
+            db.execute_insert("""
+                INSERT INTO notifications (user_id, actor_id, type, activity_id, comment_id, content, created_at)
+                VALUES (?, ?, 'comment', ?, ?, ?, ?)
+            """, (owner_id, commenter_id, activity_id, comment_id, content, created_at))
+            results["comments_created"] += 1
+
+        return {
+            "success": True,
+            "total_created": results["likes_created"] + results["comments_created"],
+            **results
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
+
+
 @router.post("/force-clean-duplicates")
 def force_clean_duplicates():
     """
