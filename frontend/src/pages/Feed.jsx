@@ -479,9 +479,8 @@ export default function Feed() {
       <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="flex flex-col md:flex-row gap-6">
           {/* Left Sidebar - Filter Menu */}
-          <aside className="hidden md:block md:w-64 flex-shrink-0">
-            <nav className="sticky z-40" style={{ top: '80px' }}>
-              <div className="flex flex-col gap-2">
+          <aside className="hidden md:block md:w-64 flex-shrink-0 md:sticky md:self-start" style={{ top: '64px' }}>
+            <nav className="flex flex-col gap-2">
                   <button
                     onClick={() => setSearchParams({ filter: 'all' })}
                     className={`w-full text-left px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2.5 ${feedFilter === 'all'
@@ -540,7 +539,6 @@ export default function Feed() {
                     </svg>
                     {language === 'ko' ? '저장한 피드' : language === 'ja' ? '保存済み' : 'Saved'}
                   </button>
-                </div>
             </nav>
           </aside>
 
