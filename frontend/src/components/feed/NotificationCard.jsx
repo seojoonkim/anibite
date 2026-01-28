@@ -52,9 +52,9 @@ export default function NotificationCard({
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all">
       {/* Notification Headers - stacked */}
-      <div className="border-b border-gray-200" style={{ background: 'linear-gradient(135deg, #F3E7F9 0%, #FFF5E6 100%)' }}>
+      <div className="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
         {uniqueNotifications.map((notification, index) => (
-          <div key={index} className={`px-4 py-3 ${index > 0 ? 'border-t' : ''}`} style={index > 0 ? { borderColor: '#E9D5F5' } : {}}>
+          <div key={index} className={`px-4 py-3 ${index > 0 ? 'border-t border-gray-200' : ''}`}>
             <div className="flex items-center gap-3">
               {/* Actor Avatar */}
               <Link to={`/user/${notification.actor_user_id}`} className="flex-shrink-0">
