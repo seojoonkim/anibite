@@ -38,7 +38,7 @@ def unified_search(
     anime_query = f"""
         SELECT
             a.id, a.title_korean, a.title_romaji, a.title_english, a.title_native,
-            COALESCE(a.cover_image_url, a.cover_image_local) as cover_image,
+            COALESCE('/' || a.cover_image_local, a.cover_image_url) as cover_image,
             a.format, a.episodes, a.status, a.season_year,
             COALESCE(
                 (SELECT AVG(ur.rating) FROM user_ratings ur
@@ -68,7 +68,7 @@ def unified_search(
                 "title_romaji": row[2],
                 "title_english": row[3],
                 "title_native": row[4],
-                "cover_image": row[5],
+                "cover_image_url": row[5],  # Match field name expected by frontend
                 "format": row[6],
                 "episodes": row[7],
                 "status": row[8],
@@ -93,7 +93,7 @@ def unified_search(
     char_query = f"""
         SELECT
             c.id, c.name_korean, c.name_full, c.name_native,
-            COALESCE(c.image_url, c.image_local) as image_large,
+            COALESCE('/' || c.image_local, c.image_url) as image_large,
             c.favourites,
             (SELECT AVG(cr.rating) FROM character_ratings cr
              WHERE cr.character_id = c.id AND cr.status = 'RATED' AND cr.rating IS NOT NULL) as site_avg_rating,
