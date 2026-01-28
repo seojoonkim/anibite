@@ -244,9 +244,9 @@ export default function Navbar() {
         }}
       >
         <div className="max-w-[1180px] mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 items-center h-9 md:h-12 md:gap-4 pb-1 md:pb-0">
-            {/* Logo and Mobile User Menu */}
-            <div className="flex items-center justify-between md:col-span-1">
+          <div className="flex items-center justify-between h-10 md:h-12">
+            {/* Logo */}
+            <div className="flex items-center flex-shrink-0">
               <Link to="/feed" className="flex items-center gap-1 md:gap-1.5 hover:opacity-80 transition-opacity group">
                 {/* Logo Icon - Bitten top-right corner */}
                 <svg className="w-6 h-6 md:w-7 md:h-7" viewBox="0 0 32 32" fill="none">
@@ -285,19 +285,68 @@ export default function Navbar() {
                   Anibite
                 </span>
               </Link>
+            </div>
 
-              {/* Mobile User Menu - Only visible on mobile */}
+            {/* Desktop Menu - Hidden on mobile/tablet */}
+            <div className="hidden lg:flex items-center flex-1 justify-center">
+              <div className="flex items-center space-x-1">
+                {menuItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`px-2 xl:px-3 py-1.5 rounded-md text-[13px] transition-colors whitespace-nowrap ${isActive(item.path)
+                      ? 'bg-primary text-white font-medium'
+                      : 'text-text-primary hover:text-text-secondary hover:bg-surface-hover font-normal'
+                      }`}
+                  >
+                    {item.labelKo ? (language === 'ko' ? item.labelKo : language === 'ja' ? item.labelJa : item.labelEn) : item.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Right Side - User & Notifications */}
+            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+              {/* Notification Bell - Desktop only */}
               {user && (
-                <div className="md:hidden relative" ref={mobileUserMenuRef}>
+                <div className="relative hidden lg:block" ref={notificationRef}>
+                  <button
+                    onClick={handleNotificationClick}
+                    className={`relative text-text-primary hover:bg-surface-hover p-2 rounded-md transition-colors flex items-center ${showNotificationDropdown ? 'bg-surface-hover' : ''}`}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-error text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 animate-pulse">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Notification Dropdown */}
+                  <NotificationDropdown
+                    isOpen={showNotificationDropdown}
+                    onClose={() => setShowNotificationDropdown(false)}
+                    unreadCount={unreadCount}
+                    onMarkAllRead={handleMarkAllRead}
+                    lastCheckTime={lastCheckTime}
+                  />
+                </div>
+              )}
+
+              {/* Desktop User Menu */}
+              {user && (
+                <div className="relative hidden lg:block" ref={userMenuRef}>
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="text-text-primary hover:bg-surface-hover text-sm font-medium px-1.5 py-0.5 rounded-md transition-colors flex items-center gap-1.5"
+                    className="text-text-primary hover:text-text-secondary hover:bg-surface-hover text-sm font-medium px-2 py-1.5 rounded-md transition-colors flex items-center gap-2"
                   >
                     {user.avatar_url ? (
                       <img
                         src={getAvatarUrl(user.avatar_url)}
                         alt={user.display_name || user.username}
-                        className="w-8 h-8 rounded-full object-cover border border-border"
+                        className="w-7 h-7 rounded-full object-cover border border-border"
                         onError={(e) => {
                           e.target.style.display = 'none';
                         }}
@@ -307,11 +356,93 @@ export default function Navbar() {
                         username={user.username}
                         displayName={user.display_name}
                         size="sm"
-                        className="w-8 h-8"
+                        className="w-7 h-7"
                       />
                     )}
-                    <span className="text-sm font-medium max-w-[80px] truncate">{user.display_name || user.username}</span>
+                    <span className="text-sm font-medium max-w-[100px] truncate">{user.display_name || user.username}</span>
+                    {(() => {
+                      const levelInfo = getCurrentLevelInfo(otakuScore, language);
+                      return (
+                        <span
+                          className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold hidden xl:inline-flex"
+                          style={{ backgroundColor: levelInfo.bgColor, border: `1px solid ${levelInfo.borderColorHex}` }}
+                        >
+                          <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span>
+                          <span style={{ color: levelInfo.color }}>{levelInfo.level}-{toRoman(levelInfo.rank)}</span>
+                        </span>
+                      );
+                    })()}
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {showUserMenu && (
+                    <div className="absolute right-0 mt-2 w-52 bg-surface rounded-md shadow-lg z-50 border border-border">
+                      <button
+                        onClick={handleMyAnipass}
+                        className="block w-full text-left px-4 py-3 text-sm font-medium rounded-t-md transition-colors bg-surface-elevated text-text-primary border-b border-border hover:bg-surface-hover"
+                      >
+                        <div className="flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                          </svg>
+                          <span>{language === 'ko' ? '내 애니바이트' : language === 'ja' ? 'マイAniBite' : 'My AniBite'}</span>
+                        </div>
+                      </button>
+                      <button
+                        onClick={handleSettings}
+                        className="block w-full text-left px-4 py-2 text-xs text-text-secondary hover:bg-surface-hover transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <span>{language === 'ko' ? '설정' : language === 'ja' ? '設定' : 'Settings'}</span>
+                        </div>
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-sm text-error hover:bg-surface-hover rounded-b-md transition-colors"
+                      >
+                          <div className="flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            <span>{language === 'ko' ? '로그아웃' : language === 'ja' ? 'ログアウト' : 'Logout'}</span>
+                          </div>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+              {/* Mobile User Menu - Visible on mobile/tablet */}
+              {user && (
+                <div className="relative lg:hidden" ref={mobileUserMenuRef}>
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="text-text-primary hover:bg-surface-hover p-1.5 rounded-md transition-colors flex items-center gap-1.5"
+                  >
+                    {user.avatar_url ? (
+                      <img
+                        src={getAvatarUrl(user.avatar_url)}
+                        alt={user.display_name || user.username}
+                        className="w-7 h-7 rounded-full object-cover border border-border"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <DefaultAvatar
+                        username={user.username}
+                        displayName={user.display_name}
+                        size="sm"
+                        className="w-7 h-7"
+                      />
+                    )}
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
@@ -357,147 +488,13 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-
-            {/* Desktop Menu and Right Side - Aligned with feed content area */}
-            <div className="hidden md:flex items-center justify-between md:col-span-3">
-              <div className="flex items-center space-x-0.5 lg:space-x-1">
-                {menuItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={`px-2 lg:px-3 py-1.5 rounded-md text-[13px] transition-colors whitespace-nowrap ${isActive(item.path)
-                      ? 'bg-primary text-white font-medium'
-                      : 'text-text-primary hover:text-text-secondary hover:bg-surface-hover font-normal'
-                      }`}
-                  >
-                    {item.labelKo ? (language === 'ko' ? item.labelKo : language === 'ja' ? item.labelJa : item.labelEn) : item.label}
-                  </Link>
-                ))}
-              </div>
-
-              {/* Right Side - User */}
-              <div className="flex items-center space-x-2">
-                {/* Notification Bell */}
-                {user && (
-                  <div className="relative" ref={notificationRef}>
-                    <button
-                      onClick={handleNotificationClick}
-                      className={`relative text-text-primary hover:bg-surface-hover p-2 rounded-md transition-colors flex items-center ${showNotificationDropdown ? 'bg-surface-hover' : ''
-                        }`}
-                      style={{ minWidth: '40px' }}
-                    >
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                      </svg>
-                      {unreadCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-error text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1 animate-pulse">
-                          {unreadCount > 99 ? '99+' : unreadCount}
-                        </span>
-                      )}
-                    </button>
-
-                    {/* Notification Dropdown */}
-                    <NotificationDropdown
-                      isOpen={showNotificationDropdown}
-                      onClose={() => setShowNotificationDropdown(false)}
-                      unreadCount={unreadCount}
-                      onMarkAllRead={handleMarkAllRead}
-                      lastCheckTime={lastCheckTime}
-                    />
-                  </div>
-                )}
-
-                {user && (
-                  <div className="relative" ref={userMenuRef}>
-                    <button
-                      onClick={() => setShowUserMenu(!showUserMenu)}
-                      className="text-text-primary hover:text-text-secondary hover:bg-surface-hover text-sm font-medium px-3 py-2 rounded-md transition-colors flex items-center gap-2"
-                      style={{ minWidth: '160px' }}
-                    >
-                      {user.avatar_url ? (
-                        <img
-                          src={getAvatarUrl(user.avatar_url)}
-                          alt={user.display_name || user.username}
-                          className="w-8 h-8 rounded-full object-cover border border-border"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                          }}
-                        />
-                      ) : (
-                        <DefaultAvatar
-                          username={user.username}
-                          displayName={user.display_name}
-                          size="sm"
-                          className="w-8 h-8"
-                        />
-                      )}
-                      <span className="text-sm font-medium">{user.display_name || user.username}</span>
-                      {(() => {
-                        const levelInfo = getCurrentLevelInfo(otakuScore, language);
-                        return (
-                          <span
-                            className="text-[10px] px-2 py-0.5 rounded-full font-semibold hidden sm:inline-flex"
-                            style={{ backgroundColor: levelInfo.bgColor, border: `1px solid ${levelInfo.borderColorHex}` }}
-                          >
-                            <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span>
-                            <span style={{ color: levelInfo.color }}>{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
-                          </span>
-                        );
-                      })()}
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-
-                    {showUserMenu && (
-                      <div className="absolute right-0 mt-2 w-52 bg-surface rounded-md shadow-lg z-50 border border-border">
-                        <button
-                          onClick={handleMyAnipass}
-                          className="block w-full text-left px-4 py-3 text-sm font-medium rounded-t-md transition-colors bg-surface-elevated text-text-primary border-b border-border hover:bg-surface-hover"
-                        >
-                          <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                            </svg>
-                            <span>{language === 'ko' ? '내 애니바이트' : language === 'ja' ? 'マイAniBite' : 'My AniBite'}</span>
-                          </div>
-                        </button>
-                        <button
-                          onClick={handleSettings}
-                          className="block w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 transition-colors"
-                        >
-                          <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span>{language === 'ko' ? '설정' : language === 'ja' ? '設定' : 'Settings'}</span>
-                          </div>
-                        </button>
-                        <button
-                          onClick={handleLogout}
-                          className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-md transition-colors"
-                        >
-                          <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                            </svg>
-                            <span>{language === 'ko' ? '로그아웃' : language === 'ja' ? 'ログアウト' : 'Logout'}</span>
-                          </div>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
         </div>
       </nav>
 
-      {/* Mobile Bottom Navigation - Only visible on mobile */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-border shadow-lg z-50">
-        <div className="grid grid-cols-6 h-14">
+      {/* Mobile/Tablet Bottom Navigation - Visible below lg breakpoint */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-border shadow-lg z-50">
+        <div className="grid grid-cols-6 h-12 sm:h-14">
           {menuItems.map((item) => (
             <Link
               key={item.path}
@@ -516,8 +513,8 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Spacer for mobile bottom nav */}
-      <div className="md:hidden h-14" />
+      {/* Spacer for mobile/tablet bottom nav */}
+      <div className="lg:hidden h-12 sm:h-14" />
     </>
   );
 }
