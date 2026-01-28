@@ -287,8 +287,11 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* Desktop Menu - Hidden below 600px, moves left as screen shrinks */}
-            <div className="hidden min-[600px]:flex items-center ml-2 sm:ml-4 md:ml-6 lg:ml-8 flex-1">
+            {/* Spacer to align menu with feed content (sidebar w-48 + gap-6 = 216px, minus logo ~100px) */}
+            <div className="hidden md:block w-[92px] flex-shrink-0" />
+
+            {/* Desktop Menu - Hidden below 600px */}
+            <div className="hidden min-[600px]:flex items-center ml-2 md:ml-6 flex-1">
               <div className="flex items-center">
                 {menuItems.map((item) => (
                   <Link
