@@ -1272,43 +1272,43 @@ export default function MyAniPass() {
       <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
         <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           {/* Header with Real User Data */}
-          <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 mb-8">
-            <div className="flex items-center gap-4 mb-6">
+          <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-4 mb-6">
+            <div className="flex items-center gap-3 mb-3">
               {/* Real Avatar */}
               {displayUser?.avatar_url ? (
                 <img
                   src={getAvatarUrl(displayUser.avatar_url)}
                   alt={displayUser.display_name || displayUser.username}
-                  className="w-20 h-20 rounded-full object-cover border-2 border-border"
+                  className="w-14 h-14 rounded-full object-cover border-2 border-border"
                   onError={(e) => {
                     e.target.style.display = 'none';
                   }}
                 />
               ) : (
-                <div className="w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold border-2 border-border" style={{ background: getAvatarGradient(displayUser?.username) }}>
+                <div className="w-14 h-14 rounded-full flex items-center justify-center text-white text-2xl font-bold border-2 border-border" style={{ background: getAvatarGradient(displayUser?.username) }}>
                   {(displayUser?.display_name || displayUser?.username || 'U')[0].toUpperCase()}
                 </div>
               )}
               <div className="flex-1">
                 {/* Real Name */}
-                <div className="flex items-center gap-2 mb-1">
-                  <h1 className="text-2xl font-bold">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <h1 className="text-xl font-bold">
                     {displayUser?.display_name || displayUser?.username}
                   </h1>
                 </div>
                 {/* Real Follow Counts */}
-                <div className="flex items-center gap-4 mb-2">
+                <div className="flex items-center gap-3">
                   <button
                     onClick={() => openFollowModal('followers')}
-                    className="text-sm hover:text-[#737373] transition-colors"
+                    className="text-xs hover:text-[#737373] transition-colors"
                   >
-                    <span className="font-bold">{followCounts.followers_count}</span> {language === 'ko' ? '팔로워' : language === 'ja' ? 'フォロワー' : 'Followers'}
+                    <span className="font-semibold">{followCounts.followers_count}</span> {language === 'ko' ? '팔로워' : language === 'ja' ? 'フォロワー' : 'Followers'}
                   </button>
                   <button
                     onClick={() => openFollowModal('following')}
-                    className="text-sm hover:text-[#737373] transition-colors"
+                    className="text-xs hover:text-[#737373] transition-colors"
                   >
-                    <span className="font-bold">{followCounts.following_count}</span> {language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following'}
+                    <span className="font-semibold">{followCounts.following_count}</span> {language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following'}
                   </button>
                 </div>
               </div>
@@ -1318,41 +1318,41 @@ export default function MyAniPass() {
             <div className="flex border-b border-border overflow-x-auto">
               <button
                 onClick={() => changeTab('feed')}
-                className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'feed'
+                className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-normal transition-colors whitespace-nowrap ${activeTab === 'feed'
                   ? 'border-b-2'
                   : 'text-text-secondary hover:text-text-primary'
                   }`}
-                style={activeTab === 'feed' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '600' } : {}}
+                style={activeTab === 'feed' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '500' } : {}}
               >
                 {language === 'ko' ? '피드' : language === 'ja' ? 'フィード' : 'Feed'}
               </button>
               <button
                 onClick={() => changeTab('anipass')}
-                className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'anipass'
+                className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-normal transition-colors whitespace-nowrap ${activeTab === 'anipass'
                   ? 'border-b-2'
                   : 'text-text-secondary hover:text-text-primary'
                   }`}
-                style={activeTab === 'anipass' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '600' } : {}}
+                style={activeTab === 'anipass' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '500' } : {}}
               >
                 {language === 'ko' ? '애니바이트' : language === 'ja' ? 'AniBite' : 'AniBite'}
               </button>
               <button
                 onClick={() => changeTab('anime')}
-                className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'anime'
+                className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-normal transition-colors whitespace-nowrap ${activeTab === 'anime'
                   ? 'border-b-2'
                   : 'text-text-secondary hover:text-text-primary'
                   }`}
-                style={activeTab === 'anime' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '600' } : {}}
+                style={activeTab === 'anime' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '500' } : {}}
               >
                 {language === 'ko' ? '애니' : language === 'ja' ? 'アニメ' : 'Anime'}
               </button>
               <button
                 onClick={() => changeTab('character')}
-                className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'character'
+                className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-normal transition-colors whitespace-nowrap ${activeTab === 'character'
                   ? 'border-b-2'
                   : 'text-text-secondary hover:text-text-primary'
                   }`}
-                style={activeTab === 'character' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '600' } : {}}
+                style={activeTab === 'character' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '500' } : {}}
               >
                 {language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character'}
               </button>
@@ -1373,25 +1373,25 @@ export default function MyAniPass() {
 
       <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
-        <div className="bg-surface rounded-2xl shadow-lg border border-border p-6 mb-8">
-          <div className="flex items-center gap-4 mb-6">
+        <div className="bg-surface rounded-2xl shadow-lg border border-border p-4 mb-6">
+          <div className="flex items-center gap-3 mb-3">
             {displayUser?.avatar_url ? (
               <img
                 src={getAvatarUrl(displayUser.avatar_url)}
                 alt={displayUser.display_name || displayUser.username}
-                className="w-20 h-20 rounded-full object-cover border-2 border-border"
+                className="w-14 h-14 rounded-full object-cover border-2 border-border"
                 onError={(e) => {
                   e.target.style.display = 'none';
                 }}
               />
             ) : (
-              <div className="w-20 h-20 rounded-full flex items-center justify-center text-text-primary text-3xl font-bold border-2 border-border" style={{ background: getAvatarGradient(displayUser?.username) }}>
+              <div className="w-14 h-14 rounded-full flex items-center justify-center text-text-primary text-2xl font-bold border-2 border-border" style={{ background: getAvatarGradient(displayUser?.username) }}>
                 {(displayUser?.display_name || displayUser?.username || 'U')[0].toUpperCase()}
               </div>
             )}
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl font-bold text-text-primary">
+              <div className="flex items-center gap-2 mb-0.5">
+                <h1 className="text-xl font-bold text-text-primary">
                   {displayUser?.display_name || displayUser?.username}
                 </h1>
                 {stats && (
@@ -1399,7 +1399,7 @@ export default function MyAniPass() {
                     const levelInfo = getCurrentLevelInfo(stats.otaku_score || 0, language);
                     return (
                       <span
-                        className="px-3 py-1 rounded-full text-xs font-semibold"
+                        className="px-2 py-0.5 rounded-full text-[10px] font-semibold"
                         style={{ backgroundColor: levelInfo.bgColor, border: `1px solid ${levelInfo.borderColorHex}` }}
                       >
                         <span style={{ color: levelInfo.color }} className="font-bold">{levelInfo.icon}</span> <span style={{ color: levelInfo.color }}>{levelInfo.level} - {toRoman(levelInfo.rank)}</span>
@@ -1408,29 +1408,29 @@ export default function MyAniPass() {
                   })()
                 )}
               </div>
-              <div className="flex items-center gap-4 mb-2">
+              <div className="flex items-center gap-3">
                 <button
                   onClick={() => openFollowModal('followers')}
-                  className="text-sm text-text-secondary hover:text-primary transition-colors"
+                  className="text-xs text-text-secondary hover:text-primary transition-colors"
                 >
-                  <span className="font-bold text-text-primary">{followCounts.followers_count}</span> {language === 'ko' ? '팔로워' : language === 'ja' ? 'フォロワー' : 'Followers'}
+                  <span className="font-semibold text-text-primary">{followCounts.followers_count}</span> {language === 'ko' ? '팔로워' : language === 'ja' ? 'フォロワー' : 'Followers'}
                 </button>
                 <button
                   onClick={() => openFollowModal('following')}
-                  className="text-sm text-text-secondary hover:text-primary transition-colors"
+                  className="text-xs text-text-secondary hover:text-primary transition-colors"
                 >
-                  <span className="font-bold text-text-primary">{followCounts.following_count}</span> {language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following'}
+                  <span className="font-semibold text-text-primary">{followCounts.following_count}</span> {language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following'}
                 </button>
               </div>
             </div>
             {!isOwnProfile && (
               <button
                 onClick={handleFollowToggle}
-                className={`ml-auto px-4 py-2 rounded-lg font-medium transition-all ${isFollowing
+                className={`ml-auto px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${isFollowing
                   ? 'bg-transparent border-2 border-gray-300 text-text-secondary hover:border-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
                   : 'text-white'
                   }`}
-                style={!isFollowing ? { backgroundColor: '#3797F0', fontWeight: '600' } : {}}
+                style={!isFollowing ? { backgroundColor: '#3797F0', fontWeight: '500' } : {}}
                 onMouseEnter={(e) => !isFollowing && (e.target.style.backgroundColor = '#1877F2')}
                 onMouseLeave={(e) => !isFollowing && (e.target.style.backgroundColor = '#3797F0')}
               >
@@ -1443,43 +1443,43 @@ export default function MyAniPass() {
           <div className="flex border-b border-border overflow-x-auto">
             <button
               onClick={() => changeTab('feed')}
-              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'feed'
+              className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-normal transition-colors whitespace-nowrap ${activeTab === 'feed'
                 ? 'border-b-2'
                 : 'text-text-secondary hover:text-text-primary'
                 }`}
-              style={activeTab === 'feed' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '600' } : {}}
+              style={activeTab === 'feed' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '500' } : {}}
             >
               {language === 'ko' ? '피드' : language === 'ja' ? 'フィード' : 'Feed'}
             </button>
             <button
               onClick={() => changeTab('anipass')}
-              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'anipass'
+              className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-normal transition-colors whitespace-nowrap ${activeTab === 'anipass'
                 ? 'border-b-2'
                 : 'text-text-secondary hover:text-text-primary'
                 }`}
-              style={activeTab === 'anipass' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '600' } : {}}
+              style={activeTab === 'anipass' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '500' } : {}}
             >
               {language === 'ko' ? '애니바이트' : language === 'ja' ? 'AniBite' : 'AniBite'}
             </button>
             <button
               onClick={() => changeTab('anime')}
-              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'anime'
+              className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-normal transition-colors whitespace-nowrap ${activeTab === 'anime'
                 ? 'border-b-2'
                 : 'text-text-secondary hover:text-text-primary'
                 }`}
-              style={activeTab === 'anime' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '600' } : {}}
+              style={activeTab === 'anime' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '500' } : {}}
             >
-              {language === 'ko' ? '애니' : language === 'ja' ? 'アニメ' : 'Anime'} {stats && <span className="text-xs sm:text-sm">({(stats.total_rated || 0) + (stats.total_want_to_watch || 0) + (stats.total_pass || 0)})</span>}
+              {language === 'ko' ? '애니' : language === 'ja' ? 'アニメ' : 'Anime'} {stats && <span className="text-[10px] sm:text-xs">({(stats.total_rated || 0) + (stats.total_want_to_watch || 0) + (stats.total_pass || 0)})</span>}
             </button>
             <button
               onClick={() => changeTab('character')}
-              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${activeTab === 'character'
+              className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-normal transition-colors whitespace-nowrap ${activeTab === 'character'
                 ? 'border-b-2'
                 : 'text-text-secondary hover:text-text-primary'
                 }`}
-              style={activeTab === 'character' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '600' } : {}}
+              style={activeTab === 'character' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '500' } : {}}
             >
-              {language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character'} {stats && <span className="text-xs sm:text-sm">({stats.total_character_ratings || 0})</span>}
+              {language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character'} {stats && <span className="text-[10px] sm:text-xs">({stats.total_character_ratings || 0})</span>}
             </button>
           </div>
         </div>
