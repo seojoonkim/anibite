@@ -250,11 +250,16 @@ export default function Navbar() {
               <Link to="/feed" className="flex items-center gap-1.5 md:gap-2 hover:opacity-80 transition-opacity group">
                 {/* Logo Icon */}
                 <div className="w-6 h-6 md:w-7 md:h-7 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
-                  <span className="text-white font-bold text-sm md:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>A</span>
+                  <span style={{ fontFamily: "'Inter', sans-serif", color: '#ffffff', fontWeight: 700, fontSize: '14px' }}>A</span>
                 </div>
                 <span
-                  className="text-lg md:text-xl font-semibold tracking-tight text-white"
-                  style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '-0.02em' }}
+                  style={{
+                    fontFamily: "'Inter', sans-serif",
+                    letterSpacing: '-0.02em',
+                    color: '#f0f4f8',
+                    fontWeight: 600,
+                    fontSize: '1.25rem'
+                  }}
                 >
                   Anibite
                 </span>
