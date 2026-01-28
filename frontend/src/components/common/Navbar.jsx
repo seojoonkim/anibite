@@ -365,7 +365,7 @@ export default function Navbar() {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`px-2 lg:px-3 py-1.5 rounded-md text-xs font-normal transition-colors whitespace-nowrap ${isActive(item.path)
+                    className={`px-2 lg:px-3 py-1.5 rounded-md text-[13px] font-normal transition-colors whitespace-nowrap ${isActive(item.path)
                       ? 'bg-primary text-white'
                       : 'text-text-primary hover:text-text-secondary hover:bg-surface-hover'
                       }`}
