@@ -105,7 +105,7 @@ export default function RatingWidget({ animeId, currentRating, onRate, onStatusC
           <StarRating
             rating={tempRating}
             onRatingChange={handleRatingChange}
-            size="lg"
+            size="xl"
             align="center"
             showNumber={false}
           />
