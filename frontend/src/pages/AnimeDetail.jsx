@@ -14,7 +14,6 @@ import RatingWidget from '../components/anime/RatingWidget';
 import ActivityCard from '../components/activity/ActivityCard';
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
-import { getCharacterImageFallback } from '../utils/imageHelpers';
 
 export default function AnimeDetail() {
   const { id } = useParams();
@@ -604,7 +603,8 @@ export default function AnimeDetail() {
 
     // Handle AniList character images - convert to R2
     if (imageUrl.includes('anilist.co') && imageUrl.includes('/character/')) {
-      const match = imageUrl.match(/\/b(\d+)-/);
+      // AniList pattern: /character/large/b{id}- or /character/large/n{id}-
+      const match = imageUrl.match(/\/[bn](\d+)-/);
       if (match && match[1]) {
         const characterId = match[1];
         return `${IMAGE_BASE_URL}/images/characters/${characterId}.jpg`;
@@ -613,7 +613,8 @@ export default function AnimeDetail() {
 
     // Handle AniList staff/voice actor images - convert to R2
     if (imageUrl.includes('anilist.co') && imageUrl.includes('/staff/')) {
-      const match = imageUrl.match(/\/b(\d+)-/);
+      // AniList pattern: /staff/large/n{id}- or /staff/large/b{id}-
+      const match = imageUrl.match(/\/[bn](\d+)-/);
       if (match && match[1]) {
         const staffId = match[1];
         return `${IMAGE_BASE_URL}/images/staff/${staffId}.jpg`;
@@ -628,6 +629,30 @@ export default function AnimeDetail() {
       ? imageUrl.replace('/covers/', '/covers_large/')
       : imageUrl;
     return `${IMAGE_BASE_URL}${processedUrl}`;
+  };
+
+  // Get character image URL - use character_id as fallback when image is null
+  const getCharacterImageUrl = (char) => {
+    if (char.character_image) {
+      return getImageUrl(char.character_image);
+    }
+    // Fallback: try R2 path using character_id
+    if (char.character_id) {
+      return `${IMAGE_BASE_URL}/images/characters/${char.character_id}.jpg`;
+    }
+    return '/placeholder-anime.svg';
+  };
+
+  // Get voice actor image URL - use voice_actor_id as fallback when image is null
+  const getVoiceActorImageUrl = (char) => {
+    if (char.voice_actor_image) {
+      return getImageUrl(char.voice_actor_image);
+    }
+    // Fallback: try R2 path using voice_actor_id
+    if (char.voice_actor_id) {
+      return `${IMAGE_BASE_URL}/images/staff/${char.voice_actor_id}.jpg`;
+    }
+    return '/placeholder-anime.svg';
   };
 
   if (loading) {
@@ -1050,13 +1075,12 @@ export default function AnimeDetail() {
                       >
                         <div className="relative">
                           <img
-                            src={getImageUrl(char.character_image)}
+                            src={getCharacterImageUrl(char)}
                             alt={char.character_name}
                             className="w-16 h-16 rounded-full object-cover"
                             onError={(e) => {
-                              const fallback = getCharacterImageFallback(char.character_image, e.target.src);
-                              if (e.target.src !== fallback) {
-                                e.target.src = fallback;
+                              if (e.target.src !== '/placeholder-anime.svg') {
+                                e.target.src = '/placeholder-anime.svg';
                               }
                             }}
                           />
@@ -1082,11 +1106,10 @@ export default function AnimeDetail() {
                       {char.voice_actor_name && (
                         <div className="flex items-center gap-3 flex-1 border-l border-gray-200 pl-3">
                           <img
-                            src={getImageUrl(char.voice_actor_image)}
+                            src={getVoiceActorImageUrl(char)}
                             alt={char.voice_actor_name}
                             className="w-16 h-16 rounded-full object-cover"
                             onError={(e) => {
-                              // Voice actors are stored in AniList, keep original URL as fallback
                               if (e.target.src !== '/placeholder-anime.svg') {
                                 e.target.src = '/placeholder-anime.svg';
                               }
