@@ -50,11 +50,11 @@ export default function NotificationCard({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-all">
-      {/* Notification Headers - stacked */}
-      <div className="border-b border-gray-300 dark:border-gray-600 bg-blue-50 dark:bg-blue-900/20">
+    <div>
+      {/* Notification Headers - attached to top of activity card */}
+      <div className="bg-blue-50 dark:bg-blue-900/30 rounded-t-xl border border-b-0 border-gray-200 dark:border-gray-700">
         {uniqueNotifications.map((notification, index) => (
-          <div key={index} className={`px-3 py-2 ${index > 0 ? 'border-t border-gray-300 dark:border-gray-600' : ''}`}>
+          <div key={index} className={`px-3 py-2 ${index > 0 ? 'border-t border-gray-200 dark:border-gray-600' : ''}`}>
             <div className="flex items-center gap-2">
               {/* Actor Avatar */}
               <Link to={`/user/${notification.actor_user_id}`} className="flex-shrink-0">
@@ -62,21 +62,21 @@ export default function NotificationCard({
                   <img
                     src={getAvatarUrl(notification.actor_avatar_url)}
                     alt={notification.actor_display_name || notification.actor_username}
-                    className="w-8 h-8 rounded-full object-cover border-2 border-white dark:border-gray-700 shadow-sm"
+                    className="w-7 h-7 rounded-full object-cover border-2 border-white dark:border-gray-700 shadow-sm"
                   />
                 ) : (
                   <DefaultAvatar
                     username={notification.actor_username}
                     displayName={notification.actor_display_name}
                     size="sm"
-                    className="w-8 h-8 border-2 border-white dark:border-gray-700 shadow-sm"
+                    className="w-7 h-7 border-2 border-white dark:border-gray-700 shadow-sm"
                   />
                 )}
               </Link>
 
               {/* Notification Text */}
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-gray-900 dark:text-gray-100">
+                <p className="text-xs font-medium text-gray-700 dark:text-gray-200">
                   {getNotificationText(notification)}
                 </p>
                 <p className="text-[10px] text-gray-500 dark:text-gray-400">
@@ -100,7 +100,7 @@ export default function NotificationCard({
 
             {/* Show comment content if notification type is comment */}
             {notification.type === 'comment' && notification.comment_content && (
-              <div className="mt-1.5 ml-10 pl-2 border-l-2 border-blue-400 dark:border-blue-500">
+              <div className="mt-1.5 ml-9 pl-2 border-l-2 border-blue-400 dark:border-blue-500">
                 <p className="text-xs text-gray-600 dark:text-gray-300 italic">"{notification.comment_content}"</p>
               </div>
             )}
@@ -108,8 +108,8 @@ export default function NotificationCard({
         ))}
       </div>
 
-      {/* Original Activity Card (passed as children) */}
-      <div className="p-4">
+      {/* Original Activity Card (passed as children) - remove top rounded corners */}
+      <div className="[&>*]:rounded-t-none [&>*]:border-t-0">
         {children}
       </div>
     </div>
