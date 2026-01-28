@@ -71,12 +71,12 @@ export default function NotificationCard({
               </div>
 
               {/* Notification Text - single line */}
-              <p className="flex-1 min-w-0 text-xs font-medium text-white truncate">
+              <p className="flex-1 min-w-0 text-xs font-semibold truncate" style={{ color: '#ffffff' }}>
                 {getNotificationText(notification)}
               </p>
 
               {/* Time - right aligned */}
-              <span className="flex-shrink-0 text-[10px] text-slate-400">
+              <span className="flex-shrink-0 text-[10px]" style={{ color: '#94a3b8' }}>
                 {getTimeAgo(notification.time)}
               </span>
             </div>
@@ -84,17 +84,17 @@ export default function NotificationCard({
             {/* Show comment content if notification type is comment - expandable */}
             {notification.type === 'comment' && (notification.comment_text || notification.comment_content) && (
               <div
-                className="mt-1 ml-5 pl-2 border-l-2 border-slate-600 cursor-pointer hover:border-slate-500 transition-colors"
+                className="mt-1 ml-5 pl-2 border-l-2 border-slate-500 cursor-pointer hover:border-slate-400 transition-colors"
                 onClick={() => setCollapsedComments(prev => ({
                   ...prev,
                   [index]: !prev[index]
                 }))}
               >
-                <p className={`text-[11px] text-slate-300 italic ${collapsedComments[index] ? 'line-clamp-1' : ''}`}>
+                <p className={`text-[11px] text-white/90 italic ${collapsedComments[index] ? 'line-clamp-1' : ''}`}>
                   "{notification.comment_text || notification.comment_content}"
                 </p>
                 {(notification.comment_text || notification.comment_content || '').length > 50 && (
-                  <span className="text-[10px] text-slate-400 hover:text-slate-300">
+                  <span className="text-[10px] text-slate-300 hover:text-white">
                     {collapsedComments[index]
                       ? (language === 'ko' ? '더보기' : language === 'ja' ? 'もっと見る' : 'more')
                       : (language === 'ko' ? '접기' : language === 'ja' ? '閉じる' : 'less')}
