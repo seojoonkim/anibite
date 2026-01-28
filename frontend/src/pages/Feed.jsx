@@ -460,7 +460,7 @@ export default function Feed() {
   return (
     <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
 
-      <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+      <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Left Sidebar - Filter Menu */}
           <aside className="hidden md:block md:col-span-1">
