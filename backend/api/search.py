@@ -41,11 +41,11 @@ def unified_search(
             COALESCE(a.cover_image_url, a.cover_image_local) as cover_image,
             a.format, a.episodes, a.status, a.season_year,
             COALESCE(
-                (SELECT AVG(ur.rating) FROM user_rating ur
+                (SELECT AVG(ur.rating) FROM user_ratings ur
                  WHERE ur.anime_id = a.id AND ur.status = 'RATED' AND ur.rating IS NOT NULL),
                 a.average_score
             ) as site_avg_rating,
-            (SELECT COUNT(*) FROM user_rating ur
+            (SELECT COUNT(*) FROM user_ratings ur
              WHERE ur.anime_id = a.id AND ur.status = 'RATED' AND ur.rating IS NOT NULL) as site_rating_count,
             a.popularity
         FROM anime a
@@ -93,9 +93,9 @@ def unified_search(
             c.id, c.name_korean, c.name_full, c.name_native,
             COALESCE(c.image_url, c.image_local) as image_large,
             c.favourites,
-            (SELECT AVG(cr.rating) FROM character_rating cr
+            (SELECT AVG(cr.rating) FROM character_ratings cr
              WHERE cr.character_id = c.id AND cr.status = 'RATED' AND cr.rating IS NOT NULL) as site_avg_rating,
-            (SELECT COUNT(*) FROM character_rating cr
+            (SELECT COUNT(*) FROM character_ratings cr
              WHERE cr.character_id = c.id AND cr.status = 'RATED' AND cr.rating IS NOT NULL) as site_rating_count,
             a.id as anime_id,
             a.title_korean as anime_title_korean,
