@@ -27,26 +27,32 @@ def unified_search(
     results = {"anime": [], "characters": []}
     pattern = f"%{q}%"
 
-    # 애니메이션 검색
+    # 애니메이션 검색 (with site ratings calculated via subquery)
     anime_order = {
-        "popularity_desc": "popularity DESC",
-        "rating_desc": "COALESCE(site_average_rating, average_score, 0) DESC",
-        "rating_asc": "COALESCE(site_average_rating, average_score, 0) ASC",
-        "title_asc": "COALESCE(title_korean, title_romaji, title_english) ASC",
-    }.get(sort, "popularity DESC")
+        "popularity_desc": "a.popularity DESC",
+        "rating_desc": "site_avg_rating DESC",
+        "rating_asc": "site_avg_rating ASC",
+        "title_asc": "COALESCE(a.title_korean, a.title_romaji, a.title_english) ASC",
+    }.get(sort, "a.popularity DESC")
 
     anime_query = f"""
         SELECT
-            id, title_korean, title_romaji, title_english, title_native,
-            COALESCE(cover_image_url, cover_image_local) as cover_image,
-            format, episodes, status, season_year,
-            COALESCE(site_average_rating, average_score) as rating,
-            site_rating_count, popularity
-        FROM anime
-        WHERE title_korean LIKE ?
-           OR title_romaji LIKE ?
-           OR title_english LIKE ?
-           OR title_native LIKE ?
+            a.id, a.title_korean, a.title_romaji, a.title_english, a.title_native,
+            COALESCE(a.cover_image_url, a.cover_image_local) as cover_image,
+            a.format, a.episodes, a.status, a.season_year,
+            COALESCE(
+                (SELECT AVG(ur.rating) FROM user_rating ur
+                 WHERE ur.anime_id = a.id AND ur.status = 'RATED' AND ur.rating IS NOT NULL),
+                a.average_score
+            ) as site_avg_rating,
+            (SELECT COUNT(*) FROM user_rating ur
+             WHERE ur.anime_id = a.id AND ur.status = 'RATED' AND ur.rating IS NOT NULL) as site_rating_count,
+            a.popularity
+        FROM anime a
+        WHERE a.title_korean LIKE ?
+           OR a.title_romaji LIKE ?
+           OR a.title_english LIKE ?
+           OR a.title_native LIKE ?
         ORDER BY {anime_order}
         LIMIT ?
     """
@@ -74,11 +80,11 @@ def unified_search(
         for row in anime_results
     ]
 
-    # 캐릭터 검색
+    # 캐릭터 검색 (with site ratings calculated via subquery)
     char_order = {
         "popularity_desc": "c.favourites DESC",
-        "rating_desc": "COALESCE(c.site_average_rating, 0) DESC",
-        "rating_asc": "COALESCE(c.site_average_rating, 0) ASC",
+        "rating_desc": "site_avg_rating DESC",
+        "rating_asc": "site_avg_rating ASC",
         "title_asc": "COALESCE(c.name_korean, c.name_full) ASC",
     }.get(sort, "c.favourites DESC")
 
@@ -87,8 +93,10 @@ def unified_search(
             c.id, c.name_korean, c.name_full, c.name_native,
             COALESCE(c.image_url, c.image_local) as image_large,
             c.favourites,
-            c.site_average_rating,
-            c.site_rating_count,
+            (SELECT AVG(cr.rating) FROM character_rating cr
+             WHERE cr.character_id = c.id AND cr.status = 'RATED' AND cr.rating IS NOT NULL) as site_avg_rating,
+            (SELECT COUNT(*) FROM character_rating cr
+             WHERE cr.character_id = c.id AND cr.status = 'RATED' AND cr.rating IS NOT NULL) as site_rating_count,
             a.id as anime_id,
             a.title_korean as anime_title_korean,
             a.title_romaji as anime_title_romaji
