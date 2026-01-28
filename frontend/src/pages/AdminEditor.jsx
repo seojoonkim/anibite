@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 import ImageCropModal from '../components/ImageCropModal';
 
@@ -263,7 +264,15 @@ export default function AdminEditor() {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">🛠️ Admin Editor</h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-4xl font-bold">🛠️ Admin Editor</h1>
+          <Link
+            to="/admin/backup"
+            className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors"
+          >
+            💾 백업 & 중복 제거
+          </Link>
+        </div>
 
         {/* 검색 */}
         <div className="bg-gray-800 rounded-lg p-6 mb-8">

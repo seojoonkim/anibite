@@ -1563,3 +1563,134 @@ def check_bookmarks_table():
             "error": str(e),
             "traceback": traceback.format_exc()
         }
+
+
+@router.post("/clean-duplicates")
+def clean_duplicates_endpoint():
+    """
+    Remove duplicate ratings from production database
+    프로덕션 DB에서 중복 평가 제거
+    """
+    try:
+        results = {
+            "character_ratings_removed": 0,
+            "user_ratings_removed": 0,
+            "character_activities_removed": 0,
+            "anime_activities_removed": 0
+        }
+
+        # 1. character_ratings 중복 제거
+        char_duplicates = db.execute_query("""
+            SELECT user_id, character_id, COUNT(*) as count
+            FROM character_ratings
+            GROUP BY user_id, character_id
+            HAVING COUNT(*) > 1
+        """)
+
+        if char_duplicates:
+            for user_id, character_id, count in char_duplicates:
+                all_ids = db.execute_query("""
+                    SELECT id FROM character_ratings
+                    WHERE user_id = ? AND character_id = ?
+                    ORDER BY updated_at DESC, created_at DESC
+                """, (user_id, character_id))
+
+                if len(all_ids) > 1:
+                    ids_to_delete = [row[0] for row in all_ids[1:]]
+                    placeholders = ','.join('?' * len(ids_to_delete))
+                    deleted = db.execute_update(
+                        f"DELETE FROM character_ratings WHERE id IN ({placeholders})",
+                        tuple(ids_to_delete)
+                    )
+                    results["character_ratings_removed"] += deleted
+
+        # 2. user_ratings 중복 제거
+        user_duplicates = db.execute_query("""
+            SELECT user_id, anime_id, COUNT(*) as count
+            FROM user_ratings
+            GROUP BY user_id, anime_id
+            HAVING COUNT(*) > 1
+        """)
+
+        if user_duplicates:
+            for user_id, anime_id, count in user_duplicates:
+                all_ids = db.execute_query("""
+                    SELECT id FROM user_ratings
+                    WHERE user_id = ? AND anime_id = ?
+                    ORDER BY updated_at DESC, created_at DESC
+                """, (user_id, anime_id))
+
+                if len(all_ids) > 1:
+                    ids_to_delete = [row[0] for row in all_ids[1:]]
+                    placeholders = ','.join('?' * len(ids_to_delete))
+                    deleted = db.execute_update(
+                        f"DELETE FROM user_ratings WHERE id IN ({placeholders})",
+                        tuple(ids_to_delete)
+                    )
+                    results["user_ratings_removed"] += deleted
+
+        # 3. activities 중복 제거 (character_rating)
+        char_activity_dups = db.execute_query("""
+            SELECT user_id, item_id, COUNT(*) as count
+            FROM activities
+            WHERE activity_type = 'character_rating'
+            GROUP BY user_id, item_id
+            HAVING COUNT(*) > 1
+        """)
+
+        if char_activity_dups:
+            for user_id, item_id, count in char_activity_dups:
+                all_ids = db.execute_query("""
+                    SELECT id FROM activities
+                    WHERE activity_type = 'character_rating'
+                      AND user_id = ? AND item_id = ?
+                    ORDER BY activity_time DESC, created_at DESC
+                """, (user_id, item_id))
+
+                if len(all_ids) > 1:
+                    ids_to_delete = [row[0] for row in all_ids[1:]]
+                    placeholders = ','.join('?' * len(ids_to_delete))
+                    deleted = db.execute_update(
+                        f"DELETE FROM activities WHERE id IN ({placeholders})",
+                        tuple(ids_to_delete)
+                    )
+                    results["character_activities_removed"] += deleted
+
+        # 4. activities 중복 제거 (anime_rating)
+        anime_activity_dups = db.execute_query("""
+            SELECT user_id, item_id, COUNT(*) as count
+            FROM activities
+            WHERE activity_type = 'anime_rating'
+            GROUP BY user_id, item_id
+            HAVING COUNT(*) > 1
+        """)
+
+        if anime_activity_dups:
+            for user_id, item_id, count in anime_activity_dups:
+                all_ids = db.execute_query("""
+                    SELECT id FROM activities
+                    WHERE activity_type = 'anime_rating'
+                      AND user_id = ? AND item_id = ?
+                    ORDER BY activity_time DESC, created_at DESC
+                """, (user_id, item_id))
+
+                if len(all_ids) > 1:
+                    ids_to_delete = [row[0] for row in all_ids[1:]]
+                    placeholders = ','.join('?' * len(ids_to_delete))
+                    deleted = db.execute_update(
+                        f"DELETE FROM activities WHERE id IN ({placeholders})",
+                        tuple(ids_to_delete)
+                    )
+                    results["anime_activities_removed"] += deleted
+
+        total_removed = sum(results.values())
+
+        return {
+            "success": True,
+            "total_removed": total_removed,
+            **results
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
