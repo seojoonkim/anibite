@@ -112,16 +112,40 @@ export default function RateCharacters() {
     }
   };
 
-  const loadMore = useCallback(() => {
+  const loadMore = useCallback(async () => {
     if (!hasMore || loadingMore) return;
     setLoadingMore(true);
-    // Frontend pagination: show 20 more items from already loaded data
-    const newDisplayedCount = Math.min(displayedCount + 20, allCharacters.length);
-    setCharacters(allCharacters.slice(0, newDisplayedCount));
-    setDisplayedCount(newDisplayedCount);
-    setHasMore(newDisplayedCount < allCharacters.length);
-    setPage(page + 1);
-    setLoadingMore(false);
+
+    try {
+      // If we have more frontend-cached items, show them first
+      if (displayedCount < allCharacters.length) {
+        const newDisplayedCount = Math.min(displayedCount + 20, allCharacters.length);
+        setCharacters(allCharacters.slice(0, newDisplayedCount));
+        setDisplayedCount(newDisplayedCount);
+        setHasMore(true); // Always true for infinite scroll
+        setPage(page + 1);
+      } else {
+        // All frontend items shown, load more from backend
+        const data = await characterService.getCharactersForRating({
+          limit: 50,
+          offset: allCharacters.length
+        });
+
+        if (data.items && data.items.length > 0) {
+          const newAllCharacters = [...allCharacters, ...data.items];
+          setAllCharacters(newAllCharacters);
+          setCharacters(newAllCharacters.slice(0, displayedCount + 20));
+          setDisplayedCount(displayedCount + 20);
+          setHasMore(true); // Keep loading
+        } else {
+          setHasMore(false); // No more items
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load more characters:', err);
+    } finally {
+      setLoadingMore(false);
+    }
   }, [hasMore, loadingMore, page, displayedCount, allCharacters]);
 
   const loadStats = async () => {
