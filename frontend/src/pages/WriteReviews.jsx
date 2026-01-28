@@ -733,7 +733,7 @@ export default function WriteReviews() {
                                 rating={editRating}
                                 onRatingChange={setEditRating}
                                 readonly={false}
-                                size="xl"
+                                size="feed"
                                 showNumber={true}
                               />
                             </div>

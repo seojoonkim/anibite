@@ -708,7 +708,7 @@ const ActivityCard = forwardRef(({
                         : 0;
 
                   return (
-                    <div key={i} className="relative w-5 h-5" style={{ marginRight: '-1px' }}>
+                    <div key={i} className="relative w-5 h-5" style={{ marginRight: '-2px' }}>
                       <svg
                         className="w-5 h-5 text-gray-200"
                         fill="currentColor"
