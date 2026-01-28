@@ -24,14 +24,28 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 
 # CORS Settings - Allow frontend domains
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS",
-    "http://localhost:3000,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://127.0.0.1:3000,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175,http://127.0.0.1:5176,https://anibite.com,https://www.anibite.com"
-).split(",")
+_DEFAULT_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "http://localhost:5176",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    "http://127.0.0.1:5175",
+    "http://127.0.0.1:5176",
+]
 
-# Add production origins if set
-PRODUCTION_ORIGIN = os.getenv("PRODUCTION_ORIGIN")
-if PRODUCTION_ORIGIN:
-    ALLOWED_ORIGINS.append(PRODUCTION_ORIGIN)
+# Production origins - always included
+_PRODUCTION_ORIGINS = [
+    "https://anibite.com",
+    "https://www.anibite.com",
+]
+
+# Build allowed origins list
+_env_origins = os.getenv("ALLOWED_ORIGINS", "").split(",") if os.getenv("ALLOWED_ORIGINS") else []
+ALLOWED_ORIGINS = list(set(_DEFAULT_ORIGINS + _PRODUCTION_ORIGINS + [o.strip() for o in _env_origins if o.strip()]))
 
 # Pagination
 DEFAULT_PAGE_SIZE = 50
