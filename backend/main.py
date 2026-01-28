@@ -58,16 +58,18 @@ async def startup_event():
         import traceback
         traceback.print_exc()
 
-    # 2. Sync Korean character names
-    print("[Startup] Syncing Korean character names...")
-    try:
-        from scripts.sync_korean_names import sync_korean_names
-        sync_korean_names()
-        print("[Startup] OK - Korean names sync complete")
-    except Exception as e:
-        print(f"[Startup] WARNING -Korean names sync failed: {e}")
-        import traceback
-        traceback.print_exc()
+    # 2. Sync Korean character names (DISABLED - overwrites manual edits)
+    # This script overwrites manually edited names from admin panel
+    # Only run this manually if you need to bulk update from korean_names.json
+    # print("[Startup] Syncing Korean character names...")
+    # try:
+    #     from scripts.sync_korean_names import sync_korean_names
+    #     sync_korean_names()
+    #     print("[Startup] OK - Korean names sync complete")
+    # except Exception as e:
+    #     print(f"[Startup] WARNING -Korean names sync failed: {e}")
+    #     import traceback
+    #     traceback.print_exc()
 
     # 2.5. Ensure UNIQUE constraints to prevent duplicate ratings
     print("[Startup] Ensuring UNIQUE constraints...")
