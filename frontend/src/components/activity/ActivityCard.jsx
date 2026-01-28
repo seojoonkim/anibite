@@ -244,8 +244,13 @@ const ActivityCard = forwardRef(({
 
   // Calculate item image src with useMemo - use centralized helper for API proxy
   const itemImageSrc = useMemo(() => {
-    const url = activity.item_image;
+    let url = activity.item_image;
     if (!url) return null;
+
+    // Normalize URL: ensure it starts with / if it's a relative path
+    if (!url.startsWith('http') && !url.startsWith('/')) {
+      url = `/${url}`;
+    }
 
     // For character images, use the centralized helper (routes through API proxy)
     if (url.includes('anilist.co') && url.includes('/character/')) {
@@ -256,10 +261,10 @@ const ActivityCard = forwardRef(({
       return getCharacterImageUrl(characterId, url);
     }
 
-    // For character images from R2 paths, extract ID and use API proxy
-    if (url.startsWith('/images/characters/')) {
+    // For character images from R2 paths - use backend API proxy
+    if (url.includes('/characters/')) {
       // Extract character ID from path like "/images/characters/8485.jpg"
-      const match = url.match(/\/images\/characters\/(\d+)\./);
+      const match = url.match(/\/characters\/(\d+)\./);
       const characterId = match && match[1] ? match[1] :
         (activity.activity_type === 'character_rating' ? activity.item_id : null);
       if (characterId) {

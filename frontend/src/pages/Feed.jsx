@@ -243,10 +243,15 @@ export default function Feed() {
   const getItemImageUrl = (url, characterId = null) => {
     if (!url) return '/placeholder-anime.svg';
 
+    // Normalize URL: ensure it starts with / if it's a relative path
+    if (!url.startsWith('http') && !url.startsWith('/')) {
+      url = `/${url}`;
+    }
+
     // For character images from R2 paths, extract ID and use API proxy
-    if (url.startsWith('/images/characters/')) {
+    if (url.includes('/characters/')) {
       // Extract character ID from path like "/images/characters/8485.jpg"
-      const match = url.match(/\/images\/characters\/(\d+)\./);
+      const match = url.match(/\/characters\/(\d+)\./);
       const extractedId = match && match[1] ? match[1] : characterId;
       if (extractedId) {
         return `${API_BASE_URL}/api/images/characters/${extractedId}.jpg`;
