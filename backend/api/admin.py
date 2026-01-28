@@ -2235,3 +2235,91 @@ def clean_duplicate_character_ratings_by_name(dry_run: bool = True):
     except Exception as e:
         import traceback
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
+
+
+@router.get("/check-korean-titles")
+def check_korean_titles():
+    """
+    Find potentially incorrect Korean titles
+    잘못된 한국어 제목 찾기
+    """
+    try:
+        results = {
+            "same_as_romaji": [],  # 한국어 제목이 로마자와 동일
+            "same_as_english": [],  # 한국어 제목이 영어와 동일
+            "contains_japanese": [],  # 일본어 문자 포함
+            "too_short": [],  # 너무 짧은 제목 (1-2자)
+            "suspicious_translation": []  # 의심스러운 번역
+        }
+
+        # 1. 한국어 제목이 로마자 제목과 동일한 경우
+        same_romaji = db.execute_query("""
+            SELECT id, title_romaji, title_korean, title_english
+            FROM anime
+            WHERE title_korean IS NOT NULL
+              AND title_korean != ''
+              AND title_korean = title_romaji
+            LIMIT 50
+        """)
+        results["same_as_romaji"] = [dict(row) for row in same_romaji]
+
+        # 2. 한국어 제목이 영어 제목과 동일한 경우 (한글이 아닌)
+        same_english = db.execute_query("""
+            SELECT id, title_romaji, title_korean, title_english
+            FROM anime
+            WHERE title_korean IS NOT NULL
+              AND title_korean != ''
+              AND title_korean = title_english
+              AND title_korean NOT GLOB '*[가-힣]*'
+            LIMIT 50
+        """)
+        results["same_as_english"] = [dict(row) for row in same_english]
+
+        # 3. 한국어 제목에 일본어 히라가나/카타카나가 포함된 경우
+        contains_japanese = db.execute_query("""
+            SELECT id, title_romaji, title_korean, title_english
+            FROM anime
+            WHERE title_korean IS NOT NULL
+              AND title_korean != ''
+              AND (title_korean GLOB '*[ぁ-ん]*' OR title_korean GLOB '*[ァ-ン]*')
+            LIMIT 50
+        """)
+        results["contains_japanese"] = [dict(row) for row in contains_japanese]
+
+        # 4. 너무 짧은 한국어 제목 (1-2자, 한글만)
+        too_short = db.execute_query("""
+            SELECT id, title_romaji, title_korean, title_english
+            FROM anime
+            WHERE title_korean IS NOT NULL
+              AND title_korean GLOB '*[가-힣]*'
+              AND LENGTH(title_korean) <= 2
+            LIMIT 50
+        """)
+        results["too_short"] = [dict(row) for row in too_short]
+
+        # 5. 인기 있는 작품 중 한국어 제목이 없는 경우
+        missing_korean = db.execute_query("""
+            SELECT id, title_romaji, title_english, popularity
+            FROM anime
+            WHERE (title_korean IS NULL OR title_korean = '')
+              AND popularity > 50000
+            ORDER BY popularity DESC
+            LIMIT 30
+        """)
+        results["missing_korean_popular"] = [dict(row) for row in missing_korean]
+
+        return {
+            "success": True,
+            "counts": {
+                "same_as_romaji": len(results["same_as_romaji"]),
+                "same_as_english": len(results["same_as_english"]),
+                "contains_japanese": len(results["contains_japanese"]),
+                "too_short": len(results["too_short"]),
+                "missing_korean_popular": len(results.get("missing_korean_popular", []))
+            },
+            "results": results
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
