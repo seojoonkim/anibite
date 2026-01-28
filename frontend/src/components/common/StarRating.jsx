@@ -11,6 +11,7 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
     md: 'w-6 h-6',
     lg: 'w-8 h-8 sm:w-10 sm:h-10',
     xl: 'w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12',
+    widget: 'w-10 h-10 sm:w-11 sm:h-11',  // 위젯용 - 더 크고 간격 작게
   };
 
   useEffect(() => {
@@ -128,6 +129,7 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
     md: 'gap-1',
     lg: 'gap-1 sm:gap-1.5',
     xl: 'gap-1 sm:gap-1.5',
+    widget: 'gap-0.5',  // 위젯용 - 간격 좁게
   };
 
   const alignClasses = {
