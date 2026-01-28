@@ -10,7 +10,7 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
     feed: 'w-5 h-5',
     md: 'w-6 h-6',
     lg: 'w-8 h-8 sm:w-10 sm:h-10',
-    xl: 'w-12 h-12',
+    xl: 'w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12',
   };
 
   useEffect(() => {
