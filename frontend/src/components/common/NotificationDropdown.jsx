@@ -281,14 +281,14 @@ export default function NotificationDropdown({
               <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
               {language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...'}
             </div>
-          ) : (notifications.length === 0 || unreadCount === 0) ? (
-            // 빈 상태
+          ) : notifications.length === 0 ? (
+            // 빈 상태 - 알림이 없을 때만 표시
             <div className="p-8 text-center">
               <svg className="w-16 h-16 mx-auto text-text-tertiary mb-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
               </svg>
               <p className="text-text-secondary font-medium">
-                {language === 'ko' ? '새로운 알림이 없습니다' : language === 'ja' ? '新しい通知はありません' : 'No new notifications'}
+                {language === 'ko' ? '알림이 없습니다' : language === 'ja' ? '通知はありません' : 'No notifications'}
               </p>
             </div>
           ) : (
@@ -419,13 +419,13 @@ export default function NotificationDropdown({
                 <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
                 {language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...'}
               </div>
-            ) : (notifications.length === 0 || unreadCount === 0) ? (
+            ) : notifications.length === 0 ? (
               <div className="p-8 text-center">
                 <svg className="w-16 h-16 mx-auto text-text-tertiary mb-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
                 <p className="text-text-secondary font-medium">
-                  {language === 'ko' ? '새로운 알림이 없습니다' : language === 'ja' ? '新しい通知はありません' : 'No new notifications'}
+                  {language === 'ko' ? '알림이 없습니다' : language === 'ja' ? '通知はありません' : 'No notifications'}
                 </p>
               </div>
             ) : (
