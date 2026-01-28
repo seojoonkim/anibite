@@ -6,65 +6,61 @@ import { useLanguage } from '../context/LanguageContext';
 import { usePrefetch } from '../hooks/usePrefetch';
 import StarRating from '../components/common/StarRating';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
+import api from '../services/api';
 
 export default function Browse() {
   const { user } = useAuth();
   const { t, getAnimeTitle, language } = useLanguage();
   const { handleAnimeMouseEnter, handleMouseLeave } = usePrefetch();
   const [animeList, setAnimeList] = useState([]);
+  const [characterList, setCharacterList] = useState([]);
   const [initialLoading, setInitialLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState('');
-  // 초기 검색어를 비워두고 인기순으로 정렬하여 표시
   const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState({
-    genre: '',
-    year: '',
-    status: '',
-    sort: 'popularity_desc',
-  });
+  const [sort, setSort] = useState('popularity_desc');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [searchMode, setSearchMode] = useState(false); // true when searching
   const observerRef = useRef(null);
   const loadMoreTriggerRef = useRef(null);
 
-  // Cache management
-  const [cachedData, setCachedData] = useState(null);
-  const cacheLoadedRef = useRef(false);
-
-  // Generate cache key based on current filters
-  const getCacheKey = () => {
-    const key = `browse_cache_${searchTerm}_${filters.genre}_${filters.year}_${filters.status}_${filters.sort}`;
-    return key;
-  };
-
-  // Load cached data on mount
+  // Load on mount and when sort changes
   useEffect(() => {
-    if (!cacheLoadedRef.current) {
-      try {
-        const cacheKey = getCacheKey();
-        const cached = sessionStorage.getItem(cacheKey);
-        if (cached) {
-          const { data, timestamp } = JSON.parse(cached);
-          // Use cache if less than 2 minutes old
-          if (Date.now() - timestamp < 120000) {
-            setCachedData(data);
-            setAnimeList(data);
-            setInitialLoading(false);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to load cache:', err);
-      }
-      cacheLoadedRef.current = true;
+    if (searchTerm) {
+      performSearch();
+    } else {
+      loadAnime(true);
     }
-  }, []);
+  }, [sort]);
 
-  useEffect(() => {
-    setCachedData(null);
-    cacheLoadedRef.current = false;
-    loadAnime(true);
-  }, [searchTerm, filters]);
+  // Unified search function
+  const performSearch = async () => {
+    if (!searchTerm.trim()) {
+      setSearchMode(false);
+      loadAnime(true);
+      return;
+    }
+
+    try {
+      setInitialLoading(true);
+      setSearchMode(true);
+      setError('');
+
+      const response = await api.get('/api/search', {
+        params: { q: searchTerm, sort, limit: 30 }
+      });
+
+      setAnimeList(response.data.anime || []);
+      setCharacterList(response.data.characters || []);
+      setHasMore(false); // Unified search doesn't support pagination yet
+      setInitialLoading(false);
+    } catch (err) {
+      console.error('Search failed:', err);
+      setError('검색에 실패했습니다.');
+      setInitialLoading(false);
+    }
+  };
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
@@ -94,6 +90,8 @@ export default function Browse() {
     try {
       if (resetList) {
         setInitialLoading(true);
+        setSearchMode(false);
+        setCharacterList([]);
       } else {
         setLoadingMore(true);
       }
@@ -102,12 +100,8 @@ export default function Browse() {
       const currentPage = resetList ? 1 : page;
       const params = {
         page: currentPage,
-        limit: 10,
-        search: searchTerm || undefined,
-        genre: filters.genre || undefined,
-        year: filters.year || undefined,
-        status: filters.status || undefined,
-        sort: filters.sort,
+        limit: 20,
+        sort: sort,
       };
 
       const data = await animeService.getAnimeList(params);
@@ -115,19 +109,6 @@ export default function Browse() {
       if (resetList) {
         setAnimeList(data.items || []);
         setPage(1);
-
-        // Cache first page data
-        if (currentPage === 1 && data.items && data.items.length > 0) {
-          try {
-            const cacheKey = getCacheKey();
-            sessionStorage.setItem(cacheKey, JSON.stringify({
-              data: data.items,
-              timestamp: Date.now()
-            }));
-          } catch (err) {
-            console.error('Failed to save cache:', err);
-          }
-        }
       } else {
         setAnimeList((prev) => [...prev, ...(data.items || [])]);
       }
@@ -145,12 +126,23 @@ export default function Browse() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    loadAnime(true);
+    if (searchTerm.trim()) {
+      performSearch();
+    } else {
+      loadAnime(true);
+    }
   };
 
-  const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+  const handleSortChange = (value) => {
+    setSort(value);
     setPage(1);
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setSearchMode(false);
+    setCharacterList([]);
+    loadAnime(true);
   };
 
   const handleLoadMore = () => {
@@ -181,87 +173,51 @@ export default function Browse() {
     <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
 
       <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6 mb-8">
-          <form onSubmit={handleSearch} className="mb-4">
-            <div className="flex gap-2">
+        {/* Search Bar - Sort on left, search input, search button */}
+        <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-4 mb-6">
+          <form onSubmit={handleSearch} className="flex items-center gap-2">
+            {/* Sort Dropdown */}
+            <select
+              value={sort}
+              onChange={(e) => handleSortChange(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm bg-white min-w-[100px]"
+            >
+              <option value="popularity_desc">{t('sortPopularity')}</option>
+              <option value="rating_desc">{t('sortRatingDesc')}</option>
+              <option value="rating_asc">{t('sortRatingAsc')}</option>
+              <option value="title_asc">{t('sortTitle')}</option>
+            </select>
+
+            {/* Search Input */}
+            <div className="flex-1 relative">
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder={t('searchPlaceholder')}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+                placeholder={language === 'ko' ? '애니메이션, 캐릭터 검색...' : language === 'ja' ? 'アニメ、キャラクター検索...' : 'Search anime, characters...'}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
               />
-              <button
-                type="submit"
-                className="bg-[#3797F0] hover:bg-[#2a7dc4] text-white px-6 py-2 rounded-lg font-medium shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(55,151,240,0.25)] transition-all text-sm"
-              >
-                {t('search')}
-              </button>
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
             </div>
+
+            {/* Search Button */}
+            <button
+              type="submit"
+              className="bg-[#3797F0] hover:bg-[#2a7dc4] text-white px-5 py-2 rounded-lg font-medium shadow-sm hover:shadow-md transition-all text-sm whitespace-nowrap"
+            >
+              {t('search')}
+            </button>
           </form>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="flex items-center gap-2 md:block">
-              <label className="w-12 text-xs font-medium text-gray-700 md:w-auto md:block md:mb-1 whitespace-nowrap">
-                {t('sort')}
-              </label>
-              <select
-                value={filters.sort}
-                onChange={(e) => handleFilterChange('sort', e.target.value)}
-                className="flex-1 md:w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
-              >
-                <option value="popularity_desc">{t('sortPopularity')}</option>
-                <option value="rating_desc">{t('sortRatingDesc')}</option>
-                <option value="rating_asc">{t('sortRatingAsc')}</option>
-                <option value="title_asc">{t('sortTitle')}</option>
-                <option value="year_desc">{t('sortYearDesc')}</option>
-                <option value="year_asc">{t('sortYearAsc')}</option>
-              </select>
-            </div>
-
-            <div className="flex items-center gap-2 md:block">
-              <label className="w-12 text-xs font-medium text-gray-700 md:w-auto md:block md:mb-1 whitespace-nowrap">
-                {t('status')}
-              </label>
-              <select
-                value={filters.status}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="flex-1 md:w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
-              >
-                <option value="">{t('statusAll')}</option>
-                <option value="Currently Airing">{t('statusAiring')}</option>
-                <option value="Finished Airing">{t('statusFinished')}</option>
-                <option value="Not yet aired">{t('statusNotYetAired')}</option>
-              </select>
-            </div>
-
-            <div className="flex items-center gap-2 md:block">
-              <label className="w-12 text-xs font-medium text-gray-700 md:w-auto md:block md:mb-1 whitespace-nowrap">
-                {t('year')}
-              </label>
-              <input
-                type="number"
-                value={filters.year}
-                onChange={(e) => handleFilterChange('year', e.target.value)}
-                placeholder={t('yearPlaceholder')}
-                className="flex-1 md:w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
-              />
-            </div>
-
-            <div className="flex items-center gap-2 md:block">
-              <label className="w-12 text-xs font-medium text-gray-700 md:w-auto md:block md:mb-1 whitespace-nowrap">
-                {t('genre')}
-              </label>
-              <input
-                type="text"
-                value={filters.genre}
-                onChange={(e) => handleFilterChange('genre', e.target.value)}
-                placeholder={t('genrePlaceholder')}
-                className="flex-1 md:w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
-              />
-            </div>
-          </div>
         </div>
 
         {/* Error Message */}
@@ -271,16 +227,68 @@ export default function Browse() {
           </div>
         )}
 
+        {/* Character Results - Only show when searching */}
+        {searchMode && characterList.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-3">
+              {language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Characters'} ({characterList.length})
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {characterList.map((character) => (
+                <Link
+                  key={character.id}
+                  to={`/character/${character.id}`}
+                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all overflow-hidden group"
+                >
+                  <div className="aspect-[3/4] bg-gray-200 overflow-hidden">
+                    <img
+                      src={character.image_large ? `${IMAGE_BASE_URL}/images/characters/${character.id}.jpg` : '/placeholder-character.svg'}
+                      alt={character.name_korean || character.name_full}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                      onError={(e) => { e.target.src = '/placeholder-character.svg'; }}
+                    />
+                  </div>
+                  <div className="p-2">
+                    <div className="font-medium text-sm text-gray-900 truncate">
+                      {character.name_korean || character.name_full}
+                    </div>
+                    {character.anime_title_korean && (
+                      <div className="text-xs text-gray-500 truncate">
+                        {character.anime_title_korean}
+                      </div>
+                    )}
+                    {character.rating && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <svg className="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        <span className="text-xs text-gray-600">{character.rating.toFixed(1)}</span>
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Anime Results Header - Only show when searching */}
+        {searchMode && animeList.length > 0 && (
+          <h2 className="text-lg font-semibold text-gray-800 mb-3">
+            {language === 'ko' ? '애니메이션' : language === 'ja' ? 'アニメ' : 'Anime'} ({animeList.length})
+          </h2>
+        )}
+
         {/* Anime List - Table Format */}
-        {initialLoading && animeList.length === 0 ? (
+        {initialLoading && animeList.length === 0 && characterList.length === 0 ? (
           <div className="flex justify-center items-center h-64">
             <div className="text-xl text-gray-600">{t('loading')}</div>
           </div>
-        ) : animeList.length === 0 ? (
+        ) : animeList.length === 0 && characterList.length === 0 ? (
           <div className="flex justify-center items-center h-64">
             <div className="text-xl text-gray-600">{t('noResults')}</div>
           </div>
-        ) : (
+        ) : animeList.length > 0 ? (
           <>
             <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden mb-8">
               <div className="overflow-x-auto">
@@ -420,21 +428,23 @@ export default function Browse() {
               </div>
             </div>
 
-            {/* Infinite scroll trigger */}
-            <div ref={loadMoreTriggerRef} className="h-20 flex items-center justify-center">
-              {loadingMore && (
-                <div className="text-gray-500 text-sm">
-                  {language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...'}
-                </div>
-              )}
-              {!initialLoading && !loadingMore && !hasMore && animeList.length > 0 && (
-                <div className="text-gray-400 text-sm">
-                  {language === 'ko' ? '모든 애니메이션을 불러왔습니다' : language === 'ja' ? 'すべてのアニメを読み込みました' : 'All anime loaded'}
-                </div>
-              )}
-            </div>
+            {/* Infinite scroll trigger - only when not in search mode */}
+            {!searchMode && (
+              <div ref={loadMoreTriggerRef} className="h-20 flex items-center justify-center">
+                {loadingMore && (
+                  <div className="text-gray-500 text-sm">
+                    {language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...'}
+                  </div>
+                )}
+                {!initialLoading && !loadingMore && !hasMore && animeList.length > 0 && (
+                  <div className="text-gray-400 text-sm">
+                    {language === 'ko' ? '모든 애니메이션을 불러왔습니다' : language === 'ja' ? 'すべてのアニメを読み込みました' : 'All anime loaded'}
+                  </div>
+                )}
+              </div>
+            )}
           </>
-        )}
+        ) : null}
       </div>
     </div>
   );
