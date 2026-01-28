@@ -243,17 +243,17 @@ export default function Navbar() {
           boxShadow: 'var(--shadow-sm)'
         }}
       >
-        <div className="max-w-[1100px] mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="max-w-[1180px] mx-auto px-3 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 items-center h-9 md:h-12 md:gap-4 pb-1 md:pb-0">
             {/* Logo and Mobile User Menu */}
             <div className="flex items-center justify-between md:col-span-1">
-              <Link to="/feed" className="flex items-center gap-1 md:gap-1.5 text-lg md:text-xl font-bold text-text-primary hover:opacity-60 transition-opacity group">
+              <Link to="/feed" className="flex items-center gap-1 md:gap-1.5 text-base md:text-lg font-bold text-text-primary hover:opacity-60 transition-opacity group">
                 {/* AniPass Logo Icon */}
                 <div className="relative">
                   <img
                     src="/logo.png"
                     alt="AniBite Logo"
-                    className="w-7 h-7 md:w-8 md:h-8 object-contain rounded-md"
+                    className="w-6 h-6 md:w-7 md:h-7 object-contain rounded-md"
                   />
                 </div>
                 <span className="">AniBite</span>
@@ -333,12 +333,12 @@ export default function Navbar() {
 
             {/* Desktop Menu and Right Side - Aligned with feed content area */}
             <div className="hidden md:flex items-center justify-between md:col-span-3">
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-0.5 lg:space-x-1">
                 {menuItems.map((item) => (
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`px-3 py-2 rounded-md text-sm font-normal transition-colors whitespace-nowrap ${isActive(item.path)
+                    className={`px-2 lg:px-3 py-1.5 rounded-md text-xs font-normal transition-colors whitespace-nowrap ${isActive(item.path)
                       ? 'bg-primary text-white'
                       : 'text-text-primary hover:text-text-secondary hover:bg-surface-hover'
                       }`}

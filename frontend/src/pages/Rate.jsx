@@ -628,7 +628,7 @@ export default function Rate() {
   return (
     <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
 
-      <div className="max-w-[1100px] mx-auto px-3 sm:px-4 lg:px-6 py-4">
+      <div className="max-w-[1180px] mx-auto px-3 sm:px-4 lg:px-6 py-4">
         {/* Header with Stats */}
         <div className="flex justify-center items-center mb-4">
           {/* Stats */}

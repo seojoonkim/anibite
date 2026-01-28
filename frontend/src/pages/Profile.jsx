@@ -67,7 +67,7 @@ export default function Profile() {
     <div className="min-h-screen pt-12 bg-transparent">
       <Navbar />
 
-      <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* User Info Header */}
         <div className="bg-surface rounded-xl shadow-lg border border-border p-6 mb-6">
           <div className="flex items-center gap-6">

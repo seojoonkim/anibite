@@ -49,7 +49,7 @@ export default function Leaderboard() {
   return (
     <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
 
-      <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+      <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="bg-surface rounded-lg shadow-lg border border-border overflow-hidden">
           <table className="w-full">
             <thead className="bg-surface-elevated border-b border-border">

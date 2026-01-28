@@ -269,7 +269,7 @@ export default function Settings() {
   return (
     <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
 
-      <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+      <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
 
         {/* Settings Sections */}
         <div className="space-y-6">
