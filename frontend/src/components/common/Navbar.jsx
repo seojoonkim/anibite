@@ -261,17 +261,11 @@ export default function Navbar() {
                     d="M4 8C4 5.79 5.79 4 8 4H18C18 4 18 6 20 8C22 10 24 10 24 10H24C26.21 10 28 11.79 28 14V24C28 26.21 26.21 28 24 28H8C5.79 28 4 26.21 4 24V8Z"
                     fill="url(#logo-gradient)"
                   />
-                  {/* Cute rounded A - Varela Round (very rounded, cute) */}
-                  <text
-                    x="50%"
-                    y="60%"
-                    dominantBaseline="middle"
-                    textAnchor="middle"
+                  {/* Cute bubble-like A with rounded strokes */}
+                  <path
+                    d="M16 10C14 10 12.5 11.5 11 15L9 22C8.8 22.6 9.2 23 9.8 23H11.5C12 23 12.4 22.7 12.5 22.2L13 20H19L19.5 22.2C19.6 22.7 20 23 20.5 23H22.2C22.8 23 23.2 22.6 23 22L21 15C19.5 11.5 18 10 16 10ZM14 17.5L15.5 13C15.7 12.4 16.3 12.4 16.5 13L18 17.5H14Z"
                     fill="white"
-                    style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '17px', fontWeight: 400 }}
-                  >
-                    A
-                  </text>
+                  />
                 </svg>
                 <span
                   style={{
