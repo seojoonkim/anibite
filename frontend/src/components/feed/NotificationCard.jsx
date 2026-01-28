@@ -71,7 +71,7 @@ export default function NotificationCard({
               </div>
 
               {/* Notification Text - single line */}
-              <p className="flex-1 min-w-0 text-xs font-semibold truncate" style={{ color: '#ffffff' }}>
+              <p className="flex-1 min-w-0 text-xs font-normal truncate" style={{ color: '#ffffff' }}>
                 {getNotificationText(notification)}
               </p>
 
