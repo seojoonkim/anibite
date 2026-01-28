@@ -1,49 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
   <defs>
-    <linearGradient id="instagramGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#833AB4" />
-      <stop offset="40%" style="stop-color:#E1306C" />
-      <stop offset="70%" style="stop-color:#F77737" />
-      <stop offset="100%" style="stop-color:#FCAF45" />
+    <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60a5fa" />
+      <stop offset="100%" stop-color="#a78bfa" />
     </linearGradient>
   </defs>
-
-  <!-- Card Background with gradient -->
-  <rect x="4" y="8" width="56" height="48" rx="6" fill="url(#instagramGradient)" />
-
-  <!-- Border -->
-  <rect x="4" y="8" width="56" height="48" rx="6" stroke="white" stroke-width="2" opacity="0.4" fill="none" />
-
-  <!-- Letter A - Bubble/Rounded Style -->
-  <!-- Left side - very rounded -->
+  <!-- Rounded square with bite mark on top-right -->
   <path
-    d="M 16 51 Q 18 49 21 44 Q 23 39 24 34 Q 26 29 27 24 Q 29 19 32 14"
-    stroke="white"
-    stroke-width="8"
-    stroke-linecap="round"
-    fill="none"
+    d="M4 8C4 5.79 5.79 4 8 4H18C18 4 18 6 20 8C22 10 24 10 24 10H24C26.21 10 28 11.79 28 14V24C28 26.21 26.21 28 24 28H8C5.79 28 4 26.21 4 24V8Z"
+    fill="url(#logo-gradient)"
   />
-  <!-- Right side - very rounded -->
-  <path
-    d="M 32 14 Q 35 19 37 24 Q 38 29 40 34 Q 41 39 43 44 Q 46 49 48 51"
-    stroke="white"
-    stroke-width="8"
-    stroke-linecap="round"
-    fill="none"
-  />
-  <!-- Cross bar - bubble style -->
-  <ellipse
-    cx="32" cy="36"
-    rx="12" ry="5"
+  <!-- White A letter -->
+  <text
+    x="50%"
+    y="58%"
+    dominant-baseline="middle"
+    text-anchor="middle"
     fill="white"
-  />
-
-  <!-- Star Icon - Simple & Cute (slightly bigger) -->
-  <path
-    d="M 32 6 L 35.5 14 L 44 15.5 L 38 22 L 39.5 30.5 L 32 26 L 24.5 30.5 L 26 22 L 20 15.5 L 28.5 14 Z"
-    fill="#FCAF45"
-    stroke="white"
-    stroke-width="2"
-    stroke-linejoin="round"
-  />
+    style="font-family: Arial, sans-serif; font-size: 15px; font-weight: 800;"
+  >A</text>
 </svg>
