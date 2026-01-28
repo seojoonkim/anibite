@@ -23,6 +23,7 @@ const CharacterDetail = lazy(() => import('./pages/CharacterDetail'));
 const MyAniPass = lazy(() => import('./pages/MyAniPass'));
 const Settings = lazy(() => import('./pages/Settings'));
 const AdminEditor = lazy(() => import('./pages/AdminEditor'));
+const BackupLogs = lazy(() => import('./pages/BackupLogs'));
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -179,6 +180,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <AdminEditor />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/backup"
+          element={
+            <ProtectedRoute>
+              <BackupLogs />
             </ProtectedRoute>
           }
         />
