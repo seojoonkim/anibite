@@ -1939,6 +1939,118 @@ def force_clean_duplicates():
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
 
 
+@router.post("/clean-all-duplicate-activities")
+def clean_all_duplicate_activities():
+    """
+    Clean ALL duplicate activities (same user + same item_id + same activity_type)
+    모든 종류의 중복 활동 정리
+    """
+    try:
+        # Find all duplicates across all activity types
+        duplicates = db.execute_query("""
+            SELECT user_id, item_id, activity_type, COUNT(*) as count
+            FROM activities
+            GROUP BY user_id, item_id, activity_type
+            HAVING COUNT(*) > 1
+        """)
+
+        total_deleted = 0
+        processed = []
+
+        for row in duplicates:
+            user_id = row['user_id']
+            item_id = row['item_id']
+            activity_type = row['activity_type']
+            count = row['count']
+
+            # Get all activities for this combination
+            all_activities = db.execute_query("""
+                SELECT id, activity_time
+                FROM activities
+                WHERE user_id = ? AND item_id = ? AND activity_type = ?
+                ORDER BY activity_time DESC
+            """, (user_id, item_id, activity_type))
+
+            # Keep the most recent one, delete the rest
+            if len(all_activities) > 1:
+                keep_id = all_activities[0]['id']
+                delete_ids = [a['id'] for a in all_activities[1:]]
+
+                placeholders = ','.join('?' * len(delete_ids))
+                deleted = db.execute_update(
+                    f"DELETE FROM activities WHERE id IN ({placeholders})",
+                    tuple(delete_ids)
+                )
+
+                total_deleted += deleted
+                processed.append({
+                    'user_id': user_id,
+                    'item_id': item_id,
+                    'activity_type': activity_type,
+                    'original_count': count,
+                    'kept': keep_id,
+                    'deleted_count': deleted
+                })
+
+        return {
+            "success": True,
+            "duplicates_found": len(duplicates),
+            "total_deleted": total_deleted,
+            "processed": processed
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
+
+
+@router.get("/debug-user-activities/{user_id}")
+def debug_user_activities(user_id: int):
+    """
+    Debug user activities to find duplicates
+    """
+    try:
+        # Get all character rating activities for this user
+        activities = db.execute_query("""
+            SELECT
+                a.id, a.item_id, a.activity_type, a.item_title, a.rating, a.activity_time,
+                c.name_korean, c.name_full
+            FROM activities a
+            LEFT JOIN character c ON a.item_id = c.id AND a.activity_type = 'character_rating'
+            WHERE a.user_id = ?
+            ORDER BY a.activity_time DESC
+        """, (user_id,))
+
+        # Find duplicates
+        seen = {}
+        duplicates = []
+        for a in activities:
+            key = (a['item_id'], a['activity_type'])
+            if key in seen:
+                duplicates.append({
+                    'duplicate_id': a['id'],
+                    'original_id': seen[key],
+                    'item_id': a['item_id'],
+                    'item_title': a['item_title'],
+                    'name_korean': a['name_korean'],
+                    'activity_type': a['activity_type']
+                })
+            else:
+                seen[key] = a['id']
+
+        return {
+            "user_id": user_id,
+            "total_activities": len(activities),
+            "duplicates_found": len(duplicates),
+            "duplicates": duplicates,
+            "activities": activities[:50]  # First 50 for debugging
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
+
+
 @router.get("/find-duplicate-characters-by-name")
 def find_duplicate_characters_by_name():
     """
