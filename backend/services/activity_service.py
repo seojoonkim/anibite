@@ -119,23 +119,11 @@ def get_activities(
             a.review_title,
             a.review_content,
             a.is_spoiler,
-            -- For character activities: anime info from anime_character join
-            CASE
-                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.id
-                ELSE NULL
-            END as anime_id,
-            CASE
-                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.title_romaji
-                ELSE NULL
-            END as anime_title,
-            CASE
-                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.title_korean
-                ELSE NULL
-            END as anime_title_korean,
-            CASE
-                WHEN a.activity_type IN ('character_rating', 'character_review') THEN char_anime.title_native
-                ELSE NULL
-            END as anime_title_native,
+            -- For character activities: anime info from anime_id stored in activities table
+            a.anime_id as anime_id,
+            a.anime_title as anime_title,
+            a.anime_title_korean as anime_title_korean,
+            a.anime_title_native as anime_title_native,
             a.metadata,
             COALESCE(likes.count, 0) as likes_count,
             COALESCE(comments.count, 0) as comments_count,
@@ -149,9 +137,6 @@ def get_activities(
         LEFT JOIN anime an ON a.activity_type IN ('anime_rating', 'anime_review') AND a.item_id = an.id
         -- JOIN character table for character activities
         LEFT JOIN character ch ON a.activity_type IN ('character_rating', 'character_review') AND a.item_id = ch.id
-        -- JOIN anime_character to get the anime for character activities
-        LEFT JOIN anime_character ac ON ch.id = ac.character_id AND ac.role = 'MAIN'
-        LEFT JOIN anime char_anime ON ac.anime_id = char_anime.id
         -- User stats
         LEFT JOIN user_stats us ON a.user_id = us.user_id
         -- Engagement counts

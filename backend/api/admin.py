@@ -1782,3 +1782,65 @@ def check_character_duplicates(character_id: int):
     except Exception as e:
         import traceback
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
+
+
+@router.post("/force-clean-duplicates")
+def force_clean_duplicates():
+    """
+    Force clean ALL duplicate activities (same user + same character)
+    모든 중복 활동 강제 제거 (같은 사용자 + 같은 캐릭터)
+    """
+    try:
+        # Find ALL duplicate character activities
+        duplicates = db.execute_query("""
+            SELECT user_id, item_id, COUNT(*) as count
+            FROM activities
+            WHERE activity_type = 'character_rating'
+            GROUP BY user_id, item_id
+            HAVING COUNT(*) > 1
+        """)
+
+        total_deleted = 0
+        processed = []
+
+        for user_id, item_id, count in duplicates:
+            # Get all activities for this user+character
+            all_activities = db.execute_query("""
+                SELECT id, anime_title, activity_time
+                FROM activities
+                WHERE activity_type = 'character_rating'
+                  AND user_id = ?
+                  AND item_id = ?
+                ORDER BY activity_time DESC
+            """, (user_id, item_id))
+
+            # Keep the most recent one, delete the rest
+            if len(all_activities) > 1:
+                keep_id = all_activities[0][0]
+                delete_ids = [row[0] for row in all_activities[1:]]
+
+                placeholders = ','.join('?' * len(delete_ids))
+                deleted = db.execute_update(
+                    f"DELETE FROM activities WHERE id IN ({placeholders})",
+                    tuple(delete_ids)
+                )
+
+                total_deleted += deleted
+                processed.append({
+                    'user_id': user_id,
+                    'item_id': item_id,
+                    'kept': keep_id,
+                    'deleted_count': deleted,
+                    'deleted_ids': delete_ids
+                })
+
+        return {
+            "success": True,
+            "duplicates_found": len(duplicates),
+            "total_deleted": total_deleted,
+            "processed": processed
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}\n{traceback.format_exc()}")
