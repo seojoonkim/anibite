@@ -101,16 +101,13 @@ export default function RatingWidget({ animeId, currentRating, onRate, onStatusC
 
       {/* Rating Display/Input */}
       <div className="mb-6">
-        <div className="bg-gray-50 rounded-lg p-4">
-          <StarRating
-            rating={tempRating}
-            onRatingChange={handleRatingChange}
-            size="lg"
-            align="center"
-            dynamicSize={true}
-            showNumber={true}
-          />
-        </div>
+        <StarRating
+          rating={tempRating}
+          onRatingChange={handleRatingChange}
+          size="xl"
+          align="center"
+          showNumber={true}
+        />
 
         {!currentRating?.rating && (
           <p className="text-sm text-gray-500 text-center mt-2">

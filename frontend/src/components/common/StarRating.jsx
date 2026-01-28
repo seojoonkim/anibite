@@ -127,7 +127,7 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
     feed: '',
     md: 'gap-1',
     lg: 'gap-1 sm:gap-1.5',
-    xl: 'gap-0',
+    xl: '',
   };
 
   const alignClasses = {
@@ -160,7 +160,7 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
             } transition-transform flex-shrink-0`}
             style={{
               ...(finalSize ? { width: finalSize, height: finalSize } : {}),
-              ...(size === 'feed' ? { marginRight: '-2px' } : {})
+              ...((size === 'feed' || size === 'xl') ? { marginRight: '-2px' } : {})
             }}
           >
             <StarIcon type={getStarType(position)} />
