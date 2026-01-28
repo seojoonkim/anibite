@@ -400,6 +400,7 @@ export default function RateCharacters() {
                       : undefined
                   }}
                   onMouseEnter={() => setHoveredCharacter(character.id)}
+                  onMouseMove={() => hoveredCharacter !== character.id && setHoveredCharacter(character.id)}
                   onMouseLeave={() => setHoveredCharacter(null)}
                 >
                   <div className={`${getCardBackgroundColor(character.id)} rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out group ${status === 'NOT_INTERESTED' ? 'opacity-50' : 'opacity-100'
