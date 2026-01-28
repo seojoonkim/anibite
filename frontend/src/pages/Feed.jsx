@@ -480,11 +480,12 @@ export default function Feed() {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Left Sidebar - Filter Menu */}
           <aside
-            className="hidden md:block md:w-64 flex-shrink-0 md:self-start"
+            className="hidden md:block md:w-64 flex-shrink-0"
             style={{
               position: 'sticky',
-              top: '64px',
-              alignSelf: 'flex-start'
+              top: '56px',
+              alignSelf: 'flex-start',
+              height: 'fit-content'
             }}
           >
             <nav className="flex flex-col gap-2">
