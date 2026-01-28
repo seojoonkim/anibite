@@ -1,120 +1,131 @@
-# CLAUDE.md - AniPass 작업 컨텍스트
+# CLAUDE.md - Anibite 프로젝트 컨텍스트
 
-## 현재 작업 (2025-01-17)
+## 프로젝트 개요
 
-### 캐릭터 한국어 이름 전체 재검증 작업
+**Anibite** - 애니메이션/캐릭터 평가 및 소셜 플랫폼
 
-**목표**: 기존 한국어 이름에 오류가 많아 모든 캐릭터의 한국어 이름을 구글 검색으로 재검증/업데이트
+## 기술 스택
 
-**방법**: `"영어이름" 이름` 형식으로 구글 검색 → 공식 한국어 이름 추출
+### 프론트엔드
+- **프레임워크**: React + Vite
+- **스타일링**: Tailwind CSS
+- **배포**: Vercel
+- **URL**: https://www.anibite.com
 
-**상태**: 진행 중
+### 백엔드
+- **프레임워크**: FastAPI (Python 3.11)
+- **데이터베이스**: SQLite (`data/anime.db`)
+- **이미지 저장소**: Cloudflare R2
+- **배포**: Railway
+- **URL**: https://api.anibite.com
 
-**스크립트**: `data/update_all_korean_names.py`
+## 프로젝트 구조
 
-**진행 상황 파일**: `data/update_all_korean_progress.json`
-
----
-
-## 실행 방법
-
-### 처음부터 시작 (기존 진행 초기화)
-```bash
-rm -f data/update_all_korean_progress.json && python3 data/update_all_korean_names.py
+```
+anibite/
+├── frontend/           # React 프론트엔드
+│   ├── src/
+│   │   ├── components/ # 재사용 컴포넌트
+│   │   ├── pages/      # 페이지 컴포넌트
+│   │   ├── services/   # API 서비스
+│   │   ├── context/    # React Context
+│   │   └── hooks/      # Custom Hooks
+│   └── vercel.json     # Vercel 설정
+├── backend/            # FastAPI 백엔드
+│   ├── api/            # API 라우터
+│   ├── services/       # 비즈니스 로직
+│   ├── models/         # Pydantic 모델
+│   └── main.py         # 앱 진입점
+├── data/               # 데이터베이스 및 스크립트
+│   └── anime.db        # SQLite DB
+├── railway.toml        # Railway 배포 설정
+└── CLAUDE.md           # 이 파일
 ```
 
-### 중단된 곳에서 이어서
+## 배포
+
+### 프론트엔드 (Vercel)
+- GitHub main 브랜치 푸시 시 자동 배포
+- 대시보드: https://vercel.com
+
+### 백엔드 (Railway)
+- GitHub main 브랜치 푸시 시 자동 배포
+- 대시보드: https://railway.app
+- 볼륨 마운트: `/app/data` (DB 파일 저장)
+
+## 주요 데이터베이스 테이블
+
+| 테이블 | 설명 |
+|--------|------|
+| `anime` | 애니메이션 정보 |
+| `character` | 캐릭터 정보 |
+| `user_ratings` | 애니메이션 평점 (복수형 주의!) |
+| `character_ratings` | 캐릭터 평점 (복수형 주의!) |
+| `activities` | 사용자 활동 피드 |
+| `follows` | 팔로우 관계 |
+
+## API 엔드포인트 규칙
+
+- 기본 URL: `https://api.anibite.com/api/`
+- 인증: Bearer Token (JWT)
+
+## 로컬 개발
+
+### 백엔드 실행
 ```bash
-python3 data/update_all_korean_names.py
+cd backend
+python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### 옵션
+### 프론트엔드 실행
 ```bash
-python3 data/update_all_korean_names.py --workers 5 --min-delay 2 --max-delay 4 --limit 100
+cd frontend
+npm run dev
 ```
 
----
+## 환경 변수
 
-## 스크립트 특징 (v2 - 2025-01-17 업데이트)
+### 프론트엔드 (.env)
+```
+VITE_API_URL=https://api.anibite.com
+VITE_IMAGE_BASE_URL=https://api.anibite.com
+```
 
-### 안정성 강화
-- 개별 캐릭터 처리 실패 시 에러 로그 후 계속 진행
-- 브라우저 크래시 시 자동 재시작 (최대 10회)
-- Ctrl+C / 종료 시 즉시 진행 상황 저장
-- `atexit` 핸들러로 비정상 종료에도 저장
+### 백엔드 (.env)
+```
+DATABASE_URL=sqlite:///data/anime.db
+R2_ACCESS_KEY_ID=...
+R2_SECRET_ACCESS_KEY=...
+R2_BUCKET_NAME=...
+R2_ENDPOINT=...
+```
 
-### 저장 주기
-- **10개마다** 진행 상황 저장 및 출력
-- 60초마다 보조 저장
+## 자주 사용하는 명령어
 
-### 구글 봇 감지 우회
-- 랜덤 딜레이 2~4초
-- 5개 다양한 User-Agent 로테이션
-- `webdriver` 속성 숨김
-- 연속 실패 시 브라우저 재시작
+### Git 커밋 & 푸시 (자동 배포 트리거)
+```bash
+git add . && git commit -m "메시지" && git push
+```
 
----
+### 백엔드 재시작 (로컬)
+```bash
+# 기존 프로세스 종료
+taskkill //F //IM python.exe
+# 재시작
+cd backend && python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
 
-## 주요 설정 (`update_all_korean_names.py`)
+## 주의사항
 
-| 설정 | 값 | 설명 |
-|------|-----|------|
-| `MAX_WORKERS` | 5 | 동시 브라우저 수 |
-| `MIN_DELAY` | 2.0초 | 최소 딜레이 |
-| `MAX_DELAY` | 4.0초 | 최대 딜레이 |
-| `SAVE_EVERY` | 10 | N개마다 저장 |
-| `MIN_SCORE` | 3 | 후보 점수 최소 기준 |
+1. **테이블명 복수형**: `user_ratings`, `character_ratings` (단수형 아님)
+2. **이미지 URL**: R2 또는 로컬 경로 모두 지원, `IMAGE_BASE_URL` 사용
+3. **CORS**: 백엔드에서 `www.anibite.com`, `anibite.com` 허용 필요
+4. **배포 후 확인**: Railway 대시보드에서 배포 상태 확인
 
----
+## 최근 변경사항
 
-## 데이터베이스 정보
-
-- 경로: `data/anime.db`
-- 캐릭터 테이블: `character`
-- 한국어 이름 컬럼: `name_korean`
-
-### 통계
-- 전체 캐릭터: 47,557개
-
-### 문제 있던 예시
-| 영어 이름 | 기존 한국어 | 올바른 한국어 |
-|----------|-------------|---------------|
-| Luffy Monkey | 원피스 | 몽키 D. 루피 |
-| Eren Yeager | 에렌・이에가 | 에렌 예거 |
-| Zoro Roronoa | 로로노아・조로 | 로로노아 조로 |
-
----
-
-## 스크립트 버전들
-
-| 파일 | 설명 | 상태 |
-|------|------|------|
-| `update_all_korean_names.py` | 구글 검색 기반 (안정성 강화) | **사용 중** |
-| `crawl_namuwiki_character_v8.py` | Playwright 기반 나무위키 크롤러 | 사용 가능 |
-| `crawl_namuwiki_character_v9.py` | httpx 기반 (나무위키 차단됨) | 차단됨 |
-| `crawl_namuwiki_character_v10.py` | 애니 제목과 함께 검색 | 차단됨 |
-
----
-
-## 다음 작업
-
-1. `update_all_korean_names.py` 실행 완료
-2. 결과 검증 (샘플 체크)
-3. 프론트엔드에서 한국어 이름 표시 확인
-
----
-
-## 문제 해결
-
-### 나무위키 429 에러
-나무위키가 httpx 요청을 차단함. Playwright(브라우저)만 사용 가능.
-
-### 구글 봇 감지
-- 랜덤 딜레이 사용 (2~4초)
-- 다양한 User-Agent 사용
-- headless 브라우저 설정 최적화
-
-### 스크립트 다운 시
-- 진행 상황이 `update_all_korean_progress.json`에 자동 저장됨
-- 다시 실행하면 자동으로 이어서 처리
-- Ctrl+C로 안전하게 중단 가능
+### 2025-01-29
+- 통합 검색 API 추가 (`/api/search`) - 애니메이션 + 캐릭터 동시 검색
+- 검색 페이지 실시간 검색 (디바운스 300ms)
+- Navbar 반응형 개선 (600px 브레이크포인트)
+- 피드 레이아웃 정렬 수정
