@@ -44,7 +44,6 @@ export default function Feed() {
   const observerRef = useRef(null);
   const loadMoreTriggerRef = useRef(null);
   const sidebarRef = useRef(null);
-  const [sidebarFixed, setSidebarFixed] = useState(false);
 
   // Cache removed - was causing inconsistent data on tab switching
 
@@ -82,22 +81,6 @@ export default function Feed() {
   // This prevents flickering when switching tabs
 
   // No auto-load for 'saved' filter - we fetch bookmarked activities from server
-
-  // Sidebar scroll fix - force it to stay fixed
-  useEffect(() => {
-    const handleScroll = () => {
-      const navbar = document.querySelector('nav');
-      const navbarHeight = navbar ? navbar.offsetHeight : 48;
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-      setSidebarFixed(scrollTop > navbarHeight);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initial check
-
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
@@ -497,17 +480,16 @@ export default function Feed() {
       <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="flex flex-col md:flex-row gap-6 md:items-start">
           {/* Left Sidebar - Filter Menu */}
-          <aside
-            ref={sidebarRef}
-            className="hidden md:block md:w-64 flex-shrink-0"
-            style={{
-              position: sidebarFixed ? 'fixed' : 'relative',
-              top: sidebarFixed ? '60px' : 'auto',
-              maxHeight: 'calc(100vh - 80px)',
-              overflow: 'auto',
-              width: '256px'
-            }}
-          >
+          <div className="hidden md:block md:w-64 flex-shrink-0">
+            <aside
+              ref={sidebarRef}
+              className="md:sticky"
+              style={{
+                top: '60px',
+                maxHeight: 'calc(100vh - 80px)',
+                overflow: 'auto'
+              }}
+            >
             <nav className="flex flex-col gap-2">
                   <button
                     onClick={() => setSearchParams({ filter: 'all' })}
@@ -569,6 +551,7 @@ export default function Feed() {
                   </button>
             </nav>
           </aside>
+          </div>
 
           {/* Right Content - Feed */}
           <div className="flex-1 min-w-0">

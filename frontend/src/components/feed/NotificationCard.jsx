@@ -52,9 +52,9 @@ export default function NotificationCard({
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-all">
       {/* Notification Headers - stacked */}
-      <div className="border-b border-gray-200 dark:border-gray-700" style={{ backgroundColor: 'rgba(59, 130, 246, 0.08)' }}>
+      <div className="border-b border-gray-300 dark:border-gray-600 bg-blue-50 dark:bg-blue-900/20">
         {uniqueNotifications.map((notification, index) => (
-          <div key={index} className={`px-3 py-2 ${index > 0 ? 'border-t border-gray-200 dark:border-gray-700' : ''}`}>
+          <div key={index} className={`px-3 py-2 ${index > 0 ? 'border-t border-gray-300 dark:border-gray-600' : ''}`}>
             <div className="flex items-center gap-2">
               {/* Actor Avatar */}
               <Link to={`/user/${notification.actor_user_id}`} className="flex-shrink-0">
@@ -62,14 +62,14 @@ export default function NotificationCard({
                   <img
                     src={getAvatarUrl(notification.actor_avatar_url)}
                     alt={notification.actor_display_name || notification.actor_username}
-                    className="w-8 h-8 rounded-full object-cover border border-white shadow-sm"
+                    className="w-8 h-8 rounded-full object-cover border-2 border-white dark:border-gray-700 shadow-sm"
                   />
                 ) : (
                   <DefaultAvatar
                     username={notification.actor_username}
                     displayName={notification.actor_display_name}
                     size="sm"
-                    className="w-8 h-8 border border-white shadow-sm"
+                    className="w-8 h-8 border-2 border-white dark:border-gray-700 shadow-sm"
                   />
                 )}
               </Link>
