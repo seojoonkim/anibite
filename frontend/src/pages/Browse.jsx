@@ -238,7 +238,7 @@ export default function Browse() {
                 >
                   <div className="aspect-[3/4] bg-gray-200 overflow-hidden">
                     <img
-                      src={character.image_large ? `${IMAGE_BASE_URL}/images/characters/${character.id}.jpg` : '/placeholder-character.svg'}
+                      src={character.image_large ? `${IMAGE_BASE_URL}${character.image_large}` : '/placeholder-character.svg'}
                       alt={character.name_korean || character.name_full}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                       onError={(e) => { e.target.src = '/placeholder-character.svg'; }}
