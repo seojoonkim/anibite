@@ -1222,12 +1222,17 @@ export default function AnimeDetail() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       {language === 'ko' ? '별점' : language === 'ja' ? '評価' : 'Rating'} *
                     </label>
-                    <StarRating
-                      rating={reviewData.rating}
-                      onRatingChange={(rating) => setReviewData({ ...reviewData, rating })}
-                      size="lg"
-                      showNumber={true}
-                    />
+                    <div className="flex items-center gap-4">
+                      <StarRating
+                        rating={reviewData.rating}
+                        onRatingChange={(rating) => setReviewData({ ...reviewData, rating })}
+                        size="xl"
+                        showNumber={false}
+                      />
+                      {reviewData.rating > 0 && (
+                        <span className="text-2xl font-bold text-gray-700">{reviewData.rating.toFixed(1)}</span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="mb-4">
