@@ -219,7 +219,7 @@ function RatingCard({ anime, onRate }) {
 
             {/* Overlay on hover */}
             <div
-              className="absolute inset-0 bg-black/0 group-hover:bg-black/70 transition-all duration-150 flex flex-col items-center justify-center p-2 z-10"
+              className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-500 flex flex-col items-center justify-center p-2 z-10"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();

@@ -43,6 +43,14 @@ def get_activities(
         join_clause = "INNER JOIN user_follows uf ON uf.following_id = a.user_id AND uf.follower_id = ?"
         params.append(current_user_id)
 
+        # Debug: Check if user has any followings
+        following_count = db.execute_query(
+            "SELECT COUNT(*) as cnt FROM user_follows WHERE follower_id = ?",
+            (current_user_id,),
+            fetch_one=True
+        )
+        print(f"[DEBUG] following_only=True, user_id={current_user_id}, following_count={following_count['cnt'] if following_count else 0}")
+
     if activity_type:
         where_clauses.append("a.activity_type = ?")
         params.append(activity_type)
@@ -65,6 +73,9 @@ def get_activities(
         fetch_one=True
     )
     total = total_row['total'] if total_row else 0
+
+    if following_only:
+        print(f"[DEBUG] following_only query result: total={total}, join_clause={join_clause}")
 
     # Get activities with engagement counts
     # IMPORTANT: Parameters must be in the order they appear in the SQL!

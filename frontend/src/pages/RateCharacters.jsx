@@ -466,9 +466,9 @@ export default function RateCharacters() {
                         {/* Rating Overlay */}
                         {starSizes[character.id] && (
                           <div
-                            className={`absolute inset-0 bg-black flex items-center justify-center px-2 py-2 z-10 transition-opacity duration-150 ${hoveredCharacter === character.id ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                            className={`absolute inset-0 bg-black flex items-center justify-center px-2 py-2 z-10 transition-opacity duration-500 ${hoveredCharacter === character.id ? 'opacity-100' : 'opacity-0 pointer-events-none'
                               }`}
-                            style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
+                            style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
