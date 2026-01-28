@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { userService } from '../services/userService';
 import { authService } from '../services/authService';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
+import DefaultAvatar from '../components/common/DefaultAvatar';
 
 export default function Settings() {
   const { user, updateUser } = useAuth();
@@ -359,11 +360,12 @@ export default function Settings() {
                     }}
                   />
                 ) : (
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center border-2 border-border">
-                    <span className="text-text-primary text-3xl font-bold">
-                      {(user?.display_name || user?.username || '?').charAt(0).toUpperCase()}
-                    </span>
-                  </div>
+                  <DefaultAvatar
+                    username={user?.username}
+                    displayName={user?.display_name}
+                    size="2xl"
+                    className="w-20 h-20 border-2 border-border"
+                  />
                 )}
                 <p className="text-sm text-text-secondary">
                   {language === 'ko'

@@ -20,6 +20,7 @@ import { useActivityLike, useActivityComments } from '../../hooks/useActivity';
 import { getCurrentLevelInfo, levels } from '../../utils/otakuLevels';
 import ActivityComments from './ActivityComments';
 import ContentMenu from '../common/ContentMenu';
+import DefaultAvatar from '../common/DefaultAvatar';
 import { ratingService } from '../../services/ratingService';
 import { characterService } from '../../services/characterService';
 import { userPostService } from '../../services/userPostService';
@@ -499,18 +500,16 @@ const ActivityCard = forwardRef(({
                   alt={activity.display_name || activity.username}
                   loading="lazy"
                   decoding="async"
-                  className="w-9 h-9 rounded-full object-cover border border-gray-200"
+                  className="w-9 h-9 rounded-full object-cover border border-border"
                   onError={() => setAvatarError(true)}
                 />
               ) : (
-                <div
-                  className="w-9 h-9 rounded-full flex items-center justify-center border border-gray-200"
-                  style={{ background: 'linear-gradient(to bottom right, #90B2E4, #638CCC)' }}
-                >
-                  <span className="text-white text-sm font-bold">
-                    {(activity.display_name || activity.username || '?').charAt(0).toUpperCase()}
-                  </span>
-                </div>
+                <DefaultAvatar
+                  username={activity.username}
+                  displayName={activity.display_name}
+                  size="sm"
+                  className="w-9 h-9"
+                />
               )}
             </Link>
 

@@ -6,6 +6,7 @@ import { userService } from '../../services/userService';
 import { notificationService } from '../../services/notificationService';
 import { getCurrentLevelInfo } from '../../utils/otakuLevels';
 import NotificationDropdown from './NotificationDropdown';
+import DefaultAvatar from './DefaultAvatar';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../../config/api';
 
 export default function Navbar() {
@@ -275,11 +276,12 @@ export default function Navbar() {
                         }}
                       />
                     ) : (
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center border border-border bg-surface-elevated">
-                        <span className="text-text-primary text-sm font-bold">
-                          {(user.display_name || user.username || '?').charAt(0).toUpperCase()}
-                        </span>
-                      </div>
+                      <DefaultAvatar
+                        username={user.username}
+                        displayName={user.display_name}
+                        size="sm"
+                        className="w-8 h-8"
+                      />
                     )}
                     <span className="text-sm font-medium max-w-[80px] truncate">{user.display_name || user.username}</span>
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -395,11 +397,12 @@ export default function Navbar() {
                           }}
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center border border-border bg-surface-elevated">
-                          <span className="text-text-primary text-sm font-bold">
-                            {(user.display_name || user.username || '?').charAt(0).toUpperCase()}
-                          </span>
-                        </div>
+                        <DefaultAvatar
+                          username={user.username}
+                          displayName={user.display_name}
+                          size="sm"
+                          className="w-8 h-8"
+                        />
                       )}
                       <span className="text-sm font-medium">{user.display_name || user.username}</span>
                       {(() => {

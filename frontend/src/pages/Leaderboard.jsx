@@ -4,6 +4,7 @@ import { userService } from '../services/userService';
 import { useLanguage } from '../context/LanguageContext';
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
 import { getAvatarUrl as getAvatarUrlHelper } from '../utils/imageHelpers';
+import DefaultAvatar from '../components/common/DefaultAvatar';
 
 export default function Leaderboard() {
   const { language } = useLanguage();
@@ -116,16 +117,12 @@ export default function Leaderboard() {
                             }}
                           />
                         ) : (
-                          <div
-                            className={`flex-shrink-0 rounded-full flex items-center justify-center border ${
-                              isTopThree ? 'w-12 h-12 border-2 border-accent' : 'w-10 h-10 border-border'
-                            }`}
-                            style={{ background: 'linear-gradient(to bottom right, var(--color-primary), var(--color-secondary))' }}
-                          >
-                            <span className={`text-text-primary font-bold ${isTopThree ? 'text-lg' : 'text-sm'}`}>
-                              {(user.display_name || user.username || '?').charAt(0).toUpperCase()}
-                            </span>
-                          </div>
+                          <DefaultAvatar
+                            username={user.username}
+                            displayName={user.display_name}
+                            size={isTopThree ? 'lg' : 'md'}
+                            className={isTopThree ? 'w-12 h-12 border-2 border-accent' : 'w-10 h-10'}
+                          />
                         )}
                         <div className={`font-semibold text-text-primary ${isTopThree ? 'text-base' : 'text-sm'}`}>
                           {user.display_name || user.username}

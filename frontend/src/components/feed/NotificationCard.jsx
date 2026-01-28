@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
+import DefaultAvatar from '../common/DefaultAvatar';
 
 export default function NotificationCard({
   notifications, // Array of notifications for the same content
@@ -64,11 +65,12 @@ export default function NotificationCard({
                     className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center border-2 border-white shadow-sm" style={{ backgroundColor: '#364F6B' }}>
-                    <span className="text-white text-sm font-bold">
-                      {(notification.actor_display_name || notification.actor_username || '?').charAt(0).toUpperCase()}
-                    </span>
-                  </div>
+                  <DefaultAvatar
+                    username={notification.actor_username}
+                    displayName={notification.actor_display_name}
+                    size="md"
+                    className="w-10 h-10 border-2 border-white shadow-sm"
+                  />
                 )}
               </Link>
 
