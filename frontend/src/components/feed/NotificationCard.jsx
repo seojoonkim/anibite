@@ -54,32 +54,32 @@ export default function NotificationCard({
       {/* Notification Headers - stacked */}
       <div className="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
         {uniqueNotifications.map((notification, index) => (
-          <div key={index} className={`px-4 py-3 ${index > 0 ? 'border-t border-gray-200' : ''}`}>
-            <div className="flex items-center gap-3">
+          <div key={index} className={`px-3 py-2 ${index > 0 ? 'border-t border-gray-200' : ''}`}>
+            <div className="flex items-center gap-2">
               {/* Actor Avatar */}
               <Link to={`/user/${notification.actor_user_id}`} className="flex-shrink-0">
                 {notification.actor_avatar_url ? (
                   <img
                     src={getAvatarUrl(notification.actor_avatar_url)}
                     alt={notification.actor_display_name || notification.actor_username}
-                    className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
+                    className="w-8 h-8 rounded-full object-cover border border-white shadow-sm"
                   />
                 ) : (
                   <DefaultAvatar
                     username={notification.actor_username}
                     displayName={notification.actor_display_name}
-                    size="md"
-                    className="w-10 h-10 border-2 border-white shadow-sm"
+                    size="sm"
+                    className="w-8 h-8 border border-white shadow-sm"
                   />
                 )}
               </Link>
 
               {/* Notification Text */}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900">
+                <p className="text-xs font-medium text-gray-900">
                   {getNotificationText(notification)}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-[10px] text-gray-500">
                   {getTimeAgo(notification.time)}
                 </p>
               </div>
@@ -87,11 +87,11 @@ export default function NotificationCard({
               {/* Notification Type Icon */}
               <div className="flex-shrink-0">
                 {notification.type === 'like' ? (
-                  <svg className="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                   </svg>
                 ) : (
-                  <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                 )}
@@ -100,8 +100,8 @@ export default function NotificationCard({
 
             {/* Show comment content if notification type is comment */}
             {notification.type === 'comment' && notification.comment_content && (
-              <div className="mt-2 ml-13 pl-4 border-l-2" style={{ borderColor: '#C7348F' }}>
-                <p className="text-sm text-gray-700 italic">"{notification.comment_content}"</p>
+              <div className="mt-1.5 ml-10 pl-2 border-l-2 border-blue-300">
+                <p className="text-xs text-gray-600 italic">"{notification.comment_content}"</p>
               </div>
             )}
           </div>
