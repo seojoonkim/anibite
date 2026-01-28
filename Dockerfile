@@ -18,9 +18,6 @@ RUN pip install --no-cache-dir -r backend/requirements.txt
 # Copy backend code
 COPY backend/ ./backend/
 
-# Copy initial database (will be copied to volume if volume is empty)
-COPY data/anime.db ./initial_anime.db
-
 # Create data directory and set permissions
 RUN mkdir -p /app/data && chmod 777 /app/data
 
