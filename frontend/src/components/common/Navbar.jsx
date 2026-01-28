@@ -248,16 +248,37 @@ export default function Navbar() {
             {/* Logo and Mobile User Menu */}
             <div className="flex items-center justify-between md:col-span-1">
               <Link to="/feed" className="flex items-center gap-1.5 md:gap-2 hover:opacity-80 transition-opacity group">
-                {/* Logo Icon */}
-                <div className="w-6 h-6 md:w-7 md:h-7 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
-                  <span style={{ fontFamily: "'Inter', sans-serif", color: '#ffffff', fontWeight: 700, fontSize: '14px' }}>A</span>
-                </div>
+                {/* Logo Icon - Bitten corner effect */}
+                <svg className="w-6 h-6 md:w-7 md:h-7" viewBox="0 0 32 32" fill="none">
+                  <defs>
+                    <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#60a5fa" />
+                      <stop offset="100%" stopColor="#a78bfa" />
+                    </linearGradient>
+                  </defs>
+                  {/* Rounded square with bite mark */}
+                  <path
+                    d="M4 8C4 5.79086 5.79086 4 8 4H24C26.2091 4 28 5.79086 28 8V18C28 18 26 18 24 20C22 22 22 24 22 24C22 26 24 28 24 28H8C5.79086 28 4 26.2091 4 24V8Z"
+                    fill="url(#logo-gradient)"
+                  />
+                  {/* Cute rounded A */}
+                  <text
+                    x="50%"
+                    y="54%"
+                    dominantBaseline="middle"
+                    textAnchor="middle"
+                    fill="white"
+                    style={{ fontFamily: "'Nunito', 'Quicksand', sans-serif", fontSize: '16px', fontWeight: 800 }}
+                  >
+                    A
+                  </text>
+                </svg>
                 <span
                   style={{
-                    fontFamily: "'Inter', sans-serif",
-                    letterSpacing: '-0.02em',
+                    fontFamily: "'Nunito', 'Quicksand', 'SUIT Variable', sans-serif",
+                    letterSpacing: '-0.01em',
                     color: '#f0f4f8',
-                    fontWeight: 600,
+                    fontWeight: 700,
                     fontSize: '1.25rem'
                   }}
                 >
