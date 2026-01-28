@@ -298,7 +298,7 @@ export default function Navbar() {
                     key={item.path}
                     to={item.path}
                     className={`px-1.5 sm:px-2 md:px-2.5 lg:px-3 py-1 sm:py-1.5 rounded-md text-[11px] sm:text-[12px] md:text-[13px] transition-colors whitespace-nowrap ${isActive(item.path)
-                      ? 'bg-primary text-white font-medium'
+                      ? 'bg-primary text-white font-semibold'
                       : 'text-text-primary hover:text-text-secondary hover:bg-surface-hover font-normal'
                       }`}
                   >
