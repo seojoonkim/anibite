@@ -142,7 +142,7 @@ function RatingCard({ anime, onRate }) {
     const displayRating = hoverRating || currentRating;
 
     const gradientStyle = {
-      background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)',
+      background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)',
       WebkitBackgroundClip: 'text',
       WebkitTextFillColor: 'transparent',
       backgroundClip: 'text'
@@ -177,7 +177,7 @@ function RatingCard({ anime, onRate }) {
         }`}
       style={{
         background: status === 'RATED'
-          ? 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+          ? 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)'
           : 'transparent',
         padding: status === 'RATED' ? '2px' : '0',
         boxShadow: status === 'RATED'
@@ -294,7 +294,7 @@ function RatingCard({ anime, onRate }) {
               <div className="absolute top-2 right-2 z-10">
                 {status === 'RATED' && (
                   <span className="px-3 py-1 text-white text-xs font-bold rounded-full shadow-lg" style={{
-                    background: 'linear-gradient(135deg, #833AB4 0%, #E1306C 40%, #F77737 70%, #FCAF45 100%)'
+                    background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)'
                   }}>
                     {language === 'ko' ? '평가완료' : language === 'ja' ? '評価済み' : 'Rated'}
                   </span>
