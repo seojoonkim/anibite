@@ -1786,10 +1786,11 @@ export default function MyAniPass() {
                         <button
                           onClick={handleCreatePost}
                           disabled={!newPostContent.trim()}
-                          className="px-4 py-2 text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-                          style={newPostContent.trim() ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
-                          onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#1877F2')}
-                          onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#3797F0')}
+                          className="px-4 py-2 text-white rounded-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed font-semibold"
+                          style={newPostContent.trim() ? {
+                            background: 'linear-gradient(135deg, #E1306C 0%, #F77737 50%, #FCAF45 100%)',
+                            color: 'white'
+                          } : {}}
                         >
                           {language === 'ko' ? '게시' : language === 'ja' ? '投稿' : 'Post'}
                         </button>
