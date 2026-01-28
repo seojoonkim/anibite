@@ -52,64 +52,46 @@ export default function NotificationCard({
   return (
     <div>
       {/* Notification Headers - attached to top of activity card */}
-      <div className="bg-blue-50 dark:bg-blue-900/30 rounded-t-xl border border-b-0 border-gray-200 dark:border-gray-700">
+      <div className="bg-slate-700 rounded-t-xl">
         {uniqueNotifications.map((notification, index) => (
-          <div key={index} className={`px-3 py-2 ${index > 0 ? 'border-t border-gray-200 dark:border-gray-600' : ''}`}>
+          <div key={index} className={`px-3 py-1.5 ${index > 0 ? 'border-t border-slate-600' : ''}`}>
             <div className="flex items-center gap-2">
-              {/* Actor Avatar */}
-              <Link to={`/user/${notification.actor_user_id}`} className="flex-shrink-0">
-                {notification.actor_avatar_url ? (
-                  <img
-                    src={getAvatarUrl(notification.actor_avatar_url)}
-                    alt={notification.actor_display_name || notification.actor_username}
-                    className="w-7 h-7 rounded-full object-cover border-2 border-white dark:border-gray-700 shadow-sm"
-                  />
-                ) : (
-                  <DefaultAvatar
-                    username={notification.actor_username}
-                    displayName={notification.actor_display_name}
-                    size="sm"
-                    className="w-7 h-7 border-2 border-white dark:border-gray-700 shadow-sm"
-                  />
-                )}
-              </Link>
-
-              {/* Notification Text */}
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-gray-700 dark:text-gray-200">
-                  {getNotificationText(notification)}
-                </p>
-                <p className="text-[10px] text-gray-500 dark:text-gray-400">
-                  {getTimeAgo(notification.time)}
-                </p>
-              </div>
-
               {/* Notification Type Icon */}
               <div className="flex-shrink-0">
                 {notification.type === 'like' ? (
-                  <svg className="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 text-red-400" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                   </svg>
                 ) : (
-                  <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                 )}
               </div>
+
+              {/* Notification Text - single line */}
+              <p className="flex-1 min-w-0 text-xs font-medium text-gray-100 truncate">
+                {getNotificationText(notification)}
+              </p>
+
+              {/* Time - right aligned */}
+              <span className="flex-shrink-0 text-[10px] text-gray-400">
+                {getTimeAgo(notification.time)}
+              </span>
             </div>
 
             {/* Show comment content if notification type is comment */}
             {notification.type === 'comment' && notification.comment_content && (
-              <div className="mt-1.5 ml-9 pl-2 border-l-2 border-blue-400 dark:border-blue-500">
-                <p className="text-xs text-gray-600 dark:text-gray-300 italic">"{notification.comment_content}"</p>
+              <div className="mt-1 ml-5 pl-2 border-l-2 border-slate-500">
+                <p className="text-[11px] text-gray-300 italic truncate">"{notification.comment_content}"</p>
               </div>
             )}
           </div>
         ))}
       </div>
 
-      {/* Original Activity Card (passed as children) - remove top rounded corners */}
-      <div className="[&>*]:rounded-t-none [&>*]:border-t-0">
+      {/* Original Activity Card (passed as children) - remove top rounded corners and connect border */}
+      <div className="[&>*]:rounded-t-none">
         {children}
       </div>
     </div>
