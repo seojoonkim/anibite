@@ -53,9 +53,9 @@ export default function NotificationCard({
   return (
     <div>
       {/* Notification Headers - attached to top of activity card */}
-      <div className="bg-slate-700 rounded-t-xl">
+      <div className="bg-slate-800 rounded-t-xl">
         {uniqueNotifications.map((notification, index) => (
-          <div key={index} className={`px-3 py-1.5 ${index > 0 ? 'border-t border-slate-600' : ''}`}>
+          <div key={index} className={`px-3 py-1.5 ${index > 0 ? 'border-t border-slate-700' : ''}`}>
             <div className="flex items-center gap-2">
               {/* Notification Type Icon */}
               <div className="flex-shrink-0">
@@ -71,12 +71,12 @@ export default function NotificationCard({
               </div>
 
               {/* Notification Text - single line */}
-              <p className="flex-1 min-w-0 text-xs font-medium text-gray-100 truncate">
+              <p className="flex-1 min-w-0 text-xs font-medium text-white truncate">
                 {getNotificationText(notification)}
               </p>
 
               {/* Time - right aligned */}
-              <span className="flex-shrink-0 text-[10px] text-gray-400">
+              <span className="flex-shrink-0 text-[10px] text-slate-400">
                 {getTimeAgo(notification.time)}
               </span>
             </div>
@@ -84,17 +84,17 @@ export default function NotificationCard({
             {/* Show comment content if notification type is comment - expandable */}
             {notification.type === 'comment' && (notification.comment_text || notification.comment_content) && (
               <div
-                className="mt-1 ml-5 pl-2 border-l-2 border-slate-500 cursor-pointer hover:border-slate-400 transition-colors"
+                className="mt-1 ml-5 pl-2 border-l-2 border-slate-600 cursor-pointer hover:border-slate-500 transition-colors"
                 onClick={() => setCollapsedComments(prev => ({
                   ...prev,
                   [index]: !prev[index]
                 }))}
               >
-                <p className={`text-[11px] text-gray-300 italic ${collapsedComments[index] ? 'line-clamp-1' : ''}`}>
+                <p className={`text-[11px] text-slate-300 italic ${collapsedComments[index] ? 'line-clamp-1' : ''}`}>
                   "{notification.comment_text || notification.comment_content}"
                 </p>
                 {(notification.comment_text || notification.comment_content || '').length > 50 && (
-                  <span className="text-[10px] text-gray-500 hover:text-gray-400">
+                  <span className="text-[10px] text-slate-400 hover:text-slate-300">
                     {collapsedComments[index]
                       ? (language === 'ko' ? '더보기' : language === 'ja' ? 'もっと見る' : 'more')
                       : (language === 'ko' ? '접기' : language === 'ja' ? '閉じる' : 'less')}
