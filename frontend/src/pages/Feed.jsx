@@ -479,7 +479,7 @@ export default function Feed() {
       {/* Fixed Sidebar - Desktop only */}
       <aside
         ref={sidebarRef}
-        className="hidden md:block fixed top-16 w-56 z-40"
+        className="hidden md:block fixed top-20 w-56 z-40"
         style={{
           left: 'max(1rem, calc((100vw - 1180px) / 2 + 1rem))'
         }}
