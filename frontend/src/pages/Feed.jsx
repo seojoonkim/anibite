@@ -479,8 +479,8 @@ export default function Feed() {
       <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Left Sidebar - Filter Menu */}
-          <aside className="hidden md:block md:col-span-1 self-start">
-            <div className="sticky top-24 z-40">
+          <aside className="hidden md:block md:col-span-1">
+            <div className="sticky top-20 z-40">
               <nav>
                 <div className="flex flex-col gap-2">
                   <button
