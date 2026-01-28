@@ -1334,7 +1334,7 @@ export default function MyAniPass() {
                   }`}
                 style={activeTab === 'anipass' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '500' } : {}}
               >
-                {language === 'ko' ? '애니바이트' : language === 'ja' ? 'AniBite' : 'AniBite'}
+                {language === 'ko' ? '분석' : language === 'ja' ? '分析' : 'Analysis'}
               </button>
               <button
                 onClick={() => changeTab('anime')}
@@ -1459,7 +1459,7 @@ export default function MyAniPass() {
                 }`}
               style={activeTab === 'anipass' ? { color: 'var(--color-primary)', borderColor: 'var(--color-primary)', fontWeight: '500' } : {}}
             >
-              {language === 'ko' ? '애니바이트' : language === 'ja' ? 'AniBite' : 'AniBite'}
+              {language === 'ko' ? '분석' : language === 'ja' ? '分析' : 'Analysis'}
             </button>
             <button
               onClick={() => changeTab('anime')}
