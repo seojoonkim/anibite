@@ -69,6 +69,17 @@ async def startup_event():
         import traceback
         traceback.print_exc()
 
+    # 2.5. Ensure UNIQUE constraints to prevent duplicate ratings
+    print("[Startup] Ensuring UNIQUE constraints...")
+    try:
+        from scripts.ensure_unique_constraints import ensure_unique_constraints
+        ensure_unique_constraints()
+        print("[Startup] OK - UNIQUE constraints ensured")
+    except Exception as e:
+        print(f"[Startup] WARNING - UNIQUE constraints check failed: {e}")
+        import traceback
+        traceback.print_exc()
+
     # 3. Create bookmarks table
     print("[Startup] Creating bookmarks table...")
     try:
