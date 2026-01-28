@@ -1703,6 +1703,9 @@ export default function MyAniPass() {
 
                   {/* Stats Summary */}
                   <div className="space-y-3 pt-4 border-t border-border">
+                    <h3 className="text-base font-bold text-text-primary mb-3">
+                      {language === 'ko' ? '통계' : language === 'ja' ? '統計' : 'Statistics'}
+                    </h3>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-text-secondary">{language === 'ko' ? '오타쿠 점수' : language === 'ja' ? 'オタクスコア' : 'Otaku Score'}</span>
                       <span className="text-sm font-bold text-text-primary">{Math.round(stats.otaku_score)}</span>
@@ -1857,6 +1860,9 @@ export default function MyAniPass() {
                   <div className="w-full">
                     {stats && (
                       <div className="bg-surface rounded-xl shadow-lg border border-border p-6 h-full">
+                        <h3 className="text-lg font-bold text-text-primary mb-4 pb-3 border-b border-border">
+                          {language === 'ko' ? '통계' : language === 'ja' ? '統計' : 'Statistics'}
+                        </h3>
                         <div className="space-y-4">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-text-primary text-xl flex-shrink-0">
