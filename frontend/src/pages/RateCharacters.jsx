@@ -460,7 +460,7 @@ export default function RateCharacters() {
 
                         {/* Show rating stars on rated characters - hide on hover */}
                         {hasRated && starSizes[character.id] && character.my_rating && character.my_rating > 0 && (
-                          <div className={`absolute inset-0 flex items-center justify-center pointer-events-none z-10 transition-opacity duration-150 ${hoveredCharacter === character.id ? 'opacity-0' : 'opacity-100'}`}>
+                          <div className={`absolute inset-0 flex items-center justify-center pointer-events-none z-10 transition-opacity duration-150 ${hoveredCharacter === character.id ? 'opacity-0' : 'opacity-100'}`} style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}>
                             <div className="flex drop-shadow-lg" style={{ gap: '2px' }}>
                               {[1, 2, 3, 4, 5].map((position) => {
                                 const rating = character.my_rating;
