@@ -1,0 +1,120 @@
+name: Backup Railway Database
+
+on:
+  schedule:
+    # 6시간마다 실행 (하루 4회)
+    # UTC 00:00, 06:00, 12:00, 18:00
+    # KST 09:00, 15:00, 21:00, 03:00
+    - cron: '0 0,6,12,18 * * *'
+  workflow_dispatch: # 수동 실행 가능
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: |
+          npm install -g @railway/cli
+
+      - name: Setup Railway credentials
+        run: |
+          echo "${{ secrets.RAILWAY_TOKEN }}" > ~/.railway-token
+
+      - name: Download database from Railway
+        run: |
+          # Railway 프로젝트와 서비스 연결
+          export RAILWAY_TOKEN="${{ secrets.RAILWAY_TOKEN }}"
+
+          # 백업 디렉토리 생성
+          mkdir -p backups
+
+          # 타임스탬프 생성
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          BACKUP_FILE="backups/anime_${TIMESTAMP}.db"
+
+          # Railway에서 DB 다운로드
+          railway run --service anipass bash -c "cat /app/data/anime.db" > "$BACKUP_FILE"
+
+          # 파일 크기 확인
+          FILE_SIZE=$(du -h "$BACKUP_FILE" | cut -f1)
+          echo "Backup size: $FILE_SIZE"
+
+          # 압축
+          gzip "$BACKUP_FILE"
+          COMPRESSED_FILE="${BACKUP_FILE}.gz"
+          COMPRESSED_SIZE=$(du -h "$COMPRESSED_FILE" | cut -f1)
+          echo "Compressed size: $COMPRESSED_SIZE"
+
+          # 환경 변수로 저장
+          echo "BACKUP_FILE=$COMPRESSED_FILE" >> $GITHUB_ENV
+          echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
+          echo "ORIGINAL_SIZE=$FILE_SIZE" >> $GITHUB_ENV
+          echo "COMPRESSED_SIZE=$COMPRESSED_SIZE" >> $GITHUB_ENV
+
+      - name: Upload backup as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: railway-db-backup-${{ env.TIMESTAMP }}
+          path: ${{ env.BACKUP_FILE }}
+          retention-days: 7 # 7일 동안 보관 (6시간마다 = 하루 4개 × 7일 = 28개)
+
+      - name: Create Release (Daily at midnight)
+        # 자정(UTC 18:00 = KST 03:00)에만 Release 생성 (장기 보관용)
+        if: github.event.schedule == '0 18 * * *' || github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: backup-${{ env.TIMESTAMP }}
+          name: Database Backup ${{ env.TIMESTAMP }}
+          body: |
+            ## Railway Database Backup
+
+            **Date:** ${{ env.TIMESTAMP }}
+            **Original Size:** ${{ env.ORIGINAL_SIZE }}
+            **Compressed Size:** ${{ env.COMPRESSED_SIZE }}
+
+            This is an automated backup of the AniBite production database.
+
+            ### How to Restore:
+            1. Download `anime_*.db.gz`
+            2. Extract: `gunzip anime_*.db.gz`
+            3. Run: `./scripts/restore_db.sh anime_*.db`
+          files: ${{ env.BACKUP_FILE }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Delete old artifacts (keep last 30)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            const backupArtifacts = artifacts.data.artifacts
+              .filter(a => a.name.startsWith('railway-db-backup-'))
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            // Keep last 30 (approximately 7.5 days at 4 backups/day), delete older ones
+            const toDelete = backupArtifacts.slice(30);
+
+            for (const artifact of toDelete) {
+              console.log(`Deleting old artifact: ${artifact.name}`);
+              await github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: artifact.id,
+              });
+            }
+
+      - name: Send notification on failure
+        if: failure()
+        run: |
+          echo "❌ Backup failed! Check the workflow logs."
+          # 여기에 Slack/Discord/Email 알림 추가 가능
