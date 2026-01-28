@@ -73,11 +73,11 @@ export default function ContentMenu({
       {/* ... 버튼 */}
       <button
         onClick={handleMenuClick}
-        className="p-2 rounded-full hover:bg-gray-200 transition-colors"
+        className="p-1.5 rounded-full hover:bg-gray-200 transition-colors"
         aria-label="More options"
       >
         <svg
-          className="w-5 h-5 text-gray-600"
+          className="w-4 h-4 text-gray-500"
           fill="currentColor"
           viewBox="0 0 20 20"
         >

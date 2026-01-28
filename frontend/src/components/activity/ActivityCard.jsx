@@ -487,10 +487,10 @@ const ActivityCard = forwardRef(({
   };
 
   return (
-    <div ref={ref} className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 hover:shadow-[0_2px_12px_rgba(0,0,0,0.12)] transition-all">
+    <div ref={ref} className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-3 hover:shadow-[0_2px_12px_rgba(0,0,0,0.12)] transition-all">
       {/* Header: User Info + Activity Type + Timestamp + Menu */}
       {finalShowOptions.showUserInfo && (
-        <div className="flex items-center mb-3 gap-2">
+        <div className="flex items-center mb-2 gap-2">
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
             {/* User Avatar */}
             <Link to={`/user/${activity.user_id}`} className="flex-shrink-0">
@@ -760,26 +760,26 @@ const ActivityCard = forwardRef(({
       </div>
 
       {/* Actions: Like, Comment, Bookmark */}
-      <div className="mt-4 flex items-center justify-between">
-            <div className="flex items-center gap-5">
+      <div className="mt-3 flex items-center justify-between">
+            <div className="flex items-center gap-4">
               {/* Like Button */}
               <button
                 onClick={handleLikeClick}
-                className="flex items-center gap-1.5 transition-all hover:scale-110"
+                className="flex items-center gap-1 transition-all hover:scale-105"
                 style={{
                   color: liked ? '#DC2626' : '#6B7280'
                 }}
               >
                 {liked ? (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                   </svg>
                 ) : (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                   </svg>
                 )}
-                <span className="text-sm font-medium">
+                <span className="text-xs font-medium">
                   {language === 'ko' ? '좋아요' : language === 'ja' ? 'いいね' : 'Like'}
                   {likesCount > 0 && <> {likesCount}</>}
                 </span>
@@ -788,12 +788,12 @@ const ActivityCard = forwardRef(({
               {/* Comment Button */}
               <button
                 onClick={() => setShowComments(!showComments)}
-                className="flex items-center gap-1.5 transition-all hover:scale-110 text-gray-600 hover:text-primary-light"
+                className="flex items-center gap-1 transition-all hover:scale-105 text-gray-600 hover:text-primary-light"
               >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
-                <span className="text-sm font-medium">
+                <span className="text-xs font-medium">
                   {language === 'ko' ? '댓글' : language === 'ja' ? 'コメント' : 'Comment'}
                   {activity.comments_count > 0 && <> {activity.comments_count}</>}
                 </span>
@@ -803,10 +803,10 @@ const ActivityCard = forwardRef(({
             {/* Bookmark Button */}
             <button
               onClick={handleBookmarkClick}
-              className="transition-all hover:scale-110"
+              className="transition-all hover:scale-105"
             >
               {bookmarked ? (
-                <svg width="22" height="22" viewBox="0 0 24 24">
+                <svg width="18" height="18" viewBox="0 0 24 24">
                   <defs>
                     <linearGradient id="bookmark-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" style={{ stopColor: '#FF6B6B', stopOpacity: 1 }} />
@@ -816,7 +816,7 @@ const ActivityCard = forwardRef(({
                   <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" fill="url(#bookmark-gradient)" />
                 </svg>
               ) : (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2">
                   <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                 </svg>
               )}
