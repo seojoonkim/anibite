@@ -124,10 +124,10 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
 
   const gapClasses = {
     sm: 'gap-0.5',
-    feed: '',
+    feed: 'gap-px',
     md: 'gap-1',
     lg: 'gap-1 sm:gap-1.5',
-    xl: '',
+    xl: 'gap-0.5',
   };
 
   const alignClasses = {
@@ -158,10 +158,7 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
             className={`${sizeClasses[size]} ${
               readonly ? 'cursor-default' : 'cursor-pointer hover:scale-110'
             } transition-transform flex-shrink-0`}
-            style={{
-              ...(finalSize ? { width: finalSize, height: finalSize } : {}),
-              ...((size === 'feed' || size === 'xl') ? { marginRight: '-2px' } : {})
-            }}
+            style={finalSize ? { width: finalSize, height: finalSize } : {}}
           >
             <StarIcon type={getStarType(position)} />
           </button>

@@ -551,7 +551,7 @@ export default function Feed() {
       <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="md:ml-64">
           {/* Feed Content */}
-          <div className="w-full max-w-2xl mx-auto md:mx-0">
+          <div className="w-full max-w-3xl">
             {/* Post Composer */}
             {user && (
               <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 mb-6">
