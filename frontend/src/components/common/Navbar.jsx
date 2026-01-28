@@ -248,7 +248,7 @@ export default function Navbar() {
             {/* Logo and Mobile User Menu */}
             <div className="flex items-center justify-between md:col-span-1">
               <Link to="/feed" className="flex items-center gap-1.5 md:gap-2 hover:opacity-80 transition-opacity group">
-                {/* Logo Icon - Bitten corner effect */}
+                {/* Logo Icon - Bitten top-right corner */}
                 <svg className="w-6 h-6 md:w-7 md:h-7" viewBox="0 0 32 32" fill="none">
                   <defs>
                     <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -256,30 +256,30 @@ export default function Navbar() {
                       <stop offset="100%" stopColor="#a78bfa" />
                     </linearGradient>
                   </defs>
-                  {/* Rounded square with bite mark */}
+                  {/* Rounded square with bite mark on top-right */}
                   <path
-                    d="M4 8C4 5.79086 5.79086 4 8 4H24C26.2091 4 28 5.79086 28 8V18C28 18 26 18 24 20C22 22 22 24 22 24C22 26 24 28 24 28H8C5.79086 28 4 26.2091 4 24V8Z"
+                    d="M4 8C4 5.79 5.79 4 8 4H18C18 4 18 6 20 8C22 10 24 10 24 10H24C26.21 10 28 11.79 28 14V24C28 26.21 26.21 28 24 28H8C5.79 28 4 26.21 4 24V8Z"
                     fill="url(#logo-gradient)"
                   />
-                  {/* Cute rounded A */}
+                  {/* Rounded A */}
                   <text
                     x="50%"
-                    y="54%"
+                    y="58%"
                     dominantBaseline="middle"
                     textAnchor="middle"
                     fill="white"
-                    style={{ fontFamily: "'Nunito', 'Quicksand', sans-serif", fontSize: '16px', fontWeight: 800 }}
+                    style={{ fontFamily: "'Nunito', sans-serif", fontSize: '15px', fontWeight: 800 }}
                   >
                     A
                   </text>
                 </svg>
                 <span
                   style={{
-                    fontFamily: "'Nunito', 'Quicksand', 'SUIT Variable', sans-serif",
-                    letterSpacing: '-0.01em',
+                    fontFamily: "'Righteous', 'Pacifico', sans-serif",
+                    letterSpacing: '0.02em',
                     color: '#f0f4f8',
-                    fontWeight: 700,
-                    fontSize: '1.25rem'
+                    fontWeight: 400,
+                    fontSize: '1.2rem'
                   }}
                 >
                   Anibite
