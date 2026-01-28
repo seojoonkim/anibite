@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import DefaultAvatar from '../common/DefaultAvatar';
@@ -10,6 +10,7 @@ export default function NotificationCard({
   getAvatarUrl
 }) {
   const { language } = useLanguage();
+  const [collapsedComments, setCollapsedComments] = useState({});
 
   // 같은 actor의 같은 type 행동은 하나로 합치기
   const uniqueNotifications = useMemo(() => {
@@ -80,10 +81,25 @@ export default function NotificationCard({
               </span>
             </div>
 
-            {/* Show comment content if notification type is comment */}
+            {/* Show comment content if notification type is comment - expandable */}
             {notification.type === 'comment' && notification.comment_content && (
-              <div className="mt-1 ml-5 pl-2 border-l-2 border-slate-500">
-                <p className="text-[11px] text-gray-300 italic truncate">"{notification.comment_content}"</p>
+              <div
+                className="mt-1 ml-5 pl-2 border-l-2 border-slate-500 cursor-pointer hover:border-slate-400 transition-colors"
+                onClick={() => setCollapsedComments(prev => ({
+                  ...prev,
+                  [index]: !prev[index]
+                }))}
+              >
+                <p className={`text-[11px] text-gray-300 italic ${collapsedComments[index] ? 'line-clamp-1' : ''}`}>
+                  "{notification.comment_content}"
+                </p>
+                {notification.comment_content.length > 50 && (
+                  <span className="text-[10px] text-gray-500 hover:text-gray-400">
+                    {collapsedComments[index]
+                      ? (language === 'ko' ? '더보기' : language === 'ja' ? 'もっと見る' : 'more')
+                      : (language === 'ko' ? '접기' : language === 'ja' ? '閉じる' : 'less')}
+                  </span>
+                )}
               </div>
             )}
           </div>
