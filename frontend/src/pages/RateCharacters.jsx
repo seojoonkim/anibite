@@ -492,7 +492,7 @@ export default function RateCharacters() {
                           <div
                             className={`absolute inset-0 bg-black flex items-center justify-center px-2 py-2 z-10 transition-opacity duration-500 ${hoveredCharacter === character.id ? 'opacity-100' : 'opacity-0 pointer-events-none'
                               }`}
-                            style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+                            style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();

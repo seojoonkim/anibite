@@ -215,7 +215,7 @@ function RatingCard({ anime, onRate }) {
             {/* Dark overlay on hover - consistent with character cards */}
             <div
               className="absolute inset-0 transition-all duration-500 flex flex-col items-center justify-center p-2 z-10 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
-              style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+              style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
