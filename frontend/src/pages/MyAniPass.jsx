@@ -1445,15 +1445,15 @@ export default function MyAniPass() {
             {!isOwnProfile && (
               <button
                 onClick={handleFollowToggle}
-                className={`ml-auto px-4 py-2 rounded-lg font-medium transition-colors ${isFollowing
-                  ? 'bg-surface-elevated text-text-secondary hover:bg-surface-hover'
-                  : 'text-text-primary'
+                className={`ml-auto px-4 py-2 rounded-lg font-medium transition-all ${isFollowing
+                  ? 'bg-transparent border-2 border-gray-300 text-text-secondary hover:border-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
+                  : 'text-white'
                   }`}
-                style={!isFollowing ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)', fontWeight: '600' } : {}}
+                style={!isFollowing ? { backgroundColor: '#3797F0', fontWeight: '600' } : {}}
                 onMouseEnter={(e) => !isFollowing && (e.target.style.backgroundColor = '#1877F2')}
                 onMouseLeave={(e) => !isFollowing && (e.target.style.backgroundColor = '#3797F0')}
               >
-                {isFollowing ? (language === 'ko' ? '언팔로우' : language === 'ja' ? 'フォロー解除' : 'Unfollow') : (language === 'ko' ? '팔로우' : language === 'ja' ? 'フォロー' : 'Follow')}
+                {isFollowing ? (language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following') : (language === 'ko' ? '팔로우' : language === 'ja' ? 'フォロー' : 'Follow')}
               </button>
             )}
           </div>
@@ -2144,15 +2144,15 @@ export default function MyAniPass() {
 
         {/* Follow Modal */}
         {showFollowModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowFollowModal(false)}>
-            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50" onClick={() => setShowFollowModal(false)}>
+            <div className="bg-surface rounded-lg p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto border border-border" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">
+                <h2 className="text-xl font-bold text-text-primary">
                   {followModalType === 'followers' ? (language === 'ko' ? '팔로워' : language === 'ja' ? 'フォロワー' : 'Followers') : (language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following')}
                 </h2>
                 <button
                   onClick={() => setShowFollowModal(false)}
-                  className="text-gray-500 hover:text-text-secondary"
+                  className="text-text-tertiary hover:text-text-primary"
                 >
                   ✕
                 </button>
@@ -2164,7 +2164,7 @@ export default function MyAniPass() {
                     <Link
                       key={follower.id}
                       to={`/user/${follower.id}`}
-                      className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                      className="flex items-center gap-3 p-2 hover:bg-surface-hover rounded-lg transition-colors"
                       onClick={() => setShowFollowModal(false)}
                     >
                       {follower.avatar_url ? (
@@ -2184,7 +2184,7 @@ export default function MyAniPass() {
                         <div className="font-medium text-text-primary">
                           {follower.display_name || follower.username}
                         </div>
-                        <div className="text-sm text-gray-500">@{follower.username}</div>
+                        <div className="text-sm text-text-tertiary">@{follower.username}</div>
                       </div>
                     </Link>
                   ))}
