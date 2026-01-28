@@ -777,6 +777,20 @@ export default function CharacterDetail() {
     return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
+  // SVG Star icon component
+  const StarIcon = ({ className = "w-6 h-6", filled = true }) => (
+    <svg className={className} viewBox="0 0 20 20" fill={filled ? "url(#star-gradient-char)" : "currentColor"}>
+      <defs>
+        <linearGradient id="star-gradient-char" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style={{ stopColor: '#FFD700', stopOpacity: 1 }} />
+          <stop offset="50%" style={{ stopColor: '#FFA500', stopOpacity: 1 }} />
+          <stop offset="100%" style={{ stopColor: '#FF8C00', stopOpacity: 1 }} />
+        </linearGradient>
+      </defs>
+      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+    </svg>
+  );
+
   const getBirthday = () => {
     const { date_of_birth_year, date_of_birth_month, date_of_birth_day } = character;
     if (!date_of_birth_month || !date_of_birth_day) return null;
@@ -936,7 +950,7 @@ export default function CharacterDetail() {
                     {language === 'ko' ? '종합 평점' : language === 'ja' ? '総合評価' : 'Overall Rating'}
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`text-6xl ${character.site_rating_count > 0 ? 'text-yellow-500' : 'text-gray-300'}`}>★</span>
+                    <StarIcon className={`w-14 h-14 ${character.site_rating_count > 0 ? '' : 'text-gray-300'}`} filled={character.site_rating_count > 0} />
                     <div>
                       <div className="text-5xl font-bold">
                         {character.site_rating_count > 0 ? character.site_average_rating?.toFixed(1) : '--'}
@@ -960,8 +974,9 @@ export default function CharacterDetail() {
 
                     return (
                       <div key={star} className="flex items-center gap-1.5 text-xs">
-                        <span className={`w-10 text-right font-medium ${character.site_rating_count > 0 ? 'text-yellow-500' : 'text-gray-400'}`}>
-                          ★{star.toFixed(1)}
+                        <span className={`w-12 text-right font-medium flex items-center justify-end gap-0.5 ${character.site_rating_count > 0 ? '' : 'text-gray-400'}`}>
+                          <StarIcon className="w-3 h-3" filled={character.site_rating_count > 0} />
+                          <span>{star.toFixed(1)}</span>
                         </span>
                         <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
                           <div
@@ -1026,7 +1041,7 @@ export default function CharacterDetail() {
                     {language === 'ko' ? '종합 평점' : language === 'ja' ? '総合評価' : 'Overall Rating'}
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`text-6xl ${character.site_rating_count > 0 ? 'text-yellow-500' : 'text-gray-300'}`}>★</span>
+                    <StarIcon className={`w-14 h-14 ${character.site_rating_count > 0 ? '' : 'text-gray-300'}`} filled={character.site_rating_count > 0} />
                     <div>
                       <div className="text-5xl font-bold">
                         {character.site_rating_count > 0 ? character.site_average_rating?.toFixed(1) : '--'}
@@ -1050,8 +1065,9 @@ export default function CharacterDetail() {
 
                     return (
                       <div key={star} className="flex items-center gap-1.5 text-xs">
-                        <span className={`w-10 text-right font-medium ${character.site_rating_count > 0 ? 'text-yellow-500' : 'text-gray-400'}`}>
-                          ★{star.toFixed(1)}
+                        <span className={`w-12 text-right font-medium flex items-center justify-end gap-0.5 ${character.site_rating_count > 0 ? '' : 'text-gray-400'}`}>
+                          <StarIcon className="w-3 h-3" filled={character.site_rating_count > 0} />
+                          <span>{star.toFixed(1)}</span>
                         </span>
                         <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
                           <div
@@ -1141,8 +1157,9 @@ export default function CharacterDetail() {
                           </div>
                           {/* My Rating Badge */}
                           {anime.my_anime_rating && (
-                            <div className="absolute top-2 right-2 bg-yellow-400 text-gray-900 px-2 py-1 rounded text-xs font-bold">
-                              ★ {anime.my_anime_rating.toFixed(1)}
+                            <div className="absolute top-2 right-2 bg-yellow-400 text-gray-900 px-2 py-1 rounded text-xs font-bold flex items-center gap-0.5">
+                              <StarIcon className="w-3 h-3" filled={true} />
+                              <span>{anime.my_anime_rating.toFixed(1)}</span>
                             </div>
                           )}
                         </div>
