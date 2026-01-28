@@ -199,11 +199,6 @@ function RatingCard({ anime, onRate }) {
               }}
             />
 
-            {/* Dark overlay for rated cards - persists always */}
-            {status === 'RATED' && currentRating > 0 && (
-              <div className="absolute inset-0 bg-black/50 transition-opacity pointer-events-none" />
-            )}
-
             {/* Show clear rating on already rated anime - hide on hover */}
             {status === 'RATED' && currentRating > 0 && (
               <div className="absolute inset-0 flex items-center justify-center transition-opacity pointer-events-none z-10 group-hover:opacity-0">
@@ -217,9 +212,10 @@ function RatingCard({ anime, onRate }) {
               </div>
             )}
 
-            {/* Overlay on hover */}
+            {/* Dark overlay on hover - consistent with character cards */}
             <div
-              className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-500 flex flex-col items-center justify-center p-2 z-10"
+              className="absolute inset-0 transition-all duration-500 flex flex-col items-center justify-center p-2 z-10 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
+              style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
