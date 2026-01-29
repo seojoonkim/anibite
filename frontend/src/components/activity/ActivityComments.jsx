@@ -75,7 +75,7 @@ export default function ActivityComments({
                 onClick={onCommentSubmit}
                 disabled={!newCommentText.trim()}
                 className="px-3 py-1.5 text-[14px] text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-                style={newCommentText.trim() ? { backgroundColor: '#5BB5F5' } : {}}
+                style={newCommentText.trim() ? { backgroundColor: '#47B5FF' } : {}}
               >
                 {language === 'ko' ? '작성' : language === 'ja' ? '作成' : 'Post'}
               </button>
@@ -115,7 +115,7 @@ export default function ActivityComments({
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <Link
                         to={`/user/${comment.user_id}`}
-                        className="text-[13px] font-medium text-gray-700 hover:text-[#5BB5F5]"
+                        className="text-[13px] font-medium text-gray-700 hover:text-[#47B5FF]"
                       >
                         {comment.display_name || comment.username}
                       </Link>
@@ -139,7 +139,7 @@ export default function ActivityComments({
                       {currentUser && (
                         <button
                           onClick={() => setReplyingTo(comment.id)}
-                          className="text-[11px] text-gray-500 hover:text-[#5BB5F5]"
+                          className="text-[11px] text-gray-500 hover:text-[#47B5FF]"
                         >
                           {language === 'ko' ? '답글' : language === 'ja' ? '返信' : 'Reply'}
                         </button>
@@ -178,7 +178,7 @@ export default function ActivityComments({
                           onClick={() => onReplySubmit(comment.id)}
                           disabled={!replyText.trim()}
                           className="px-2 py-1 text-[12px] text-white rounded transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-                          style={replyText.trim() ? { backgroundColor: '#5BB5F5' } : {}}
+                          style={replyText.trim() ? { backgroundColor: '#47B5FF' } : {}}
                         >
                           {language === 'ko' ? '작성' : language === 'ja' ? '作成' : 'Post'}
                         </button>
@@ -223,7 +223,7 @@ export default function ActivityComments({
                                 <div className="flex items-center gap-2 mb-1">
                                   <Link
                                     to={`/user/${reply.user_id}`}
-                                    className="text-[13px] font-medium text-gray-700 hover:text-[#5BB5F5]"
+                                    className="text-[13px] font-medium text-gray-700 hover:text-[#47B5FF]"
                                   >
                                     {reply.display_name || reply.username}
                                   </Link>
@@ -249,7 +249,7 @@ export default function ActivityComments({
                                   {currentUser && (
                                     <button
                                       onClick={() => setReplyingTo(comment.id)}
-                                      className="text-[11px] text-gray-500 hover:text-[#5BB5F5]"
+                                      className="text-[11px] text-gray-500 hover:text-[#47B5FF]"
                                     >
                                       {language === 'ko' ? '답글' : language === 'ja' ? '返信' : 'Reply'}
                                     </button>

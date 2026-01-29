@@ -128,7 +128,7 @@ export default function Login() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Enter your username or email"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5BB5F5] focus:border-transparent transition-all text-sm"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#47B5FF] focus:border-transparent transition-all text-sm"
               required
             />
             <p className="text-xs text-gray-500 mt-1.5">
@@ -145,7 +145,7 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5BB5F5] focus:border-transparent transition-all text-sm"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#47B5FF] focus:border-transparent transition-all text-sm"
               required
             />
           </div>
@@ -154,12 +154,12 @@ export default function Login() {
             type="submit"
             disabled={loading}
             className="w-full text-white font-semibold py-3 px-4 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
-            style={{ backgroundColor: '#5BB5F5' }}
+            style={{ backgroundColor: '#47B5FF' }}
             onMouseEnter={(e) => {
               if (!loading) e.target.style.backgroundColor = '#2378D5';
             }}
             onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#5BB5F5';
+              e.target.style.backgroundColor = '#47B5FF';
             }}
           >
             {loading ? 'Logging in...' : 'Login'}
@@ -168,7 +168,7 @@ export default function Login() {
 
         <p className="text-center mt-6 text-gray-600 text-sm">
           Don't have an account?{' '}
-          <Link to="/register" className="font-semibold hover:underline" style={{ color: '#5BB5F5' }}>
+          <Link to="/register" className="font-semibold hover:underline" style={{ color: '#47B5FF' }}>
             Sign up
           </Link>
         </p>

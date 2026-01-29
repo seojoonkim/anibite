@@ -720,7 +720,7 @@ export default function AnimeDetail() {
           </div>
           <button
             onClick={() => navigate('/')}
-            className="mt-4 text-blue-500 hover:text-[#5BB5F5]"
+            className="mt-4 text-blue-500 hover:text-[#47B5FF]"
           >
             홈으로 돌아가기
           </button>
@@ -1104,7 +1104,7 @@ export default function AnimeDetail() {
                           {char.character_role && (
                             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded text-[10px] font-bold text-white whitespace-nowrap" style={{
                               backgroundColor: char.character_role === 'MAIN'
-                                ? '#5BB5F5'  // 주연: 하늘색 (프라이머리)
+                                ? '#47B5FF'  // 주연: 하늘색 (프라이머리)
                                 : char.character_role === 'SUPPORTING'
                                   ? '#F59E0B'  // 조연: 주황색
                                   : '#9CA3AF'  // 엑스트라: 회색
@@ -1118,7 +1118,7 @@ export default function AnimeDetail() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-sm truncate hover:text-[#5BB5F5] transition-colors">{language === 'ko' && char.character_name_korean ? char.character_name_korean : char.character_name}</h4>
+                          <h4 className="font-medium text-sm truncate hover:text-[#47B5FF] transition-colors">{language === 'ko' && char.character_name_korean ? char.character_name_korean : char.character_name}</h4>
                           <p className="text-xs text-gray-400">{language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character'}</p>
                           {/* 내 별점 표시 */}
                           {char.my_rating && char.my_rating > 0 && (
@@ -1206,7 +1206,7 @@ export default function AnimeDetail() {
                           )}
                         </div>
                         <div className="p-2">
-                          <h4 className="font-medium text-sm line-clamp-2 group-hover:text-[#5BB5F5] transition-colors">
+                          <h4 className="font-medium text-sm line-clamp-2 group-hover:text-[#47B5FF] transition-colors">
                             {getAnimeTitle(rec)}
                           </h4>
                         </div>
@@ -1262,9 +1262,9 @@ export default function AnimeDetail() {
                       setShowReviewForm(!showReviewForm);
                     }}
                     className="px-4 py-2 text-white rounded-lg transition-colors"
-                    style={{ backgroundColor: '#5BB5F5' }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#3A9FE8'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#5BB5F5'}
+                    style={{ backgroundColor: '#47B5FF' }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#2DA0ED'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#47B5FF'}
                   >
                     {showReviewForm
                       ? (language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel')
@@ -1330,9 +1330,9 @@ export default function AnimeDetail() {
                   <button
                     type="submit"
                     className="px-6 py-2 text-white rounded-lg transition-colors"
-                    style={{ backgroundColor: '#5BB5F5' }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#3A9FE8'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#5BB5F5'}
+                    style={{ backgroundColor: '#47B5FF' }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#2DA0ED'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#47B5FF'}
                   >
                     {isEditingReview
                       ? (language === 'ko' ? '리뷰 수정' : language === 'ja' ? 'レビュー編集' : 'Update Review')

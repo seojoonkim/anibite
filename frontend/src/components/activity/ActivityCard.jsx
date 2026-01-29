@@ -887,9 +887,9 @@ const ActivityCard = forwardRef(({
               <button
                 onClick={handleSaveEditPost}
                 className="px-4 py-2 text-white rounded-lg transition-all"
-                style={{ backgroundColor: '#5BB5F5' }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#3A9FE8'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#5BB5F5'}
+                style={{ backgroundColor: '#47B5FF' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#2DA0ED'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#47B5FF'}
               >
                 {language === 'ko' ? '저장' : language === 'ja' ? '保存' : 'Save'}
               </button>
