@@ -619,25 +619,14 @@ const ActivityCard = forwardRef(({
               {activity.activity_type === 'character_rating' && (activity.anime_title || activity.anime_title_korean) && (
                 <Link
                   to={`/anime/${activity.anime_id}`}
-                  className="text-xs text-gray-500 mt-0.5 hover:text-primary transition-colors block"
+                  className="text-sm text-gray-500 mt-0.5 hover:text-primary transition-colors block"
                 >
-                  from: {language === 'ko' ? (
-                    <>
-                      {activity.anime_title_korean || activity.anime_title}
-                      {activity.anime_title_korean && activity.anime_title && (
-                        <span className="text-[10px] text-gray-400 font-normal ml-1">({activity.anime_title})</span>
-                      )}
-                    </>
-                  ) : language === 'ja' ? (
-                    <>
-                      {activity.anime_title_native || activity.anime_title}
-                      {activity.anime_title_native && activity.anime_title && (
-                        <span className="text-[10px] text-gray-400 font-normal ml-1">({activity.anime_title})</span>
-                      )}
-                    </>
-                  ) : (
-                    activity.anime_title
-                  )}
+                  from: {language === 'ko'
+                    ? (activity.anime_title_korean || activity.anime_title)
+                    : language === 'ja'
+                      ? (activity.anime_title_native || activity.anime_title)
+                      : activity.anime_title
+                  }
                 </Link>
               )}
             </div>
