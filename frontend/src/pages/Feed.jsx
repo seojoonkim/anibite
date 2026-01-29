@@ -488,7 +488,7 @@ export default function Feed() {
               <button
                 onClick={() => setSearchParams({ filter: 'all' })}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'all'
-                  ? 'text-[#4A8AC9] font-semibold'
+                  ? 'bg-[#4A8AC9] text-white font-semibold'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
                   }`}
               >
@@ -504,7 +504,7 @@ export default function Feed() {
               <button
                 onClick={() => setSearchParams({ filter: 'following' })}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'following'
-                  ? 'text-[#4A8AC9] font-semibold'
+                  ? 'bg-[#4A8AC9] text-white font-semibold'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
                   }`}
               >
@@ -520,7 +520,7 @@ export default function Feed() {
               <button
                 onClick={() => setSearchParams({ filter: 'notifications' })}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'notifications'
-                  ? 'text-[#4A8AC9] font-semibold'
+                  ? 'bg-[#4A8AC9] text-white font-semibold'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
                   }`}
               >
@@ -534,7 +534,7 @@ export default function Feed() {
               <button
                 onClick={() => setSearchParams({ filter: 'saved' })}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'saved'
-                  ? 'text-[#4A8AC9] font-semibold'
+                  ? 'bg-[#4A8AC9] text-white font-semibold'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
                   }`}
               >
