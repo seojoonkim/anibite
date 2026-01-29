@@ -705,7 +705,7 @@ export default function Rate() {
         </div>
 
         {/* Anime Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 items-start">
           {loading && animeList.length === 0 ? (
             // Skeleton cards during initial load (Show 8 skeletons)
             Array.from({ length: 8 }).map((_, index) => (
