@@ -14,12 +14,13 @@
   <!-- Rounded square background with bite -->
   <rect x="2" y="2" width="36" height="36" rx="10" ry="10" fill="url(#bgGradient)" mask="url(#biteMask)"/>
 
-  <!-- Cute rounded 'A' letter with smooth rounded top -->
-  <!-- Single smooth path for A shape -->
-  <path d="M11 30 Q13 28 15 24 Q17 19 19 14 Q20 12 20 12 Q20 12 21 14 Q23 19 25 24 Q27 28 29 30"
-        stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <!-- Rounded top cap -->
-  <circle cx="20" cy="11" r="3" fill="white"/>
-  <!-- Crossbar - rounded bubble style -->
-  <ellipse cx="20" cy="23" rx="6" ry="2.5" fill="white"/>
+  <!-- Cute rounded 'A' letter - soft and bubbly style -->
+  <!-- Left leg - curved outward for cute look -->
+  <path d="M12 29 Q11 24 14 18 Q17 12 20 10"
+        stroke="white" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <!-- Right leg - curved outward for cute look -->
+  <path d="M20 10 Q23 12 26 18 Q29 24 28 29"
+        stroke="white" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <!-- Crossbar - pill/capsule shape -->
+  <rect x="13" y="21" width="14" height="5" rx="2.5" ry="2.5" fill="white"/>
 </svg>
