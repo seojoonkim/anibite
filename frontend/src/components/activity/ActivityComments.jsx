@@ -32,7 +32,7 @@ export default function ActivityComments({
   if (loading) {
     return (
       <div className="mt-4 border-t pt-4">
-        <p className="text-[15px] text-gray-500">{language === 'ko' ? '?��? 로딩 �?..' : language === 'ja' ? '?�メ?�ト�?��込み�?..' : 'Loading comments...'}</p>
+        <p className="text-[15px] text-gray-500">{language === 'ko' ? '댓글 로딩 중...' : language === 'ja' ? 'コメント読込中...' : 'Loading comments...'}</p>
       </div>
     );
   }
@@ -68,7 +68,7 @@ export default function ActivityComments({
                     onCommentSubmit();
                   }
                 }}
-                placeholder={language === 'ko' ? '?��????�력?�세??..' : language === 'ja' ? '?�メ?�ト?�入?�し?�く?�さ??..' : 'Write a comment...'}
+                placeholder={language === 'ko' ? '댓글을 입력하세요...' : language === 'ja' ? 'コメントを入力してください...' : 'Write a comment...'}
                 className="flex-1 px-3 py-1.5 text-[14px] border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <button
@@ -77,7 +77,7 @@ export default function ActivityComments({
                 className="px-3 py-1.5 text-[14px] font-semibold text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                 style={newCommentText.trim() ? { backgroundColor: '#4EEAF7' } : {}}
               >
-                {language === 'ko' ? '?�성' : language === 'ja' ? '作成' : 'Post'}
+                {language === 'ko' ? '작성' : language === 'ja' ? '作成' : 'Post'}
               </button>
             </div>
           </div>
@@ -141,19 +141,19 @@ export default function ActivityComments({
                           onClick={() => setReplyingTo(comment.id)}
                           className="text-[11px] text-gray-500 hover:text-[#4EEAF7]"
                         >
-                          {language === 'ko' ? '?��?' : language === 'ja' ? '返信' : 'Reply'}
+                          {language === 'ko' ? '답글' : language === 'ja' ? '返信' : 'Reply'}
                         </button>
                       )}
                       {currentUser && currentUser.id === comment.user_id && (
                         <button
                           onClick={() => {
-                            if (window.confirm(language === 'ko' ? '?��?????��?�시겠습?�까?' : language === 'ja' ? '?�メ?�ト?�削?�し?�す?�？' : 'Delete this comment?')) {
+                            if (window.confirm(language === 'ko' ? '댓글을 삭제하시겠습니까?' : language === 'ja' ? 'コメントを削除しますか？' : 'Delete this comment?')) {
                               onDeleteComment(comment.id);
                             }
                           }}
                           className="text-[11px] text-red-500 hover:text-red-700"
                         >
-                          {language === 'ko' ? '??��' : language === 'ja' ? '?�除' : 'Delete'}
+                          {language === 'ko' ? '삭제' : language === 'ja' ? '削除' : 'Delete'}
                         </button>
                       )}
                     </div>
@@ -171,7 +171,7 @@ export default function ActivityComments({
                               onReplySubmit(comment.id);
                             }
                           }}
-                          placeholder={language === 'ko' ? '?��????�력?�세??..' : language === 'ja' ? '返信?�入?�し?�く?�さ??..' : 'Write a reply...'}
+                          placeholder={language === 'ko' ? '답글을 입력하세요...' : language === 'ja' ? '返信を入力してください...' : 'Write a reply...'}
                           className="flex-1 px-2 py-1 text-[12px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                         />
                         <button
@@ -180,7 +180,7 @@ export default function ActivityComments({
                           className="px-2 py-1 text-[12px] font-semibold text-white rounded transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                           style={replyText.trim() ? { backgroundColor: '#4EEAF7' } : {}}
                         >
-                          {language === 'ko' ? '?�성' : language === 'ja' ? '作成' : 'Post'}
+                          {language === 'ko' ? '작성' : language === 'ja' ? '作成' : 'Post'}
                         </button>
                         <button
                           onClick={() => {
@@ -189,7 +189,7 @@ export default function ActivityComments({
                           }}
                           className="px-2 py-1 text-[12px] font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
                         >
-                          {language === 'ko' ? '취소' : language === 'ja' ? '??��?�セ?? : 'Cancel'}
+                          {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                         </button>
                       </div>
                     )}
@@ -251,19 +251,19 @@ export default function ActivityComments({
                                       onClick={() => setReplyingTo(comment.id)}
                                       className="text-[11px] text-gray-500 hover:text-[#4EEAF7]"
                                     >
-                                      {language === 'ko' ? '?��?' : language === 'ja' ? '返信' : 'Reply'}
+                                      {language === 'ko' ? '답글' : language === 'ja' ? '返信' : 'Reply'}
                                     </button>
                                   )}
                                   {currentUser && currentUser.id === reply.user_id && (
                                     <button
                                       onClick={() => {
-                                        if (window.confirm(language === 'ko' ? '?��?????��?�시겠습?�까?' : language === 'ja' ? '返信?�削?�し?�す?�？' : 'Delete this reply?')) {
+                                        if (window.confirm(language === 'ko' ? '댓글을 삭제하시겠습니까?' : language === 'ja' ? '返信を削除しますか？' : 'Delete this reply?')) {
                                           onDeleteComment(reply.id, comment.id);
                                         }
                                       }}
                                       className="text-[11px] text-red-500 hover:text-red-700"
                                     >
-                                      {language === 'ko' ? '??��' : language === 'ja' ? '?�除' : 'Delete'}
+                                      {language === 'ko' ? '삭제' : language === 'ja' ? '削除' : 'Delete'}
                                     </button>
                                   )}
                                 </div>

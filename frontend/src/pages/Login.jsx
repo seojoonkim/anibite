@@ -112,7 +112,7 @@ export default function Login() {
                 onClick={() => navigate('/resend-verification', { state: { email: userEmail } })}
                 className="text-sm underline hover:no-underline"
               >
-                Resend verification email ??
+                Resend verification email →
               </button>
             )}
           </div>

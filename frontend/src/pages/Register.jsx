@@ -28,7 +28,7 @@ export default function Register() {
     e.preventDefault();
     setError('');
 
-    // ë¹„ë?ë²ˆí˜¸ ?•ì¸
+    // ë¹„ë°€ë²ˆí˜¸ í™•ì¸
     if (formData.password !== formData.passwordConfirm) {
       setError('Passwords do not match');
       return;
@@ -175,7 +175,7 @@ export default function Register() {
 
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-semibold mb-2">
-              Preferred Language / ? í˜¸ ?¸ì–´ / è¨€èª?*
+              Preferred Language / ì„ í˜¸ ì–¸ì–´ / è¨€èª *
             </label>
             <div className="flex items-center gap-2 p-3 border border-gray-300 rounded-lg bg-gray-50">
               <button
@@ -186,7 +186,7 @@ export default function Register() {
                     : 'bg-white text-gray-700 hover:bg-gray-100'
                   }`}
               >
-                ?‡°?‡· ?œêµ­??
+                ğŸ‡°ğŸ‡· í•œêµ­ì–´
               </button>
               <button
                 type="button"
@@ -196,7 +196,7 @@ export default function Register() {
                     : 'bg-white text-gray-700 hover:bg-gray-100'
                   }`}
               >
-                ?‡º?‡¸ English
+                ğŸ‡ºğŸ‡¸ English
               </button>
               <button
                 type="button"
@@ -206,7 +206,7 @@ export default function Register() {
                     : 'bg-white text-gray-700 hover:bg-gray-100'
                   }`}
               >
-                ?‡¯?‡µ ?¥æœ¬èª?
+                ğŸ‡¯ğŸ‡µ æ—¥æœ¬èª
               </button>
             </div>
           </div>

@@ -95,7 +95,7 @@ export default function AnimeDetail() {
     return allActivities;
   }, [otherActivities, myRating, myReview, user, id, anime]);
 
-  // 로마 ?�자 변???�수
+  // 로마 숫자 변환 함수
   const toRoman = (num) => {
     const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
     return romanNumerals[num - 1] || num;
@@ -128,46 +128,46 @@ export default function AnimeDetail() {
         return; // Skip API calls, data is already fresh from prefetch
       }
 
-      // 1?�계: ?�니메이??기본 ?�보 먼�? 로드?�고 즉시 ?�시
+      // 1단계: 애니메이션 기본 정보 먼저 로드하고 즉시 표시
       const animeData = await animeService.getAnimeById(id);
 
       if (!animeData) {
-        setError('?�니메이?�을 찾을 ???�습?�다.');
+        setError('애니메이션을 찾을 수 없습니다.');
         setLoading(false);
         return;
       }
 
-      // 기본 ?�보 ?�정?�고 즉시 ?�면 ?�시
+      // 기본 정보 설정하고 즉시 화면 표시
       setAnime(animeData);
-      setLoading(false); // ?�기??로딩 ?�제 - 기본 ?�보 바로 ?�시
+      setLoading(false); // 여기서 로딩 해제 - 기본 정보 바로 표시
 
-      // 2?�계: ???�점/리뷰??백그?�운?�에??로드 (?�면?� ?��? ?�시 �?
+      // 2단계: 내 평점/리뷰를 백그라운드에서 로드 (화면에 이미 표시 됨)
       if (user) {
         const [myRatingData, myReviewData] = await Promise.all([
           ratingService.getUserRating(id).catch(() => null),
           reviewService.getMyReview(id).catch(() => null)
         ]);
 
-        // ???�점
+        // 내 평점
         if (myRatingData) {
           setMyRating(myRatingData);
         }
 
-        // ??리뷰
+        // 내 리뷰
         if (myReviewData) {
           processMyReview(myReviewData);
         }
       }
 
-      // 3?�계: ?�른 ?�람?�의 ?�동?� useActivities hook?�서 ?�동?�로 로드??
+      // 3단계: 다른 사람들의 활동은 useActivities hook에서 자동으로 로드됨
     } catch (err) {
       console.error('Failed to load anime data:', err);
-      setError(`?�이?��? 불러?�는???�패?�습?�다: ${err.message || '?????�는 ?�류'}`);
+      setError(`데이터를 불러오는데 실패했습니다: ${err.message || '알 수 없는 오류'}`);
       setLoading(false);
     }
   };
 
-  // 컴포?�트 마운?????�?�된 ?�동 로드 (?�드?� ?�기??
+  // 컴포넌트 마운트 시 저장된 활동 로드 (하드코딩 임시)
   useEffect(() => {
     const saved = localStorage.getItem('savedActivities');
     if (saved) {
@@ -188,7 +188,7 @@ export default function AnimeDetail() {
   const processReviews = (data) => {
     setReviews(data.items || []);
 
-    // 좋아???��? ?�보 초기??
+    // 좋아요 상태 정보 초기화
     const newReviewLikes = {};
     const newComments = {};
     const newExpandedComments = new Set();
@@ -201,10 +201,10 @@ export default function AnimeDetail() {
       };
       newComments[review.id] = [];
 
-      // ?��????�으�??�동?�로 ?�치�?
+      // 댓글이 있으면 자동으로 펼치기
       if (review.comments_count > 0) {
         newExpandedComments.add(review.id);
-        commentsToLoad.push(review); // review 객체 ?�체�??�달
+        commentsToLoad.push(review); // review 객체 전체를 전달
       }
     });
 
@@ -212,16 +212,16 @@ export default function AnimeDetail() {
     setComments(newComments);
     setExpandedComments(newExpandedComments);
 
-    // ?��? 병렬 로드
+    // 댓글 병렬 로드
     if (commentsToLoad.length > 0) {
-      Promise.all(commentsToLoad.map(review => loadReviewComments(review))); // review 객체 ?�달
+      Promise.all(commentsToLoad.map(review => loadReviewComments(review))); // review 객체 전달
     }
   };
 
   const processMyReview = (data) => {
     setMyReview(data);
 
-    // 좋아???�태 ?�정
+    // 좋아요 상태 설정
     if (data) {
       setReviewLikes(prev => ({
         ...prev,
@@ -231,7 +231,7 @@ export default function AnimeDetail() {
         }
       }));
 
-      // ??리뷰???��????�으�??�동?�로 ?�치�?로드
+      // 내 리뷰에 댓글이 있으면 자동으로 펼치기 로드
       if (data.comments_count > 0) {
         setExpandedComments(prev => new Set([...prev, data.id]));
         loadReviewComments(data);
@@ -239,10 +239,10 @@ export default function AnimeDetail() {
     }
   };
 
-  // ?�드 ?�식 ?�들???�수??
+  // 새로운 형식 핸들링 함수로
   const loadReviewComments = async (reviewOrId) => {
     try {
-      // review 객체가 직접 ?�달?�었?��?, ID�??�달?�었?��? ?�인
+      // review 객체가 직접 전달되었는지, ID만 전달되었는지 확인
       const review = typeof reviewOrId === 'object' ? reviewOrId : getReviewById(reviewOrId);
       const reviewId = typeof reviewOrId === 'object' ? reviewOrId.id : reviewOrId;
 
@@ -265,7 +265,7 @@ export default function AnimeDetail() {
       newExpanded.delete(reviewId);
     } else {
       newExpanded.add(reviewId);
-      // ?��????�직 로드?��? ?�았?�면 로드
+      // 댓글이 아직 로드되지 않았으면 로드
       if (!comments[reviewId] || comments[reviewId].length === 0) {
         loadReviewComments(reviewId);
       }
@@ -275,7 +275,7 @@ export default function AnimeDetail() {
 
   const handleToggleReviewLike = async (reviewId) => {
     if (!user) {
-      alert(language === 'ko' ? '로그?�이 ?�요?�니??' : language === 'ja' ? '??��?�ン?�必要で?��? : 'Please login first.');
+      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
       return;
     }
 
@@ -303,7 +303,7 @@ export default function AnimeDetail() {
 
   const handleSubmitComment = async (reviewId) => {
     if (!user) {
-      alert(language === 'ko' ? '로그?�이 ?�요?�니??' : language === 'ja' ? '??��?�ン?�必要で?��? : 'Please login first.');
+      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
       return;
     }
 
@@ -319,17 +319,17 @@ export default function AnimeDetail() {
       setNewComment(prev => ({ ...prev, [reviewId]: '' }));
       loadReviewComments(reviewId);
 
-      // 리뷰 목록 ?�로고침 (?��? ???�데?�트)
+      // 리뷰 목록 새로고침 (댓글 수 업데이트)
       const reviewData = await reviewService.getAnimeReviews(id, { page: 1, page_size: 10 });
       if (reviewData) processReviews(reviewData);
     } catch (err) {
       console.error('[AnimeDetail] Failed to create comment:', err);
-      alert(language === 'ko' ? '?��? ?�성???�패?�습?�다.' : language === 'ja' ? '?�メ?�ト作成?�失?�し?�し?��? : 'Failed to create comment.');
+      alert(language === 'ko' ? '댓글 작성에 실패했습니다.' : language === 'ja' ? 'コメント作成に失敗しました。' : 'Failed to create comment.');
     }
   };
 
   const handleDeleteComment = async (reviewId, commentId) => {
-    if (!confirm(language === 'ko' ? '?��?????��?�시겠습?�까?' : language === 'ja' ? '?�の?�メ?�ト?�削?�し?�す?�？' : 'Delete this comment?')) return;
+    if (!confirm(language === 'ko' ? '댓글을 삭제하시겠습니까?' : language === 'ja' ? 'このコメントを削除しますか？' : 'Delete this comment?')) return;
 
     try {
       const review = getReviewById(reviewId);
@@ -339,18 +339,18 @@ export default function AnimeDetail() {
 
       loadReviewComments(review);
 
-      // ?��? ???�데?�트
+      // 댓글 수 업데이트
       const reviewData = await reviewService.getAnimeReviews(id, { page: 1, page_size: 10 });
       if (reviewData) processReviews(reviewData);
     } catch (err) {
       console.error('Failed to delete comment:', err);
-      alert(language === 'ko' ? '?��? ??��???�패?�습?�다.' : language === 'ja' ? '?�メ?�ト?�除?�失?�し?�し?��? : 'Failed to delete comment.');
+      alert(language === 'ko' ? '댓글 삭제에 실패했습니다.' : language === 'ja' ? 'コメント削除に失敗しました。' : 'Failed to delete comment.');
     }
   };
 
   const handleToggleCommentLike = async (reviewId, commentId) => {
     if (!user) {
-      alert(language === 'ko' ? '로그?�이 ?�요?�니??' : language === 'ja' ? '??��?�ン?�必要で?��? : 'Please login first.');
+      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
       return;
     }
 
@@ -371,7 +371,7 @@ export default function AnimeDetail() {
       } else {
         newSet.add(activityKey);
       }
-      // 로컬 ?�토리�????�??(?�드?� ?�기??
+      // 로컬 스토리지에 저장 (하드코딩 임시)
       localStorage.setItem('savedActivities', JSON.stringify([...newSet]));
       return newSet;
     });
@@ -386,7 +386,7 @@ export default function AnimeDetail() {
 
   const handleSubmitReply = async (reviewId, parentCommentId) => {
     if (!user) {
-      alert(language === 'ko' ? '로그?�이 ?�요?�니??' : language === 'ja' ? '??��?�ン?�必要で?��? : 'Please login first.');
+      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
       return;
     }
 
@@ -403,12 +403,12 @@ export default function AnimeDetail() {
       setReplyingTo(prev => ({ ...prev, [reviewId]: null }));
       loadReviewComments(reviewId);
 
-      // ?��? ???�데?�트
+      // 댓글 수 업데이트
       const reviewData = await reviewService.getAnimeReviews(id, { page: 1, page_size: 10 });
       if (reviewData) processReviews(reviewData);
     } catch (err) {
       console.error('Failed to create reply:', err);
-      alert(language === 'ko' ? '?��? ?�성???�패?�습?�다.' : language === 'ja' ? '返信作成?�失?�し?�し?��? : 'Failed to create reply.');
+      alert(language === 'ko' ? '답글 작성에 실패했습니다.' : language === 'ja' ? '返信作成に失敗しました。' : 'Failed to create reply.');
     }
   };
 
@@ -424,13 +424,13 @@ export default function AnimeDetail() {
 
   const getTimeAgo = (timestamp) => {
     const now = new Date();
-    // SQLite timestamp�?UTC�??�싱
+    // SQLite timestamp를 UTC로 파싱
     const past = new Date(timestamp.endsWith('Z') ? timestamp : timestamp + 'Z');
     const diffInSeconds = Math.floor((now - past) / 1000);
 
-    if (diffInSeconds < 3600) return language === 'ko' ? `${Math.max(1, Math.floor(diffInSeconds / 60))}�??? : language === 'ja' ? `${Math.max(1, Math.floor(diffInSeconds / 60))}?�前` : `${Math.max(1, Math.floor(diffInSeconds / 60))}m ago`;
-    if (diffInSeconds < 86400) return language === 'ko' ? `${Math.floor(diffInSeconds / 3600)}?�간 ?? : language === 'ja' ? `${Math.floor(diffInSeconds / 3600)}?�間?? : `${Math.floor(diffInSeconds / 3600)}h ago`;
-    if (diffInSeconds < 604800) return language === 'ko' ? `${Math.floor(diffInSeconds / 86400)}???? : language === 'ja' ? `${Math.floor(diffInSeconds / 86400)}?�前` : `${Math.floor(diffInSeconds / 86400)}d ago`;
+    if (diffInSeconds < 3600) return language === 'ko' ? `${Math.max(1, Math.floor(diffInSeconds / 60))}분 전` : language === 'ja' ? `${Math.max(1, Math.floor(diffInSeconds / 60))}分前` : `${Math.max(1, Math.floor(diffInSeconds / 60))}m ago`;
+    if (diffInSeconds < 86400) return language === 'ko' ? `${Math.floor(diffInSeconds / 3600)}시간 전` : language === 'ja' ? `${Math.floor(diffInSeconds / 3600)}時間前` : `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 604800) return language === 'ko' ? `${Math.floor(diffInSeconds / 86400)}일 전` : language === 'ja' ? `${Math.floor(diffInSeconds / 86400)}日前` : `${Math.floor(diffInSeconds / 86400)}d ago`;
     return past.toLocaleDateString(language === 'ko' ? 'ko-KR' : language === 'ja' ? 'ja-JP' : 'en-US');
   };
 
@@ -447,14 +447,14 @@ export default function AnimeDetail() {
   };
 
   const handleDeleteReview = async () => {
-    if (!confirm(language === 'ko' ? '리뷰�???��?�시겠습?�까?' : language === 'ja' ? '?�の?�ビ?�ー?�削?�し?�す?�？' : 'Delete this review?')) return;
+    if (!confirm(language === 'ko' ? '리뷰를 삭제하시겠습니까?' : language === 'ja' ? 'このレビューを削除しますか？' : 'Delete this review?')) return;
 
     try {
       await reviewService.deleteReview(myReview.id);
       setMyReview(null);
-      setReviewSuccess(language === 'ko' ? '리뷰가 ??��?�었?�니??' : language === 'ja' ? '?�ビ?�ー?�削?�さ?�ま?�た?? : 'Review deleted successfully.');
+      setReviewSuccess(language === 'ko' ? '리뷰가 삭제되었습니다.' : language === 'ja' ? 'レビューが削除されました。' : 'Review deleted successfully.');
 
-      // anime stats�??�데?�트 (?�체 리프?�시 ?�이)
+      // anime stats를 업데이트 (전체 리프레시 없이)
       const animeData = await animeService.getAnimeById(id);
       if (animeData) setAnime(animeData);
 
@@ -464,7 +464,7 @@ export default function AnimeDetail() {
       setTimeout(() => setReviewSuccess(''), 3000);
     } catch (err) {
       console.error('Failed to delete review:', err);
-      setReviewError(language === 'ko' ? '리뷰 ??��???�패?�습?�다.' : language === 'ja' ? '?�ビ?�ー?�除?�失?�し?�し?��? : 'Failed to delete review.');
+      setReviewError(language === 'ko' ? '리뷰 삭제에 실패했습니다.' : language === 'ja' ? 'レビュー削除に失敗しました。' : 'Failed to delete review.');
     }
   };
 
@@ -474,43 +474,43 @@ export default function AnimeDetail() {
     setReviewSuccess('');
 
     if (reviewData.rating === 0 || !reviewData.rating) {
-      setReviewError(language === 'ko' ? '별점???�택?�주?�요.' : language === 'ja' ? '評価?�選?�し?�く?�さ?��? : 'Please select a rating.');
+      setReviewError(language === 'ko' ? '별점을 선택해주세요.' : language === 'ja' ? '評価を選択してください。' : 'Please select a rating.');
       return;
     }
 
     if (!reviewData.content.trim()) {
-      setReviewError(language === 'ko' ? '리뷰 ?�용???�력?�주?�요.' : language === 'ja' ? '?�ビ?�ー?��??�入?�し?�く?�さ?��? : 'Please enter review content.');
+      setReviewError(language === 'ko' ? '리뷰 내용을 입력해주세요.' : language === 'ja' ? 'レビュー内容を入力してください。' : 'Please enter review content.');
       return;
     }
 
     try {
       if (isEditingReview && myReview) {
-        // ?�정 ?? rating??리뷰 API???�께 ?�송
+        // 수정 시 rating을 리뷰 API에 함께 전송
         await reviewService.updateReview(myReview.id, {
           content: reviewData.content,
           is_spoiler: reviewData.is_spoiler,
-          rating: reviewData.rating  // 별점???�께 ?�송
+          rating: reviewData.rating  // 별점도 함께 전송
         });
-        setReviewSuccess(language === 'ko' ? '리뷰가 ?�정?�었?�니??' : language === 'ja' ? '?�ビ?�ー?�編?�さ?�ま?�た?? : 'Review updated successfully.');
+        setReviewSuccess(language === 'ko' ? '리뷰가 수정되었습니다.' : language === 'ja' ? 'レビューが編集されました。' : 'Review updated successfully.');
       } else {
-        // ?�로 ?�성: 별점�?리뷰�???번에 ?�송
+        // 새로 작성: 별점과 리뷰를 한번에 전송
         await reviewService.createReview({
           anime_id: parseInt(id),
           content: reviewData.content,
           is_spoiler: reviewData.is_spoiler,
-          rating: reviewData.rating  // 별점??리뷰 API???�께 ?�송
+          rating: reviewData.rating  // 별점을 리뷰 API에 함께 전송
         });
 
-        setReviewSuccess(language === 'ko' ? '리뷰가 ?�성?�었?�니??' : language === 'ja' ? '?�ビ?�ー?�作?�さ?�ま?�た?? : 'Review submitted successfully.');
+        setReviewSuccess(language === 'ko' ? '리뷰가 작성되었습니다.' : language === 'ja' ? 'レビューが作成されました。' : 'Review submitted successfully.');
       }
 
       setReviewData({ content: '', is_spoiler: false, rating: 0 });
       setShowReviewForm(false);
       setIsEditingReview(false);
 
-      // 로컬 state�??�데?�트 (?�체 리프?�시 ?�이)
+      // 로컬 state를 업데이트 (전체 리프레시 없이)
       if (isEditingReview) {
-        // 리뷰 ?�정: myReview, myRating, anime ?�데?�트
+        // 리뷰 수정: myReview, myRating, anime 업데이트
         const [updatedMyReview, updatedMyRating, updatedAnime] = await Promise.all([
           reviewService.getMyReview(id).catch(() => null),
           ratingService.getUserRating(id).catch(() => null),
@@ -524,7 +524,7 @@ export default function AnimeDetail() {
         // Refresh activities list to update review list immediately
         await refetchActivities();
       } else {
-        // ??리뷰 ?�성: myReview, myRating�?anime stats�??�데?�트
+        // 새 리뷰 작성: myReview, myRating과 anime stats를 업데이트
         const [myReviewData, myRatingData, animeData] = await Promise.all([
           reviewService.getMyReview(id).catch(() => null),
           ratingService.getUserRating(id).catch(() => null),
@@ -538,12 +538,12 @@ export default function AnimeDetail() {
 
       setTimeout(() => setReviewSuccess(''), 3000);
     } catch (err) {
-      console.error('리뷰 ?�출 ?�패:', err);
+      console.error('리뷰 제출 실패:', err);
       setReviewError(
         language === 'ko'
-          ? err.response?.data?.detail || '리뷰 ?�성???�패?�습?�다.'
+          ? err.response?.data?.detail || '리뷰 작성에 실패했습니다.'
           : language === 'ja'
-          ? err.response?.data?.detail || '?�ビ?�ー作成?�失?�し?�し?��?
+          ? err.response?.data?.detail || 'レビュー作成に失敗しました。'
           : err.response?.data?.detail || 'Failed to submit review.'
       );
     }
@@ -553,7 +553,7 @@ export default function AnimeDetail() {
     try {
       await ratingService.rateAnime(id, { rating, status });
 
-      // 병렬�??�이???�로고침 (리뷰 목록 ?�함)
+      // 병렬로 데이터 새로고침 (리뷰 목록 포함)
       const [myRatingData, animeData, reviewData] = await Promise.all([
         ratingService.getUserRating(id).catch(() => null),
         animeService.getAnimeById(id),
@@ -575,7 +575,7 @@ export default function AnimeDetail() {
       }
     } catch (err) {
       console.error('Failed to rate:', err);
-      alert(language === 'ko' ? '?��?�??�?�하?�데 ?�패?�습?�다.' : language === 'ja' ? '評価??��存に失敗?�ま?�た?? : 'Failed to save rating.');
+      alert(language === 'ko' ? '평점 저장에 실패했습니다.' : language === 'ja' ? '評価の保存に失敗しました。' : 'Failed to save rating.');
     }
   };
 
@@ -589,12 +589,12 @@ export default function AnimeDetail() {
         setMyRating(result);
       }
 
-      // ?�계 ?�로고침
+      // 통계 새로고침
       const animeData = await animeService.getAnimeById(id);
       if (animeData) setAnime(animeData);
     } catch (err) {
       console.error('Failed to update status:', err);
-      alert('?�태 변경에 ?�패?�습?�다.');
+      alert('상태 변경에 실패했습니다.');
     }
   };
 
@@ -716,13 +716,13 @@ export default function AnimeDetail() {
       <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
         <div className="max-w-[1180px] mx-auto px-4 py-8">
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {error || '?�니메이?�을 찾을 ???�습?�다.'}
+            {error || '애니메이션을 찾을 수 없습니다.'}
           </div>
           <button
             onClick={() => navigate('/')}
             className="mt-4 text-blue-500 hover:text-[#4EEAF7]"
           >
-            ???�으�??�아가�?
+            홈으로 돌아가기
           </button>
         </div>
       </div>
@@ -780,12 +780,12 @@ export default function AnimeDetail() {
                 <h2 className="text-xl text-gray-500 mb-4">{anime.title_romaji}</h2>
               )}
 
-              {/* AniPass ?�이???��? */}
+              {/* AniPass 스타일 평점 */}
               <div className="mb-6 flex gap-8 items-center justify-center">
-                {/* ?�쪽: 종합 ?�점 */}
+                {/* 왼쪽: 종합 평점 */}
                 <div className="flex flex-col items-center">
                   <div className="text-sm font-medium text-gray-600 mb-3">
-                    {language === 'ko' ? '종합 ?�점' : language === 'ja' ? '総合評価' : 'Overall Rating'}
+                    {language === 'ko' ? '종합 평점' : language === 'ja' ? '総合評価' : 'Overall Rating'}
                   </div>
                   <div className="flex items-center gap-3">
                     <StarIcon className={`w-14 h-14 ${anime.site_rating_count > 0 ? '' : 'text-gray-300'}`} filled={anime.site_rating_count > 0} />
@@ -795,15 +795,15 @@ export default function AnimeDetail() {
                       </div>
                       <div className="text-base text-gray-600 mt-1">
                         {anime.site_rating_count > 0
-                          ? (language === 'ko' ? `${anime.site_rating_count}�??��?` : language === 'ja' ? `${anime.site_rating_count}件の評価` : `${anime.site_rating_count} ratings`)
-                          : (language === 'ko' ? '?�직 ?��? ?�음' : language === 'ja' ? '?�だ評価?�あ?�ま?�ん' : 'No ratings yet')
+                          ? (language === 'ko' ? `${anime.site_rating_count}개 평가` : language === 'ja' ? `${anime.site_rating_count}件の評価` : `${anime.site_rating_count} ratings`)
+                          : (language === 'ko' ? '아직 평가 없음' : language === 'ja' ? 'まだ評価がありません' : 'No ratings yet')
                         }
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* ?�른�? 별점 ?�스?�그??(컴팩?? */}
+                {/* 오른쪽: 별점 히스토그램(컴팩트) */}
                 <div className="flex-1 max-w-md space-y-0.5">
                   {[5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5].map((star) => {
                     const dist = anime.site_rating_distribution?.find(d => d.rating === star);
@@ -834,49 +834,49 @@ export default function AnimeDetail() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 {anime.status && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '방영 ?�태:' : language === 'ja' ? '?�送状??' : 'Status:'}</span> {anime.status}
+                    <span className="font-medium">{language === 'ko' ? '방영 상태:' : language === 'ja' ? '放送状態:' : 'Status:'}</span> {anime.status}
                   </div>
                 )}
                 {anime.format && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '?�맷:' : language === 'ja' ? '?�ォ?�マ?�ト:' : 'Format:'}</span> {anime.format}
+                    <span className="font-medium">{language === 'ko' ? '포맷:' : language === 'ja' ? 'フォーマット:' : 'Format:'}</span> {anime.format}
                   </div>
                 )}
                 {anime.episodes && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '?�피?�드:' : language === 'ja' ? '?�ピ?�ー??' : 'Episodes:'}</span> {anime.episodes}{language === 'ko' ? '?? : language === 'ja' ? '�? : ''}
+                    <span className="font-medium">{language === 'ko' ? '에피소드:' : language === 'ja' ? 'エピソード:' : 'Episodes:'}</span> {anime.episodes}{language === 'ko' ? '화' : language === 'ja' ? '話' : ''}
                   </div>
                 )}
                 {anime.duration && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '?�닝?�??' : language === 'ja' ? '?�送時??' : 'Duration:'}</span> {anime.duration}min
+                    <span className="font-medium">{language === 'ko' ? '러닝타임:' : language === 'ja' ? '放送時間:' : 'Duration:'}</span> {anime.duration}min
                   </div>
                 )}
                 {anime.start_date && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '방영 ?�작:' : language === 'ja' ? '?�送開�?' : 'Start Date:'}</span> {anime.start_date}
+                    <span className="font-medium">{language === 'ko' ? '방영 시작:' : language === 'ja' ? '放送開始:' : 'Start Date:'}</span> {anime.start_date}
                   </div>
                 )}
                 {anime.season && anime.season_year && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '?�즌:' : language === 'ja' ? '?�ー?�ン:' : 'Season:'}</span> {anime.season} {anime.season_year}
+                    <span className="font-medium">{language === 'ko' ? '시즌:' : language === 'ja' ? 'シーズン:' : 'Season:'}</span> {anime.season} {anime.season_year}
                   </div>
                 )}
                 {anime.source && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '?�작:' : language === 'ja' ? '?�作:' : 'Source:'}</span> {anime.source}
+                    <span className="font-medium">{language === 'ko' ? '원작:' : language === 'ja' ? '原作:' : 'Source:'}</span> {anime.source}
                   </div>
                 )}
                 {anime.country_of_origin && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '�??:' : language === 'ja' ? '??' : 'Country:'}</span> {anime.country_of_origin}
+                    <span className="font-medium">{language === 'ko' ? '국가:' : language === 'ja' ? '国:' : 'Country:'}</span> {anime.country_of_origin}
                   </div>
                 )}
               </div>
 
               {anime.genres && anime.genres.length > 0 && (
                 <div className="mt-4">
-                  <span className="font-medium text-sm">{language === 'ko' ? '?�르:' : language === 'ja' ? '?�ャ?�ル:' : 'Genres:'}</span>
+                  <span className="font-medium text-sm">{language === 'ko' ? '장르:' : language === 'ja' ? 'ジャンル:' : 'Genres:'}</span>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {anime.genres.map((genre) => (
                       <span
@@ -892,7 +892,7 @@ export default function AnimeDetail() {
 
               {anime.studios && anime.studios.length > 0 && (
                 <div className="mt-4">
-                  <span className="font-medium text-sm">{language === 'ko' ? '?�작??' : language === 'ja' ? '?�タ?�オ:' : 'Studios:'}</span>
+                  <span className="font-medium text-sm">{language === 'ko' ? '제작사:' : language === 'ja' ? 'スタジオ:' : 'Studios:'}</span>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {anime.studios.map((studio, idx) => (
                       <span
@@ -908,7 +908,7 @@ export default function AnimeDetail() {
 
               {anime.tags && anime.tags.length > 0 && (
                 <div className="mt-4">
-                  <span className="font-medium text-sm">{language === 'ko' ? '?�그:' : language === 'ja' ? '?�グ:' : 'Tags:'}</span>
+                  <span className="font-medium text-sm">{language === 'ko' ? '태그:' : language === 'ja' ? 'タグ:' : 'Tags:'}</span>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {anime.tags.slice(0, 10).map((tag, idx) => (
                       <span
@@ -926,12 +926,12 @@ export default function AnimeDetail() {
 
             {/* Basic Info - Mobile only (without title) */}
             <div className="lg:hidden bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
-              {/* AniPass ?�이???��? */}
+              {/* AniPass 스타일 평점 */}
               <div className="mb-6 flex gap-8 items-center justify-center">
-                {/* ?�쪽: 종합 ?�점 */}
+                {/* 왼쪽: 종합 평점 */}
                 <div className="flex flex-col items-center">
                   <div className="text-sm font-medium text-gray-600 mb-3">
-                    {language === 'ko' ? '종합 ?�점' : language === 'ja' ? '総合評価' : 'Overall Rating'}
+                    {language === 'ko' ? '종합 평점' : language === 'ja' ? '総合評価' : 'Overall Rating'}
                   </div>
                   <div className="flex items-center gap-3">
                     <StarIcon className={`w-14 h-14 ${anime.site_rating_count > 0 ? '' : 'text-gray-300'}`} filled={anime.site_rating_count > 0} />
@@ -941,15 +941,15 @@ export default function AnimeDetail() {
                       </div>
                       <div className="text-base text-gray-600 mt-1">
                         {anime.site_rating_count > 0
-                          ? (language === 'ko' ? `${anime.site_rating_count}�??��?` : language === 'ja' ? `${anime.site_rating_count}件の評価` : `${anime.site_rating_count} ratings`)
-                          : (language === 'ko' ? '?�직 ?��? ?�음' : language === 'ja' ? '?�だ評価?�あ?�ま?�ん' : 'No ratings yet')
+                          ? (language === 'ko' ? `${anime.site_rating_count}개 평가` : language === 'ja' ? `${anime.site_rating_count}件の評価` : `${anime.site_rating_count} ratings`)
+                          : (language === 'ko' ? '아직 평가 없음' : language === 'ja' ? 'まだ評価がありません' : 'No ratings yet')
                         }
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* ?�른�? 별점 ?�스?�그??(컴팩?? */}
+                {/* 오른쪽: 별점 히스토그램(컴팩트) */}
                 <div className="flex-1 max-w-md space-y-0.5">
                   {[5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5].map((star) => {
                     const dist = anime.site_rating_distribution?.find(d => d.rating === star);
@@ -980,49 +980,49 @@ export default function AnimeDetail() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 {anime.status && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '방영 ?�태:' : language === 'ja' ? '?�送状??' : 'Status:'}</span> {anime.status}
+                    <span className="font-medium">{language === 'ko' ? '방영 상태:' : language === 'ja' ? '放送状態:' : 'Status:'}</span> {anime.status}
                   </div>
                 )}
                 {anime.format && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '?�맷:' : language === 'ja' ? '?�ォ?�マ?�ト:' : 'Format:'}</span> {anime.format}
+                    <span className="font-medium">{language === 'ko' ? '포맷:' : language === 'ja' ? 'フォーマット:' : 'Format:'}</span> {anime.format}
                   </div>
                 )}
                 {anime.episodes && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '?�피?�드:' : language === 'ja' ? '?�ピ?�ー??' : 'Episodes:'}</span> {anime.episodes}{language === 'ko' ? '?? : language === 'ja' ? '�? : ''}
+                    <span className="font-medium">{language === 'ko' ? '에피소드:' : language === 'ja' ? 'エピソード:' : 'Episodes:'}</span> {anime.episodes}{language === 'ko' ? '화' : language === 'ja' ? '話' : ''}
                   </div>
                 )}
                 {anime.duration && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '?�닝?�??' : language === 'ja' ? '?�送時??' : 'Duration:'}</span> {anime.duration}min
+                    <span className="font-medium">{language === 'ko' ? '러닝타임:' : language === 'ja' ? '放送時間:' : 'Duration:'}</span> {anime.duration}min
                   </div>
                 )}
                 {anime.start_date && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '방영 ?�작:' : language === 'ja' ? '?�送開�?' : 'Start Date:'}</span> {anime.start_date}
+                    <span className="font-medium">{language === 'ko' ? '방영 시작:' : language === 'ja' ? '放送開始:' : 'Start Date:'}</span> {anime.start_date}
                   </div>
                 )}
                 {anime.season && anime.season_year && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '?�즌:' : language === 'ja' ? '?�ー?�ン:' : 'Season:'}</span> {anime.season} {anime.season_year}
+                    <span className="font-medium">{language === 'ko' ? '시즌:' : language === 'ja' ? 'シーズン:' : 'Season:'}</span> {anime.season} {anime.season_year}
                   </div>
                 )}
                 {anime.source && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '?�작:' : language === 'ja' ? '?�作:' : 'Source:'}</span> {anime.source}
+                    <span className="font-medium">{language === 'ko' ? '원작:' : language === 'ja' ? '原作:' : 'Source:'}</span> {anime.source}
                   </div>
                 )}
                 {anime.country_of_origin && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '�??:' : language === 'ja' ? '??' : 'Country:'}</span> {anime.country_of_origin}
+                    <span className="font-medium">{language === 'ko' ? '국가:' : language === 'ja' ? '国:' : 'Country:'}</span> {anime.country_of_origin}
                   </div>
                 )}
               </div>
 
               {anime.genres && anime.genres.length > 0 && (
                 <div className="mt-4">
-                  <span className="font-medium text-sm">{language === 'ko' ? '?�르:' : language === 'ja' ? '?�ャ?�ル:' : 'Genres:'}</span>
+                  <span className="font-medium text-sm">{language === 'ko' ? '장르:' : language === 'ja' ? 'ジャンル:' : 'Genres:'}</span>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {anime.genres.map((genre) => (
                       <span
@@ -1038,7 +1038,7 @@ export default function AnimeDetail() {
 
               {anime.studios && anime.studios.length > 0 && (
                 <div className="mt-4">
-                  <span className="font-medium text-sm">{language === 'ko' ? '?�작??' : language === 'ja' ? '?�タ?�オ:' : 'Studios:'}</span>
+                  <span className="font-medium text-sm">{language === 'ko' ? '제작사:' : language === 'ja' ? 'スタジオ:' : 'Studios:'}</span>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {anime.studios.map((studio, idx) => (
                       <span
@@ -1054,7 +1054,7 @@ export default function AnimeDetail() {
 
               {anime.tags && anime.tags.length > 0 && (
                 <div className="mt-4">
-                  <span className="font-medium text-sm">{language === 'ko' ? '?�그:' : language === 'ja' ? '?�グ:' : 'Tags:'}</span>
+                  <span className="font-medium text-sm">{language === 'ko' ? '태그:' : language === 'ja' ? 'タグ:' : 'Tags:'}</span>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {anime.tags.slice(0, 10).map((tag, idx) => (
                       <span
@@ -1073,7 +1073,7 @@ export default function AnimeDetail() {
             {/* Synopsis */}
             {anime.description && (
               <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
-                <h3 className="text-xl font-bold mb-4">{language === 'ko' ? '줄거�? : language === 'ja' ? '?�ら?�じ' : 'Synopsis'}</h3>
+                <h3 className="text-xl font-bold mb-4">{language === 'ko' ? '줄거리' : language === 'ja' ? 'あらすじ' : 'Synopsis'}</h3>
                 <p className="text-gray-700 whitespace-pre-line">{anime.description}</p>
               </div>
             )}
@@ -1081,7 +1081,7 @@ export default function AnimeDetail() {
             {/* Characters & Voice Actors */}
             {anime.characters && anime.characters.length > 0 && (
               <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
-                <h3 className="text-xl font-bold mb-4">{language === 'ko' ? '캐릭??& ?�우' : language === 'ja' ? '??��?�ク?�ー & 声優' : 'Characters & Voice Actors'}</h3>
+                <h3 className="text-xl font-bold mb-4">{language === 'ko' ? '캐릭터 & 성우' : language === 'ja' ? 'キャラクター & 声優' : 'Characters & Voice Actors'}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {anime.characters.map((char, idx) => (
                     <div key={idx} className="flex items-center gap-4 p-3 border border-gray-200 rounded-lg hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-shadow">
@@ -1107,16 +1107,16 @@ export default function AnimeDetail() {
                               color: char.character_role === 'BACKGROUND' ? '#364F6B' : 'white'
                             }}>
                               {char.character_role === 'MAIN'
-                                ? (language === 'ko' ? '주연' : language === 'ja' ? '?�イ?? : 'Main')
+                                ? (language === 'ko' ? '주연' : language === 'ja' ? 'メイン' : 'Main')
                                 : char.character_role === 'SUPPORTING'
-                                ? (language === 'ko' ? '조연' : language === 'ja' ? '?�ポ?�ト' : 'Supporting')
-                                : (language === 'ko' ? '?�스?�라' : language === 'ja' ? '?�キ?�ト?? : 'Extra')}
+                                ? (language === 'ko' ? '조연' : language === 'ja' ? 'サポート' : 'Supporting')
+                                : (language === 'ko' ? '엑스트라' : language === 'ja' ? 'エキストラ' : 'Extra')}
                             </div>
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="font-medium text-sm truncate hover:text-[#4EEAF7] transition-colors">{language === 'ko' && char.character_name_korean ? char.character_name_korean : char.character_name}</h4>
-                          <p className="text-xs text-gray-400">{language === 'ko' ? '캐릭?? : language === 'ja' ? '??��?�ク?�ー' : 'Character'}</p>
+                          <p className="text-xs text-gray-400">{language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character'}</p>
                         </div>
                       </div>
                       {char.voice_actor_name && (
@@ -1133,7 +1133,7 @@ export default function AnimeDetail() {
                           />
                           <div className="flex-1 min-w-0">
                             <h4 className="font-medium text-sm truncate">{char.voice_actor_name}</h4>
-                            <p className="text-xs text-gray-500">{language === 'ko' ? '?�우' : language === 'ja' ? '声優' : 'Voice Actor'}</p>
+                            <p className="text-xs text-gray-500">{language === 'ko' ? '성우' : language === 'ja' ? '声優' : 'Voice Actor'}</p>
                           </div>
                         </div>
                       )}
@@ -1146,7 +1146,7 @@ export default function AnimeDetail() {
             {/* Staff */}
             {anime.staff && anime.staff.length > 0 && (
               <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
-                <h3 className="text-xl font-bold mb-4">{language === 'ko' ? '?�작�? : language === 'ja' ? '?�タ?�フ' : 'Staff'}</h3>
+                <h3 className="text-xl font-bold mb-4">{language === 'ko' ? '제작진' : language === 'ja' ? 'スタッフ' : 'Staff'}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {anime.staff.map((staff, idx) => (
                     <div key={idx} className="flex flex-col items-center text-center p-3 border border-gray-200 rounded-lg hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-shadow">
@@ -1169,7 +1169,7 @@ export default function AnimeDetail() {
             {/* Recommendations */}
             {anime.recommendations && anime.recommendations.length > 0 && (
               <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
-                <h3 className="text-xl font-bold mb-4">{language === 'ko' ? '추천 ?�니메이?? : language === 'ja' ? '?�す?�め?�ニ?? : 'Recommendations'}</h3>
+                <h3 className="text-xl font-bold mb-4">{language === 'ko' ? '추천 애니메이션' : language === 'ja' ? 'おすすめアニメ' : 'Recommendations'}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {anime.recommendations.map((rec) => (
                     <div
@@ -1206,7 +1206,7 @@ export default function AnimeDetail() {
             {/* External Links */}
             {anime.external_links && anime.external_links.length > 0 && (
               <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
-                <h3 className="text-xl font-bold mb-4">{language === 'ko' ? '?��? 링크' : language === 'ja' ? '外部?�ン?? : 'External Links'}</h3>
+                <h3 className="text-xl font-bold mb-4">{language === 'ko' ? '외부 링크' : language === 'ja' ? '外部リンク' : 'External Links'}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {anime.external_links.map((link, idx) => (
                     <a
@@ -1216,12 +1216,12 @@ export default function AnimeDetail() {
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
                     >
-                      <span className="text-2xl">?��</span>
+                      <span className="text-2xl">🔗</span>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-sm truncate">{link.site}</h4>
                         <p className="text-xs text-gray-500">{link.type}</p>
                       </div>
-                      <span className="text-gray-400">??/span>
+                      <span className="text-gray-400">→</span>
                     </a>
                   ))}
                 </div>
@@ -1232,7 +1232,7 @@ export default function AnimeDetail() {
             <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold">
-                  {language === 'ko' ? '리뷰' : language === 'ja' ? '?�ビ?�ー' : 'Reviews'} ({activities.length})
+                  {language === 'ko' ? '리뷰' : language === 'ja' ? 'レビュー' : 'Reviews'} ({activities.length})
                 </h3>
                 {!myReview && (
                   <button
@@ -1250,8 +1250,8 @@ export default function AnimeDetail() {
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                   >
                     {showReviewForm
-                      ? (language === 'ko' ? '취소' : language === 'ja' ? '??��?�セ?? : 'Cancel')
-                      : (language === 'ko' ? '리뷰 ?�성' : language === 'ja' ? '?�ビ?�ー作成' : 'Write Review')
+                      ? (language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel')
+                      : (language === 'ko' ? '리뷰 작성' : language === 'ja' ? 'レビュー作成' : 'Write Review')
                     }
                   </button>
                 )}
@@ -1285,13 +1285,13 @@ export default function AnimeDetail() {
 
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {language === 'ko' ? '리뷰 ?�용' : language === 'ja' ? '?�ビ?�ー?��?' : 'Review Content'} *
+                      {language === 'ko' ? '리뷰 내용' : language === 'ja' ? 'レビュー内容' : 'Review Content'} *
                     </label>
                     <textarea
                       value={reviewData.content}
                       onChange={(e) => setReviewData({ ...reviewData, content: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md h-32"
-                      placeholder={language === 'ko' ? '???�품???�???�신???�각??공유?�주?�요...' : language === 'ja' ? '?�の作品?�つ?�て??��?�た??��?�を?�ェ?�し?�く?�さ??..' : 'Share your thoughts about this anime...'}
+                      placeholder={language === 'ko' ? '이 작품에 대한 당신의 생각을 공유해주세요...' : language === 'ja' ? 'この作品についてのあなたの考えをシェアしてください...' : 'Share your thoughts about this anime...'}
                       required
                     />
                   </div>
@@ -1305,7 +1305,7 @@ export default function AnimeDetail() {
                         className="mr-2"
                       />
                       <span className="text-sm text-gray-700">
-                        {language === 'ko' ? '?�포?�러 ?�함' : language === 'ja' ? '?�タ?�レ?�含?�' : 'Contains spoilers'}
+                        {language === 'ko' ? '스포일러 포함' : language === 'ja' ? 'ネタバレ含む' : 'Contains spoilers'}
                       </span>
                     </label>
                   </div>
@@ -1315,8 +1315,8 @@ export default function AnimeDetail() {
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                   >
                     {isEditingReview
-                      ? (language === 'ko' ? '리뷰 ?�정' : language === 'ja' ? '?�ビ?�ー編集' : 'Update Review')
-                      : (language === 'ko' ? '리뷰 ?�록' : language === 'ja' ? '?�ビ?�ー作成' : 'Submit Review')
+                      ? (language === 'ko' ? '리뷰 수정' : language === 'ja' ? 'レビュー編集' : 'Update Review')
+                      : (language === 'ko' ? '리뷰 등록' : language === 'ja' ? 'レビュー作成' : 'Submit Review')
                     }
                   </button>
                 </form>
@@ -1371,7 +1371,7 @@ export default function AnimeDetail() {
                               await handleDeleteReview();
                             } else if (myRating) {
                               // Delete rating only
-                              if (!confirm(language === 'ko' ? '?��?�???��?�시겠습?�까?' : language === 'ja' ? '?�の評価?�削?�し?�す?�？' : 'Delete this rating?')) return;
+                              if (!confirm(language === 'ko' ? '평점을 삭제하시겠습니까?' : language === 'ja' ? 'この評価を削除しますか？' : 'Delete this rating?')) return;
 
                               try {
                                 await ratingService.deleteRating(id);
@@ -1383,7 +1383,7 @@ export default function AnimeDetail() {
                                 await refetchActivities();
                               } catch (err) {
                                 console.error('Failed to delete rating:', err);
-                                alert(language === 'ko' ? '?��? ??��???�패?�습?�다.' : language === 'ja' ? '評価?�除?�失?�し?�し?��? : 'Failed to delete rating.');
+                                alert(language === 'ko' ? '평점 삭제에 실패했습니다.' : language === 'ja' ? '評価削除に失敗しました。' : 'Failed to delete rating.');
                               }
                             }
                           }
@@ -1393,7 +1393,7 @@ export default function AnimeDetail() {
                   })}
                 </div>
               ) : (
-                <p className="text-gray-600">{language === 'ko' ? '?�직 리뷰가 ?�습?�다.' : language === 'ja' ? '?�だ?�ビ?�ー?�あ?�ま?�ん?? : 'No reviews yet.'}</p>
+                <p className="text-gray-600">{language === 'ko' ? '아직 리뷰가 없습니다.' : language === 'ja' ? 'まだレビューがありません。' : 'No reviews yet.'}</p>
               )}
             </div>
           </div>
