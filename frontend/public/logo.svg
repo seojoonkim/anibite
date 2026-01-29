@@ -4,10 +4,15 @@
       <stop offset="0%" style="stop-color:#5B8EBF"/>
       <stop offset="100%" style="stop-color:#9AC4E8"/>
     </linearGradient>
+    <mask id="biteMask">
+      <rect x="0" y="0" width="40" height="40" fill="white"/>
+      <!-- Bite mark - circle that cuts into top-right corner -->
+      <circle cx="38" cy="2" r="8" fill="black"/>
+    </mask>
   </defs>
 
-  <!-- Rounded square background -->
-  <rect x="2" y="2" width="36" height="36" rx="10" ry="10" fill="url(#bgGradient)"/>
+  <!-- Rounded square background with bite -->
+  <rect x="2" y="2" width="36" height="36" rx="10" ry="10" fill="url(#bgGradient)" mask="url(#biteMask)"/>
 
   <!-- Cute rounded 'A' letter with smooth rounded top -->
   <!-- Single smooth path for A shape -->
