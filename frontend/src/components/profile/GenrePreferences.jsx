@@ -23,11 +23,11 @@ export default function GenrePreferences({ preferences }) {
   // 각 장르마다 다른 그라디언트 색상 - Neon terminal style
   const getGradient = (index) => {
     const gradients = [
-      'linear-gradient(135deg, #4EEAF7 0%, #2DD4E4 100%)', // Primary cyan
+      'linear-gradient(135deg, #4A8AC9 0%, #2DD4E4 100%)', // Primary cyan
       'linear-gradient(135deg, #f778ba 0%, #db61a2 100%)', // Secondary pink
       'linear-gradient(135deg, #3fb950 0%, #2ea043 100%)', // Tertiary green
       'linear-gradient(135deg, #f0b429 0%, #d29922 100%)', // Accent gold
-      'linear-gradient(135deg, #6FF4FF 0%, #4EEAF7 100%)', // Light cyan
+      'linear-gradient(135deg, #6FF4FF 0%, #4A8AC9 100%)', // Light cyan
     ];
     return gradients[index % gradients.length];
   };
