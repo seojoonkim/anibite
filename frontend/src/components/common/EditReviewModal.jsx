@@ -188,13 +188,13 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
               <img
                 src={getImageUrl(activity?.item_image, activity?.activity_type, activity?.item_id)}
                 alt={activity?.item_title_korean || activity?.item_title || 'Item'}
-                className="w-14 h-[70px] object-cover rounded bg-gray-200 flex-shrink-0"
+                className="w-[84px] h-[105px] object-cover rounded bg-gray-200 flex-shrink-0"
                 onError={(e) => {
                   e.target.src = '/placeholder-anime.svg';
                 }}
               />
               <div className="min-w-0 flex-1">
-                <h3 className="font-semibold text-gray-900 text-sm">
+                <h3 className="font-semibold text-gray-900 text-xl">
                   {activity?.activity_type === 'character_rating' ? (
                     <>
                       {activity?.item_title}{' '}
@@ -205,7 +205,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
                   )}
                 </h3>
                 {activity?.activity_type === 'character_rating' && (activity?.anime_title || activity?.anime_title_korean) && (
-                  <p className="text-xs text-gray-600 mt-0.5">
+                  <p className="text-sm text-gray-600 mt-0.5">
                     from: {activity.anime_title_korean || activity.anime_title}
                   </p>
                 )}
@@ -217,10 +217,10 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
           <div className="mb-3">
             <div className="flex items-center gap-2 mb-1.5">
               <label className="text-sm font-medium text-gray-700">
-                {language === 'ko' ? '별점' : language === 'ja' ? '評価' : 'Rating'} *
+                {language === 'ko' ? '별점' : language === 'ja' ? '評価' : 'Rating'}
               </label>
-              <span className="text-xs text-blue-500">
-                {language === 'ko' ? '(클릭하여 수정)' : language === 'ja' ? '(クリックして編集)' : '(Click to edit)'}
+              <span className="text-xs text-gray-500 font-normal">
+                ({language === 'ko' ? '클릭하여 수정' : language === 'ja' ? 'クリックして編集' : 'Click to edit'})
               </span>
             </div>
             <div className="flex items-center gap-4">
