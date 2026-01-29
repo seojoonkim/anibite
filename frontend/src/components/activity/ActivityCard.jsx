@@ -772,7 +772,7 @@ const ActivityCard = forwardRef(({
 
       {/* Actions: Like, Comment, Bookmark */}
       <div className="mt-3 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-5">
           {/* Like Button */}
           <button
             onClick={handleLikeClick}

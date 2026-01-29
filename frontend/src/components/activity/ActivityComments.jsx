@@ -41,7 +41,7 @@ export default function ActivityComments({
     <div className="mt-3 border-t pt-3">
       {/* New Comment Input */}
       {currentUser && (
-        <div className="mb-2">
+        <div className="mb-1">
           <div className="flex gap-2 items-start">
             {currentUser.avatar_url ? (
               <img
