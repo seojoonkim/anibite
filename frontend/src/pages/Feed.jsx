@@ -491,7 +491,7 @@ export default function Feed() {
                   ? 'text-white font-semibold'
                   : 'text-gray-600 hover:text-black hover:bg-gray-100 font-normal'
                   }`}
-                style={feedFilter === 'all' ? { background: 'linear-gradient(135deg, #4A8AC9 0%, #2DD4E4 100%)' } : {}}
+                style={feedFilter === 'all' ? { background: 'linear-gradient(135deg, #3A7AB9 0%, #4A8AC9 100%)' } : {}}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="3" y="3" width="7" height="7"></rect>
@@ -508,7 +508,7 @@ export default function Feed() {
                   ? 'text-white font-semibold'
                   : 'text-gray-600 hover:text-black hover:bg-gray-100 font-normal'
                   }`}
-                style={feedFilter === 'following' ? { background: 'linear-gradient(135deg, #4A8AC9 0%, #2DD4E4 100%)' } : {}}
+                style={feedFilter === 'following' ? { background: 'linear-gradient(135deg, #3A7AB9 0%, #4A8AC9 100%)' } : {}}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -525,7 +525,7 @@ export default function Feed() {
                   ? 'text-white font-semibold'
                   : 'text-gray-600 hover:text-black hover:bg-gray-100 font-normal'
                   }`}
-                style={feedFilter === 'notifications' ? { background: 'linear-gradient(135deg, #4A8AC9 0%, #2DD4E4 100%)' } : {}}
+                style={feedFilter === 'notifications' ? { background: 'linear-gradient(135deg, #3A7AB9 0%, #4A8AC9 100%)' } : {}}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -540,7 +540,7 @@ export default function Feed() {
                   ? 'text-white font-semibold'
                   : 'text-gray-600 hover:text-black hover:bg-gray-100 font-normal'
                   }`}
-                style={feedFilter === 'saved' ? { background: 'linear-gradient(135deg, #4A8AC9 0%, #2DD4E4 100%)' } : {}}
+                style={feedFilter === 'saved' ? { background: 'linear-gradient(135deg, #3A7AB9 0%, #4A8AC9 100%)' } : {}}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
@@ -583,7 +583,7 @@ export default function Feed() {
                         onClick={handleCreatePost}
                         disabled={!newPostContent.trim()}
                         className="px-4 py-1.5 text-[14px] text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-                        style={newPostContent.trim() ? { background: 'linear-gradient(135deg, #4A8AC9 0%, #2DD4E4 100%)', fontWeight: '600' } : {}}
+                        style={newPostContent.trim() ? { background: 'linear-gradient(135deg, #3A7AB9 0%, #4A8AC9 100%)', fontWeight: '600' } : {}}
                       >
                         {language === 'ko' ? '게시' : language === 'ja' ? '投稿' : 'Post'}
                       </button>
