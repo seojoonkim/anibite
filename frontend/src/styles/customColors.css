@@ -2,16 +2,16 @@
 /* Based on https://colorhunt.co/palette/3498dbecf0f134495ef1c40f */
 
 :root {
-  --primary: #5BB5F5;        /* Vivid Sky Blue - Point Color */
+  --primary: #47B5FF;        /* Vivid Sky Blue - Point Color */
   --secondary: #ECF0F1;      /* Light Gray */
   --dark: #34495E;           /* Dark Navy */
   --accent: #F5C842;         /* Calm Gold - Star Color */
-  --primary-hover: #3A9FE8;  /* Darker Blue for hover */
+  --primary-hover: #2DA0ED;  /* Darker Blue for hover */
 }
 
 /* Custom gradient for profile avatars */
 .gradient-custom-profile {
-  background: linear-gradient(to bottom right, #5BB5F5, #3A7AB9) !important;
+  background: linear-gradient(to bottom right, #47B5FF, #3A7AB9) !important;
 }
 
 /* Custom orange replacement */
@@ -22,7 +22,7 @@
 
 /* Filter button active states */
 .filter-button-active-all {
-  background-color: #5BB5F5 !important;
+  background-color: #47B5FF !important;
   color: #1a1a2e !important;
 }
 
@@ -32,7 +32,7 @@
 }
 
 .filter-button-active-4star {
-  background-color: #5BB5F5 !important;
+  background-color: #47B5FF !important;
   color: #1a1a2e !important;
 }
 

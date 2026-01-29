@@ -474,7 +474,7 @@ export default function WriteReviews() {
             <button
               onClick={() => setFilter('all')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filter === 'all'
-                ? 'bg-[#5BB5F5] text-white font-semibold'
+                ? 'bg-[#47B5FF] text-white font-semibold'
                 : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
@@ -483,7 +483,7 @@ export default function WriteReviews() {
             <button
               onClick={() => setFilter('anime')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filter === 'anime'
-                ? 'bg-[#5BB5F5] text-white font-semibold'
+                ? 'bg-[#47B5FF] text-white font-semibold'
                 : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
@@ -492,7 +492,7 @@ export default function WriteReviews() {
             <button
               onClick={() => setFilter('character')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filter === 'character'
-                ? 'bg-[#5BB5F5] text-white font-semibold'
+                ? 'bg-[#47B5FF] text-white font-semibold'
                 : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
@@ -601,7 +601,7 @@ export default function WriteReviews() {
                           <h3 className="font-semibold text-lg">
                             <Link
                               to={item.type === 'anime' ? `/anime/${item.itemId}` : `/character/${item.itemId}`}
-                              className="text-gray-900 hover:text-[#5BB5F5] transition-colors hover:underline cursor-pointer"
+                              className="text-gray-900 hover:text-[#47B5FF] transition-colors hover:underline cursor-pointer"
                             >
                               {item.type === 'anime' ? (
                                 language === 'ko' ? (
@@ -655,7 +655,7 @@ export default function WriteReviews() {
                             {item.anime_id ? (
                               <Link
                                 to={`/anime/${item.anime_id}`}
-                                className="hover:text-[#5BB5F5] hover:underline transition-colors"
+                                className="hover:text-[#47B5FF] hover:underline transition-colors"
                               >
                                 {language === 'ko' ? (
                                   <>
@@ -712,7 +712,7 @@ export default function WriteReviews() {
                                 </p>
                                 <button
                                   onClick={() => handleStartEdit(item, hasReview.content, item.rating)}
-                                  className="text-sm text-[#5BB5F5] hover:text-[#2DD4E4]"
+                                  className="text-sm text-[#47B5FF] hover:text-[#2DD4E4]"
                                 >
                                   {language === 'ko' ? '수정' : language === 'ja' ? '編集' : 'Edit'}
                                 </button>
@@ -767,9 +767,9 @@ export default function WriteReviews() {
                                 onClick={() => handleSaveReview(item)}
                                 disabled={!editContent.trim() || !editRating}
                                 className="text-xs px-3 py-1.5 rounded disabled:opacity-50 transition-colors"
-                                style={{ backgroundColor: '#5BB5F5', color: 'white' }}
-                                onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#3A9FE8')}
-                                onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#5BB5F5')}
+                                style={{ backgroundColor: '#47B5FF', color: 'white' }}
+                                onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#2DA0ED')}
+                                onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#47B5FF')}
                               >
                                 {language === 'ko' ? '저장' : language === 'ja' ? '保存' : 'Save'}
                               </button>

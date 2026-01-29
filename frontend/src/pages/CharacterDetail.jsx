@@ -1164,7 +1164,7 @@ export default function CharacterDetail() {
                           )}
                         </div>
                         <div className="p-2">
-                          <h4 className="font-medium text-sm line-clamp-2 group-hover:text-[#5BB5F5] transition-colors">
+                          <h4 className="font-medium text-sm line-clamp-2 group-hover:text-[#47B5FF] transition-colors">
                             {getAnimeTitle(anime)}
                           </h4>
                         </div>
@@ -1199,9 +1199,9 @@ export default function CharacterDetail() {
                       setShowReviewForm(!showReviewForm);
                     }}
                     className="px-4 py-2 text-white rounded-lg transition-colors"
-                    style={{ backgroundColor: '#5BB5F5' }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#3A9FE8'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#5BB5F5'}
+                    style={{ backgroundColor: '#47B5FF' }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#2DA0ED'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#47B5FF'}
                   >
                     {showReviewForm
                       ? (language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel')
@@ -1270,9 +1270,9 @@ export default function CharacterDetail() {
                   <button
                     type="submit"
                     className="px-6 py-2 text-white rounded-lg transition-colors"
-                    style={{ backgroundColor: '#5BB5F5' }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#3A9FE8'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#5BB5F5'}
+                    style={{ backgroundColor: '#47B5FF' }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#2DA0ED'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#47B5FF'}
                   >
                     {isEditingReview
                       ? (language === 'ko' ? '리뷰 수정' : language === 'ja' ? 'レビュー編集' : 'Update Review')

@@ -1430,9 +1430,9 @@ export default function MyAniPass() {
                   ? 'bg-transparent border-2 border-gray-300 text-text-secondary hover:border-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
                   : 'text-white'
                   }`}
-                style={!isFollowing ? { backgroundColor: '#5BB5F5', fontWeight: '500' } : {}}
+                style={!isFollowing ? { backgroundColor: '#47B5FF', fontWeight: '500' } : {}}
                 onMouseEnter={(e) => !isFollowing && (e.target.style.backgroundColor = '#1877F2')}
-                onMouseLeave={(e) => !isFollowing && (e.target.style.backgroundColor = '#5BB5F5')}
+                onMouseLeave={(e) => !isFollowing && (e.target.style.backgroundColor = '#47B5FF')}
               >
                 {isFollowing ? (language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following') : (language === 'ko' ? '팔로우' : language === 'ja' ? 'フォロー' : 'Follow')}
               </button>

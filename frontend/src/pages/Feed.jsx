@@ -491,7 +491,7 @@ export default function Feed() {
               <button
                 onClick={() => { setSearchParams({ filter: 'all' }); triggerWiggle(); }}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'all'
-                  ? 'bg-[#5BB5F5] text-[#1a1a2e] font-semibold'
+                  ? 'bg-[#47B5FF] text-[#1a1a2e] font-semibold'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
                   }`}
               >
@@ -507,7 +507,7 @@ export default function Feed() {
               <button
                 onClick={() => { setSearchParams({ filter: 'following' }); triggerWiggle(); }}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'following'
-                  ? 'bg-[#5BB5F5] text-[#1a1a2e] font-semibold'
+                  ? 'bg-[#47B5FF] text-[#1a1a2e] font-semibold'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
                   }`}
               >
@@ -523,7 +523,7 @@ export default function Feed() {
               <button
                 onClick={() => { setSearchParams({ filter: 'notifications' }); triggerWiggle(); }}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'notifications'
-                  ? 'bg-[#5BB5F5] text-[#1a1a2e] font-semibold'
+                  ? 'bg-[#47B5FF] text-[#1a1a2e] font-semibold'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
                   }`}
               >
@@ -537,7 +537,7 @@ export default function Feed() {
               <button
                 onClick={() => { setSearchParams({ filter: 'saved' }); triggerWiggle(); }}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'saved'
-                  ? 'bg-[#5BB5F5] text-[#1a1a2e] font-semibold'
+                  ? 'bg-[#47B5FF] text-[#1a1a2e] font-semibold'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
                   }`}
               >
@@ -582,7 +582,7 @@ export default function Feed() {
                         onClick={handleCreatePost}
                         disabled={!newPostContent.trim()}
                         className="px-4 py-1.5 text-[14px] text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-                        style={newPostContent.trim() ? { backgroundColor: '#5BB5F5' } : {}}
+                        style={newPostContent.trim() ? { backgroundColor: '#47B5FF' } : {}}
                       >
                         {language === 'ko' ? '게시' : language === 'ja' ? '投稿' : 'Post'}
                       </button>
