@@ -156,7 +156,10 @@ export default function ImageCropModal({ imageFile, onComplete, onCancel, aspect
           <button
             onClick={createCroppedImage}
             disabled={isProcessing}
-            className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:opacity-50"
+            className="flex-1 px-6 py-3 text-white rounded-lg disabled:opacity-50 transition-colors"
+            style={{ backgroundColor: '#5BB5F5' }}
+            onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#3A9FE8')}
+            onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#5BB5F5')}
           >
             {isProcessing ? '처리 중...' : '완료'}
           </button>
