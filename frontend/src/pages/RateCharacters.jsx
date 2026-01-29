@@ -44,9 +44,9 @@ export default function RateCharacters() {
         const cardElement = cardRefs.current[charId];
         if (cardElement) {
           const cardWidth = cardElement.offsetWidth;
-          // 별 5개가 카드에 딱 차도록 계산 (패딩 고려)
-          const availableWidth = cardWidth - 12; // 좌우 패딩 px-2 (8px * 2) 줄임
-          const starSize = Math.floor(availableWidth / 4.1); // 더 크게 (4% increase): 5.5 -> 4.5
+          // 별 5개가 카드에 딱 차도록 계산 (애니 평가와 동일한 방식 적용)
+          const availableWidth = cardWidth * 0.85; // 카드 너비의 85% 사용
+          const starSize = Math.floor(availableWidth / 4.3); // 별 간격 약간 줄임
           newSizes[charId] = `${starSize}px`;
         }
       });

@@ -39,9 +39,9 @@ function RatingCard({ anime, onRate }) {
     const updateStarSize = () => {
       if (cardRef.current) {
         const cardWidth = cardRef.current.offsetWidth;
-        // 카드 너비의 85%를 별 5개로 나눔 (20% 더 크게)
+        // 카드 너비의 85%를 별 5개로 나눔
         const availableWidth = cardWidth * 0.85;
-        const singleStarSize = availableWidth / 4.1; // 10% 추가: 4.5 → 4.1
+        const singleStarSize = availableWidth / 4.3; // 별 간격 약간 줄임: 4.1 → 4.3
         setStarSize(`${singleStarSize}px`);
       }
     };
