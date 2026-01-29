@@ -1177,26 +1177,30 @@ export default function AnimeDetail() {
                       onClick={() => navigate(`/anime/${rec.id}`)}
                       className="cursor-pointer group"
                     >
-                      <div className="aspect-[2/3] bg-gray-200 rounded-lg overflow-hidden mb-2 shadow-[0_2px_12px_rgba(0,0,0,0.08)] group-hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow">
-                        <img
-                          src={getImageUrl(rec.cover_image_url)}
-                          alt={getAnimeTitle(rec)}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.src = '/placeholder-anime.svg';
-                          }}
-                        />
-                      </div>
-                      <h4 className="font-medium text-sm line-clamp-2 group-hover:text-[#5BB5F5] transition-colors">
-                        {getAnimeTitle(rec)}
-                      </h4>
-                      {rec.site_rating_count > 0 && (
-                        <div className="flex items-center gap-1 text-xs text-gray-600 mt-1">
-                          <StarIcon className="w-3 h-3" filled={true} />
-                          <span>{rec.site_average_rating.toFixed(1)}</span>
-                          <span className="text-gray-400">({rec.site_rating_count})</span>
+                      <div className="bg-gray-100 rounded-lg overflow-hidden hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-all duration-300">
+                        <div className="aspect-[2/3] bg-gray-200 relative">
+                          <img
+                            src={getImageUrl(rec.cover_image_url)}
+                            alt={getAnimeTitle(rec)}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={(e) => {
+                              e.target.src = '/placeholder-anime.svg';
+                            }}
+                          />
+                          {/* Rating Badge */}
+                          {rec.site_rating_count > 0 && (
+                            <div className="absolute top-2 right-2 bg-yellow-400 text-gray-900 px-2 py-1 rounded text-xs font-bold flex items-center gap-0.5">
+                              <StarIcon className="w-3 h-3" filled={true} />
+                              <span>{rec.site_average_rating.toFixed(1)}</span>
+                            </div>
+                          )}
                         </div>
-                      )}
+                        <div className="p-2">
+                          <h4 className="font-medium text-sm line-clamp-2 group-hover:text-[#5BB5F5] transition-colors">
+                            {getAnimeTitle(rec)}
+                          </h4>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
