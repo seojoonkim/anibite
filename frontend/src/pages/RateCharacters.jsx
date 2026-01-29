@@ -423,7 +423,7 @@ export default function RateCharacters() {
                         {character.role && (
                           <div className={`absolute top-2 left-2 px-2 py-1 rounded text-xs font-bold text-white`} style={{
                             backgroundColor: character.role === 'MAIN'
-                              ? '#00E5FF'  // ì£¼ì—°: ?Œë???(?Œë§ˆ??
+                              ? '#4EEAF7'  // ì£¼ì—°: ?Œë???(?Œë§ˆ??
                               : character.role === 'SUPPORTING'
                                 ? '#F59E0B'  // ì¡°ì—°: ì£¼í™©??(?Œë??‰ê³¼ ?€ë¹?
                                 : '#9CA3AF',  // ?‘ìŠ¤?¸ë¼: ?Œìƒ‰

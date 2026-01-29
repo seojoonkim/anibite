@@ -8,11 +8,11 @@ export default function GenrePreferences({ preferences }) {
       <div className="bg-surface rounded-xl shadow-lg border border-border p-6 w-full h-full flex flex-col">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-base font-semibold text-text-primary">
-            {language === 'ko' ? '선호 장르' : language === 'ja' ? 'お気に入りのジャンル' : 'Favorite Genres'}
+            {language === 'ko' ? '?�호 ?�르' : language === 'ja' ? '?�気?�入?�の?�ャ?�ル' : 'Favorite Genres'}
           </h3>
         </div>
         <p className="text-sm text-text-secondary">
-          {language === 'ko' ? '아직 충분한 데이터가 없습니다.' : language === 'ja' ? 'まだ十分なデータがありません。' : 'Not enough data yet.'}
+          {language === 'ko' ? '?�직 충분???�이?��? ?�습?�다.' : language === 'ja' ? '?�だ?�分?�デ?�タ?�あ?�ま?�ん?? : 'Not enough data yet.'}
         </p>
       </div>
     );
@@ -20,14 +20,14 @@ export default function GenrePreferences({ preferences }) {
 
   const maxCount = Math.max(...preferences.map((p) => p.count));
 
-  // 각 장르마다 다른 그라데이션 색상 - Neon terminal style
+  // �??�르마다 ?�른 그라?�이???�상 - Neon terminal style
   const getGradient = (index) => {
     const gradients = [
-      'linear-gradient(135deg, #00E5FF 0%, #00B8D4 100%)', // Primary cyan
+      'linear-gradient(135deg, #4EEAF7 0%, #2DD4E4 100%)', // Primary cyan
       'linear-gradient(135deg, #f778ba 0%, #db61a2 100%)', // Secondary pink
       'linear-gradient(135deg, #3fb950 0%, #2ea043 100%)', // Tertiary green
       'linear-gradient(135deg, #f0b429 0%, #d29922 100%)', // Accent gold
-      'linear-gradient(135deg, #18FFFF 0%, #00E5FF 100%)', // Light cyan
+      'linear-gradient(135deg, #6FF4FF 0%, #4EEAF7 100%)', // Light cyan
     ];
     return gradients[index % gradients.length];
   };
@@ -36,7 +36,7 @@ export default function GenrePreferences({ preferences }) {
     <div className="bg-surface rounded-xl shadow-lg border border-border p-6 w-full h-full flex flex-col">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-base font-semibold text-text-primary">
-          {language === 'ko' ? '선호 장르 Top 5' : language === 'ja' ? 'お気に入りのジャンルTOP 5' : 'Top 5 Favorite Genres'}
+          {language === 'ko' ? '?�호 ?�르 Top 5' : language === 'ja' ? '?�気?�入?�の?�ャ?�ルTOP 5' : 'Top 5 Favorite Genres'}
         </h3>
       </div>
 
@@ -52,11 +52,11 @@ export default function GenrePreferences({ preferences }) {
                 </span>
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-text-secondary font-medium">
-                    {pref.count}{language === 'ko' ? '작품' : language === 'ja' ? '作品' : ' works'}
+                    {pref.count}{language === 'ko' ? '?�품' : language === 'ja' ? '作品' : ' works'}
                   </span>
                   {pref.average_rating && (
                     <span className="font-bold flex items-center gap-0.5 text-accent">
-                      <span>★</span>
+                      <span>??/span>
                       <span>{pref.average_rating.toFixed(1)}</span>
                     </span>
                   )}

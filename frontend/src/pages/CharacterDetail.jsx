@@ -1164,7 +1164,7 @@ export default function CharacterDetail() {
                           )}
                         </div>
                         <div className="p-2">
-                          <h4 className="font-medium text-sm line-clamp-2 group-hover:text-[#00E5FF] transition-colors">
+                          <h4 className="font-medium text-sm line-clamp-2 group-hover:text-[#4EEAF7] transition-colors">
                             {getAnimeTitle(anime)}
                           </h4>
                         </div>

@@ -41,7 +41,7 @@ export default function SourcePreferences({ sources }) {
                   className="h-2 rounded-full transition-all duration-500"
                   style={{
                     width: `${percentage}%`,
-                    background: 'linear-gradient(to right, #A8E6CF, #00B8D4)'
+                    background: 'linear-gradient(to right, #A8E6CF, #2DD4E4)'
                   }}
                 />
               </div>
