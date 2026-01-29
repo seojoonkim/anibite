@@ -24,7 +24,7 @@ function CharacterSearchCard({ character, language }) {
         {/* Always show placeholder first, hide when image loads successfully */}
         {(!imageLoaded || imageError || !imageUrl) && (
           <img
-            src="/placeholder-character.svg"
+            src="/placeholder-anime.svg"
             alt=""
             className="w-full h-full object-cover absolute inset-0"
           />
@@ -123,7 +123,7 @@ export default function Browse() {
       setInitialLoading(false);
     } catch (err) {
       console.error('Search failed:', err);
-      setError(language === 'ko' ? '검?�에 ?�패?�습?�다.' : language === 'ja' ? '検索?�失?�し?�し?��? : 'Search failed.');
+      setError(language === 'ko' ? '검?�에 ?�패?�습?�다.' : language === 'ja' ? '検索?�失?�し?�し?��? : 'Search failed.');
       setInitialLoading(false);
     }
   };
@@ -184,7 +184,7 @@ export default function Browse() {
       setLoadingMore(false);
     } catch (err) {
       console.error('Failed to load anime:', err);
-      setError('?�니메이?�을 불러?�는???�패?�습?�다.');
+      setError('?�니메이?�을 불러?�는???�패?�습?�다.');
       setInitialLoading(false);
       setLoadingMore(false);
     }
@@ -219,8 +219,8 @@ export default function Browse() {
 
   const getStatusBadge = (status) => {
     const badges = {
-      'Currently Airing': { text: '방영�?, color: 'bg-green-100 text-green-800' },
-      'Finished Airing': { text: '?�결', color: 'bg-blue-100 text-blue-800' },
+      'Currently Airing': { text: '방영�?, color: 'bg-green-100 text-green-800' },
+      'Finished Airing': { text: '?�결', color: 'bg-blue-100 text-blue-800' },
       'Not yet aired': { text: '미방??, color: 'bg-yellow-100 text-yellow-800' },
     };
     return badges[status] || { text: status, color: 'bg-gray-100 text-gray-800' };
@@ -254,7 +254,7 @@ export default function Browse() {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder={language === 'ko' ? '?�니메이?? 캐릭??검??..' : language === 'ja' ? '?�ニ?�、キ?�ラ??��?�検�?..' : 'Search anime, characters...'}
+                placeholder={language === 'ko' ? '?�니메이?? 캐릭??검??..' : language === 'ja' ? '?�ニ?�、キ?�ラ??��?�検�?..' : 'Search anime, characters...'}
                 className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
               />
               {searchTerm && (
@@ -283,7 +283,7 @@ export default function Browse() {
         {searchMode && characterList.length > 0 && (
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-3">
-              {language === 'ko' ? '캐릭?? : language === 'ja' ? '??��?�ク?�ー' : 'Characters'} ({characterList.length})
+              {language === 'ko' ? '캐릭?? : language === 'ja' ? '??��?�ク?�ー' : 'Characters'} ({characterList.length})
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
               {characterList.map((character) => (
@@ -296,7 +296,7 @@ export default function Browse() {
         {/* Anime Results Header - Only show when searching */}
         {searchMode && animeList.length > 0 && (
           <h2 className="text-lg font-semibold text-gray-800 mb-3">
-            {language === 'ko' ? '?�니메이?? : language === 'ja' ? '?�ニ?? : 'Anime'} ({animeList.length})
+            {language === 'ko' ? '?�니메이?? : language === 'ja' ? '?�ニ?? : 'Anime'} ({animeList.length})
           </h2>
         )}
 
@@ -318,25 +318,25 @@ export default function Browse() {
                   <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-200">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '?�스?? : language === 'ja' ? '?�ス?�ー' : 'Poster'}
+                        {language === 'ko' ? '?�스?? : language === 'ja' ? '?�ス?�ー' : 'Poster'}
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '?�목' : language === 'ja' ? '?�イ?�ル' : 'Title'}
+                        {language === 'ko' ? '?�목' : language === 'ja' ? '?�イ?�ル' : 'Title'}
                       </th>
                       <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '?�태' : language === 'ja' ? '?�テ?�タ?? : 'Status'}
+                        {language === 'ko' ? '?�태' : language === 'ja' ? '?�テ?�タ?? : 'Status'}
                       </th>
                       <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '?�도' : language === 'ja' ? '�? : 'Year'}
+                        {language === 'ko' ? '?�도' : language === 'ja' ? '�? : 'Year'}
                       </th>
                       <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '?�수' : language === 'ja' ? '話数' : 'Episodes'}
+                        {language === 'ko' ? '?�수' : language === 'ja' ? '話数' : 'Episodes'}
                       </th>
                       <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '?�르' : language === 'ja' ? '?�ャ?�ル' : 'Genres'}
+                        {language === 'ko' ? '?�르' : language === 'ja' ? '?�ャ?�ル' : 'Genres'}
                       </th>
                       <th className="hidden md:table-cell px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '?�점' : language === 'ja' ? '評価' : 'Rating'}
+                        {language === 'ko' ? '?�점' : language === 'ja' ? '評価' : 'Rating'}
                       </th>
                     </tr>
                   </thead>
@@ -434,7 +434,7 @@ export default function Browse() {
                                   </span>
                                 </div>
                                 <div className="text-xs text-gray-500 mt-0.5">
-                                  {anime.site_rating_count.toLocaleString()}�?
+                                  {anime.site_rating_count.toLocaleString()}�?
                                 </div>
                               </div>
                             ) : (
@@ -454,12 +454,12 @@ export default function Browse() {
               <div ref={loadMoreTriggerRef} className="h-20 flex items-center justify-center">
                 {loadingMore && (
                   <div className="text-gray-500 text-sm">
-                    {language === 'ko' ? '로딩 �?..' : language === 'ja' ? '�?��込み�?..' : 'Loading...'}
+                    {language === 'ko' ? '로딩 �?..' : language === 'ja' ? '�?��込み�?..' : 'Loading...'}
                   </div>
                 )}
                 {!initialLoading && !loadingMore && !hasMore && animeList.length > 0 && (
                   <div className="text-gray-400 text-sm">
-                    {language === 'ko' ? '모든 ?�니메이?�을 불러?�습?�다' : language === 'ja' ? '?�べ?�の?�ニ?�を�?��込み?�し?? : 'All anime loaded'}
+                    {language === 'ko' ? '모든 ?�니메이?�을 불러?�습?�다' : language === 'ja' ? '?�べ?�の?�ニ?�を�?��込み?�し?? : 'All anime loaded'}
                   </div>
                 )}
               </div>
