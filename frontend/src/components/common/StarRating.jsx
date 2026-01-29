@@ -7,7 +7,7 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
 
   const sizeClasses = {
     sm: 'w-4 h-4',
-    feed: 'w-[18px] h-[18px]',
+    feed: 'w-[20px] h-[20px]',
     md: 'w-6 h-6',
     lg: 'w-8 h-8 sm:w-10 sm:h-10',
     xl: 'w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12',
@@ -125,7 +125,7 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
 
   const gapClasses = {
     sm: 'gap-0.5',
-    feed: 'gap-0',
+    feed: '-space-x-0.5',
     md: 'gap-1',
     lg: 'gap-1 sm:gap-1.5',
     xl: 'gap-1 sm:gap-1.5',
