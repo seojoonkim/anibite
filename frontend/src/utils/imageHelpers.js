@@ -14,14 +14,14 @@ import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 export const getCharacterImageUrl = (characterId, imageUrl = null) => {
   let finalUrl;
 
-  // Priority 1: imageUrl이 R2 URL이면 그대로 사용 (어드민에서 업로드한 이미지)
-  if (imageUrl && imageUrl.includes(IMAGE_BASE_URL)) {
-    finalUrl = imageUrl;
-  }
-  // Priority 2: characterId가 있으면 백엔드 API 사용 (자동 다운로드 & 캐싱)
-  else if (characterId) {
-    // 백엔드 API 엔드포인트 사용 - R2에 없으면 자동으로 AniList에서 다운로드
+  // Priority 1: characterId가 있으면 백엔드 API 사용 (가장 안정적)
+  // 백엔드가 R2에서 찾거나 없으면 AniList에서 자동 다운로드
+  if (characterId) {
     finalUrl = `${API_BASE_URL}/api/images/characters/${characterId}.jpg`;
+  }
+  // Priority 2: imageUrl이 R2 URL이면 그대로 사용 (어드민에서 업로드한 이미지)
+  else if (imageUrl && imageUrl.includes(IMAGE_BASE_URL)) {
+    finalUrl = imageUrl;
   }
   // Priority 3: imageUrl이 AniList URL이면 character ID 추출 후 백엔드 API 사용
   else if (imageUrl && imageUrl.includes('anilist.co') && imageUrl.includes('/character/')) {
