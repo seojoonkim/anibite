@@ -484,14 +484,13 @@ export default function Feed() {
             ref={sidebarRef}
             className="hidden md:block w-48 flex-shrink-0"
           >
-            <nav className="sticky top-20 flex flex-col gap-2">
+            <nav className="sticky top-20 flex flex-col gap-1">
               <button
                 onClick={() => setSearchParams({ filter: 'all' })}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'all'
-                  ? 'text-white font-semibold'
-                  : 'text-gray-600 hover:text-black hover:bg-gray-100 font-normal'
+                  ? 'text-[#4A8AC9] font-semibold'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
                   }`}
-                style={feedFilter === 'all' ? { background: 'linear-gradient(135deg, #3A7AB9 0%, #4A8AC9 100%)' } : {}}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="3" y="3" width="7" height="7"></rect>
@@ -505,10 +504,9 @@ export default function Feed() {
               <button
                 onClick={() => setSearchParams({ filter: 'following' })}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'following'
-                  ? 'text-white font-semibold'
-                  : 'text-gray-600 hover:text-black hover:bg-gray-100 font-normal'
+                  ? 'text-[#4A8AC9] font-semibold'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
                   }`}
-                style={feedFilter === 'following' ? { background: 'linear-gradient(135deg, #3A7AB9 0%, #4A8AC9 100%)' } : {}}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -522,10 +520,9 @@ export default function Feed() {
               <button
                 onClick={() => setSearchParams({ filter: 'notifications' })}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'notifications'
-                  ? 'text-white font-semibold'
-                  : 'text-gray-600 hover:text-black hover:bg-gray-100 font-normal'
+                  ? 'text-[#4A8AC9] font-semibold'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
                   }`}
-                style={feedFilter === 'notifications' ? { background: 'linear-gradient(135deg, #3A7AB9 0%, #4A8AC9 100%)' } : {}}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -537,10 +534,9 @@ export default function Feed() {
               <button
                 onClick={() => setSearchParams({ filter: 'saved' })}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'saved'
-                  ? 'text-white font-semibold'
-                  : 'text-gray-600 hover:text-black hover:bg-gray-100 font-normal'
+                  ? 'text-[#4A8AC9] font-semibold'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
                   }`}
-                style={feedFilter === 'saved' ? { background: 'linear-gradient(135deg, #3A7AB9 0%, #4A8AC9 100%)' } : {}}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
