@@ -44,9 +44,9 @@ export default function RateCharacters() {
         const cardElement = cardRefs.current[charId];
         if (cardElement) {
           const cardWidth = cardElement.offsetWidth;
-          // �?5개�? 카드??�?차도�?계산 (?�딩 고려)
+          // �?5개�? 카드??�?차도�?계산 (?�딩 고려)
           const availableWidth = cardWidth - 12; // 좌우 ?�딩 px-2 (8px * 2) 줄임
-          const starSize = Math.floor(availableWidth / 4.5); // ???�게 (4% increase): 5.5 ??4.5
+          const starSize = Math.floor(availableWidth / 4.1); // ???�게 (4% increase): 5.5 ??4.5
           newSizes[charId] = `${starSize}px`;
         }
       });
@@ -218,7 +218,7 @@ export default function RateCharacters() {
 
       alert(
         language === 'ko'
-          ? `?��?�??�?�하?�데 ?�패?�습?�다${errorStatus}\n${errorDetail}`
+          ? `?��?�??�?�하?�데 ?�패?�습?�다${errorStatus}\n${errorDetail}`
           : language === 'ja'
             ? `評価??��存に失敗?�ま?�た${errorStatus}\n${errorDetail}`
             : `Failed to save rating${errorStatus}\n${errorDetail}`
@@ -297,7 +297,7 @@ export default function RateCharacters() {
     return 'bg-surface';
   };
 
-  // 캐릭터 이미지 URL - imageHelpers의 getCharacterImageUrl 사용
+  // 캐릭???��?지 URL - imageHelpers??getCharacterImageUrl ?�용
   const getImageUrl = (characterId, imageUrl) => {
     return getCharacterImageUrl(characterId, imageUrl);
   };
