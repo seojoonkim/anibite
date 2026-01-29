@@ -16,6 +16,7 @@ import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
+import { useLogoWiggle } from '../../context/LogoWiggleContext';
 import { useActivityLike, useActivityComments } from '../../hooks/useActivity';
 import { getCurrentLevelInfo, levels } from '../../utils/otakuLevels';
 import ActivityComments from './ActivityComments';
@@ -78,6 +79,7 @@ const ActivityCard = forwardRef(({
 }, ref) => {
   const { language } = useLanguage();
   const { user } = useAuth();
+  const { triggerWiggle } = useLogoWiggle();
   const navigate = useNavigate();
 
   // Merge context preset with custom showOptions
@@ -303,6 +305,7 @@ const ActivityCard = forwardRef(({
       return;
     }
     await toggleLike();
+    triggerWiggle();
     // Don't call onUpdate() - let the hook handle optimistic updates
   };
 
@@ -326,6 +329,7 @@ const ActivityCard = forwardRef(({
         setBookmarked(true);
         console.log('Bookmark added to server');
       }
+      triggerWiggle();
     } catch (error) {
       console.error('Failed to update bookmark:', error);
       alert(language === 'ko' ? '북마크 업데이트에 실패했습니다.' : language === 'ja' ? 'ブックマークの更新に失敗しました。' : 'Failed to update bookmark.');
@@ -346,6 +350,7 @@ const ActivityCard = forwardRef(({
     try {
       await createComment(newCommentText.trim());
       setNewCommentText('');
+      triggerWiggle();
       // Don't call onUpdate() - useActivityComments already handles optimistic updates
     } catch (err) {
       console.error('Failed to create comment:', err);
@@ -360,6 +365,7 @@ const ActivityCard = forwardRef(({
       await createComment(replyText.trim(), parentCommentId);
       setReplyText('');
       setReplyingTo(null);
+      triggerWiggle();
       // Don't call onUpdate() - useActivityComments already handles optimistic updates
     } catch (err) {
       console.error('Failed to create reply:', err);

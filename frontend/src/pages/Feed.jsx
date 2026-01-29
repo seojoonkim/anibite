@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useLogoWiggle } from '../context/LogoWiggleContext';
 import { useActivityPagination } from '../hooks/useActivity';
 import { activityService } from '../services/activityService';
 import { notificationService } from '../services/notificationService';
@@ -22,6 +23,7 @@ import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 export default function Feed() {
   const { user } = useAuth();
   const { language } = useLanguage();
+  const { triggerWiggle } = useLogoWiggle();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [feedFilter, setFeedFilter] = useState(searchParams.get('filter') || 'all');
@@ -230,6 +232,7 @@ export default function Feed() {
       // Use userPostService instead of activityService for proper content handling
       await userPostService.createPost(newPostContent.trim());
       setNewPostContent('');
+      triggerWiggle();
 
       resetActivities();
     } catch (err) {
@@ -486,7 +489,7 @@ export default function Feed() {
           >
             <nav className="sticky top-20 flex flex-col gap-1">
               <button
-                onClick={() => setSearchParams({ filter: 'all' })}
+                onClick={() => { setSearchParams({ filter: 'all' }); triggerWiggle(); }}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'all'
                   ? 'bg-[#5BB5F5] text-[#1a1a2e] font-semibold'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
@@ -502,7 +505,7 @@ export default function Feed() {
               </button>
 
               <button
-                onClick={() => setSearchParams({ filter: 'following' })}
+                onClick={() => { setSearchParams({ filter: 'following' }); triggerWiggle(); }}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'following'
                   ? 'bg-[#5BB5F5] text-[#1a1a2e] font-semibold'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
@@ -518,7 +521,7 @@ export default function Feed() {
               </button>
 
               <button
-                onClick={() => setSearchParams({ filter: 'notifications' })}
+                onClick={() => { setSearchParams({ filter: 'notifications' }); triggerWiggle(); }}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'notifications'
                   ? 'bg-[#5BB5F5] text-[#1a1a2e] font-semibold'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
@@ -532,7 +535,7 @@ export default function Feed() {
               </button>
 
               <button
-                onClick={() => setSearchParams({ filter: 'saved' })}
+                onClick={() => { setSearchParams({ filter: 'saved' }); triggerWiggle(); }}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'saved'
                   ? 'bg-[#5BB5F5] text-[#1a1a2e] font-semibold'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'

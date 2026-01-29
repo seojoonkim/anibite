@@ -6,12 +6,14 @@ import { characterService } from '../services/characterService';
 import { characterReviewService } from '../services/characterReviewService';
 import { ratingPageService } from '../services/ratingPageService';
 import { useLanguage } from '../context/LanguageContext';
+import { useLogoWiggle } from '../context/LogoWiggleContext';
 import StarRating from '../components/common/StarRating';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 import { getCharacterImageUrl } from '../utils/imageHelpers';
 
 export default function WriteReviews() {
   const { getAnimeTitle, language } = useLanguage();
+  const { triggerWiggle } = useLogoWiggle();
   const [filter, setFilter] = useState('all'); // all, anime, character
   const [allItems, setAllItems] = useState([]);
   const [reviews, setReviews] = useState({});
@@ -291,6 +293,7 @@ export default function WriteReviews() {
 
       // Mark as just completed
       setJustCompleted(prev => new Set([...prev, `anime_${animeId}`]));
+      triggerWiggle();
 
       // Remove from justCompleted after 3 seconds (animation duration)
       setTimeout(() => {
@@ -373,6 +376,7 @@ export default function WriteReviews() {
 
       // Mark as just completed
       setJustCompleted(prev => new Set([...prev, `character_${characterId}`]));
+      triggerWiggle();
 
       // Remove from justCompleted after 3 seconds (animation duration)
       setTimeout(() => {

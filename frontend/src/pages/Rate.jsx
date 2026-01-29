@@ -4,6 +4,7 @@ import { animeService } from '../services/animeService';
 import { ratingService } from '../services/ratingService';
 import { seriesService } from '../services/seriesService';
 import { useLanguage } from '../context/LanguageContext';
+import { useLogoWiggle } from '../context/LogoWiggleContext';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 function RatingCard({ anime, onRate }) {
@@ -443,6 +444,7 @@ function RatingCard({ anime, onRate }) {
 
 export default function Rate() {
   const { t, language } = useLanguage();
+  const { triggerWiggle } = useLogoWiggle();
   const [animeList, setAnimeList] = useState([]);
   const [allAnimeItems, setAllAnimeItems] = useState([]); // All loaded items
   const [displayedCount, setDisplayedCount] = useState(0); // How many are displayed
@@ -633,6 +635,7 @@ export default function Rate() {
         : { status };
 
       const response = await ratingService.rateAnime(animeId, payload);
+      triggerWiggle();
 
       // Update cached otaku_score if provided
       if (response && response.otaku_score !== undefined) {
