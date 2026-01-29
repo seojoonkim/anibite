@@ -18,9 +18,18 @@ export default function Navbar() {
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [lastCheckTime, setLastCheckTime] = useState(null);
+  const [logoWiggle, setLogoWiggle] = useState(false);
   const notificationRef = useRef(null);
   const userMenuRef = useRef(null);
   const mobileUserMenuRef = useRef(null);
+  const logoRef = useRef(null);
+
+  // Trigger logo wiggle animation on page navigation
+  useEffect(() => {
+    setLogoWiggle(true);
+    const timer = setTimeout(() => setLogoWiggle(false), 600);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
 
   // Initialize from localStorage cache to prevent flickering
   const [otakuScore, setOtakuScore] = useState(() => {
@@ -249,9 +258,10 @@ export default function Navbar() {
             <div className="flex items-center flex-shrink-0">
               <Link to="/feed" className="flex items-center gap-1 md:gap-1.5 hover:opacity-80 transition-opacity group">
                 <img
+                  ref={logoRef}
                   src="/logo.svg"
                   alt="Anibite"
-                  className="w-6 h-6 md:w-7 md:h-7 object-contain"
+                  className={`w-6 h-6 md:w-7 md:h-7 object-contain ${logoWiggle ? 'logo-wiggle' : ''}`}
                 />
                 <span
                   style={{
