@@ -138,7 +138,7 @@ export default function Register() {
               value={formData.username}
               onChange={handleChange}
               placeholder="Choose a username"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7FBFEF] focus:border-transparent transition-all text-sm"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5BB5F5] focus:border-transparent transition-all text-sm"
               required
               minLength={3}
             />
@@ -154,7 +154,7 @@ export default function Register() {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter your email"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7FBFEF] focus:border-transparent transition-all text-sm"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5BB5F5] focus:border-transparent transition-all text-sm"
               required
             />
           </div>
@@ -169,7 +169,7 @@ export default function Register() {
               value={formData.display_name}
               onChange={handleChange}
               placeholder="How should we call you?"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7FBFEF] focus:border-transparent transition-all text-sm"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5BB5F5] focus:border-transparent transition-all text-sm"
             />
           </div>
 
@@ -182,7 +182,7 @@ export default function Register() {
                 type="button"
                 onClick={() => setFormData({ ...formData, preferred_language: 'ko' })}
                 className={`flex-1 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all ${formData.preferred_language === 'ko'
-                    ? 'bg-[#7FBFEF] text-white shadow-sm'
+                    ? 'bg-[#5BB5F5] text-white shadow-sm'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
                   }`}
               >
@@ -192,7 +192,7 @@ export default function Register() {
                 type="button"
                 onClick={() => setFormData({ ...formData, preferred_language: 'en' })}
                 className={`flex-1 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all ${formData.preferred_language === 'en'
-                    ? 'bg-[#7FBFEF] text-white shadow-sm'
+                    ? 'bg-[#5BB5F5] text-white shadow-sm'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
                   }`}
               >
@@ -202,7 +202,7 @@ export default function Register() {
                 type="button"
                 onClick={() => setFormData({ ...formData, preferred_language: 'ja' })}
                 className={`flex-1 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all ${formData.preferred_language === 'ja'
-                    ? 'bg-[#7FBFEF] text-white shadow-sm'
+                    ? 'bg-[#5BB5F5] text-white shadow-sm'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
                   }`}
               >
@@ -221,7 +221,7 @@ export default function Register() {
               value={formData.password}
               onChange={handleChange}
               placeholder="Create a password"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7FBFEF] focus:border-transparent transition-all text-sm"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5BB5F5] focus:border-transparent transition-all text-sm"
               required
               minLength={8}
             />
@@ -237,7 +237,7 @@ export default function Register() {
               value={formData.passwordConfirm}
               onChange={handleChange}
               placeholder="Confirm your password"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7FBFEF] focus:border-transparent transition-all text-sm"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5BB5F5] focus:border-transparent transition-all text-sm"
               required
             />
           </div>
@@ -246,12 +246,12 @@ export default function Register() {
             type="submit"
             disabled={loading}
             className="w-full text-white font-semibold py-3 px-4 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
-            style={{ backgroundColor: '#7FBFEF' }}
+            style={{ backgroundColor: '#5BB5F5' }}
             onMouseEnter={(e) => {
               if (!loading) e.target.style.backgroundColor = '#2378D5';
             }}
             onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#7FBFEF';
+              e.target.style.backgroundColor = '#5BB5F5';
             }}
           >
             {loading ? 'Creating account...' : 'Sign Up'}
@@ -260,7 +260,7 @@ export default function Register() {
 
         <p className="text-center mt-6 text-gray-600 text-sm">
           Already have an account?{' '}
-          <Link to="/login" className="font-semibold hover:underline" style={{ color: '#7FBFEF' }}>
+          <Link to="/login" className="font-semibold hover:underline" style={{ color: '#5BB5F5' }}>
             Login
           </Link>
         </p>

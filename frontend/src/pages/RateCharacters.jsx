@@ -388,7 +388,7 @@ export default function RateCharacters() {
                     }`}
                   style={{
                     background: hasRated
-                      ? 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)'
+                      ? 'linear-gradient(135deg, #F5C842 0%, #E8B835 50%, #D9A828 100%)'
                       : 'transparent',
                     padding: hasRated ? '2px' : '0',
                     boxShadow: hasRated
@@ -419,7 +419,7 @@ export default function RateCharacters() {
                         {character.role && (
                           <div className={`absolute top-2 left-2 px-2 py-1 rounded text-xs font-bold text-white`} style={{
                             backgroundColor: character.role === 'MAIN'
-                              ? '#7FBFEF'  // 주연: 청록색 (프라이머리)
+                              ? '#5BB5F5'  // 주연: 청록색 (프라이머리)
                               : character.role === 'SUPPORTING'
                                 ? '#F59E0B'  // 조연: 주황색 (프라이머리과 대조)
                                 : '#9CA3AF',  // 엑스트라: 회색
@@ -437,7 +437,7 @@ export default function RateCharacters() {
                         {(hasRated || characterStatuses[character.id]) && (
                           <div className="absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold text-white shadow-lg" style={{
                             background: (hasRated || characterStatuses[character.id] === 'RATED')
-                              ? 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)'
+                              ? 'linear-gradient(135deg, #F5C842 0%, #E8B835 50%, #D9A828 100%)'
                               : characterStatuses[character.id] === 'WANT_TO_KNOW'
                                 ? '#3B82F6'
                                 : '#6B7280'
@@ -469,9 +469,9 @@ export default function RateCharacters() {
                                     <svg key={position} style={{ width: size, height: size }} fill="url(#star-gradient-char)" viewBox="0 0 20 20">
                                       <defs>
                                         <linearGradient id="star-gradient-char" x1="0%" y1="0%" x2="100%" y2="100%">
-                                          <stop offset="0%" style={{ stopColor: '#FFD700', stopOpacity: 1 }} />
-                                          <stop offset="50%" style={{ stopColor: '#FFA500', stopOpacity: 1 }} />
-                                          <stop offset="100%" style={{ stopColor: '#FF8C00', stopOpacity: 1 }} />
+                                          <stop offset="0%" style={{ stopColor: '#F5C842', stopOpacity: 1 }} />
+                                          <stop offset="50%" style={{ stopColor: '#E8B835', stopOpacity: 1 }} />
+                                          <stop offset="100%" style={{ stopColor: '#D9A828', stopOpacity: 1 }} />
                                         </linearGradient>
                                       </defs>
                                       <path d={starPath} />
@@ -487,9 +487,9 @@ export default function RateCharacters() {
                                         <svg className="h-full" fill="url(#star-gradient-char-half)" viewBox="0 0 20 20" style={{ width: '200%' }}>
                                           <defs>
                                             <linearGradient id="star-gradient-char-half" x1="0%" y1="0%" x2="100%" y2="100%">
-                                              <stop offset="0%" style={{ stopColor: '#FFD700', stopOpacity: 1 }} />
-                                              <stop offset="50%" style={{ stopColor: '#FFA500', stopOpacity: 1 }} />
-                                              <stop offset="100%" style={{ stopColor: '#FF8C00', stopOpacity: 1 }} />
+                                              <stop offset="0%" style={{ stopColor: '#F5C842', stopOpacity: 1 }} />
+                                              <stop offset="50%" style={{ stopColor: '#E8B835', stopOpacity: 1 }} />
+                                              <stop offset="100%" style={{ stopColor: '#D9A828', stopOpacity: 1 }} />
                                             </linearGradient>
                                           </defs>
                                           <path d={starPath} />
@@ -534,9 +534,9 @@ export default function RateCharacters() {
                                       <svg style={{ width: size, height: size }} fill="url(#star-gradient-char-overlay)" viewBox="0 0 20 20">
                                         <defs>
                                           <linearGradient id="star-gradient-char-overlay" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" style={{ stopColor: '#FFD700', stopOpacity: 1 }} />
-                                            <stop offset="50%" style={{ stopColor: '#FFA500', stopOpacity: 1 }} />
-                                            <stop offset="100%" style={{ stopColor: '#FF8C00', stopOpacity: 1 }} />
+                                            <stop offset="0%" style={{ stopColor: '#F5C842', stopOpacity: 1 }} />
+                                            <stop offset="50%" style={{ stopColor: '#E8B835', stopOpacity: 1 }} />
+                                            <stop offset="100%" style={{ stopColor: '#D9A828', stopOpacity: 1 }} />
                                           </linearGradient>
                                         </defs>
                                         <path d={starPath} />
@@ -552,9 +552,9 @@ export default function RateCharacters() {
                                           <svg className="h-full" fill="url(#star-gradient-char-overlay-half)" viewBox="0 0 20 20" style={{ width: '200%' }}>
                                             <defs>
                                               <linearGradient id="star-gradient-char-overlay-half" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" style={{ stopColor: '#FFD700', stopOpacity: 1 }} />
-                                                <stop offset="50%" style={{ stopColor: '#FFA500', stopOpacity: 1 }} />
-                                                <stop offset="100%" style={{ stopColor: '#FF8C00', stopOpacity: 1 }} />
+                                                <stop offset="0%" style={{ stopColor: '#F5C842', stopOpacity: 1 }} />
+                                                <stop offset="50%" style={{ stopColor: '#E8B835', stopOpacity: 1 }} />
+                                                <stop offset="100%" style={{ stopColor: '#D9A828', stopOpacity: 1 }} />
                                               </linearGradient>
                                             </defs>
                                             <path d={starPath} />

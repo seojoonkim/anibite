@@ -30,17 +30,18 @@
   --color-text-tertiary: #6b7a8c;
 
   /* Accent Colors - Logo Light Blue (Point Color) */
-  --color-primary: #7FBFEF;
-  --color-primary-dark: #5BA8E0;
-  --color-primary-light: #A8D8F8;
+  --color-primary: #5BB5F5;
+  --color-primary-dark: #3A9FE8;
+  --color-primary-light: #8CCBF9;
 
   --color-secondary: #f778ba;
   --color-secondary-dark: #db61a2;
   --color-secondary-light: #ffa0d2;
 
-  --color-accent: #f0b429;
-  --color-accent-dark: #d29922;
-  --color-accent-light: #ffcf4a;
+  /* Accent Colors - Calm Gold (Star Color) */
+  --color-accent: #F5C842;
+  --color-accent-dark: #E0B530;
+  --color-accent-light: #FFDA6A;
 
   /* Tertiary accent - Cyan/Teal for variety */
   --color-tertiary: #3fb950;
@@ -50,13 +51,13 @@
   /* Borders - More visible */
   --color-border: #2d3748;
   --color-border-hover: #4a5568;
-  --color-border-focus: #7FBFEF;
+  --color-border-focus: #5BB5F5;
 
   /* Semantic Colors - Brighter for dark mode */
   --color-success: #3fb950;
   --color-warning: #d29922;
   --color-error: #f85149;
-  --color-info: #7FBFEF;
+  --color-info: #5BB5F5;
 
   /* Spacing Scale - 25% SMALLER (compact) */
   --space-xs: 3px;
@@ -106,15 +107,15 @@
   --shadow-2xl: 0 32px 48px -12px rgba(0, 0, 0, 0.9);
 
   /* Glow Effects - Neon style */
-  --glow-primary: 0 0 20px rgba(127, 191, 239, 0.5), 0 0 40px rgba(127, 191, 239, 0.2);
+  --glow-primary: 0 0 20px rgba(91, 181, 245, 0.5), 0 0 40px rgba(91, 181, 245, 0.2);
   --glow-secondary: 0 0 20px rgba(247, 120, 186, 0.5), 0 0 40px rgba(247, 120, 186, 0.2);
-  --glow-accent: 0 0 20px rgba(240, 180, 41, 0.5), 0 0 40px rgba(240, 180, 41, 0.2);
+  --glow-accent: 0 0 20px rgba(245, 200, 66, 0.5), 0 0 40px rgba(245, 200, 66, 0.2);
   --glow-success: 0 0 20px rgba(63, 185, 80, 0.5), 0 0 40px rgba(63, 185, 80, 0.2);
 
   /* Colored Shadows - For cards and buttons */
-  --shadow-primary: 0 8px 24px -4px rgba(127, 191, 239, 0.35);
+  --shadow-primary: 0 8px 24px -4px rgba(91, 181, 245, 0.35);
   --shadow-secondary: 0 8px 24px -4px rgba(247, 120, 186, 0.35);
-  --shadow-accent: 0 8px 24px -4px rgba(240, 180, 41, 0.35);
+  --shadow-accent: 0 8px 24px -4px rgba(245, 200, 66, 0.35);
 
   /* Transitions - Snappier */
   --transition-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -221,7 +222,7 @@ select:focus {
   background-color: var(--color-input-focus) !important;
   outline: none !important;
   border-color: var(--color-border-focus) !important;
-  box-shadow: 0 0 0 3px rgba(127, 191, 239, 0.15) !important;
+  box-shadow: 0 0 0 3px rgba(91, 181, 245, 0.15) !important;
 }
 
 /* Override ANY white backgrounds */

@@ -603,9 +603,9 @@ export default function AnimeDetail() {
     <svg className={className} viewBox="0 0 20 20" fill={filled ? "url(#star-gradient-detail)" : "currentColor"}>
       <defs>
         <linearGradient id="star-gradient-detail" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: '#FFD700', stopOpacity: 1 }} />
-          <stop offset="50%" style={{ stopColor: '#FFA500', stopOpacity: 1 }} />
-          <stop offset="100%" style={{ stopColor: '#FF8C00', stopOpacity: 1 }} />
+          <stop offset="0%" style={{ stopColor: '#F5C842', stopOpacity: 1 }} />
+          <stop offset="50%" style={{ stopColor: '#E8B835', stopOpacity: 1 }} />
+          <stop offset="100%" style={{ stopColor: '#D9A828', stopOpacity: 1 }} />
         </linearGradient>
       </defs>
       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -720,7 +720,7 @@ export default function AnimeDetail() {
           </div>
           <button
             onClick={() => navigate('/')}
-            className="mt-4 text-blue-500 hover:text-[#7FBFEF]"
+            className="mt-4 text-blue-500 hover:text-[#5BB5F5]"
           >
             홈으로 돌아가기
           </button>
@@ -1115,7 +1115,7 @@ export default function AnimeDetail() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-sm truncate hover:text-[#7FBFEF] transition-colors">{language === 'ko' && char.character_name_korean ? char.character_name_korean : char.character_name}</h4>
+                          <h4 className="font-medium text-sm truncate hover:text-[#5BB5F5] transition-colors">{language === 'ko' && char.character_name_korean ? char.character_name_korean : char.character_name}</h4>
                           <p className="text-xs text-gray-400">{language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character'}</p>
                         </div>
                       </div>
@@ -1187,7 +1187,7 @@ export default function AnimeDetail() {
                           }}
                         />
                       </div>
-                      <h4 className="font-medium text-sm line-clamp-2 group-hover:text-[#7FBFEF] transition-colors">
+                      <h4 className="font-medium text-sm line-clamp-2 group-hover:text-[#5BB5F5] transition-colors">
                         {getAnimeTitle(rec)}
                       </h4>
                       {rec.site_rating_count > 0 && (
