@@ -248,25 +248,11 @@ export default function Navbar() {
             {/* Logo */}
             <div className="flex items-center flex-shrink-0">
               <Link to="/feed" className="flex items-center gap-1 md:gap-1.5 hover:opacity-80 transition-opacity group">
-                {/* Logo Icon - Bitten top-right corner */}
-                <svg className="w-6 h-6 md:w-7 md:h-7" viewBox="0 0 32 32" fill="none">
-                  <defs>
-                    <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#4EEAF7" />
-                      <stop offset="100%" stopColor="#2DD4E4" />
-                    </linearGradient>
-                  </defs>
-                  {/* Rounded square with bite mark on top-right */}
-                  <path
-                    d="M4 8C4 5.79 5.79 4 8 4H18C18 4 18 6 20 8C22 10 24 10 24 10H24C26.21 10 28 11.79 28 14V24C28 26.21 26.21 28 24 28H8C5.79 28 4 26.21 4 24V8Z"
-                    fill="url(#logo-gradient)"
-                  />
-                  {/* Cute bubble-like A with rounded strokes */}
-                  <path
-                    d="M16 10C14 10 12.5 11.5 11 15L9 22C8.8 22.6 9.2 23 9.8 23H11.5C12 23 12.4 22.7 12.5 22.2L13 20H19L19.5 22.2C19.6 22.7 20 23 20.5 23H22.2C22.8 23 23.2 22.6 23 22L21 15C19.5 11.5 18 10 16 10ZM14 17.5L15.5 13C15.7 12.4 16.3 12.4 16.5 13L18 17.5H14Z"
-                    fill="white"
-                  />
-                </svg>
+                <img
+                  src="/logo.png"
+                  alt="Anibite"
+                  className="w-6 h-6 md:w-7 md:h-7 object-contain"
+                />
                 <span
                   style={{
                     fontFamily: "'Righteous', 'Pacifico', sans-serif",
