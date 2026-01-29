@@ -583,6 +583,8 @@ export default function Feed() {
                         disabled={!newPostContent.trim()}
                         className="px-4 py-1.5 text-[14px] text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                         style={newPostContent.trim() ? { backgroundColor: '#47B5FF' } : {}}
+                        onMouseEnter={(e) => newPostContent.trim() && (e.target.style.backgroundColor = '#2DA0ED')}
+                        onMouseLeave={(e) => newPostContent.trim() && (e.target.style.backgroundColor = '#47B5FF')}
                       >
                         {language === 'ko' ? '게시' : language === 'ja' ? '投稿' : 'Post'}
                       </button>

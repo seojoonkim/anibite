@@ -127,7 +127,7 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
     sm: 'gap-0.5',
     feed: '-space-x-0.5',
     md: 'gap-1',
-    lg: 'gap-1 sm:gap-1.5',
+    lg: 'gap-0.5 sm:gap-1',
     xl: 'gap-1 sm:gap-1.5',
     widget: 'gap-px',  // 위젯용 - 간격 좁게 (1px)
   };
