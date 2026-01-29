@@ -288,10 +288,10 @@ export default function Navbar() {
                     key={item.path}
                     to={item.path}
                     className={`px-1.5 sm:px-2 md:px-2.5 lg:px-3 py-1 sm:py-1.5 rounded-md text-[11px] sm:text-[12px] md:text-[13px] transition-colors whitespace-nowrap ${isActive(item.path)
-                      ? 'text-white font-semibold'
+                      ? 'text-[#1a1a2e] font-semibold'
                       : 'text-text-primary hover:text-text-secondary hover:bg-surface-hover font-normal'
                       }`}
-                    style={isActive(item.path) ? { background: 'linear-gradient(135deg, #7FBFEF 0%, #2DD4E4 100%)' } : {}}
+                    style={isActive(item.path) ? { backgroundColor: '#FFD700' } : {}}
                   >
                     {item.labelKo ? (language === 'ko' ? item.labelKo : language === 'ja' ? item.labelJa : item.labelEn) : item.label}
                   </Link>
@@ -507,10 +507,10 @@ export default function Navbar() {
               key={item.path}
               to={item.path}
               className={`flex flex-col items-center justify-center gap-0.5 transition-colors py-1 ${isActive(item.path)
-                ? 'text-white'
+                ? 'text-[#1a1a2e]'
                 : 'text-text-secondary hover:text-text-primary'
                 }`}
-              style={isActive(item.path) ? { background: 'linear-gradient(135deg, #7FBFEF 0%, #2DD4E4 100%)' } : {}}
+              style={isActive(item.path) ? { backgroundColor: '#FFD700' } : {}}
             >
               <div className="scale-90">{item.icon}</div>
               <span className="text-[9px] font-medium">
