@@ -58,7 +58,7 @@ export default function EmailSent() {
               onClick={() => navigate('/login')}
               className="w-full py-2.5 px-4 rounded-lg font-medium transition-colors"
               style={{ backgroundColor: '#3498DB', color: 'white' }}
-              onMouseEnter={(e) => (e.target.style.backgroundColor = '#00B8D4')}
+              onMouseEnter={(e) => (e.target.style.backgroundColor = '#2DD4E4')}
               onMouseLeave={(e) => (e.target.style.backgroundColor = '#3498DB')}
             >
               로그???�이지�?

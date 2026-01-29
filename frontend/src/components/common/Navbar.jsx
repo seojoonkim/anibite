@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -252,8 +252,8 @@ export default function Navbar() {
                 <svg className="w-6 h-6 md:w-7 md:h-7" viewBox="0 0 32 32" fill="none">
                   <defs>
                     <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#00E5FF" />
-                      <stop offset="100%" stopColor="#00B8D4" />
+                      <stop offset="0%" stopColor="#4EEAF7" />
+                      <stop offset="100%" stopColor="#2DD4E4" />
                     </linearGradient>
                   </defs>
                   {/* Rounded square with bite mark on top-right */}
@@ -295,7 +295,7 @@ export default function Navbar() {
                       ? 'text-white font-semibold'
                       : 'text-text-primary hover:text-text-secondary hover:bg-surface-hover font-normal'
                       }`}
-                    style={isActive(item.path) ? { background: 'linear-gradient(135deg, #00E5FF 0%, #00B8D4 100%)' } : {}}
+                    style={isActive(item.path) ? { background: 'linear-gradient(135deg, #4EEAF7 0%, #2DD4E4 100%)' } : {}}
                   >
                     {item.labelKo ? (language === 'ko' ? item.labelKo : language === 'ja' ? item.labelJa : item.labelEn) : item.label}
                   </Link>
@@ -514,7 +514,7 @@ export default function Navbar() {
                 ? 'text-white'
                 : 'text-text-secondary hover:text-text-primary'
                 }`}
-              style={isActive(item.path) ? { background: 'linear-gradient(135deg, #00E5FF 0%, #00B8D4 100%)' } : {}}
+              style={isActive(item.path) ? { background: 'linear-gradient(135deg, #4EEAF7 0%, #2DD4E4 100%)' } : {}}
             >
               <div className="scale-90">{item.icon}</div>
               <span className="text-[9px] font-medium">
