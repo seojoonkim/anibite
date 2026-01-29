@@ -14,13 +14,11 @@
   <!-- Rounded square background with bite -->
   <rect x="2" y="2" width="36" height="36" rx="10" ry="10" fill="url(#bgGradient)" mask="url(#biteMask)"/>
 
-  <!-- Cute rounded 'A' letter - soft and bubbly style -->
-  <!-- Left leg - curved outward for cute look -->
-  <path d="M12 29 Q11 24 14 18 Q17 12 20 10"
-        stroke="white" stroke-width="5" stroke-linecap="round" fill="none"/>
-  <!-- Right leg - curved outward for cute look -->
-  <path d="M20 10 Q23 12 26 18 Q29 24 28 29"
-        stroke="white" stroke-width="5" stroke-linecap="round" fill="none"/>
-  <!-- Play button triangle inside A -->
-  <polygon points="17,19 17,27 24,23" fill="white"/>
+  <!-- A letter with play button shaped inner space -->
+  <!-- Solid A shape with triangular cutout facing right (like play button) -->
+  <path d="M20 8 L10 30 L15 30 L16.5 26 L28 20 L23.5 26 L25 30 L30 30 Z"
+        fill="white"/>
+  <!-- Play button cutout (facing right) -->
+  <path d="M17 24 L17 16 L24 20 Z"
+        fill="url(#bgGradient)"/>
 </svg>
