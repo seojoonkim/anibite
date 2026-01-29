@@ -21,6 +21,6 @@
   <!-- Right leg - curved outward for cute look -->
   <path d="M20 10 Q23 12 26 18 Q29 24 28 29"
         stroke="white" stroke-width="5" stroke-linecap="round" fill="none"/>
-  <!-- Crossbar - pill/capsule shape -->
-  <rect x="13" y="21" width="14" height="5" rx="2.5" ry="2.5" fill="white"/>
+  <!-- Play button triangle inside A -->
+  <polygon points="17,19 17,27 24,23" fill="white"/>
 </svg>
