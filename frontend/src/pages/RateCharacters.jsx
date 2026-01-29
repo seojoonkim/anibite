@@ -2,12 +2,14 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { characterService } from '../services/characterService';
 import { useLanguage } from '../context/LanguageContext';
+import { useLogoWiggle } from '../context/LogoWiggleContext';
 import StarRating from '../components/common/StarRating';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 import { getCharacterImageUrl } from '../utils/imageHelpers';
 
 export default function RateCharacters() {
   const { t, language, getAnimeTitle } = useLanguage();
+  const { triggerWiggle } = useLogoWiggle();
   const navigate = useNavigate();
   const [characters, setCharacters] = useState([]);
   const [allCharacters, setAllCharacters] = useState([]); // All loaded items
@@ -188,6 +190,7 @@ export default function RateCharacters() {
 
     try {
       const response = await characterService.rateCharacter(characterId, { rating, status: 'RATED' });
+      triggerWiggle();
 
       // Update cached otaku_score if provided
       if (response && response.otaku_score !== undefined) {
@@ -258,6 +261,7 @@ export default function RateCharacters() {
 
     try {
       const response = await characterService.rateCharacter(characterId, { status: newStatus });
+      triggerWiggle();
 
       // Update cached otaku_score if provided
       if (response && response.otaku_score !== undefined) {

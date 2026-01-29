@@ -1,7 +1,8 @@
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useLogoWiggle } from '../../context/LogoWiggleContext';
 import { userService } from '../../services/userService';
 import { notificationService } from '../../services/notificationService';
 import { getCurrentLevelInfo } from '../../utils/otakuLevels';
@@ -12,13 +13,13 @@ import { API_BASE_URL, IMAGE_BASE_URL } from '../../config/api';
 export default function Navbar() {
   const { user, logout } = useAuth();
   const { language, setLanguage, toggleLanguage, t } = useLanguage();
+  const { isWiggling, triggerWiggle } = useLogoWiggle();
   const navigate = useNavigate();
   const location = useLocation();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [lastCheckTime, setLastCheckTime] = useState(null);
-  const [logoWiggle, setLogoWiggle] = useState(false);
   const notificationRef = useRef(null);
   const userMenuRef = useRef(null);
   const mobileUserMenuRef = useRef(null);
@@ -26,9 +27,7 @@ export default function Navbar() {
 
   // Trigger logo wiggle animation on page navigation
   useEffect(() => {
-    setLogoWiggle(true);
-    const timer = setTimeout(() => setLogoWiggle(false), 600);
-    return () => clearTimeout(timer);
+    triggerWiggle();
   }, [location.pathname]);
 
   // Initialize from localStorage cache to prevent flickering
@@ -261,7 +260,7 @@ export default function Navbar() {
                   ref={logoRef}
                   src="/logo.svg"
                   alt="Anibite"
-                  className={`w-6 h-6 md:w-7 md:h-7 object-contain ${logoWiggle ? 'logo-wiggle' : ''}`}
+                  className={`w-6 h-6 md:w-7 md:h-7 object-contain ${isWiggling ? 'logo-wiggle' : ''}`}
                 />
                 <span
                   style={{

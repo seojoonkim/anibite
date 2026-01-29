@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { LogoWiggleProvider } from './context/LogoWiggleContext';
 import ScrollToTop from './components/common/ScrollToTop';
 import Navbar from './components/common/Navbar';
 
@@ -209,10 +210,12 @@ function App() {
   return (
     <AuthProvider>
       <LanguageProvider>
-        <BrowserRouter>
-          <ScrollToTop />
-          <AppRoutes />
-        </BrowserRouter>
+        <LogoWiggleProvider>
+          <BrowserRouter>
+            <ScrollToTop />
+            <AppRoutes />
+          </BrowserRouter>
+        </LogoWiggleProvider>
       </LanguageProvider>
     </AuthProvider>
   );
