@@ -1,4 +1,4 @@
-/* 모던?�고 ?�련???�트 */
+/* 모던?�고 ?�련???�트 */
 @import url('https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css');
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -29,10 +29,10 @@
   --color-text-secondary: #a8b5c4;
   --color-text-tertiary: #6b7a8c;
 
-  /* Accent Colors - Neon Terminal Style (Logo Cyan) */
-  --color-primary: #4EEAF7;
-  --color-primary-dark: #2DD4E4;
-  --color-primary-light: #6FF4FF;
+  /* Accent Colors - Logo Blue */
+  --color-primary: #4A8AC9;
+  --color-primary-dark: #3A7AB9;
+  --color-primary-light: #7FBFEF;
 
   --color-secondary: #f778ba;
   --color-secondary-dark: #db61a2;
@@ -50,13 +50,13 @@
   /* Borders - More visible */
   --color-border: #2d3748;
   --color-border-hover: #4a5568;
-  --color-border-focus: #4EEAF7;
+  --color-border-focus: #4A8AC9;
 
   /* Semantic Colors - Brighter for dark mode */
   --color-success: #3fb950;
   --color-warning: #d29922;
   --color-error: #f85149;
-  --color-info: #4EEAF7;
+  --color-info: #4A8AC9;
 
   /* Spacing Scale - 25% SMALLER (compact) */
   --space-xs: 3px;
@@ -106,13 +106,13 @@
   --shadow-2xl: 0 32px 48px -12px rgba(0, 0, 0, 0.9);
 
   /* Glow Effects - Neon style */
-  --glow-primary: 0 0 20px rgba(78, 234, 247, 0.5), 0 0 40px rgba(78, 234, 247, 0.2);
+  --glow-primary: 0 0 20px rgba(74, 138, 201, 0.5), 0 0 40px rgba(74, 138, 201, 0.2);
   --glow-secondary: 0 0 20px rgba(247, 120, 186, 0.5), 0 0 40px rgba(247, 120, 186, 0.2);
   --glow-accent: 0 0 20px rgba(240, 180, 41, 0.5), 0 0 40px rgba(240, 180, 41, 0.2);
   --glow-success: 0 0 20px rgba(63, 185, 80, 0.5), 0 0 40px rgba(63, 185, 80, 0.2);
 
   /* Colored Shadows - For cards and buttons */
-  --shadow-primary: 0 8px 24px -4px rgba(78, 234, 247, 0.35);
+  --shadow-primary: 0 8px 24px -4px rgba(74, 138, 201, 0.35);
   --shadow-secondary: 0 8px 24px -4px rgba(247, 120, 186, 0.35);
   --shadow-accent: 0 8px 24px -4px rgba(240, 180, 41, 0.35);
 
@@ -221,7 +221,7 @@ select:focus {
   background-color: var(--color-input-focus) !important;
   outline: none !important;
   border-color: var(--color-border-focus) !important;
-  box-shadow: 0 0 0 3px rgba(78, 234, 247, 0.15) !important;
+  box-shadow: 0 0 0 3px rgba(74, 138, 201, 0.15) !important;
 }
 
 /* Override ANY white backgrounds */
