@@ -76,6 +76,8 @@ export default function ActivityComments({
                 disabled={!newCommentText.trim()}
                 className="px-3 py-1.5 text-[14px] text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                 style={newCommentText.trim() ? { backgroundColor: '#47B5FF' } : {}}
+                onMouseEnter={(e) => newCommentText.trim() && (e.target.style.backgroundColor = '#2DA0ED')}
+                onMouseLeave={(e) => newCommentText.trim() && (e.target.style.backgroundColor = '#47B5FF')}
               >
                 {language === 'ko' ? '작성' : language === 'ja' ? '作成' : 'Post'}
               </button>
@@ -179,6 +181,8 @@ export default function ActivityComments({
                           disabled={!replyText.trim()}
                           className="px-2 py-1 text-[12px] text-white rounded transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                           style={replyText.trim() ? { backgroundColor: '#47B5FF' } : {}}
+                          onMouseEnter={(e) => replyText.trim() && (e.target.style.backgroundColor = '#2DA0ED')}
+                          onMouseLeave={(e) => replyText.trim() && (e.target.style.backgroundColor = '#47B5FF')}
                         >
                           {language === 'ko' ? '작성' : language === 'ja' ? '作成' : 'Post'}
                         </button>
