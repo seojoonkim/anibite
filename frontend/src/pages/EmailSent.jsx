@@ -18,20 +18,20 @@ export default function EmailSent() {
           </div>
 
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            이메일을 확인해주세요! 📧
+            ?�메?�을 ?�인?�주?�요! ?��
           </h1>
 
           <p className="text-gray-600 mb-4">
-            <span className="font-semibold">{username}</span>님, 환영합니다!
+            <span className="font-semibold">{username}</span>?? ?�영?�니??
           </p>
 
           <div className="bg-blue-50 rounded-lg p-4 mb-6">
             <p className="text-sm text-gray-700 mb-2">
-              <span className="font-medium">{email}</span> 으로<br />
-              인증 이메일을 보내드렸습니다.
+              <span className="font-medium">{email}</span> ?�로<br />
+              ?�증 ?�메?�을 보내?�렸?�니??
             </p>
             <p className="text-xs text-gray-600">
-              이메일의 인증 링크를 클릭하여 회원가입을 완료해주세요.
+              ?�메?�의 ?�증 링크�??�릭?�여 ?�원가?�을 ?�료?�주?�요.
             </p>
           </div>
 
@@ -42,12 +42,12 @@ export default function EmailSent() {
               </svg>
               <div className="text-left">
                 <p className="text-sm font-medium text-yellow-800">
-                  주의사항
+                  주의?�항
                 </p>
                 <ul className="text-xs text-yellow-700 mt-1 space-y-1">
-                  <li>• 인증 링크는 24시간 동안 유효합니다</li>
-                  <li>• 스팸 메일함도 확인해주세요</li>
-                  <li>• 이메일이 오지 않았다면 재전송할 수 있습니다</li>
+                  <li>???�증 링크??24?�간 ?�안 ?�효?�니??/li>
+                  <li>???�팸 메일?�도 ?�인?�주?�요</li>
+                  <li>???�메?�이 ?��? ?�았?�면 ?�전?�할 ???�습?�다</li>
                 </ul>
               </div>
             </div>
@@ -58,17 +58,17 @@ export default function EmailSent() {
               onClick={() => navigate('/login')}
               className="w-full py-2.5 px-4 rounded-lg font-medium transition-colors"
               style={{ backgroundColor: '#3498DB', color: 'white' }}
-              onMouseEnter={(e) => (e.target.style.backgroundColor = '#2C7CB8')}
+              onMouseEnter={(e) => (e.target.style.backgroundColor = '#00B8D4')}
               onMouseLeave={(e) => (e.target.style.backgroundColor = '#3498DB')}
             >
-              로그인 페이지로
+              로그???�이지�?
             </button>
 
             <button
               onClick={() => navigate('/resend-verification', { state: { email } })}
               className="w-full py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
             >
-              인증 이메일 재전송
+              ?�증 ?�메???�전??
             </button>
           </div>
         </div>

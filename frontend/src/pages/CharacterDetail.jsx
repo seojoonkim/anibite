@@ -123,20 +123,20 @@ export default function CharacterDetail() {
         return; // Skip API calls, data is already fresh from prefetch
       }
 
-      // 1단계: 캐릭터 기본 정보 먼저 로드하고 즉시 표시
+      // 1?�계: 캐릭??기본 ?�보 먼�? 로드?�고 즉시 ?�시
       const characterData = await characterService.getCharacterDetail(id);
 
       if (characterData) {
         setCharacter(characterData);
         setError(null);
-        setLoading(false); // 여기서 로딩 해제 - 기본 정보 바로 표시
+        setLoading(false); // ?�기??로딩 ?�제 - 기본 ?�보 바로 ?�시
       } else {
-        setError(language === 'ko' ? '캐릭터 정보를 불러오지 못했습니다.' : 'Failed to load character.');
+        setError(language === 'ko' ? '캐릭???�보�?불러?��? 못했?�니??' : 'Failed to load character.');
         setLoading(false);
         return;
       }
 
-      // 2단계: 리뷰와 내 리뷰는 백그라운드에서 로드 (화면은 이미 표시 중)
+      // 2?�계: 리뷰?� ??리뷰??백그?�운?�에??로드 (?�면?� ?��? ?�시 �?
       const reviewPromises = [
         characterReviewService.getCharacterReviews(id, { page: 1, page_size: 10 }).catch(() => null)
       ];
@@ -152,15 +152,15 @@ export default function CharacterDetail() {
         processReviews(reviewResults[0]);
       }
 
-      // 내 리뷰
+      // ??리뷰
       if (user && reviewResults[1]) {
         processMyReview(reviewResults[1]);
       }
 
-      // 3단계: 다른 사람들의 활동은 useActivities hook에서 자동으로 로드됨
+      // 3?�계: ?�른 ?�람?�의 ?�동?� useActivities hook?�서 ?�동?�로 로드??
     } catch (err) {
       console.error('Failed to load character data:', err);
-      setError(language === 'ko' ? '데이터를 불러오지 못했습니다.' : 'Failed to load data.');
+      setError(language === 'ko' ? '?�이?��? 불러?��? 못했?�니??' : 'Failed to load data.');
       setLoading(false);
     }
   };
@@ -184,7 +184,7 @@ export default function CharacterDetail() {
   }, []);
 
   const processReviews = (data) => {
-    // 내 리뷰는 myReview로 따로 표시하므로, reviews에서는 제외
+    // ??리뷰??myReview�??�로 ?�시?��?�? reviews?�서???�외
     const otherReviews = (data.items || []).filter(review => review.user_id !== user?.id);
     setReviews(otherReviews);
 
@@ -201,7 +201,7 @@ export default function CharacterDetail() {
       };
       newComments[review.id] = [];
 
-      // 댓글이 있으면 자동으로 펼치기
+      // ?��????�으�??�동?�로 ?�치�?
       if (review.comments_count > 0) {
         newExpandedSet.add(review.id);
         commentsToLoad.push(review);
@@ -212,7 +212,7 @@ export default function CharacterDetail() {
     setComments(prev => ({ ...prev, ...newComments }));
     setExpandedComments(prev => new Set([...prev, ...newExpandedSet]));
 
-    // 댓글 병렬 로드
+    // ?��? 병렬 로드
     if (commentsToLoad.length > 0) {
       Promise.all(commentsToLoad.map(review => loadComments(review)));
     }
@@ -221,7 +221,7 @@ export default function CharacterDetail() {
   const processMyReview = (data) => {
     setMyReview(data);
 
-    // 좋아요 상태 설정
+    // 좋아???�태 ?�정
     if (data) {
       setReviewLikes(prev => ({
         ...prev,
@@ -231,7 +231,7 @@ export default function CharacterDetail() {
         }
       }));
 
-      // 내 리뷰에 댓글이 있으면 자동으로 펼치고 로드
+      // ??리뷰???��????�으�??�동?�로 ?�치�?로드
       if (data.comments_count > 0) {
         setExpandedComments(prev => new Set([...prev, data.id]));
         loadComments(data);
@@ -249,7 +249,7 @@ export default function CharacterDetail() {
         // rateCharacter expects an object, not a direct rating value
         await characterService.rateCharacter(id, { rating });
         setCharacter({ ...character, my_rating: rating });
-        // 평점 입력 후 내 리뷰 섹션에 바로 표시
+        // ?�점 ?�력 ????리뷰 ?�션??바로 ?�시
         const myReviewData = await characterReviewService.getMyReview(id).catch(() => null);
         if (myReviewData) processMyReview(myReviewData);
 
@@ -262,7 +262,7 @@ export default function CharacterDetail() {
         }
       }
 
-      // 병렬로 데이터 새로고침 (BUT preserve the locally updated my_rating)
+      // 병렬�??�이???�로고침 (BUT preserve the locally updated my_rating)
       const [charData, reviewData] = await Promise.all([
         characterService.getCharacterDetail(id),
         characterReviewService.getCharacterReviews(id, { page: 1, page_size: 10 })
@@ -283,9 +283,9 @@ export default function CharacterDetail() {
 
       alert(
         language === 'ko'
-          ? `평가를 저장하는데 실패했습니다${errorStatus}\n${errorDetail}`
+          ? `?��?�??�?�하?�데 ?�패?�습?�다${errorStatus}\n${errorDetail}`
           : language === 'ja'
-            ? `評価の保存に失敗しました${errorStatus}\n${errorDetail}`
+            ? `評価??��存に失敗?�ま?�た${errorStatus}\n${errorDetail}`
             : `Failed to save rating${errorStatus}\n${errorDetail}`
       );
     }
@@ -300,7 +300,7 @@ export default function CharacterDetail() {
       if (charData) setCharacter(charData);
     } catch (err) {
       console.error('Failed to change status:', err);
-      alert(language === 'ko' ? '상태 변경에 실패했습니다.' : language === 'ja' ? 'ステータス変更に失敗しました。' : 'Failed to change status.');
+      alert(language === 'ko' ? '?�태 변경에 ?�패?�습?�다.' : language === 'ja' ? '?�テ?�タ?�変?�に失敗?�ま?�た?? : 'Failed to change status.');
     }
   };
 
@@ -310,51 +310,51 @@ export default function CharacterDetail() {
     setReviewSuccess('');
 
     if (reviewData.rating === 0 || !reviewData.rating) {
-      setReviewError(language === 'ko' ? '별점을 선택해주세요.' : language === 'ja' ? '評価を選択してください。' : 'Please select a rating.');
+      setReviewError(language === 'ko' ? '별점???�택?�주?�요.' : language === 'ja' ? '評価?�選?�し?�く?�さ?��? : 'Please select a rating.');
       return;
     }
 
     if (!reviewData.content.trim()) {
-      setReviewError(language === 'ko' ? '리뷰 내용을 입력해주세요.' : language === 'ja' ? 'レビュー内容を入力してください。' : 'Please enter review content.');
+      setReviewError(language === 'ko' ? '리뷰 ?�용???�력?�주?�요.' : language === 'ja' ? '?�ビ?�ー?��??�入?�し?�く?�さ?��? : 'Please enter review content.');
       return;
     }
 
     if (reviewData.content.trim().length < 10) {
-      setReviewError(language === 'ko' ? '리뷰는 최소 10자 이상 작성해주세요.' : language === 'ja' ? 'レビューは最低10文字以上入力してください。' : 'Review must be at least 10 characters.');
+      setReviewError(language === 'ko' ? '리뷰??최소 10???�상 ?�성?�주?�요.' : language === 'ja' ? '?�ビ?�ー???�?0?�字以上?�力?�て?�だ?�い?? : 'Review must be at least 10 characters.');
       return;
     }
 
     try {
       if (isEditingReview && myReview && myReview.id) {
-        // 수정 시: rating을 리뷰 API에 함께 전송
+        // ?�정 ?? rating??리뷰 API???�께 ?�송
         await characterReviewService.updateReview(myReview.id, {
           content: reviewData.content,
           is_spoiler: reviewData.is_spoiler,
-          rating: reviewData.rating  // 별점도 함께 전송
+          rating: reviewData.rating  // 별점???�께 ?�송
         });
-        setReviewSuccess(language === 'ko' ? '리뷰가 수정되었습니다.' : language === 'ja' ? 'レビューが編集されました。' : 'Review updated successfully.');
+        setReviewSuccess(language === 'ko' ? '리뷰가 ?�정?�었?�니??' : language === 'ja' ? '?�ビ?�ー?�編?�さ?�ま?�た?? : 'Review updated successfully.');
       } else {
-        // 새로 작성: 별점과 리뷰를 한 번에 전송
+        // ?�로 ?�성: 별점�?리뷰�???번에 ?�송
         await characterReviewService.createReview({
           character_id: parseInt(id),
           content: reviewData.content,
           is_spoiler: reviewData.is_spoiler,
-          rating: reviewData.rating  // 별점을 리뷰 API에 함께 전송
+          rating: reviewData.rating  // 별점??리뷰 API???�께 ?�송
         });
 
-        // 리뷰 생성 후 캐릭터 데이터 새로고침하여 별점 상태 반영
+        // 리뷰 ?�성 ??캐릭???�이???�로고침?�여 별점 ?�태 반영
         setCharacter({ ...character, my_rating: reviewData.rating });
 
-        setReviewSuccess(language === 'ko' ? '리뷰가 작성되었습니다.' : language === 'ja' ? 'レビューが作成されました。' : 'Review submitted successfully.');
+        setReviewSuccess(language === 'ko' ? '리뷰가 ?�성?�었?�니??' : language === 'ja' ? '?�ビ?�ー?�作?�さ?�ま?�た?? : 'Review submitted successfully.');
       }
 
       setReviewData({ content: '', is_spoiler: false, rating: 0 });
       setShowReviewForm(false);
       setIsEditingReview(false);
 
-      // 로컬 state만 업데이트 (전체 리프레시 없이)
+      // 로컬 state�??�데?�트 (?�체 리프?�시 ?�이)
       if (isEditingReview) {
-        // 리뷰 수정: myReview와 character 업데이트
+        // 리뷰 ?�정: myReview?� character ?�데?�트
         const [updatedMyReview, updatedCharacter] = await Promise.all([
           characterReviewService.getMyReview(id).catch(() => null),
           characterService.getCharacterDetail(id).catch(() => null)
@@ -370,7 +370,7 @@ export default function CharacterDetail() {
         // Refresh activities list to update review list immediately
         await refetchActivities();
       } else {
-        // 새 리뷰 작성: myReview와 character stats만 업데이트
+        // ??리뷰 ?�성: myReview?� character stats�??�데?�트
         const [myReviewData, charData] = await Promise.all([
           characterReviewService.getMyReview(id).catch(() => null),
           characterService.getCharacterDetail(id)
@@ -385,23 +385,23 @@ export default function CharacterDetail() {
       console.error('Failed to submit review:', err);
       setReviewError(
         language === 'ko'
-          ? err.response?.data?.detail || '리뷰 작성에 실패했습니다.'
+          ? err.response?.data?.detail || '리뷰 ?�성???�패?�습?�다.'
           : language === 'ja'
-            ? err.response?.data?.detail || 'レビュー作成に失敗しました。'
+            ? err.response?.data?.detail || '?�ビ?�ー作成?�失?�し?�し?��?
             : err.response?.data?.detail || 'Failed to submit review.'
       );
     }
   };
 
   const handleEditReview = () => {
-    // 평점만 있는 경우 리뷰 작성 폼을 열어줌
+    // ?�점�??�는 경우 리뷰 ?�성 ?�을 ?�어�?
     if (ActivityUtils.isRatingsOnly(myReview)) {
       setReviewData({
         content: '',
         is_spoiler: false,
         rating: myReview?.user_rating || character?.my_rating || 0
       });
-      setIsEditingReview(false); // 새로 작성하는 것이므로 editing이 아님
+      setIsEditingReview(false); // ?�로 ?�성?�는 것이므�?editing???�님
       setShowReviewForm(true);
     } else {
       setReviewData({
@@ -415,11 +415,11 @@ export default function CharacterDetail() {
   };
 
   const handleDeleteReview = async () => {
-    // 평점만 있는 경우와 리뷰가 있는 경우 다르게 처리
+    // ?�점�??�는 경우?� 리뷰가 ?�는 경우 ?�르�?처리
     const isRatingOnly = ActivityUtils.isRatingsOnly(myReview);
     const confirmMessage = isRatingOnly
-      ? (language === 'ko' ? '평점을 삭제하시겠습니까?' : language === 'ja' ? 'この評価を削除しますか？' : 'Are you sure you want to delete this rating?')
-      : (language === 'ko' ? '리뷰를 삭제하시겠습니까?' : language === 'ja' ? 'このレビューを削除しますか？' : 'Are you sure you want to delete this review?');
+      ? (language === 'ko' ? '?�점????��?�시겠습?�까?' : language === 'ja' ? '?�の評価?�削?�し?�す?�？' : 'Are you sure you want to delete this rating?')
+      : (language === 'ko' ? '리뷰�???��?�시겠습?�까?' : language === 'ja' ? '?�の?�ビ?�ー?�削?�し?�す?�？' : 'Are you sure you want to delete this review?');
 
     if (!window.confirm(confirmMessage)) {
       return;
@@ -427,21 +427,21 @@ export default function CharacterDetail() {
 
     try {
       if (isRatingOnly) {
-        // 평점만 있는 경우 - character rating 삭제
+        // ?�점�??�는 경우 - character rating ??��
         await characterService.deleteCharacterRating(id);
         setCharacter({ ...character, my_rating: null });
       } else {
-        // 리뷰가 있는 경우 - review 삭제
+        // 리뷰가 ?�는 경우 - review ??��
         await characterReviewService.deleteReview(myReview.id);
       }
 
       setMyReview(null);
       const successMessage = isRatingOnly
-        ? (language === 'ko' ? '평점이 삭제되었습니다.' : language === 'ja' ? '評価が削除されました。' : 'Rating deleted successfully.')
-        : (language === 'ko' ? '리뷰가 삭제되었습니다.' : language === 'ja' ? 'レビューが削除されました。' : 'Review deleted successfully.');
+        ? (language === 'ko' ? '?�점????��?�었?�니??' : language === 'ja' ? '評価?�削?�さ?�ま?�た?? : 'Rating deleted successfully.')
+        : (language === 'ko' ? '리뷰가 ??��?�었?�니??' : language === 'ja' ? '?�ビ?�ー?�削?�さ?�ま?�た?? : 'Review deleted successfully.');
       setReviewSuccess(successMessage);
 
-      // character stats만 업데이트 (전체 리프레시 없이)
+      // character stats�??�데?�트 (?�체 리프?�시 ?�이)
       const charData = await characterService.getCharacterDetail(id);
       if (charData) setCharacter(charData);
 
@@ -451,7 +451,7 @@ export default function CharacterDetail() {
       setTimeout(() => setReviewSuccess(''), 3000);
     } catch (err) {
       console.error('Failed to delete:', err);
-      alert(language === 'ko' ? '삭제에 실패했습니다.' : language === 'ja' ? '削除に失敗しました。' : 'Failed to delete.');
+      alert(language === 'ko' ? '??��???�패?�습?�다.' : language === 'ja' ? '?�除?�失?�し?�し?��? : 'Failed to delete.');
     }
   };
 
@@ -463,10 +463,10 @@ export default function CharacterDetail() {
     return reviews.find(r => r.id === reviewId);
   };
 
-  // 댓글 관련 함수
+  // ?��? 관???�수
   const loadComments = async (reviewOrId) => {
     try {
-      // review 객체가 직접 전달되었는지, ID만 전달되었는지 확인
+      // review 객체가 직접 ?�달?�었?��?, ID�??�달?�었?��? ?�인
       const review = typeof reviewOrId === 'object' ? reviewOrId : getReviewById(reviewOrId);
       const reviewId = typeof reviewOrId === 'object' ? reviewOrId.id : reviewOrId;
 
@@ -479,7 +479,7 @@ export default function CharacterDetail() {
       console.log('[CharacterDetail] loadComments - isRatingsOnly:', ActivityUtils.isRatingsOnly(review));
       console.log('[CharacterDetail] loadComments - activityType:', ActivityUtils.getActivityType(review));
 
-      // 통합 유틸리티 사용
+      // ?�합 ?�틸리티 ?�용
       const data = await ActivityUtils.loadComments(review);
 
       console.log('[CharacterDetail] loadComments - data received:', data);
@@ -487,7 +487,7 @@ export default function CharacterDetail() {
 
       setComments(prev => ({ ...prev, [reviewId]: data.items || [] }));
 
-      // 각 댓글의 좋아요 상태 로드
+      // �??��???좋아???�태 로드
       const likes = {};
       (data.items || []).forEach(comment => {
         console.log('[CharacterDetail] loadComments - Processing comment:', {
@@ -517,9 +517,9 @@ export default function CharacterDetail() {
     }
   };
 
-  // 리뷰의 댓글 수를 업데이트하는 헬퍼 함수
+  // 리뷰???��? ?��? ?�데?�트?�는 ?�퍼 ?�수
   const updateReviewCommentsCount = (reviewId, delta) => {
-    // myReview 업데이트
+    // myReview ?�데?�트
     if (myReview && myReview.id === reviewId) {
       setMyReview(prev => ({
         ...prev,
@@ -527,7 +527,7 @@ export default function CharacterDetail() {
       }));
     }
 
-    // reviews 배열 업데이트
+    // reviews 배열 ?�데?�트
     setReviews(prev => prev.map(review =>
       review.id === reviewId
         ? { ...review, comments_count: Math.max(0, (review.comments_count || 0) + delta) }
@@ -551,7 +551,7 @@ export default function CharacterDetail() {
       console.log('[CharacterDetail] handleSubmitComment - isRatingsOnly:', ActivityUtils.isRatingsOnly(review));
       console.log('[CharacterDetail] handleSubmitComment - activityType:', ActivityUtils.getActivityType(review));
 
-      // 통합 유틸리티 사용
+      // ?�합 ?�틸리티 ?�용
       await ActivityUtils.createComment(review, content);
 
       console.log('[CharacterDetail] handleSubmitComment - comment created successfully');
@@ -562,7 +562,7 @@ export default function CharacterDetail() {
     } catch (err) {
       console.error('[CharacterDetail] Failed to submit comment:', err);
       console.error('[CharacterDetail] Error details:', err);
-      alert(language === 'ko' ? '댓글 작성에 실패했습니다.' : language === 'ja' ? 'コメント作成に失敗しました。' : 'Failed to submit comment.');
+      alert(language === 'ko' ? '?��? ?�성???�패?�습?�다.' : language === 'ja' ? '?�メ?�ト作成?�失?�し?�し?��? : 'Failed to submit comment.');
     }
   };
 
@@ -577,7 +577,7 @@ export default function CharacterDetail() {
         return;
       }
 
-      // 통합 유틸리티 사용
+      // ?�합 ?�틸리티 ?�용
       await ActivityUtils.createReply(review, parentCommentId, content);
 
       setReplyText(prev => ({ ...prev, [parentCommentId]: '' }));
@@ -586,12 +586,12 @@ export default function CharacterDetail() {
       updateReviewCommentsCount(reviewId, 1);
     } catch (err) {
       console.error('Failed to submit reply:', err);
-      alert(language === 'ko' ? '답글 작성에 실패했습니다.' : language === 'ja' ? '返信作成に失敗しました。' : 'Failed to submit reply.');
+      alert(language === 'ko' ? '?��? ?�성???�패?�습?�다.' : language === 'ja' ? '返信作成?�失?�し?�し?��? : 'Failed to submit reply.');
     }
   };
 
   const handleDeleteComment = async (reviewId, commentId) => {
-    if (!window.confirm(language === 'ko' ? '댓글을 삭제하시겠습니까?' : language === 'ja' ? 'このコメントを削除しますか？' : 'Are you sure you want to delete this comment?')) {
+    if (!window.confirm(language === 'ko' ? '?��?????��?�시겠습?�까?' : language === 'ja' ? '?�の?�メ?�ト?�削?�し?�す?�？' : 'Are you sure you want to delete this comment?')) {
       return;
     }
 
@@ -604,23 +604,23 @@ export default function CharacterDetail() {
 
       console.log('[CharacterDetail] handleDeleteComment - deleting comment:', commentId, 'from review:', review);
 
-      // 통합 유틸리티 사용
+      // ?�합 ?�틸리티 ?�용
       await ActivityUtils.deleteComment(review, commentId);
 
       console.log('[CharacterDetail] handleDeleteComment - comment deleted successfully');
 
-      await loadComments(review);  // review 객체 전달
+      await loadComments(review);  // review 객체 ?�달
       updateReviewCommentsCount(reviewId, -1);
     } catch (err) {
       console.error('[CharacterDetail] Failed to delete comment:', err);
       console.error('[CharacterDetail] Error details:', err.response?.data || err.message);
-      alert(language === 'ko' ? '댓글 삭제에 실패했습니다.' : language === 'ja' ? 'コメント削除に失敗しました。' : 'Failed to delete comment.');
+      alert(language === 'ko' ? '?��? ??��???�패?�습?�다.' : language === 'ja' ? '?�メ?�ト?�除?�失?�し?�し?��? : 'Failed to delete comment.');
     }
   };
 
   const handleToggleCommentLike = async (commentId) => {
     if (!user) {
-      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
+      alert(language === 'ko' ? '로그?�이 ?�요?�니??' : language === 'ja' ? '??��?�ン?�必要で?��? : 'Please login first.');
       return;
     }
 
@@ -681,7 +681,7 @@ export default function CharacterDetail() {
       newExpanded.delete(reviewId);
     } else {
       newExpanded.add(reviewId);
-      // 댓글이 아직 로드되지 않았으면 로드
+      // ?��????�직 로드?��? ?�았?�면 로드
       if (!comments[reviewId] || comments[reviewId].length === 0) {
         loadComments(reviewId);
       }
@@ -691,7 +691,7 @@ export default function CharacterDetail() {
 
   const handleToggleReviewLike = async (reviewId) => {
     if (!user) {
-      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
+      alert(language === 'ko' ? '로그?�이 ?�요?�니??' : language === 'ja' ? '??��?�ン?�必要で?��? : 'Please login first.');
       return;
     }
 
@@ -702,7 +702,7 @@ export default function CharacterDetail() {
         return;
       }
 
-      // 현재 좋아요 상태 가져오기 (없으면 기본값)
+      // ?�재 좋아???�태 가?�오�?(?�으�?기본�?
       const currentLike = reviewLikes[reviewId] || { liked: false, count: 0 };
       const newLiked = !currentLike.liked;
 
@@ -723,7 +723,7 @@ export default function CharacterDetail() {
   };
 
   const handleToggleSaveReview = (review) => {
-    // Feed와 동일한 형식으로 activity key 생성 (character_rating 사용!)
+    // Feed?� ?�일???�식?�로 activity key ?�성 (character_rating ?�용!)
     const activityKey = `character_rating_${review.user_id}_${id}`;
     console.log('[CharacterDetail] Toggling save for key:', activityKey);
     console.log('[CharacterDetail] Review user_id:', review.user_id, 'Character ID:', id);
@@ -737,7 +737,7 @@ export default function CharacterDetail() {
         newSet.add(activityKey);
         console.log('[CharacterDetail] Added to saved');
       }
-      // 로컬 스토리지에 저장 (피드와 동기화)
+      // 로컬 ?�토리�????�??(?�드?� ?�기??
       const savedArray = [...newSet];
       localStorage.setItem('savedActivities', JSON.stringify(savedArray));
       console.log('[CharacterDetail] Saved to localStorage:', savedArray);
@@ -753,19 +753,19 @@ export default function CharacterDetail() {
   };
 
   const getTimeAgo = (dateString) => {
-    // SQLite timestamp를 UTC로 파싱
+    // SQLite timestamp�?UTC�??�싱
     const date = new Date(dateString.endsWith('Z') ? dateString : dateString + 'Z');
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
 
-    if (diffInSeconds < 3600) return language === 'ko' ? `${Math.max(1, Math.floor(diffInSeconds / 60))}분 전` : language === 'ja' ? `${Math.max(1, Math.floor(diffInSeconds / 60))}分前` : `${Math.max(1, Math.floor(diffInSeconds / 60))}m ago`;
-    if (diffInSeconds < 86400) return language === 'ko' ? `${Math.floor(diffInSeconds / 3600)}시간 전` : language === 'ja' ? `${Math.floor(diffInSeconds / 3600)}時間前` : `${Math.floor(diffInSeconds / 3600)}h ago`;
-    if (diffInSeconds < 2592000) return language === 'ko' ? `${Math.floor(diffInSeconds / 86400)}일 전` : language === 'ja' ? `${Math.floor(diffInSeconds / 86400)}日前` : `${Math.floor(diffInSeconds / 86400)}d ago`;
+    if (diffInSeconds < 3600) return language === 'ko' ? `${Math.max(1, Math.floor(diffInSeconds / 60))}�??? : language === 'ja' ? `${Math.max(1, Math.floor(diffInSeconds / 60))}?�前` : `${Math.max(1, Math.floor(diffInSeconds / 60))}m ago`;
+    if (diffInSeconds < 86400) return language === 'ko' ? `${Math.floor(diffInSeconds / 3600)}?�간 ?? : language === 'ja' ? `${Math.floor(diffInSeconds / 3600)}?�間?? : `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 2592000) return language === 'ko' ? `${Math.floor(diffInSeconds / 86400)}???? : language === 'ja' ? `${Math.floor(diffInSeconds / 86400)}?�前` : `${Math.floor(diffInSeconds / 86400)}d ago`;
     return date.toLocaleDateString(language === 'ko' ? 'ko-KR' : language === 'ja' ? 'ja-JP' : 'en-US');
   };
 
   // Use imageHelpers function for consistency with list pages
-  // This ensures proper fallback chain: R2 .jpg → R2 .png → external URL
+  // This ensures proper fallback chain: R2 .jpg ??R2 .png ??external URL
 
   const getCoverUrl = (coverUrl) => {
     if (!coverUrl) return '/placeholder-anime.svg';
@@ -796,9 +796,9 @@ export default function CharacterDetail() {
     if (!date_of_birth_month || !date_of_birth_day) return null;
 
     const parts = [];
-    if (date_of_birth_month) parts.push(`${date_of_birth_month}${language === 'ko' ? '월' : language === 'ja' ? '月' : '/'}`);
-    if (date_of_birth_day) parts.push(`${date_of_birth_day}${language === 'ko' ? '일' : language === 'ja' ? '日' : ''}`);
-    if (date_of_birth_year) parts.unshift(`${date_of_birth_year}${language === 'ko' ? '년 ' : language === 'ja' ? '年' : '-'}`);
+    if (date_of_birth_month) parts.push(`${date_of_birth_month}${language === 'ko' ? '?? : language === 'ja' ? '?? : '/'}`);
+    if (date_of_birth_day) parts.push(`${date_of_birth_day}${language === 'ko' ? '?? : language === 'ja' ? '?? : ''}`);
+    if (date_of_birth_year) parts.unshift(`${date_of_birth_year}${language === 'ko' ? '??' : language === 'ja' ? '�? : '-'}`);
 
     return parts.join(language === 'ko' ? ' ' : language === 'ja' ? '' : '');
   };
@@ -850,12 +850,12 @@ export default function CharacterDetail() {
       <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
         <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
-            <div className="text-xl text-red-600 mb-4">{error || (language === 'ko' ? '캐릭터를 찾을 수 없습니다.' : language === 'ja' ? 'キャラクターが見つかりません。' : 'Character not found.')}</div>
+            <div className="text-xl text-red-600 mb-4">{error || (language === 'ko' ? '캐릭?��? 찾을 ???�습?�다.' : language === 'ja' ? '??��?�ク?�ー?�見?�か?�ま?�ん?? : 'Character not found.')}</div>
             <button
               onClick={() => navigate(-1)}
               className="text-[#A8E6CF] hover:text-blue-700 font-medium"
             >
-              ← {language === 'ko' ? '뒤로 가기' : language === 'ja' ? '戻る' : 'Go Back'}
+              ??{language === 'ko' ? '?�로 가�? : language === 'ja' ? '?�る' : 'Go Back'}
             </button>
           </div>
         </div>
@@ -893,7 +893,7 @@ export default function CharacterDetail() {
                 alt={character.name_full}
                 className="w-full"
                 onError={(e) => {
-                  // Fallback chain: R2 .jpg → R2 .png → external URL → placeholder
+                  // Fallback chain: R2 .jpg ??R2 .png ??external URL ??placeholder
                   if (!e.target.dataset.fallbackAttempt) {
                     e.target.dataset.fallbackAttempt = '1';
                     // Try .png if .jpg failed
@@ -944,10 +944,10 @@ export default function CharacterDetail() {
 
               {/* Community Rating */}
               <div className="mb-6 flex gap-8 items-center justify-center">
-                {/* 왼쪽: 종합 평점 */}
+                {/* ?�쪽: 종합 ?�점 */}
                 <div className="flex flex-col items-center">
                   <div className="text-sm font-medium text-gray-600 mb-3">
-                    {language === 'ko' ? '종합 평점' : language === 'ja' ? '総合評価' : 'Overall Rating'}
+                    {language === 'ko' ? '종합 ?�점' : language === 'ja' ? '総合評価' : 'Overall Rating'}
                   </div>
                   <div className="flex items-center gap-3">
                     <StarIcon className={`w-14 h-14 ${character.site_rating_count > 0 ? '' : 'text-gray-300'}`} filled={character.site_rating_count > 0} />
@@ -957,15 +957,15 @@ export default function CharacterDetail() {
                       </div>
                       <div className="text-base text-gray-600 mt-1">
                         {character.site_rating_count > 0
-                          ? (language === 'ko' ? `${character.site_rating_count}명 평가` : language === 'ja' ? `${character.site_rating_count}件の評価` : `${character.site_rating_count} ratings`)
-                          : (language === 'ko' ? '아직 평가 없음' : language === 'ja' ? 'まだ評価がありません' : 'No ratings yet')
+                          ? (language === 'ko' ? `${character.site_rating_count}�??��?` : language === 'ja' ? `${character.site_rating_count}件の評価` : `${character.site_rating_count} ratings`)
+                          : (language === 'ko' ? '?�직 ?��? ?�음' : language === 'ja' ? '?�だ評価?�あ?�ま?�ん' : 'No ratings yet')
                         }
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* 오른쪽: 별점 히스토그램 (컴팩트) */}
+                {/* ?�른�? 별점 ?�스?�그??(컴팩?? */}
                 <div className="flex-1 max-w-md space-y-0.5">
                   {[5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5].map((star) => {
                     const dist = character.site_rating_distribution?.find(d => d.rating === star);
@@ -997,25 +997,25 @@ export default function CharacterDetail() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 {character.gender && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '성별:' : language === 'ja' ? '性別:' : 'Gender:'}</span> {character.gender === 'Male' ? (language === 'ko' ? '남성' : language === 'ja' ? '男性' : 'Male') : character.gender === 'Female' ? (language === 'ko' ? '여성' : language === 'ja' ? '女性' : 'Female') : character.gender}
+                    <span className="font-medium">{language === 'ko' ? '?�별:' : language === 'ja' ? '?�別:' : 'Gender:'}</span> {character.gender === 'Male' ? (language === 'ko' ? '?�성' : language === 'ja' ? '?��? : 'Male') : character.gender === 'Female' ? (language === 'ko' ? '?�성' : language === 'ja' ? '女�? : 'Female') : character.gender}
                   </div>
                 )}
 
                 {getBirthday() && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '생일:' : language === 'ja' ? '誕生日:' : 'Birthday:'}</span> {getBirthday()}
+                    <span className="font-medium">{language === 'ko' ? '?�일:' : language === 'ja' ? '誕生??' : 'Birthday:'}</span> {getBirthday()}
                   </div>
                 )}
 
                 {character.age && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '나이:' : language === 'ja' ? '年齢:' : 'Age:'}</span> {character.age}
+                    <span className="font-medium">{language === 'ko' ? '?�이:' : language === 'ja' ? '年齢:' : 'Age:'}</span> {character.age}
                   </div>
                 )}
 
                 {character.blood_type && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '혈액형:' : language === 'ja' ? '血液型:' : 'Blood Type:'}</span> {character.blood_type}
+                    <span className="font-medium">{language === 'ko' ? '?�액??' : language === 'ja' ? '血液型:' : 'Blood Type:'}</span> {character.blood_type}
                   </div>
                 )}
               </div>
@@ -1024,7 +1024,7 @@ export default function CharacterDetail() {
               {character.description && (
                 <div className="mt-6">
                   <h3 className="text-xl font-bold mb-4">
-                    {language === 'ko' ? '설명' : language === 'ja' ? '説明' : 'Description'}
+                    {language === 'ko' ? '?�명' : language === 'ja' ? '説明' : 'Description'}
                   </h3>
                   <p className="text-gray-700 whitespace-pre-wrap">{character.description}</p>
                 </div>
@@ -1035,10 +1035,10 @@ export default function CharacterDetail() {
             <div className="lg:hidden bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
               {/* Community Rating */}
               <div className="mb-6 flex gap-8 items-center justify-center">
-                {/* 왼쪽: 종합 평점 */}
+                {/* ?�쪽: 종합 ?�점 */}
                 <div className="flex flex-col items-center">
                   <div className="text-sm font-medium text-gray-600 mb-3">
-                    {language === 'ko' ? '종합 평점' : language === 'ja' ? '総合評価' : 'Overall Rating'}
+                    {language === 'ko' ? '종합 ?�점' : language === 'ja' ? '総合評価' : 'Overall Rating'}
                   </div>
                   <div className="flex items-center gap-3">
                     <StarIcon className={`w-14 h-14 ${character.site_rating_count > 0 ? '' : 'text-gray-300'}`} filled={character.site_rating_count > 0} />
@@ -1048,15 +1048,15 @@ export default function CharacterDetail() {
                       </div>
                       <div className="text-base text-gray-600 mt-1">
                         {character.site_rating_count > 0
-                          ? (language === 'ko' ? `${character.site_rating_count}명 평가` : language === 'ja' ? `${character.site_rating_count}件の評価` : `${character.site_rating_count} ratings`)
-                          : (language === 'ko' ? '아직 평가 없음' : language === 'ja' ? 'まだ評価がありません' : 'No ratings yet')
+                          ? (language === 'ko' ? `${character.site_rating_count}�??��?` : language === 'ja' ? `${character.site_rating_count}件の評価` : `${character.site_rating_count} ratings`)
+                          : (language === 'ko' ? '?�직 ?��? ?�음' : language === 'ja' ? '?�だ評価?�あ?�ま?�ん' : 'No ratings yet')
                         }
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* 오른쪽: 별점 히스토그램 (컴팩트) */}
+                {/* ?�른�? 별점 ?�스?�그??(컴팩?? */}
                 <div className="flex-1 max-w-md space-y-0.5">
                   {[5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5].map((star) => {
                     const dist = character.site_rating_distribution?.find(d => d.rating === star);
@@ -1088,27 +1088,27 @@ export default function CharacterDetail() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 {character.gender && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '성별:' : language === 'ja' ? '性別:' : 'Gender:'}</span> {character.gender === 'Male' ? (language === 'ko' ? '남성' : language === 'ja' ? '男性' : 'Male') : character.gender === 'Female' ? (language === 'ko' ? '여성' : language === 'ja' ? '女性' : 'Female') : character.gender}
+                    <span className="font-medium">{language === 'ko' ? '?�별:' : language === 'ja' ? '?�別:' : 'Gender:'}</span> {character.gender === 'Male' ? (language === 'ko' ? '?�성' : language === 'ja' ? '?��? : 'Male') : character.gender === 'Female' ? (language === 'ko' ? '?�성' : language === 'ja' ? '女�? : 'Female') : character.gender}
                   </div>
                 )}
                 {character.age && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '나이:' : language === 'ja' ? '年齢:' : 'Age:'}</span> {character.age}
+                    <span className="font-medium">{language === 'ko' ? '?�이:' : language === 'ja' ? '年齢:' : 'Age:'}</span> {character.age}
                   </div>
                 )}
                 {character.date_of_birth && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '생일:' : 'Birthday:'}</span> {character.date_of_birth}
+                    <span className="font-medium">{language === 'ko' ? '?�일:' : 'Birthday:'}</span> {character.date_of_birth}
                   </div>
                 )}
                 {character.blood_type && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '혈액형:' : language === 'ja' ? '血液型:' : 'Blood Type:'}</span> {character.blood_type}
+                    <span className="font-medium">{language === 'ko' ? '?�액??' : language === 'ja' ? '血液型:' : 'Blood Type:'}</span> {character.blood_type}
                   </div>
                 )}
                 {character.favourites && character.favourites > 0 && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '좋아요:' : 'Favorites:'}</span> {character.favourites.toLocaleString()}
+                    <span className="font-medium">{language === 'ko' ? '좋아??' : 'Favorites:'}</span> {character.favourites.toLocaleString()}
                   </div>
                 )}
               </div>
@@ -1117,7 +1117,7 @@ export default function CharacterDetail() {
               {character.description && (
                 <div className="mt-6">
                   <h3 className="text-xl font-bold mb-4">
-                    {language === 'ko' ? '설명' : language === 'ja' ? '説明' : 'Description'}
+                    {language === 'ko' ? '?�명' : language === 'ja' ? '説明' : 'Description'}
                   </h3>
                   <p className="text-gray-700 whitespace-pre-wrap">{character.description}</p>
                 </div>
@@ -1127,7 +1127,7 @@ export default function CharacterDetail() {
             {/* Anime Appearances */}
             <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
               <h3 className="text-xl font-bold mb-4">
-                {language === 'ko' ? '출연 작품' : language === 'ja' ? '出演作品' : 'Appearances'}
+                {language === 'ko' ? '출연 ?�품' : language === 'ja' ? '?�演作品' : 'Appearances'}
               </h3>
 
               {character.anime && character.anime.length > 0 ? (
@@ -1153,7 +1153,7 @@ export default function CharacterDetail() {
                               ? 'bg-red-500 text-white'
                               : 'bg-blue-500 text-white'
                             }`}>
-                            {anime.role === 'MAIN' ? (language === 'ko' ? '메인' : language === 'ja' ? 'メイン' : 'Main') : (language === 'ko' ? '서브' : language === 'ja' ? 'サポート' : 'Supporting')}
+                            {anime.role === 'MAIN' ? (language === 'ko' ? '메인' : language === 'ja' ? '?�イ?? : 'Main') : (language === 'ko' ? '?�브' : language === 'ja' ? '?�ポ?�ト' : 'Supporting')}
                           </div>
                           {/* My Rating Badge */}
                           {anime.my_anime_rating && (
@@ -1164,7 +1164,7 @@ export default function CharacterDetail() {
                           )}
                         </div>
                         <div className="p-2">
-                          <h4 className="font-medium text-sm line-clamp-2 group-hover:text-[#3797F0] transition-colors">
+                          <h4 className="font-medium text-sm line-clamp-2 group-hover:text-[#00E5FF] transition-colors">
                             {getAnimeTitle(anime)}
                           </h4>
                         </div>
@@ -1174,7 +1174,7 @@ export default function CharacterDetail() {
                 </div>
               ) : (
                 <p className="text-gray-600">
-                  {language === 'ko' ? '출연 작품이 없습니다.' : language === 'ja' ? '出演作品が見つかりません。' : 'No anime appearances found.'}
+                  {language === 'ko' ? '출연 ?�품???�습?�다.' : language === 'ja' ? '?�演作品?�見?�か?�ま?�ん?? : 'No anime appearances found.'}
                 </p>
               )}
             </div>
@@ -1183,7 +1183,7 @@ export default function CharacterDetail() {
             <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold">
-                  {language === 'ko' ? '리뷰' : language === 'ja' ? 'レビュー' : 'Reviews'} ({activities.length})
+                  {language === 'ko' ? '리뷰' : language === 'ja' ? '?�ビ?�ー' : 'Reviews'} ({activities.length})
                 </h3>
                 {!myReview && (
                   <button
@@ -1201,8 +1201,8 @@ export default function CharacterDetail() {
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                   >
                     {showReviewForm
-                      ? (language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel')
-                      : (language === 'ko' ? '리뷰 작성' : language === 'ja' ? 'レビュー作成' : 'Write Review')
+                      ? (language === 'ko' ? '취소' : language === 'ja' ? '??��?�セ?? : 'Cancel')
+                      : (language === 'ko' ? '리뷰 ?�성' : language === 'ja' ? '?�ビ?�ー作成' : 'Write Review')
                     }
                   </button>
                 )}
@@ -1236,17 +1236,17 @@ export default function CharacterDetail() {
 
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {language === 'ko' ? '리뷰 내용' : language === 'ja' ? 'レビュー内容' : 'Review Content'} *
+                      {language === 'ko' ? '리뷰 ?�용' : language === 'ja' ? '?�ビ?�ー?��?' : 'Review Content'} *
                     </label>
                     <textarea
                       value={reviewData.content}
                       onChange={(e) => setReviewData({ ...reviewData, content: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md h-32"
-                      placeholder={language === 'ko' ? '이 캐릭터에 대한 당신의 생각을 공유해주세요...' : language === 'ja' ? 'このキャラクターについてのあなたの感想をシェアしてください...' : 'Share your thoughts about this character...'}
+                      placeholder={language === 'ko' ? '??캐릭?�에 ?�???�신???�각??공유?�주?�요...' : language === 'ja' ? '?�の??��?�ク?�ー?�つ?�て??��?�た??��?�を?�ェ?�し?�く?�さ??..' : 'Share your thoughts about this character...'}
                       required
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      {reviewData.content.length} / 5000 {language === 'ko' ? '자' : language === 'ja' ? '文字' : 'characters'}
+                      {reviewData.content.length} / 5000 {language === 'ko' ? '?? : language === 'ja' ? '?�字' : 'characters'}
                     </p>
                   </div>
 
@@ -1259,7 +1259,7 @@ export default function CharacterDetail() {
                         className="mr-2"
                       />
                       <span className="text-sm text-gray-700">
-                        {language === 'ko' ? '스포일러 포함' : language === 'ja' ? 'ネタバレを含む' : 'Contains spoilers'}
+                        {language === 'ko' ? '?�포?�러 ?�함' : language === 'ja' ? '?�タ?�レ?�含?�' : 'Contains spoilers'}
                       </span>
                     </label>
                   </div>
@@ -1269,8 +1269,8 @@ export default function CharacterDetail() {
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                   >
                     {isEditingReview
-                      ? (language === 'ko' ? '리뷰 수정' : language === 'ja' ? 'レビュー編集' : 'Update Review')
-                      : (language === 'ko' ? '리뷰 등록' : language === 'ja' ? 'レビュー作成' : 'Submit Review')
+                      ? (language === 'ko' ? '리뷰 ?�정' : language === 'ja' ? '?�ビ?�ー編集' : 'Update Review')
+                      : (language === 'ko' ? '리뷰 ?�록' : language === 'ja' ? '?�ビ?�ー作成' : 'Submit Review')
                     }
                   </button>
                 </form>
@@ -1329,7 +1329,7 @@ export default function CharacterDetail() {
                   })}
                 </div>
               ) : (
-                <p className="text-gray-600">{language === 'ko' ? '아직 리뷰가 없습니다.' : language === 'ja' ? 'まだレビューがありません。' : 'No reviews yet.'}</p>
+                <p className="text-gray-600">{language === 'ko' ? '?�직 리뷰가 ?�습?�다.' : language === 'ja' ? '?�だ?�ビ?�ー?�あ?�ま?�ん?? : 'No reviews yet.'}</p>
               )}
             </div>
           </div>

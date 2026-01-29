@@ -112,7 +112,7 @@ export default function Login() {
                 onClick={() => navigate('/resend-verification', { state: { email: userEmail } })}
                 className="text-sm underline hover:no-underline"
               >
-                Resend verification email →
+                Resend verification email ??
               </button>
             )}
           </div>
@@ -128,7 +128,7 @@ export default function Login() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Enter your username or email"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-sm"
               required
             />
             <p className="text-xs text-gray-500 mt-1.5">
@@ -145,7 +145,7 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-sm"
               required
             />
           </div>
@@ -154,12 +154,12 @@ export default function Login() {
             type="submit"
             disabled={loading}
             className="w-full text-white font-semibold py-3 px-4 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
-            style={{ backgroundColor: '#3797F0' }}
+            style={{ backgroundColor: '#00E5FF' }}
             onMouseEnter={(e) => {
               if (!loading) e.target.style.backgroundColor = '#2378D5';
             }}
             onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#3797F0';
+              e.target.style.backgroundColor = '#00E5FF';
             }}
           >
             {loading ? 'Logging in...' : 'Login'}
@@ -168,7 +168,7 @@ export default function Login() {
 
         <p className="text-center mt-6 text-gray-600 text-sm">
           Don't have an account?{' '}
-          <Link to="/register" className="font-semibold hover:underline" style={{ color: '#3797F0' }}>
+          <Link to="/register" className="font-semibold hover:underline" style={{ color: '#00E5FF' }}>
             Sign up
           </Link>
         </p>
