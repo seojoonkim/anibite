@@ -1198,7 +1198,10 @@ export default function CharacterDetail() {
                       }
                       setShowReviewForm(!showReviewForm);
                     }}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    className="px-4 py-2 text-white rounded-lg transition-colors"
+                    style={{ backgroundColor: '#5BB5F5' }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#3A9FE8'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#5BB5F5'}
                   >
                     {showReviewForm
                       ? (language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel')
@@ -1266,7 +1269,10 @@ export default function CharacterDetail() {
 
                   <button
                     type="submit"
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    className="px-6 py-2 text-white rounded-lg transition-colors"
+                    style={{ backgroundColor: '#5BB5F5' }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#3A9FE8'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#5BB5F5'}
                   >
                     {isEditingReview
                       ? (language === 'ko' ? '리뷰 수정' : language === 'ja' ? 'レビュー編集' : 'Update Review')

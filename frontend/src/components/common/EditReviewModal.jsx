@@ -286,7 +286,10 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
             </button>
             <button
               type="submit"
-              className="px-5 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm disabled:bg-gray-400"
+              className="px-5 py-1.5 text-white rounded-lg transition-colors text-sm disabled:bg-gray-400"
+              style={{ backgroundColor: '#5BB5F5' }}
+              onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#3A9FE8')}
+              onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#5BB5F5')}
               disabled={saving}
             >
               {saving
