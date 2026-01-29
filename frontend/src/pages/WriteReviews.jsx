@@ -701,7 +701,7 @@ export default function WriteReviews() {
                           <div className="transition-all duration-300 ease-in-out">
                             <div className="flex items-center gap-3 text-sm text-gray-500 mb-3">
                               <div className="flex items-center">
-                                <StarRating rating={item.rating || 0} readonly size="sm" showNumber={false} />
+                                <StarRating rating={item.rating || 0} readonly size="feed" showNumber={false} />
                               </div>
                               {item.type === 'anime' && item.year && <span>• {item.year}</span>}
                             </div>
