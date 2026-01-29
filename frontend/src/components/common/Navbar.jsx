@@ -291,7 +291,7 @@ export default function Navbar() {
                       ? 'text-[#1a1a2e] font-semibold'
                       : 'text-text-primary hover:text-text-secondary hover:bg-surface-hover font-normal'
                       }`}
-                    style={isActive(item.path) ? { backgroundColor: '#FFD700' } : {}}
+                    style={isActive(item.path) ? { backgroundColor: '#F5C842' } : {}}
                   >
                     {item.labelKo ? (language === 'ko' ? item.labelKo : language === 'ja' ? item.labelJa : item.labelEn) : item.label}
                   </Link>
@@ -510,7 +510,7 @@ export default function Navbar() {
                 ? 'text-[#1a1a2e]'
                 : 'text-text-secondary hover:text-text-primary'
                 }`}
-              style={isActive(item.path) ? { backgroundColor: '#FFD700' } : {}}
+              style={isActive(item.path) ? { backgroundColor: '#F5C842' } : {}}
             >
               <div className="scale-90">{item.icon}</div>
               <span className="text-[9px] font-medium">

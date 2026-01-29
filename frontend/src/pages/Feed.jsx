@@ -488,7 +488,7 @@ export default function Feed() {
               <button
                 onClick={() => setSearchParams({ filter: 'all' })}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'all'
-                  ? 'bg-[#7FBFEF] text-[#1a1a2e] font-semibold'
+                  ? 'bg-[#5BB5F5] text-[#1a1a2e] font-semibold'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
                   }`}
               >
@@ -504,7 +504,7 @@ export default function Feed() {
               <button
                 onClick={() => setSearchParams({ filter: 'following' })}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'following'
-                  ? 'bg-[#7FBFEF] text-[#1a1a2e] font-semibold'
+                  ? 'bg-[#5BB5F5] text-[#1a1a2e] font-semibold'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
                   }`}
               >
@@ -520,7 +520,7 @@ export default function Feed() {
               <button
                 onClick={() => setSearchParams({ filter: 'notifications' })}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'notifications'
-                  ? 'bg-[#7FBFEF] text-[#1a1a2e] font-semibold'
+                  ? 'bg-[#5BB5F5] text-[#1a1a2e] font-semibold'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
                   }`}
               >
@@ -534,7 +534,7 @@ export default function Feed() {
               <button
                 onClick={() => setSearchParams({ filter: 'saved' })}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'saved'
-                  ? 'bg-[#7FBFEF] text-[#1a1a2e] font-semibold'
+                  ? 'bg-[#5BB5F5] text-[#1a1a2e] font-semibold'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
                   }`}
               >
@@ -579,7 +579,7 @@ export default function Feed() {
                         onClick={handleCreatePost}
                         disabled={!newPostContent.trim()}
                         className="px-4 py-1.5 text-[14px] text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-                        style={newPostContent.trim() ? { background: 'linear-gradient(135deg, #3A7AB9 0%, #7FBFEF 100%)', fontWeight: '600' } : {}}
+                        style={newPostContent.trim() ? { background: 'linear-gradient(135deg, #3A7AB9 0%, #5BB5F5 100%)', fontWeight: '600' } : {}}
                       >
                         {language === 'ko' ? '게시' : language === 'ja' ? '投稿' : 'Post'}
                       </button>

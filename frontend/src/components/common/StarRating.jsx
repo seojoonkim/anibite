@@ -87,9 +87,9 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
         <svg className="w-full h-full" fill="url(#star-gradient-rating)" viewBox="0 0 20 20">
           <defs>
             <linearGradient id="star-gradient-rating" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style={{ stopColor: '#FFD700', stopOpacity: 1 }} />
-              <stop offset="50%" style={{ stopColor: '#FFA500', stopOpacity: 1 }} />
-              <stop offset="100%" style={{ stopColor: '#FF8C00', stopOpacity: 1 }} />
+              <stop offset="0%" style={{ stopColor: '#F5C842', stopOpacity: 1 }} />
+              <stop offset="50%" style={{ stopColor: '#E8B835', stopOpacity: 1 }} />
+              <stop offset="100%" style={{ stopColor: '#D9A828', stopOpacity: 1 }} />
             </linearGradient>
           </defs>
           <path d={starPath} />
@@ -105,9 +105,9 @@ export default function StarRating({ rating, onRatingChange, readonly = false, s
             <svg className="w-full h-full" fill="url(#star-gradient-rating-half)" viewBox="0 0 20 20" style={{ width: '200%' }}>
               <defs>
                 <linearGradient id="star-gradient-rating-half" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style={{ stopColor: '#FFD700', stopOpacity: 1 }} />
-                  <stop offset="50%" style={{ stopColor: '#FFA500', stopOpacity: 1 }} />
-                  <stop offset="100%" style={{ stopColor: '#FF8C00', stopOpacity: 1 }} />
+                  <stop offset="0%" style={{ stopColor: '#F5C842', stopOpacity: 1 }} />
+                  <stop offset="50%" style={{ stopColor: '#E8B835', stopOpacity: 1 }} />
+                  <stop offset="100%" style={{ stopColor: '#D9A828', stopOpacity: 1 }} />
                 </linearGradient>
               </defs>
               <path d={starPath} />

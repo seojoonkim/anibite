@@ -123,7 +123,7 @@ export default function RatingStatsCard({ stats }) {
             </div>
             <div className="text-lg font-bold text-text-primary">
               <span style={{
-                background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)',
+                background: 'linear-gradient(135deg, #F5C842 0%, #E8B835 50%, #D9A828 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text'
@@ -136,7 +136,7 @@ export default function RatingStatsCard({ stats }) {
             </div>
             <div className="text-lg font-bold text-accent">
               <span style={{
-                background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)',
+                background: 'linear-gradient(135deg, #F5C842 0%, #E8B835 50%, #D9A828 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text'
@@ -149,7 +149,7 @@ export default function RatingStatsCard({ stats }) {
             </div>
             <div className="text-lg font-bold text-primary">
               <span style={{
-                background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)',
+                background: 'linear-gradient(135deg, #F5C842 0%, #E8B835 50%, #D9A828 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text'

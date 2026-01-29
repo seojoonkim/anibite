@@ -470,7 +470,7 @@ export default function WriteReviews() {
             <button
               onClick={() => setFilter('all')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filter === 'all'
-                ? 'bg-[#7FBFEF] text-white font-semibold'
+                ? 'bg-[#5BB5F5] text-white font-semibold'
                 : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
@@ -479,7 +479,7 @@ export default function WriteReviews() {
             <button
               onClick={() => setFilter('anime')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filter === 'anime'
-                ? 'bg-[#7FBFEF] text-white font-semibold'
+                ? 'bg-[#5BB5F5] text-white font-semibold'
                 : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
@@ -488,7 +488,7 @@ export default function WriteReviews() {
             <button
               onClick={() => setFilter('character')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filter === 'character'
-                ? 'bg-[#7FBFEF] text-white font-semibold'
+                ? 'bg-[#5BB5F5] text-white font-semibold'
                 : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
@@ -551,7 +551,7 @@ export default function WriteReviews() {
                   className="rounded-xl transition-all duration-500 ease-out self-start"
                   style={{
                     background: isJustCompleted
-                      ? 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)'
+                      ? 'linear-gradient(135deg, #F5C842 0%, #E8B835 50%, #D9A828 100%)'
                       : 'transparent',
                     padding: isJustCompleted ? '2px' : '0',
                     boxShadow: isJustCompleted
@@ -566,7 +566,7 @@ export default function WriteReviews() {
                       {isJustCompleted && (
                         <div className="absolute top-2 right-2 z-10">
                           <span className="px-3 py-1 text-white text-xs font-bold rounded-full shadow-lg" style={{
-                            background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)'
+                            background: 'linear-gradient(135deg, #F5C842 0%, #E8B835 50%, #D9A828 100%)'
                           }}>
                             {language === 'ko' ? '작성완료' : language === 'ja' ? '作成完了' : 'Completed'}
                           </span>
@@ -597,7 +597,7 @@ export default function WriteReviews() {
                           <h3 className="font-semibold text-lg">
                             <Link
                               to={item.type === 'anime' ? `/anime/${item.itemId}` : `/character/${item.itemId}`}
-                              className="text-gray-900 hover:text-[#7FBFEF] transition-colors hover:underline cursor-pointer"
+                              className="text-gray-900 hover:text-[#5BB5F5] transition-colors hover:underline cursor-pointer"
                             >
                               {item.type === 'anime' ? (
                                 language === 'ko' ? (
@@ -651,7 +651,7 @@ export default function WriteReviews() {
                             {item.anime_id ? (
                               <Link
                                 to={`/anime/${item.anime_id}`}
-                                className="hover:text-[#7FBFEF] hover:underline transition-colors"
+                                className="hover:text-[#5BB5F5] hover:underline transition-colors"
                               >
                                 {language === 'ko' ? (
                                   <>
@@ -708,7 +708,7 @@ export default function WriteReviews() {
                                 </p>
                                 <button
                                   onClick={() => handleStartEdit(item, hasReview.content, item.rating)}
-                                  className="text-sm text-[#7FBFEF] hover:text-[#2DD4E4]"
+                                  className="text-sm text-[#5BB5F5] hover:text-[#2DD4E4]"
                                 >
                                   {language === 'ko' ? '수정' : language === 'ja' ? '編集' : 'Edit'}
                                 </button>
@@ -757,9 +757,9 @@ export default function WriteReviews() {
                                 onClick={() => handleSaveReview(item)}
                                 disabled={!editContent.trim() || !editRating}
                                 className="text-sm px-4 py-2 rounded disabled:opacity-50 transition-colors"
-                                style={{ backgroundColor: '#7FBFEF', color: 'white', fontWeight: '600' }}
+                                style={{ backgroundColor: '#5BB5F5', color: 'white', fontWeight: '600' }}
                                 onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#1877F2')}
-                                onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#7FBFEF')}
+                                onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#5BB5F5')}
                               >
                                 {language === 'ko' ? '저장' : language === 'ja' ? '保存' : 'Save'}
                               </button>

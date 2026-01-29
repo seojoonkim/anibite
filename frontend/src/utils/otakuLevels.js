@@ -125,8 +125,8 @@ export const levels = [
     threshold: 1800,
     max: Infinity,
     icon: '◆', // 다이아몬드 (최고 레벨)
-    gradient: 'linear-gradient(135deg, #FCAF45 0%, #FFD700 100%)',
-    color: '#FFD700',
+    gradient: 'linear-gradient(135deg, #FCAF45 0%, #F5C842 100%)',
+    color: '#F5C842',
     textColor: 'text-white',
     bgColor: 'rgba(255, 215, 0, 0.15)',
     borderColorHex: 'rgba(255, 215, 0, 0.3)'
