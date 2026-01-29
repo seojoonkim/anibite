@@ -737,7 +737,7 @@ export default function WriteReviews() {
                                 rating={editRating}
                                 onRatingChange={setEditRating}
                                 readonly={false}
-                                size="feed"
+                                size="lg"
                                 showNumber={true}
                               />
                             </div>
@@ -756,22 +756,22 @@ export default function WriteReviews() {
                                 autoFocus
                               />
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-1.5 justify-end mt-1">
+                              <button
+                                onClick={handleCancel}
+                                className="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded transition-colors"
+                              >
+                                {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
+                              </button>
                               <button
                                 onClick={() => handleSaveReview(item)}
                                 disabled={!editContent.trim() || !editRating}
-                                className="text-sm px-4 py-2 rounded disabled:opacity-50 transition-colors"
+                                className="text-xs px-3 py-1.5 rounded disabled:opacity-50 transition-colors"
                                 style={{ backgroundColor: '#5BB5F5', color: 'white' }}
                                 onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#3A9FE8')}
                                 onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#5BB5F5')}
                               >
                                 {language === 'ko' ? '저장' : language === 'ja' ? '保存' : 'Save'}
-                              </button>
-                              <button
-                                onClick={handleCancel}
-                                className="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded transition-colors"
-                              >
-                                {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
                               </button>
                             </div>
                           </div>
