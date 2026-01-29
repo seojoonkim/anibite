@@ -1708,28 +1708,28 @@ export default function MyAniPass() {
                     </h3>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-text-secondary">{language === 'ko' ? '오타쿠 점수' : language === 'ja' ? 'オタクスコア' : 'Otaku Score'}</span>
-                      <span className="text-sm font-bold text-text-primary">{Math.round(stats.otaku_score)}</span>
+                      <span className="text-sm text-text-primary">{Math.round(stats.otaku_score)}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-text-secondary">{language === 'ko' ? '평가한 애니' : language === 'ja' ? '評価済みアニメ' : 'Rated Anime'}</span>
-                      <span className="text-sm font-bold text-text-primary">{stats.total_rated}</span>
+                      <span className="text-sm text-text-primary">{stats.total_rated}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-text-secondary">{language === 'ko' ? '평가한 캐릭터' : language === 'ja' ? '評価済みキャラ' : 'Rated Characters'}</span>
-                      <span className="text-sm font-bold text-text-primary">{stats.total_character_ratings || 0}</span>
+                      <span className="text-sm text-text-primary">{stats.total_character_ratings || 0}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-text-secondary">{language === 'ko' ? '작성한 리뷰' : language === 'ja' ? '作成レビュー' : 'Reviews Written'}</span>
-                      <span className="text-sm font-bold text-text-primary">{stats.total_reviews}</span>
+                      <span className="text-sm text-text-primary">{stats.total_reviews}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-text-secondary">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</span>
-                      <span className="text-sm font-bold text-text-primary">{stats.average_rating?.toFixed(1) || 'N/A'}</span>
+                      <span className="text-sm text-text-primary">{stats.average_rating?.toFixed(1) || 'N/A'}</span>
                     </div>
                     {displayUser?.created_at && (
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-text-secondary">{language === 'ko' ? '가입일' : language === 'ja' ? '登録日' : 'Joined'}</span>
-                        <span className="text-sm font-bold text-text-primary">
+                        <span className="text-sm text-text-primary">
                           {new Date(displayUser.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : language === 'ja' ? 'ja-JP' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                         </span>
                       </div>
@@ -1737,10 +1737,10 @@ export default function MyAniPass() {
                   </div>
 
                   {/* Follow Stats */}
-                  <div className="flex gap-4 justify-center pt-4 border-t border-border mt-4">
+                  <div className="flex justify-center pt-4 border-t border-border mt-4">
                     <button
                       onClick={() => openFollowModal('followers')}
-                      className="flex flex-col items-center hover:text-[#737373] transition-colors"
+                      className="flex-1 flex flex-col items-center hover:text-[#737373] transition-colors"
                     >
                       <span className="text-lg font-bold text-text-primary">{followCounts.followers_count}</span>
                       <span className="text-xs text-text-secondary">{language === 'ko' ? '팔로워' : language === 'ja' ? 'フォロワー' : 'Followers'}</span>
@@ -1748,7 +1748,7 @@ export default function MyAniPass() {
                     <div className="w-px bg-gray-200"></div>
                     <button
                       onClick={() => openFollowModal('following')}
-                      className="flex flex-col items-center hover:text-[#737373] transition-colors"
+                      className="flex-1 flex flex-col items-center hover:text-[#737373] transition-colors"
                     >
                       <span className="text-lg font-bold text-text-primary">{followCounts.following_count}</span>
                       <span className="text-xs text-text-secondary">{language === 'ko' ? '팔로잉' : language === 'ja' ? 'フォロー中' : 'Following'}</span>
