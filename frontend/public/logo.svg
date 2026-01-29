@@ -1,21 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
   <defs>
     <linearGradient id="bgGradient" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#5B7DB1"/>
-      <stop offset="100%" style="stop-color:#8BAFD4"/>
+      <stop offset="0%" style="stop-color:#5B8EBF"/>
+      <stop offset="100%" style="stop-color:#9AC4E8"/>
     </linearGradient>
   </defs>
 
   <!-- Rounded square background -->
   <rect x="2" y="2" width="36" height="36" rx="10" ry="10" fill="url(#bgGradient)"/>
 
-  <!-- Cute rounded 'A' letter -->
-  <!-- Left leg -->
-  <path d="M11 30 Q13 29 15 25 Q17 20 18 16 Q19 13 20 11"
-        stroke="white" stroke-width="4.5" stroke-linecap="round" fill="none"/>
-  <!-- Right leg -->
-  <path d="M20 11 Q21 13 22 16 Q23 20 25 25 Q27 29 29 30"
-        stroke="white" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+  <!-- Cute rounded 'A' letter with smooth rounded top -->
+  <!-- Single smooth path for A shape -->
+  <path d="M11 30 Q13 28 15 24 Q17 19 19 14 Q20 12 20 12 Q20 12 21 14 Q23 19 25 24 Q27 28 29 30"
+        stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Rounded top cap -->
+  <circle cx="20" cy="11" r="3" fill="white"/>
   <!-- Crossbar - rounded bubble style -->
   <ellipse cx="20" cy="23" rx="6" ry="2.5" fill="white"/>
 </svg>
