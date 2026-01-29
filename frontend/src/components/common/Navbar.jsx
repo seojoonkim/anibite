@@ -252,8 +252,8 @@ export default function Navbar() {
                 <svg className="w-6 h-6 md:w-7 md:h-7" viewBox="0 0 32 32" fill="none">
                   <defs>
                     <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#60a5fa" />
-                      <stop offset="100%" stopColor="#a78bfa" />
+                      <stop offset="0%" stopColor="#00E5FF" />
+                      <stop offset="100%" stopColor="#00B8D4" />
                     </linearGradient>
                   </defs>
                   {/* Rounded square with bite mark on top-right */}
@@ -292,9 +292,10 @@ export default function Navbar() {
                     key={item.path}
                     to={item.path}
                     className={`px-1.5 sm:px-2 md:px-2.5 lg:px-3 py-1 sm:py-1.5 rounded-md text-[11px] sm:text-[12px] md:text-[13px] transition-colors whitespace-nowrap ${isActive(item.path)
-                      ? 'bg-primary text-white font-semibold'
+                      ? 'text-white font-semibold'
                       : 'text-text-primary hover:text-text-secondary hover:bg-surface-hover font-normal'
                       }`}
+                    style={isActive(item.path) ? { background: 'linear-gradient(135deg, #00E5FF 0%, #00B8D4 100%)' } : {}}
                   >
                     {item.labelKo ? (language === 'ko' ? item.labelKo : language === 'ja' ? item.labelJa : item.labelEn) : item.label}
                   </Link>
@@ -510,9 +511,10 @@ export default function Navbar() {
               key={item.path}
               to={item.path}
               className={`flex flex-col items-center justify-center gap-0.5 transition-colors py-1 ${isActive(item.path)
-                ? 'bg-primary text-white'
+                ? 'text-white'
                 : 'text-text-secondary hover:text-text-primary'
                 }`}
+              style={isActive(item.path) ? { background: 'linear-gradient(135deg, #00E5FF 0%, #00B8D4 100%)' } : {}}
             >
               <div className="scale-90">{item.icon}</div>
               <span className="text-[9px] font-medium">

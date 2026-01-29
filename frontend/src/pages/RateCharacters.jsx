@@ -43,9 +43,9 @@ export default function RateCharacters() {
         const cardElement = cardRefs.current[charId];
         if (cardElement) {
           const cardWidth = cardElement.offsetWidth;
-          // 별 5개가 카드에 꽉 차도록 계산 (패딩 고려)
-          const availableWidth = cardWidth - 12; // 좌우 패딩 px-2 (8px * 2) 줄임
-          const starSize = Math.floor(availableWidth / 5.29); // 더 크게 (4% increase): 5.5 → 5.29
+          // �?5개�? 카드??�?차도�?계산 (?�딩 고려)
+          const availableWidth = cardWidth - 12; // 좌우 ?�딩 px-2 (8px * 2) 줄임
+          const starSize = Math.floor(availableWidth / 5.29); // ???�게 (4% increase): 5.5 ??5.29
           newSizes[charId] = `${starSize}px`;
         }
       });
@@ -217,9 +217,9 @@ export default function RateCharacters() {
 
       alert(
         language === 'ko'
-          ? `평가를 저장하는데 실패했습니다${errorStatus}\n${errorDetail}`
+          ? `?��?�??�?�하?�데 ?�패?�습?�다${errorStatus}\n${errorDetail}`
           : language === 'ja'
-            ? `評価の保存に失敗しました${errorStatus}\n${errorDetail}`
+            ? `評価??��存に失敗?�ま?�た${errorStatus}\n${errorDetail}`
             : `Failed to save rating${errorStatus}\n${errorDetail}`
       );
     }
@@ -281,7 +281,7 @@ export default function RateCharacters() {
         [characterId]: prevStatusState
       }));
 
-      alert(language === 'ko' ? '상태 변경에 실패했습니다.' : language === 'ja' ? 'ステータス変更に失敗しました。' : 'Failed to change status.');
+      alert(language === 'ko' ? '?�태 변경에 ?�패?�습?�다.' : language === 'ja' ? '?�テ?�タ?�変?�に失敗?�ま?�た?? : 'Failed to change status.');
     }
   };
 
@@ -325,27 +325,27 @@ export default function RateCharacters() {
           <div className="flex gap-2 items-center flex-wrap justify-center">
             {/* Rated Characters */}
             <div className="bg-surface px-3 py-1.5 rounded-md shadow-sm hover:shadow-md transition-shadow min-w-[80px] border border-border">
-              <div className="text-xs text-text-secondary text-center">{language === 'ko' ? '평가했어요' : language === 'ja' ? '評価済み' : 'Rated'}</div>
+              <div className="text-xs text-text-secondary text-center">{language === 'ko' ? '?��??�어?? : language === 'ja' ? '評価済み' : 'Rated'}</div>
               <div className="text-base font-bold text-primary text-center tabular-nums">{(stats.rated || 0).toLocaleString()}</div>
             </div>
 
             {/* Want to Know */}
             <div className="bg-surface px-3 py-1.5 rounded-md shadow-sm hover:shadow-md transition-shadow min-w-[80px] border border-border">
-              <div className="text-xs text-text-secondary text-center">{language === 'ko' ? '알고싶어요' : language === 'ja' ? '知りたい' : 'Want to Know'}</div>
+              <div className="text-xs text-text-secondary text-center">{language === 'ko' ? '?�고?�어?? : language === 'ja' ? '?�り?�い' : 'Want to Know'}</div>
               <div className="text-base font-bold text-secondary text-center tabular-nums">{(stats.wantToKnow || 0).toLocaleString()}</div>
             </div>
 
             {/* Not Interested */}
             <div className="bg-surface px-3 py-1.5 rounded-md shadow-sm hover:shadow-md transition-shadow min-w-[80px] border border-border">
-              <div className="text-xs text-text-secondary text-center">{language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Not Interested'}</div>
+              <div className="text-xs text-text-secondary text-center">{language === 'ko' ? '관?�없?�요' : language === 'ja' ? '?�味?�し' : 'Not Interested'}</div>
               <div className="text-base font-bold text-text-tertiary text-center tabular-nums">{(stats.notInterested || 0).toLocaleString()}</div>
             </div>
 
             {/* Average Rating - Always show */}
             <div className="bg-surface px-3 py-1.5 rounded-md shadow-sm hover:shadow-md transition-shadow min-w-[80px] border border-border">
-              <div className="text-xs text-text-secondary text-center">{language === 'ko' ? '평균 평점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</div>
+              <div className="text-xs text-text-secondary text-center">{language === 'ko' ? '?�균 ?�점' : language === 'ja' ? '平均評価' : 'Avg Rating'}</div>
               <div className="text-base font-bold text-accent text-center tabular-nums">
-                {stats.averageRating > 0 ? `★ ${stats.averageRating.toFixed(1)}` : '-'}
+                {stats.averageRating > 0 ? `??${stats.averageRating.toFixed(1)}` : '-'}
               </div>
             </div>
           </div>
@@ -423,17 +423,17 @@ export default function RateCharacters() {
                         {character.role && (
                           <div className={`absolute top-2 left-2 px-2 py-1 rounded text-xs font-bold text-white`} style={{
                             backgroundColor: character.role === 'MAIN'
-                              ? '#3797F0'  // 주연: 파란색 (테마색)
+                              ? '#00E5FF'  // 주연: ?��???(?�마??
                               : character.role === 'SUPPORTING'
-                                ? '#F59E0B'  // 조연: 주황색 (파란색과 대비)
-                                : '#9CA3AF',  // 엑스트라: 회색
+                                ? '#F59E0B'  // 조연: 주황??(?��??�과 ?��?
+                                : '#9CA3AF',  // ?�스?�라: ?�색
                             color: 'white'
                           }}>
                             {character.role === 'MAIN'
                               ? (language === 'ko' ? '주연' : language === 'ja' ? '主役' : 'Main')
                               : character.role === 'SUPPORTING'
-                                ? (language === 'ko' ? '조연' : language === 'ja' ? '助演' : 'Supporting')
-                                : (language === 'ko' ? '엑스트라' : language === 'ja' ? 'エキストラ' : 'Extra')}
+                                ? (language === 'ko' ? '조연' : language === 'ja' ? '?�演' : 'Supporting')
+                                : (language === 'ko' ? '?�스?�라' : language === 'ja' ? '?�キ?�ト?? : 'Extra')}
                           </div>
                         )}
 
@@ -447,10 +447,10 @@ export default function RateCharacters() {
                                 : '#6B7280'
                           }}>
                             {(hasRated || characterStatuses[character.id] === 'RATED')
-                              ? (language === 'ko' ? '평가완료' : language === 'ja' ? '評価済み' : 'Rated')
+                              ? (language === 'ko' ? '?��??�료' : language === 'ja' ? '評価済み' : 'Rated')
                               : characterStatuses[character.id] === 'WANT_TO_KNOW'
-                                ? (language === 'ko' ? '알고싶어요' : language === 'ja' ? '知りたい' : 'Want to Know')
-                                : (language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Not Interested')}
+                                ? (language === 'ko' ? '?�고?�어?? : language === 'ja' ? '?�り?�い' : 'Want to Know')
+                                : (language === 'ko' ? '관?�없?�요' : language === 'ja' ? '?�味?�し' : 'Not Interested')}
                           </div>
                         )}
 
@@ -616,7 +616,7 @@ export default function RateCharacters() {
                                     : 'text-white/80 hover:text-white'
                                     }`}
                                 >
-                                  {language === 'ko' ? '알고싶어요' : language === 'ja' ? '知りたい' : 'Want to Know'}
+                                  {language === 'ko' ? '?�고?�어?? : language === 'ja' ? '?�り?�い' : 'Want to Know'}
                                 </button>
                                 <span className="text-white/40">|</span>
                                 <button
@@ -630,7 +630,7 @@ export default function RateCharacters() {
                                     : 'text-white/60 hover:text-white/90'
                                     }`}
                                 >
-                                  {language === 'ko' ? '관심없어요' : language === 'ja' ? '興味なし' : 'Not Interested'}
+                                  {language === 'ko' ? '관?�없?�요' : language === 'ja' ? '?�味?�し' : 'Not Interested'}
                                 </button>
                               </div>
                             </div>
@@ -687,10 +687,10 @@ export default function RateCharacters() {
         ) : (
           <div className="text-center py-12">
             <div className="text-xl text-text-secondary mb-4">
-              {language === 'ko' ? '평가한 애니메이션이 없습니다' : language === 'ja' ? '評価済みのアニメがありません' : 'No rated anime'}
+              {language === 'ko' ? '?��????�니메이?�이 ?�습?�다' : language === 'ja' ? '評価済み??��?�メ?�あ?�ま?�ん' : 'No rated anime'}
             </div>
             <p className="text-text-tertiary">
-              {language === 'ko' ? '먼저 애니메이션을 평가하면 캐릭터를 평가할 수 있습니다.' : language === 'ja' ? 'まずアニメを評価すると、キャラクターを評価できます。' : 'Rate anime first to rate characters.'}
+              {language === 'ko' ? '먼�? ?�니메이?�을 ?��??�면 캐릭?��? ?��??????�습?�다.' : language === 'ja' ? '?�ず?�ニ?�を評価?�る?�、キ?�ラ??��?�を評価?�き?�す?? : 'Rate anime first to rate characters.'}
             </p>
           </div>
         )}

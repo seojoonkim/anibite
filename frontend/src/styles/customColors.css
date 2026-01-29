@@ -2,16 +2,16 @@
 /* Based on https://colorhunt.co/palette/3498dbecf0f134495ef1c40f */
 
 :root {
-  --primary: #3498DB;        /* Bright Blue */
+  --primary: #00E5FF;        /* Bright Blue */
   --secondary: #ECF0F1;      /* Light Gray */
   --dark: #34495E;           /* Dark Navy */
   --accent: #F1C40F;         /* Gold */
-  --primary-hover: #2C7CB8;  /* Darker Blue */
+  --primary-hover: #00B8D4;  /* Darker Blue */
 }
 
 /* Custom gradient for profile avatars */
 .gradient-custom-profile {
-  background: linear-gradient(to bottom right, #3498DB, #34495E) !important;
+  background: linear-gradient(to bottom right, #00E5FF, #34495E) !important;
 }
 
 /* Custom orange replacement */
@@ -22,7 +22,7 @@
 
 /* Filter button active states */
 .filter-button-active-all {
-  background-color: #3498DB !important;
+  background-color: #00E5FF !important;
   color: white !important;
 }
 
@@ -32,7 +32,7 @@
 }
 
 .filter-button-active-4star {
-  background-color: #3498DB !important;
+  background-color: #00E5FF !important;
   color: white !important;
 }
 

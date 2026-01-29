@@ -101,7 +101,7 @@ export default function VerifyEmail() {
         <div className="text-center">
           {status === 'verifying' && (
             <div className="flex flex-col items-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#3797F0] mb-4"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#00E5FF] mb-4"></div>
               <p className="text-gray-600">Verifying your email...</p>
             </div>
           )}
@@ -132,7 +132,7 @@ export default function VerifyEmail() {
                 <Link
                   to="/login"
                   className="block w-full text-white font-semibold py-3 px-4 rounded-lg transition-all shadow-sm hover:shadow-md text-center"
-                  style={{ backgroundColor: '#3797F0' }}
+                  style={{ backgroundColor: '#00E5FF' }}
                 >
                   Go to Login
                 </Link>

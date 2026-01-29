@@ -28,7 +28,7 @@ export default function Register() {
     e.preventDefault();
     setError('');
 
-    // ë¹„ë°€ë²ˆí˜¸ í™•ì¸
+    // ë¹„ë?ë²ˆí˜¸ ?•ì¸
     if (formData.password !== formData.passwordConfirm) {
       setError('Passwords do not match');
       return;
@@ -138,7 +138,7 @@ export default function Register() {
               value={formData.username}
               onChange={handleChange}
               placeholder="Choose a username"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-sm"
               required
               minLength={3}
             />
@@ -154,7 +154,7 @@ export default function Register() {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter your email"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-sm"
               required
             />
           </div>
@@ -169,44 +169,44 @@ export default function Register() {
               value={formData.display_name}
               onChange={handleChange}
               placeholder="How should we call you?"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-sm"
             />
           </div>
 
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-semibold mb-2">
-              Preferred Language / ì„ í˜¸ ì–¸ì–´ / è¨€èªž *
+              Preferred Language / ? í˜¸ ?¸ì–´ / è¨€èª?*
             </label>
             <div className="flex items-center gap-2 p-3 border border-gray-300 rounded-lg bg-gray-50">
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, preferred_language: 'ko' })}
                 className={`flex-1 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all ${formData.preferred_language === 'ko'
-                    ? 'bg-[#3797F0] text-white shadow-sm'
+                    ? 'bg-[#00E5FF] text-white shadow-sm'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
                   }`}
               >
-                ðŸ‡°ðŸ‡· í•œêµ­ì–´
+                ?‡°?‡· ?œêµ­??
               </button>
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, preferred_language: 'en' })}
                 className={`flex-1 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all ${formData.preferred_language === 'en'
-                    ? 'bg-[#3797F0] text-white shadow-sm'
+                    ? 'bg-[#00E5FF] text-white shadow-sm'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
                   }`}
               >
-                ðŸ‡ºðŸ‡¸ English
+                ?‡º?‡¸ English
               </button>
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, preferred_language: 'ja' })}
                 className={`flex-1 py-2.5 px-3 rounded-lg font-semibold text-sm transition-all ${formData.preferred_language === 'ja'
-                    ? 'bg-[#3797F0] text-white shadow-sm'
+                    ? 'bg-[#00E5FF] text-white shadow-sm'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
                   }`}
               >
-                ðŸ‡¯ðŸ‡µ æ—¥æœ¬èªž
+                ?‡¯?‡µ ?¥æœ¬èª?
               </button>
             </div>
           </div>
@@ -221,7 +221,7 @@ export default function Register() {
               value={formData.password}
               onChange={handleChange}
               placeholder="Create a password"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-sm"
               required
               minLength={8}
             />
@@ -237,7 +237,7 @@ export default function Register() {
               value={formData.passwordConfirm}
               onChange={handleChange}
               placeholder="Confirm your password"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3797F0] focus:border-transparent transition-all text-sm"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-sm"
               required
             />
           </div>
@@ -246,12 +246,12 @@ export default function Register() {
             type="submit"
             disabled={loading}
             className="w-full text-white font-semibold py-3 px-4 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
-            style={{ backgroundColor: '#3797F0' }}
+            style={{ backgroundColor: '#00E5FF' }}
             onMouseEnter={(e) => {
               if (!loading) e.target.style.backgroundColor = '#2378D5';
             }}
             onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#3797F0';
+              e.target.style.backgroundColor = '#00E5FF';
             }}
           >
             {loading ? 'Creating account...' : 'Sign Up'}
@@ -260,7 +260,7 @@ export default function Register() {
 
         <p className="text-center mt-6 text-gray-600 text-sm">
           Already have an account?{' '}
-          <Link to="/login" className="font-semibold hover:underline" style={{ color: '#3797F0' }}>
+          <Link to="/login" className="font-semibold hover:underline" style={{ color: '#00E5FF' }}>
             Login
           </Link>
         </p>

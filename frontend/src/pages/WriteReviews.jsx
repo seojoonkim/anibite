@@ -16,11 +16,11 @@ export default function WriteReviews() {
   const [allItems, setAllItems] = useState([]);
   const [reviews, setReviews] = useState({});
   const [loading, setLoading] = useState(true);
-  const [reviewsLoading, setReviewsLoading] = useState(true); // 리뷰 로딩 상태
+  const [reviewsLoading, setReviewsLoading] = useState(true); // 리뷰 로딩 ?�태
   const [editingId, setEditingId] = useState(null);
   const [editContent, setEditContent] = useState('');
   const [editRating, setEditRating] = useState(0);
-  const [justCompleted, setJustCompleted] = useState(new Set()); // 방금 작성 완료한 항목
+  const [justCompleted, setJustCompleted] = useState(new Set()); // 방금 ?�성 ?�료????��
   const [stats, setStats] = useState({
     anime: { reviewed: 0, pending: 0 },
     character: { reviewed: 0, pending: 0 },
@@ -122,12 +122,12 @@ export default function WriteReviews() {
       const currentOffset = resetOffset ? 0 : offset;
       console.log('[WriteReviews] Starting to load data... offset:', currentOffset);
 
-      // 초고속 API 사용 - 단일 쿼리로 애니+캐릭터 모두 가져오기 (0.1초 목표)
+      // 초고??API ?�용 - ?�일 쿼리�??�니+캐릭??모두 가?�오�?(0.1�?목표)
       const data = await ratingPageService.getItemsForReviews(50, currentOffset);
       console.log('[WriteReviews] API response:', data);
       console.log('[WriteReviews] Items count:', data?.items?.length || 0);
 
-      // 응답 데이터를 기존 형식으로 변환
+      // ?�답 ?�이?��? 기존 ?�식?�로 변??
       const items = (data.items || []).map(item => {
         const processed = {
           type: item.type,
@@ -135,7 +135,7 @@ export default function WriteReviews() {
           itemId: item.item_id,
           rating: item.rating,
           updated_at: item.updated_at,
-          // 애니메이션 필드
+          // ?�니메이???�드
           ...(item.type === 'anime' ? {
             anime_id: item.item_id,
             title_romaji: item.item_title,
@@ -145,7 +145,7 @@ export default function WriteReviews() {
             image_url: item.item_image,
             year: item.item_year
           } : {}),
-          // 캐릭터 필드
+          // 캐릭???�드
           ...(item.type === 'character' ? {
             character_id: item.item_id,
             character_name: item.item_title,
@@ -173,7 +173,7 @@ export default function WriteReviews() {
 
       console.log('[WriteReviews] Processed items:', items.length);
 
-      // 이미 백엔드에서 정렬되어 옴 (popularity + 랜덤성)
+      // ?��? 백엔?�에???�렬?�어 ??(popularity + ?�덤??
       if (resetOffset) {
         setAllItems(items);
         setOffset(50);
@@ -233,33 +233,33 @@ export default function WriteReviews() {
     const trimmedContent = editContent.trim();
 
     if (!trimmedContent) {
-      alert('리뷰 내용을 입력해주세요.');
+      alert('리뷰 ?�용???�력?�주?�요.');
       return;
     }
 
     if (trimmedContent.length < 10) {
-      alert('리뷰는 최소 10자 이상 작성해야 합니다.');
+      alert('리뷰??최소 10???�상 ?�성?�야 ?�니??');
       return;
     }
 
     if (trimmedContent.length > 5000) {
-      alert('리뷰는 최대 5000자까지 작성할 수 있습니다.');
+      alert('리뷰??최�? 5000?�까지 ?�성?????�습?�다.');
       return;
     }
 
     if (!editRating || editRating === 0) {
-      alert('평점을 선택해주세요.');
+      alert('?�점???�택?�주?�요.');
       return;
     }
 
     try {
-      // 평점 업데이트
+      // ?�점 ?�데?�트
       await ratingService.rateAnime(animeId, {
         rating: editRating,
         status: 'RATED'
       });
 
-      // 리뷰 저장 또는 업데이트
+      // 리뷰 ?�???�는 ?�데?�트
       const existingReview = reviews[`anime_${animeId}`];
       let savedReview;
 
@@ -309,7 +309,7 @@ export default function WriteReviews() {
       setEditRating(0);
     } catch (err) {
       console.error('Failed to save review:', err);
-      const errorMessage = err.response?.data?.detail || '리뷰 저장에 실패했습니다.';
+      const errorMessage = err.response?.data?.detail || '리뷰 ?�?�에 ?�패?�습?�다.';
       alert(errorMessage);
     }
   };
@@ -318,30 +318,30 @@ export default function WriteReviews() {
     const trimmedContent = editContent.trim();
 
     if (!trimmedContent) {
-      alert('리뷰 내용을 입력해주세요.');
+      alert('리뷰 ?�용???�력?�주?�요.');
       return;
     }
 
     if (trimmedContent.length < 10) {
-      alert('리뷰는 최소 10자 이상 작성해야 합니다.');
+      alert('리뷰??최소 10???�상 ?�성?�야 ?�니??');
       return;
     }
 
     if (trimmedContent.length > 5000) {
-      alert('리뷰는 최대 5000자까지 작성할 수 있습니다.');
+      alert('리뷰??최�? 5000?�까지 ?�성?????�습?�다.');
       return;
     }
 
     if (!editRating || editRating === 0) {
-      alert('평점을 선택해주세요.');
+      alert('?�점???�택?�주?�요.');
       return;
     }
 
     try {
-      // 평점 업데이트
+      // ?�점 ?�데?�트
       await characterService.rateCharacter(characterId, editRating);
 
-      // 리뷰 저장 또는 업데이트
+      // 리뷰 ?�???�는 ?�데?�트
       const existingReview = reviews[`character_${characterId}`];
       let savedReview;
 
@@ -391,7 +391,7 @@ export default function WriteReviews() {
       setEditRating(0);
     } catch (err) {
       console.error('Failed to save review:', err);
-      const errorMessage = err.response?.data?.detail || '리뷰 저장에 실패했습니다.';
+      const errorMessage = err.response?.data?.detail || '리뷰 ?�?�에 ?�패?�습?�다.';
       alert(errorMessage);
     }
   };
@@ -470,29 +470,29 @@ export default function WriteReviews() {
             <button
               onClick={() => setFilter('all')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filter === 'all'
-                ? 'bg-[#3797F0] text-white font-semibold'
+                ? 'bg-[#00E5FF] text-white font-semibold'
                 : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
-              {language === 'ko' ? '모두' : language === 'ja' ? 'すべて' : 'All'}
+              {language === 'ko' ? '모두' : language === 'ja' ? '?�べ?? : 'All'}
             </button>
             <button
               onClick={() => setFilter('anime')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filter === 'anime'
-                ? 'bg-[#3797F0] text-white font-semibold'
+                ? 'bg-[#00E5FF] text-white font-semibold'
                 : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
-              {language === 'ko' ? '애니' : language === 'ja' ? 'アニメ' : 'Anime'}
+              {language === 'ko' ? '?�니' : language === 'ja' ? '?�ニ?? : 'Anime'}
             </button>
             <button
               onClick={() => setFilter('character')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filter === 'character'
-                ? 'bg-[#3797F0] text-white font-semibold'
+                ? 'bg-[#00E5FF] text-white font-semibold'
                 : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
-              {language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character'}
+              {language === 'ko' ? '캐릭?? : language === 'ja' ? '??��?�ク?�ー' : 'Character'}
             </button>
           </div>
 
@@ -501,11 +501,11 @@ export default function WriteReviews() {
             {hasStats ? (
               <>
                 <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-                  <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '작성완료' : language === 'ja' ? '作成完了' : 'Completed'}</div>
+                  <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '?�성?�료' : language === 'ja' ? '作成完了' : 'Completed'}</div>
                   <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{currentStats.reviewed.toLocaleString()}</div>
                 </div>
                 <div className="bg-white px-4 py-2.5 rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow min-w-[100px]">
-                  <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '작성대기' : language === 'ja' ? '作成待ち' : 'Pending'}</div>
+                  <div className="text-xs text-gray-600 mb-0.5 text-center">{language === 'ko' ? '?�성?��? : language === 'ja' ? '作成待ち' : 'Pending'}</div>
                   <div className="text-lg font-bold text-gray-800 text-center tabular-nums">{currentStats.remaining.toLocaleString()}</div>
                 </div>
               </>
@@ -562,13 +562,13 @@ export default function WriteReviews() {
                   <div className={`bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out overflow-hidden relative group ${!isJustCompleted ? 'border border-gray-200' : ''
                     }`}>
                     <div className="flex items-start relative">
-                      {/* 작성완료 뱃지 */}
+                      {/* ?�성?�료 뱃�? */}
                       {isJustCompleted && (
                         <div className="absolute top-2 right-2 z-10">
                           <span className="px-3 py-1 text-white text-xs font-bold rounded-full shadow-lg" style={{
                             background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)'
                           }}>
-                            {language === 'ko' ? '작성완료' : language === 'ja' ? '作成完了' : 'Completed'}
+                            {language === 'ko' ? '?�성?�료' : language === 'ja' ? '作成完了' : 'Completed'}
                           </span>
                         </div>
                       )}
@@ -597,7 +597,7 @@ export default function WriteReviews() {
                           <h3 className="font-semibold text-lg">
                             <Link
                               to={item.type === 'anime' ? `/anime/${item.itemId}` : `/character/${item.itemId}`}
-                              className="text-gray-900 hover:text-[#3797F0] transition-colors hover:underline cursor-pointer"
+                              className="text-gray-900 hover:text-[#00E5FF] transition-colors hover:underline cursor-pointer"
                             >
                               {item.type === 'anime' ? (
                                 language === 'ko' ? (
@@ -640,7 +640,7 @@ export default function WriteReviews() {
                             ? 'bg-blue-100 text-blue-800'
                             : 'bg-pink-100 text-pink-800'
                             }`}>
-                            {item.type === 'anime' ? (language === 'ko' ? '애니' : language === 'ja' ? 'アニメ' : 'Anime') : (language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character')}
+                            {item.type === 'anime' ? (language === 'ko' ? '?�니' : language === 'ja' ? '?�ニ?? : 'Anime') : (language === 'ko' ? '캐릭?? : language === 'ja' ? '??��?�ク?�ー' : 'Character')}
                           </span>
                         </div>
 
@@ -651,7 +651,7 @@ export default function WriteReviews() {
                             {item.anime_id ? (
                               <Link
                                 to={`/anime/${item.anime_id}`}
-                                className="hover:text-[#3797F0] hover:underline transition-colors"
+                                className="hover:text-[#00E5FF] hover:underline transition-colors"
                               >
                                 {language === 'ko' ? (
                                   <>
@@ -699,7 +699,7 @@ export default function WriteReviews() {
                               <div className="flex items-center">
                                 <StarRating rating={item.rating || 0} readonly size="sm" showNumber={false} />
                               </div>
-                              {item.type === 'anime' && item.year && <span>• {item.year}</span>}
+                              {item.type === 'anime' && item.year && <span>??{item.year}</span>}
                             </div>
                             {hasReview ? (
                               <>
@@ -708,9 +708,9 @@ export default function WriteReviews() {
                                 </p>
                                 <button
                                   onClick={() => handleStartEdit(item, hasReview.content, item.rating)}
-                                  className="text-sm text-[#3797F0] hover:text-[#2C7CB8]"
+                                  className="text-sm text-[#00E5FF] hover:text-[#00B8D4]"
                                 >
-                                  {language === 'ko' ? '수정' : language === 'ja' ? '編集' : 'Edit'}
+                                  {language === 'ko' ? '?�정' : language === 'ja' ? '編集' : 'Edit'}
                                 </button>
                               </>
                             ) : (
@@ -718,16 +718,16 @@ export default function WriteReviews() {
                                 onClick={() => handleStartEdit(item, '', item.rating)}
                                 className="text-sm text-gray-500 hover:text-gray-700 border border-gray-300 px-4 py-2 rounded hover:border-gray-400 transition-all group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-300"
                               >
-                                {language === 'ko' ? '리뷰 작성하기' : language === 'ja' ? 'レビュー作成' : 'Write Review'}
+                                {language === 'ko' ? '리뷰 ?�성?�기' : language === 'ja' ? '?�ビ?�ー作成' : 'Write Review'}
                               </button>
                             )}
                           </div>
                         ) : (
                           <div className="space-y-3 animate-fadeIn">
-                            {/* 평점 선택 */}
+                            {/* ?�점 ?�택 */}
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
-                                {language === 'ko' ? '평점 (클릭하여 수정 가능)' : language === 'ja' ? '評価 (クリックして変更)' : 'Rating (Click to edit)'}
+                                {language === 'ko' ? '?�점 (?�릭?�여 ?�정 가??' : language === 'ja' ? '評価 (??��?�ク?�て変更)' : 'Rating (Click to edit)'}
                               </label>
                               <StarRating
                                 rating={editRating}
@@ -738,15 +738,15 @@ export default function WriteReviews() {
                               />
                             </div>
 
-                            {/* 리뷰 입력 */}
+                            {/* 리뷰 ?�력 */}
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
-                                {language === 'ko' ? '리뷰' : language === 'ja' ? 'レビュー' : 'Review'}
+                                {language === 'ko' ? '리뷰' : language === 'ja' ? '?�ビ?�ー' : 'Review'}
                               </label>
                               <textarea
                                 value={editContent}
                                 onChange={(e) => setEditContent(e.target.value)}
-                                placeholder={language === 'ko' ? '리뷰를 작성하세요...' : language === 'ja' ? 'レビューを作成...' : 'Write your review...'}
+                                placeholder={language === 'ko' ? '리뷰�??�성?�세??..' : language === 'ja' ? '?�ビ?�ー?�作??..' : 'Write your review...'}
                                 className="w-full text-sm border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500 resize-none"
                                 rows="4"
                                 autoFocus
@@ -757,17 +757,17 @@ export default function WriteReviews() {
                                 onClick={() => handleSaveReview(item)}
                                 disabled={!editContent.trim() || !editRating}
                                 className="text-sm px-4 py-2 rounded disabled:opacity-50 transition-colors"
-                                style={{ backgroundColor: '#3797F0', color: 'white', fontWeight: '600' }}
+                                style={{ backgroundColor: '#00E5FF', color: 'white', fontWeight: '600' }}
                                 onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#1877F2')}
-                                onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#3797F0')}
+                                onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#00E5FF')}
                               >
-                                {language === 'ko' ? '저장' : language === 'ja' ? '保存' : 'Save'}
+                                {language === 'ko' ? '?�?? : language === 'ja' ? '保存' : 'Save'}
                               </button>
                               <button
                                 onClick={handleCancel}
                                 className="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded transition-colors"
                               >
-                                {language === 'ko' ? '취소' : language === 'ja' ? 'キャンセル' : 'Cancel'}
+                                {language === 'ko' ? '취소' : language === 'ja' ? '??��?�セ?? : 'Cancel'}
                               </button>
                             </div>
                           </div>
@@ -783,14 +783,14 @@ export default function WriteReviews() {
             {loadingMore && (
               <div className="text-center py-8">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                <p className="text-gray-500 mt-2">{language === 'ko' ? '더 불러오는 중...' : language === 'ja' ? '読み込み中...' : 'Loading more...'}</p>
+                <p className="text-gray-500 mt-2">{language === 'ko' ? '??불러?�는 �?..' : language === 'ja' ? '�?��込み�?..' : 'Loading more...'}</p>
               </div>
             )}
 
             {/* No more items */}
             {!hasMore && filteredItems.length > 0 && (
               <div className="text-center py-8 text-gray-500">
-                {language === 'ko' ? '모든 항목을 불러왔습니다' : language === 'ja' ? 'すべての項目を読み込みました' : 'All items loaded'}
+                {language === 'ko' ? '모든 ??��??불러?�습?�다' : language === 'ja' ? '?�べ?�の?�目?�読?�込?�ま?�た' : 'All items loaded'}
               </div>
             )}
 
@@ -798,18 +798,18 @@ export default function WriteReviews() {
               <div className="text-center py-16">
                 <p className="text-gray-600">
                   {filter === 'all'
-                    ? (language === 'ko' ? '아직 평가한 애니나 캐릭터가 없습니다.' : language === 'ja' ? 'まだ評価したアニメやキャラクターがありません。' : 'No rated anime or characters yet.')
+                    ? (language === 'ko' ? '?�직 ?��????�니??캐릭?��? ?�습?�다.' : language === 'ja' ? '?�だ評価?�た?�ニ?�や??��?�ク?�ー?�あ?�ま?�ん?? : 'No rated anime or characters yet.')
                     : filter === 'anime'
-                      ? (language === 'ko' ? '아직 평가한 애니가 없습니다.' : language === 'ja' ? 'まだ評価したアニメがありません。' : 'No rated anime yet.')
-                      : (language === 'ko' ? '아직 평가한 캐릭터가 없습니다.' : language === 'ja' ? 'まだ評価したキャラクターがありません。' : 'No rated characters yet.')
+                      ? (language === 'ko' ? '?�직 ?��????�니가 ?�습?�다.' : language === 'ja' ? '?�だ評価?�た?�ニ?�が?�り?�せ?��? : 'No rated anime yet.')
+                      : (language === 'ko' ? '?�직 ?��???캐릭?��? ?�습?�다.' : language === 'ja' ? '?�だ評価?�た??��?�ク?�ー?�あ?�ま?�ん?? : 'No rated characters yet.')
                   }
                 </p>
                 <p className="text-sm text-gray-500 mt-2">
                   {filter === 'all'
-                    ? (language === 'ko' ? '애니나 캐릭터를 평가하면 리뷰를 작성할 수 있습니다.' : language === 'ja' ? 'アニメやキャラクターを評価するとレビューを作成できます。' : 'Rate anime or characters to write reviews.')
+                    ? (language === 'ko' ? '?�니??캐릭?��? ?��??�면 리뷰�??�성?????�습?�다.' : language === 'ja' ? '?�ニ?�や??��?�ク?�ー?�評価す?�と?�ビ?�ー?�作?�で?�ま?��? : 'Rate anime or characters to write reviews.')
                     : filter === 'anime'
-                      ? (language === 'ko' ? '애니를 평가하면 리뷰를 작성할 수 있습니다.' : language === 'ja' ? 'アニメを評価するとレビューを作成できます。' : 'Rate anime to write reviews.')
-                      : (language === 'ko' ? '캐릭터를 평가하면 리뷰를 작성할 수 있습니다.' : language === 'ja' ? 'キャラクターを評価するとレビューを作成できます。' : 'Rate characters to write reviews.')
+                      ? (language === 'ko' ? '?�니�??��??�면 리뷰�??�성?????�습?�다.' : language === 'ja' ? '?�ニ?�を評価?�る?�レ?�ュ?�を作成?�き?�す?? : 'Rate anime to write reviews.')
+                      : (language === 'ko' ? '캐릭?��? ?��??�면 리뷰�??�성?????�습?�다.' : language === 'ja' ? '??��?�ク?�ー?�評価す?�と?�ビ?�ー?�作?�で?�ま?��? : 'Rate characters to write reviews.')
                   }
                 </p>
               </div>

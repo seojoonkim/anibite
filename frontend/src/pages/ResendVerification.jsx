@@ -26,16 +26,16 @@ export default function ResendVerification() {
     } catch (err) {
       setLoading(false);
       if (err.response?.status === 404) {
-        setError('등록되지 않은 이메일입니다.');
+        setError('?�록?��? ?��? ?�메?�입?�다.');
       } else if (err.response?.status === 400) {
         const detail = err.response.data?.detail || '';
         if (detail.includes('already verified')) {
-          setError('이미 인증된 계정입니다. 로그인해주세요.');
+          setError('?��? ?�증??계정?�니?? 로그?�해주세??');
         } else {
-          setError('인증 이메일 전송에 실패했습니다.');
+          setError('?�증 ?�메???�송???�패?�습?�다.');
         }
       } else {
-        setError('인증 이메일 전송에 실패했습니다.');
+        setError('?�증 ?�메???�송???�패?�습?�다.');
       }
     }
   };
@@ -51,14 +51,14 @@ export default function ResendVerification() {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              이메일 전송 완료!
+              ?�메???�송 ?�료!
             </h2>
             <p className="text-gray-600 mb-4">
-              <span className="font-medium">{email}</span> 으로<br />
-              새로운 인증 이메일을 보내드렸습니다.
+              <span className="font-medium">{email}</span> ?�로<br />
+              ?�로???�증 ?�메?�을 보내?�렸?�니??
             </p>
             <p className="text-sm text-gray-500">
-              잠시 후 로그인 페이지로 이동합니다...
+              ?�시 ??로그???�이지�??�동?�니??..
             </p>
           </div>
         </div>
@@ -71,17 +71,17 @@ export default function ResendVerification() {
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            인증 이메일 재전송
+            ?�증 ?�메???�전??
           </h1>
           <p className="text-gray-600 text-sm">
-            등록하신 이메일 주소를 입력해주세요
+            ?�록?�신 ?�메??주소�??�력?�주?�요
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              이메일
+              ?�메??
             </label>
             <input
               id="email"
@@ -105,10 +105,10 @@ export default function ResendVerification() {
             disabled={loading || !email}
             className="w-full py-2.5 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ backgroundColor: '#3498DB', color: 'white' }}
-            onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#2C7CB8')}
+            onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#00B8D4')}
             onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#3498DB')}
           >
-            {loading ? '전송 중...' : '인증 이메일 재전송'}
+            {loading ? '?�송 �?..' : '?�증 ?�메???�전??}
           </button>
 
           <button
@@ -116,7 +116,7 @@ export default function ResendVerification() {
             onClick={() => navigate('/login')}
             className="w-full py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
           >
-            로그인 페이지로
+            로그???�이지�?
           </button>
         </form>
       </div>
