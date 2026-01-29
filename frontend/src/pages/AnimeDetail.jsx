@@ -1100,23 +1100,33 @@ export default function AnimeDetail() {
                               }
                             }}
                           />
-                          {/* Role Badge */}
+                          {/* Role Badge - 캐릭터 평가 페이지 스타일과 동일 */}
                           {char.character_role && (
-                            <div className={`absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded text-xs font-bold`} style={{
-                              backgroundColor: char.character_role === 'MAIN' ? '#A8E6CF' : char.character_role === 'SUPPORTING' ? '#364F6B' : '#ECF0F1',
-                              color: char.character_role === 'BACKGROUND' ? '#364F6B' : 'white'
+                            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded text-[10px] font-bold text-white whitespace-nowrap" style={{
+                              backgroundColor: char.character_role === 'MAIN'
+                                ? '#5BB5F5'  // 주연: 하늘색 (프라이머리)
+                                : char.character_role === 'SUPPORTING'
+                                  ? '#F59E0B'  // 조연: 주황색
+                                  : '#9CA3AF'  // 엑스트라: 회색
                             }}>
                               {char.character_role === 'MAIN'
-                                ? (language === 'ko' ? '주연' : language === 'ja' ? 'メイン' : 'Main')
+                                ? (language === 'ko' ? '주연' : language === 'ja' ? '主役' : 'Main')
                                 : char.character_role === 'SUPPORTING'
-                                ? (language === 'ko' ? '조연' : language === 'ja' ? 'サポート' : 'Supporting')
-                                : (language === 'ko' ? '엑스트라' : language === 'ja' ? 'エキストラ' : 'Extra')}
+                                  ? (language === 'ko' ? '조연' : language === 'ja' ? '脇役' : 'Supporting')
+                                  : (language === 'ko' ? '엑스트라' : language === 'ja' ? 'エキストラ' : 'Extra')}
                             </div>
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="font-medium text-sm truncate hover:text-[#5BB5F5] transition-colors">{language === 'ko' && char.character_name_korean ? char.character_name_korean : char.character_name}</h4>
                           <p className="text-xs text-gray-400">{language === 'ko' ? '캐릭터' : language === 'ja' ? 'キャラクター' : 'Character'}</p>
+                          {/* 내 별점 표시 */}
+                          {char.my_rating && char.my_rating > 0 && (
+                            <div className="flex items-center gap-1 mt-0.5">
+                              <StarIcon className="w-3 h-3" filled={true} />
+                              <span className="text-xs font-medium text-gray-700">{char.my_rating.toFixed(1)}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                       {char.voice_actor_name && (

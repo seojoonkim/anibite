@@ -107,13 +107,15 @@ def genres():
 
 
 @router.get("/{anime_id}", response_model=AnimeDetailResponse)
-def get_anime(anime_id: int):
+def get_anime(anime_id: int, current_user = Depends(get_current_user_optional)):
     """
     애니메이션 상세 정보
 
     장르, 태그, 스튜디오 정보 포함
+    로그인 시 캐릭터별 내 별점 포함
     """
-    anime = get_anime_by_id(anime_id)
+    user_id = current_user.id if current_user else None
+    anime = get_anime_by_id(anime_id, user_id=user_id)
     if anime is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

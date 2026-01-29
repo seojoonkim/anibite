@@ -180,8 +180,8 @@ def get_anime_list(
     )
 
 
-def get_anime_by_id(anime_id: int) -> Optional[AnimeDetailResponse]:
-    """애니메이션 상세 정보 조회"""
+def get_anime_by_id(anime_id: int, user_id: int = None) -> Optional[AnimeDetailResponse]:
+    """애니메이션 상세 정보 조회 (user_id가 있으면 캐릭터별 내 별점 포함)"""
 
     # 기본 정보 (로컬 이미지 우선)
     anime_row = db.execute_query(
@@ -245,34 +245,66 @@ def get_anime_by_id(anime_id: int) -> Optional[AnimeDetailResponse]:
     )
     anime_dict['studios'] = [dict_from_row(row) for row in studio_rows]
 
-    # 캐릭터 & 성우 (상위 12명)
-    character_rows = db.execute_query(
-        """
-        SELECT
-            c.id as character_id,
-            c.name_full as character_name,
-            c.name_korean as character_name_korean,
-            COALESCE('/' || c.image_local, c.image_url) as character_image,
-            ac.role as character_role,
-            s.id as voice_actor_id,
-            s.name_full as voice_actor_name,
-            s.image_url as voice_actor_image
-        FROM anime_character ac
-        JOIN character c ON ac.character_id = c.id
-        LEFT JOIN character_voice_actor cva ON cva.character_id = c.id AND cva.anime_id = ac.anime_id
-        LEFT JOIN staff s ON cva.staff_id = s.id
-        WHERE ac.anime_id = ?
-        ORDER BY
-            CASE ac.role
-                WHEN 'MAIN' THEN 1
-                WHEN 'SUPPORTING' THEN 2
-                ELSE 3
-            END,
-            c.favourites DESC
-        LIMIT 12
-        """,
-        (anime_id,)
-    )
+    # 캐릭터 & 성우 (상위 12명) - user_id가 있으면 내 별점 포함
+    if user_id:
+        character_rows = db.execute_query(
+            """
+            SELECT
+                c.id as character_id,
+                c.name_full as character_name,
+                c.name_korean as character_name_korean,
+                COALESCE('/' || c.image_local, c.image_url) as character_image,
+                ac.role as character_role,
+                s.id as voice_actor_id,
+                s.name_full as voice_actor_name,
+                s.image_url as voice_actor_image,
+                cr.rating as my_rating
+            FROM anime_character ac
+            JOIN character c ON ac.character_id = c.id
+            LEFT JOIN character_voice_actor cva ON cva.character_id = c.id AND cva.anime_id = ac.anime_id
+            LEFT JOIN staff s ON cva.staff_id = s.id
+            LEFT JOIN character_ratings cr ON cr.character_id = c.id AND cr.user_id = ?
+            WHERE ac.anime_id = ?
+            ORDER BY
+                CASE ac.role
+                    WHEN 'MAIN' THEN 1
+                    WHEN 'SUPPORTING' THEN 2
+                    ELSE 3
+                END,
+                c.favourites DESC
+            LIMIT 12
+            """,
+            (user_id, anime_id)
+        )
+    else:
+        character_rows = db.execute_query(
+            """
+            SELECT
+                c.id as character_id,
+                c.name_full as character_name,
+                c.name_korean as character_name_korean,
+                COALESCE('/' || c.image_local, c.image_url) as character_image,
+                ac.role as character_role,
+                s.id as voice_actor_id,
+                s.name_full as voice_actor_name,
+                s.image_url as voice_actor_image,
+                NULL as my_rating
+            FROM anime_character ac
+            JOIN character c ON ac.character_id = c.id
+            LEFT JOIN character_voice_actor cva ON cva.character_id = c.id AND cva.anime_id = ac.anime_id
+            LEFT JOIN staff s ON cva.staff_id = s.id
+            WHERE ac.anime_id = ?
+            ORDER BY
+                CASE ac.role
+                    WHEN 'MAIN' THEN 1
+                    WHEN 'SUPPORTING' THEN 2
+                    ELSE 3
+                END,
+                c.favourites DESC
+            LIMIT 12
+            """,
+            (anime_id,)
+        )
     anime_dict['characters'] = [dict_from_row(row) for row in character_rows]
 
     # 스태프 (감독, 각본 등 - 상위 10명)
