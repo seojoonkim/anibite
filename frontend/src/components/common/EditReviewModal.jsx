@@ -28,6 +28,11 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
 
   // Helper to convert relative URLs to absolute - same logic as ActivityCard
   const getImageUrl = (url, activityType = null, itemId = null) => {
+    // 캐릭터 평가의 경우 itemId를 직접 사용 (가장 안정적)
+    if (activityType === 'character_rating' && itemId) {
+      return `${API_BASE_URL}/api/images/characters/${itemId}.jpg`;
+    }
+
     if (!url) return '/placeholder-anime.svg';
 
     // Normalize URL: ensure it starts with / if it's a relative path
@@ -39,20 +44,16 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
     if (url.includes('/characters/')) {
       // Extract character ID from path like "/images/characters/8485.jpg"
       const match = url.match(/\/characters\/(\d+)\./);
-      const characterId = match && match[1] ? match[1] :
-        (activityType === 'character_rating' ? itemId : null);
-      if (characterId) {
-        return `${API_BASE_URL}/api/images/characters/${characterId}.jpg`;
+      if (match && match[1]) {
+        return `${API_BASE_URL}/api/images/characters/${match[1]}.jpg`;
       }
     }
 
     // If it's an AniList character image, use API proxy
     if (url.includes('anilist.co') && url.includes('/character/')) {
       const match = url.match(/\/[bn](\d+)-/);
-      const characterId = match && match[1] ? match[1] :
-        (activityType === 'character_rating' ? itemId : null);
-      if (characterId) {
-        return `${API_BASE_URL}/api/images/characters/${characterId}.jpg`;
+      if (match && match[1]) {
+        return `${API_BASE_URL}/api/images/characters/${match[1]}.jpg`;
       }
     }
 
@@ -182,7 +183,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
           )}
 
           {/* Item Info */}
-          <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+          <div className="mb-4">
             <div className="flex items-center gap-3">
               <img
                 src={getImageUrl(activity?.item_image, activity?.activity_type, activity?.item_id)}
