@@ -219,8 +219,8 @@ export default function Browse() {
 
   const getStatusBadge = (status) => {
     const badges = {
-      'Currently Airing': { text: '방영�?, color: 'bg-green-100 text-green-800' },
-      'Finished Airing': { text: '?�결', color: 'bg-blue-100 text-blue-800' },
+      'Currently Airing': { text: '방영중', color: 'bg-green-100 text-green-800' },
+      'Finished Airing': { text: '완결', color: 'bg-blue-100 text-blue-800' },
       'Not yet aired': { text: '미방영', color: 'bg-yellow-100 text-yellow-800' },
     };
     return badges[status] || { text: status, color: 'bg-gray-100 text-gray-800' };
@@ -321,22 +321,22 @@ export default function Browse() {
                         {language === 'ko' ? '포스터' : language === 'ja' ? 'ポスター' : 'Poster'}
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '?�목' : language === 'ja' ? '?�イ?�ル' : 'Title'}
+                        {language === 'ko' ? '제목' : language === 'ja' ? 'タイトル' : 'Title'}
                       </th>
                       <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                         {language === 'ko' ? '상태' : language === 'ja' ? 'ステータス' : 'Status'}
                       </th>
                       <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '?�도' : language === 'ja' ? '�? : 'Year'}
+                        {language === 'ko' ? '연도' : language === 'ja' ? '年' : 'Year'}
                       </th>
                       <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '?�수' : language === 'ja' ? '話数' : 'Episodes'}
+                        {language === 'ko' ? '화수' : language === 'ja' ? '話数' : 'Episodes'}
                       </th>
                       <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '?�르' : language === 'ja' ? '?�ャ?�ル' : 'Genres'}
+                        {language === 'ko' ? '장르' : language === 'ja' ? 'ジャンル' : 'Genres'}
                       </th>
                       <th className="hidden md:table-cell px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        {language === 'ko' ? '?�점' : language === 'ja' ? '評価' : 'Rating'}
+                        {language === 'ko' ? '평점' : language === 'ja' ? '評価' : 'Rating'}
                       </th>
                     </tr>
                   </thead>
@@ -434,7 +434,7 @@ export default function Browse() {
                                   </span>
                                 </div>
                                 <div className="text-xs text-gray-500 mt-0.5">
-                                  {anime.site_rating_count.toLocaleString()}�?
+                                  {anime.site_rating_count.toLocaleString()}개
                                 </div>
                               </div>
                             ) : (
@@ -454,7 +454,7 @@ export default function Browse() {
               <div ref={loadMoreTriggerRef} className="h-20 flex items-center justify-center">
                 {loadingMore && (
                   <div className="text-gray-500 text-sm">
-                    {language === 'ko' ? '로딩 �?..' : language === 'ja' ? '�?��込み�?..' : 'Loading...'}
+                    {language === 'ko' ? '로딩 중...' : language === 'ja' ? '読み込み中...' : 'Loading...'}
                   </div>
                 )}
                 {!initialLoading && !loadingMore && !hasMore && animeList.length > 0 && (

@@ -519,7 +519,7 @@ export default function CharacterDetail() {
 
   // 리뷰의 댓글 수를 업데이트하는 헬퍼 함수
   const updateReviewCommentsCount = (reviewId, delta) => {
-    // myReview ?�데?�트
+    // myReview 업데이트
     if (myReview && myReview.id === reviewId) {
       setMyReview(prev => ({
         ...prev,
@@ -527,7 +527,7 @@ export default function CharacterDetail() {
       }));
     }
 
-    // reviews 배열 ?�데?�트
+    // reviews 배열 업데이트
     setReviews(prev => prev.map(review =>
       review.id === reviewId
         ? { ...review, comments_count: Math.max(0, (review.comments_count || 0) + delta) }
@@ -1098,7 +1098,7 @@ export default function CharacterDetail() {
                 )}
                 {character.date_of_birth && (
                   <div>
-                    <span className="font-medium">{language === 'ko' ? '?�일:' : 'Birthday:'}</span> {character.date_of_birth}
+                    <span className="font-medium">{language === 'ko' ? '생일:' : 'Birthday:'}</span> {character.date_of_birth}
                   </div>
                 )}
                 {character.blood_type && (
