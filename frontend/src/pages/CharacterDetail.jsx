@@ -39,6 +39,8 @@ export default function CharacterDetail() {
   const [commentLikes, setCommentLikes] = useState({});
   const [replyingTo, setReplyingTo] = useState({});
   const [myReviewComments, setMyReviewComments] = useState([]);
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const [replyText, setReplyText] = useState({});
 
   // Use unified activities hook
   const {
@@ -996,37 +998,71 @@ export default function CharacterDetail() {
               {/* Character Details */}
               <div className="grid grid-cols-2 gap-4 text-sm">
                 {character.gender && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '성별:' : language === 'ja' ? '性別:' : 'Gender:'}</span> {character.gender === 'Male' ? (language === 'ko' ? '남성' : language === 'ja' ? '男性' : 'Male') : character.gender === 'Female' ? (language === 'ko' ? '여성' : language === 'ja' ? '女性' : 'Female') : character.gender}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">⚥</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '성별' : language === 'ja' ? '性別' : 'Gender'}</span>
+                      <div className="text-gray-900">{character.gender === 'Male' ? (language === 'ko' ? '남성' : language === 'ja' ? '男性' : 'Male') : character.gender === 'Female' ? (language === 'ko' ? '여성' : language === 'ja' ? '女性' : 'Female') : character.gender}</div>
+                    </div>
                   </div>
                 )}
 
                 {getBirthday() && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '생일:' : language === 'ja' ? '誕生日:' : 'Birthday:'}</span> {getBirthday()}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">🎂</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '생일' : language === 'ja' ? '誕生日' : 'Birthday'}</span>
+                      <div className="text-gray-900">{getBirthday()}</div>
+                    </div>
                   </div>
                 )}
 
                 {character.age && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '나이:' : language === 'ja' ? '年齢:' : 'Age:'}</span> {character.age}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">🎈</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '나이' : language === 'ja' ? '年齢' : 'Age'}</span>
+                      <div className="text-gray-900">{character.age}</div>
+                    </div>
                   </div>
                 )}
 
                 {character.blood_type && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '혈액형:' : language === 'ja' ? '血液型:' : 'Blood Type:'}</span> {character.blood_type}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">🩸</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '혈액형' : language === 'ja' ? '血液型' : 'Blood Type'}</span>
+                      <div className="text-gray-900">{character.blood_type}</div>
+                    </div>
                   </div>
                 )}
               </div>
 
               {/* Description */}
               {character.description && (
-                <div className="mt-6">
-                  <h3 className="text-xl font-bold mb-4">
-                    {language === 'ko' ? '설명' : language === 'ja' ? '説明' : 'Description'}
-                  </h3>
-                  <p className="text-gray-700 whitespace-pre-wrap">{character.description}</p>
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-xl">📝</span>
+                    <h3 className="text-xl font-bold">
+                      {language === 'ko' ? '설명' : language === 'ja' ? '説明' : 'Description'}
+                    </h3>
+                  </div>
+                  <div className="relative">
+                    <p className={`text-gray-700 whitespace-pre-wrap leading-relaxed ${!showFullDescription && character.description.length > 300 ? 'line-clamp-4' : ''}`}>
+                      {character.description}
+                    </p>
+                    {character.description.length > 300 && (
+                      <button
+                        onClick={() => setShowFullDescription(!showFullDescription)}
+                        className="mt-2 text-[#47B5FF] hover:text-[#2DA0ED] font-medium text-sm transition-colors"
+                      >
+                        {showFullDescription
+                          ? (language === 'ko' ? '접기' : language === 'ja' ? '折りたたむ' : 'Show less')
+                          : (language === 'ko' ? '더 보기' : language === 'ja' ? 'もっと見る' : 'Read more')
+                        }
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -1115,20 +1151,41 @@ export default function CharacterDetail() {
 
               {/* Description */}
               {character.description && (
-                <div className="mt-6">
-                  <h3 className="text-xl font-bold mb-4">
-                    {language === 'ko' ? '설명' : language === 'ja' ? '説明' : 'Description'}
-                  </h3>
-                  <p className="text-gray-700 whitespace-pre-wrap">{character.description}</p>
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-xl">📝</span>
+                    <h3 className="text-xl font-bold">
+                      {language === 'ko' ? '설명' : language === 'ja' ? '説明' : 'Description'}
+                    </h3>
+                  </div>
+                  <div className="relative">
+                    <p className={`text-gray-700 whitespace-pre-wrap leading-relaxed ${!showFullDescription && character.description.length > 300 ? 'line-clamp-4' : ''}`}>
+                      {character.description}
+                    </p>
+                    {character.description.length > 300 && (
+                      <button
+                        onClick={() => setShowFullDescription(!showFullDescription)}
+                        className="mt-2 text-[#47B5FF] hover:text-[#2DA0ED] font-medium text-sm transition-colors"
+                      >
+                        {showFullDescription
+                          ? (language === 'ko' ? '접기' : language === 'ja' ? '折りたたむ' : 'Show less')
+                          : (language === 'ko' ? '더 보기' : language === 'ja' ? 'もっと見る' : 'Read more')
+                        }
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
 
             {/* Anime Appearances */}
             <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
-              <h3 className="text-xl font-bold mb-4">
-                {language === 'ko' ? '출연 작품' : language === 'ja' ? '出演作品' : 'Appearances'}
-              </h3>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-xl">🎬</span>
+                <h3 className="text-xl font-bold">
+                  {language === 'ko' ? '출연 작품' : language === 'ja' ? '出演作品' : 'Appearances'}
+                </h3>
+              </div>
 
               {character.anime && character.anime.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
