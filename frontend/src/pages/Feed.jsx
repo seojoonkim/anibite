@@ -46,6 +46,7 @@ export default function Feed() {
   const observerRef = useRef(null);
   const loadMoreTriggerRef = useRef(null);
   const sidebarRef = useRef(null);
+  const [sidebarFixed, setSidebarFixed] = useState(false);
 
   // Cache removed - was causing inconsistent data on tab switching
 
@@ -77,6 +78,23 @@ export default function Feed() {
     } catch (err) {
       // Ignore
     }
+  }, []);
+
+  // Sidebar fixed positioning on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const navbar = document.querySelector('nav[class*="fixed top-0"]');
+      const navbarHeight = navbar ? navbar.offsetHeight : 48;
+      const scrollY = window.scrollY;
+
+      // Fix sidebar when scrolled past navbar
+      setSidebarFixed(scrollY > navbarHeight);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial check
+
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Don't auto-reset on filter change - let the hook handle it naturally
@@ -485,10 +503,18 @@ export default function Feed() {
           {/* Sidebar - Desktop only */}
           <aside
             ref={sidebarRef}
-            className="hidden md:block w-48 flex-shrink-0 self-start"
+            className="hidden md:block w-48 flex-shrink-0"
           >
-            <div className="sticky top-14">
-              <nav className="flex flex-col gap-1">
+            <nav
+              className="flex flex-col gap-1"
+              style={sidebarFixed ? {
+                position: 'fixed',
+                top: '56px',
+                width: '192px',
+                zIndex: 10
+              } : {}
+              }
+            >
                 <button
                   onClick={() => { setSearchParams({ filter: 'all' }); triggerWiggle(); }}
                   className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'all'
@@ -548,7 +574,6 @@ export default function Feed() {
                   {language === 'ko' ? '저장한 피드' : language === 'ja' ? '保存済み' : 'Saved'}
                 </button>
               </nav>
-            </div>
           </aside>
 
           {/* Main Content */}
