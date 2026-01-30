@@ -10,14 +10,20 @@ from services.auth_service import (
     verify_email,
     resend_verification_email
 )
+from services.google_oauth_service import verify_google_token, google_login_or_register
 from api.deps import get_current_user
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 router = APIRouter()
 
 
 class ResendVerificationRequest(BaseModel):
     email: EmailStr
+
+
+class GoogleAuthRequest(BaseModel):
+    credential: str  # Google ID token
+    preferred_language: str = Field(default='en', pattern='^(ko|en|ja)$')
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
@@ -93,3 +99,21 @@ def resend_verification(request: ResendVerificationRequest):
         성공 메시지
     """
     return resend_verification_email(request.email)
+
+
+@router.post("/google", response_model=TokenResponse)
+async def google_auth(auth_data: GoogleAuthRequest):
+    """
+    Google OAuth 로그인/회원가입
+
+    Google Sign-In으로 받은 credential(ID token)을 검증하고,
+    기존 사용자는 로그인 처리, 신규 사용자는 자동 회원가입 처리합니다.
+
+    Args:
+        auth_data: Google credential과 선호 언어
+
+    Returns:
+        TokenResponse: JWT 액세스 토큰 및 사용자 정보
+    """
+    google_user_info = await verify_google_token(auth_data.credential)
+    return await google_login_or_register(google_user_info, auth_data.preferred_language)

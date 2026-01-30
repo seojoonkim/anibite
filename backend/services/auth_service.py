@@ -15,7 +15,7 @@ from services.email_service import send_verification_email
 def register_user(user_data: UserRegister) -> dict:
     """회원가입 - 이메일 인증 필요"""
 
-    # 중복 확인
+    # 중복 확인 (username 및 email)
     existing_user = db.execute_query(
         "SELECT id FROM users WHERE username = ? OR email = ?",
         (user_data.username, user_data.email),
@@ -26,6 +26,19 @@ def register_user(user_data: UserRegister) -> dict:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username or email already exists"
+        )
+
+    # OAuth 이메일 중복 확인
+    oauth_user = db.execute_query(
+        "SELECT id FROM users WHERE email = ? AND oauth_provider IS NOT NULL AND oauth_provider != 'local'",
+        (user_data.email,),
+        fetch_one=True
+    )
+
+    if oauth_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="An account with this email already exists through social login"
         )
 
     # 비밀번호 해싱
@@ -39,9 +52,9 @@ def register_user(user_data: UserRegister) -> dict:
     user_id = db.execute_insert(
         """
         INSERT INTO users (username, email, password_hash, display_name,
-                          preferred_language, is_verified, verification_token,
+                          preferred_language, oauth_provider, is_verified, verification_token,
                           verification_token_expires, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, 1, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        VALUES (?, ?, ?, ?, ?, 'local', 1, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         """,
         (user_data.username, user_data.email, hashed_password, user_data.display_name,
          user_data.preferred_language, verification_token, token_expires.isoformat())
@@ -254,6 +267,13 @@ def update_user_password(user_id: int, current_password: str, new_password: str)
         )
 
     user_dict = dict_from_row(user_row)
+
+    # OAuth 사용자의 비밀번호 변경 차단
+    if user_dict.get('oauth_provider') and user_dict['oauth_provider'] != 'local':
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot change password for OAuth accounts"
+        )
 
     # 현재 비밀번호 확인
     if not verify_password(current_password, user_dict['password_hash']):

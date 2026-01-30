@@ -4,6 +4,10 @@ AniPass Backend Configuration
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
 
 # Base directory
 # In production (Railway), we work from backend/ directory
@@ -22,6 +26,10 @@ DATABASE_PATH = os.getenv("DATABASE_PATH", str(DATA_DIR / "anime.db"))
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-this-in-production")  # 프로덕션에서는 환경변수로 변경 필수
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
+
+# Google OAuth Settings
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
 
 # CORS Settings - Allow frontend domains
 _DEFAULT_ORIGINS = [

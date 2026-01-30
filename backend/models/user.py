@@ -56,6 +56,7 @@ class UserResponse(BaseModel):
     avatar_url: Optional[str]
     bio: Optional[str]
     preferred_language: Optional[str] = 'ko'
+    oauth_provider: Optional[str] = None  # 'google', 'local', None
     created_at: datetime
     otaku_score: Optional[float] = 0.0
 
