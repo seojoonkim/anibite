@@ -6,6 +6,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import { LogoWiggleProvider } from './context/LogoWiggleContext';
 import ScrollToTop from './components/common/ScrollToTop';
 import Navbar from './components/common/Navbar';
+import MobileWebBanner from './components/common/MobileWebBanner';
 
 // Lazy load all pages for code splitting (reduces initial bundle size)
 const Login = lazy(() => import('./pages/Login'));
@@ -80,6 +81,9 @@ function AppRoutes() {
     <>
       {/* Show Navbar on all authenticated pages except admin - render to body via portal */}
       {showNavbar && createPortal(<Navbar />, document.body)}
+
+      {/* Mobile web version banner - only on authenticated pages */}
+      {showNavbar && createPortal(<MobileWebBanner />, document.body)}
 
       <Suspense fallback={<PageLoader />}>
         <Routes>
