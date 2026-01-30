@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import GoogleSignInButton from '../components/GoogleSignInButton';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -76,6 +77,21 @@ export default function Register() {
         </div>
 
         <h2 className="text-xl font-semibold text-center mb-6 text-gray-800">Sign Up</h2>
+
+        {/* Google Sign-In */}
+        <div className="mb-6">
+          <GoogleSignInButton onError={setError} />
+
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">Or continue with email</span>
+            </div>
+          </div>
+        </div>
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
