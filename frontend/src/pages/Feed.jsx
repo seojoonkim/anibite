@@ -487,66 +487,68 @@ export default function Feed() {
             ref={sidebarRef}
             className="hidden md:block w-48 flex-shrink-0 self-start"
           >
-            <nav className="sticky top-14 flex flex-col gap-1">
-              <button
-                onClick={() => { setSearchParams({ filter: 'all' }); triggerWiggle(); }}
-                className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'all'
-                  ? 'bg-[#47B5FF] text-[#1a1a2e] font-semibold'
-                  : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
-                  }`}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="3" y="3" width="7" height="7"></rect>
-                  <rect x="14" y="3" width="7" height="7"></rect>
-                  <rect x="14" y="14" width="7" height="7"></rect>
-                  <rect x="3" y="14" width="7" height="7"></rect>
-                </svg>
-                {language === 'ko' ? '전체 보기' : language === 'ja' ? '全て表示' : 'View All'}
-              </button>
+            <div className="sticky top-14">
+              <nav className="flex flex-col gap-1">
+                <button
+                  onClick={() => { setSearchParams({ filter: 'all' }); triggerWiggle(); }}
+                  className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'all'
+                    ? 'bg-[#47B5FF] text-[#1a1a2e] font-semibold'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
+                    }`}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                  {language === 'ko' ? '전체 보기' : language === 'ja' ? '全て表示' : 'View All'}
+                </button>
 
-              <button
-                onClick={() => { setSearchParams({ filter: 'following' }); triggerWiggle(); }}
-                className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'following'
-                  ? 'bg-[#47B5FF] text-[#1a1a2e] font-semibold'
-                  : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
-                  }`}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-                {language === 'ko' ? '팔로잉 보기' : language === 'ja' ? 'フォロー中' : 'Following'}
-              </button>
+                <button
+                  onClick={() => { setSearchParams({ filter: 'following' }); triggerWiggle(); }}
+                  className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'following'
+                    ? 'bg-[#47B5FF] text-[#1a1a2e] font-semibold'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
+                    }`}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                  {language === 'ko' ? '팔로잉 보기' : language === 'ja' ? 'フォロー中' : 'Following'}
+                </button>
 
-              <button
-                onClick={() => { setSearchParams({ filter: 'notifications' }); triggerWiggle(); }}
-                className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'notifications'
-                  ? 'bg-[#47B5FF] text-[#1a1a2e] font-semibold'
-                  : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
-                  }`}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                </svg>
-                {language === 'ko' ? '알림 보기' : language === 'ja' ? '通知' : 'Notifications'}
-              </button>
+                <button
+                  onClick={() => { setSearchParams({ filter: 'notifications' }); triggerWiggle(); }}
+                  className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'notifications'
+                    ? 'bg-[#47B5FF] text-[#1a1a2e] font-semibold'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
+                    }`}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                  </svg>
+                  {language === 'ko' ? '알림 보기' : language === 'ja' ? '通知' : 'Notifications'}
+                </button>
 
-              <button
-                onClick={() => { setSearchParams({ filter: 'saved' }); triggerWiggle(); }}
-                className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'saved'
-                  ? 'bg-[#47B5FF] text-[#1a1a2e] font-semibold'
-                  : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
-                  }`}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-                </svg>
-                {language === 'ko' ? '저장한 피드' : language === 'ja' ? '保存済み' : 'Saved'}
-              </button>
-            </nav>
+                <button
+                  onClick={() => { setSearchParams({ filter: 'saved' }); triggerWiggle(); }}
+                  className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'saved'
+                    ? 'bg-[#47B5FF] text-[#1a1a2e] font-semibold'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
+                    }`}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  {language === 'ko' ? '저장한 피드' : language === 'ja' ? '保存済み' : 'Saved'}
+                </button>
+              </nav>
+            </div>
           </aside>
 
           {/* Main Content */}
