@@ -500,10 +500,10 @@ const ActivityCard = forwardRef(({
   };
 
   return (
-    <div ref={ref} className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-3 hover:shadow-[0_2px_12px_rgba(0,0,0,0.12)] transition-all">
+    <div ref={ref} className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-2.5 sm:p-3 md:p-4 hover:shadow-[0_2px_12px_rgba(0,0,0,0.12)] transition-all">
       {/* Header: User Info + Activity Type + Timestamp + Menu */}
       {finalShowOptions.showUserInfo && (
-        <div className="flex items-center mb-2 gap-2">
+        <div className="flex items-center mb-2 sm:mb-2.5 md:mb-3 gap-2">
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
             {/* User Avatar */}
             <Link to={`/user/${activity.user_id}`} className="flex-shrink-0">
@@ -575,7 +575,7 @@ const ActivityCard = forwardRef(({
       )}
 
       {/* Content: Item Image + Details */}
-      <div className="flex gap-4">
+      <div className="flex gap-2.5 sm:gap-3 md:gap-4">
         {/* Item Image (anime/character thumbnail) */}
         {finalShowOptions.showItemImage && activity.item_image && itemImageSrc && (
           <Link
@@ -587,7 +587,7 @@ const ActivityCard = forwardRef(({
               alt={activity.item_title || ''}
               loading="lazy"
               decoding="async"
-              className="w-16 h-24 object-cover rounded border-2 border-transparent hover:border-primary transition-all"
+              className="w-14 h-20 sm:w-16 sm:h-24 object-cover rounded border-2 border-transparent hover:border-primary transition-all"
               onError={handleItemImageError}
             />
           </Link>
@@ -766,8 +766,8 @@ const ActivityCard = forwardRef(({
       </div>
 
       {/* Actions: Like, Comment, Bookmark */}
-      <div className="mt-3 flex items-center justify-between">
-        <div className="flex items-center gap-5">
+      <div className="mt-2.5 sm:mt-3 md:mt-4 flex items-center justify-between">
+        <div className="flex items-center gap-4 sm:gap-5">
           {/* Like Button */}
           <button
             onClick={handleLikeClick}
