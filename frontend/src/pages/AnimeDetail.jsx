@@ -37,6 +37,7 @@ export default function AnimeDetail() {
   const [comments, setComments] = useState({});
   const [expandedComments, setExpandedComments] = useState(new Set());
   const [savedActivities, setSavedActivities] = useState(new Set());
+  const [showFullSynopsis, setShowFullSynopsis] = useState(false);
 
   // Use unified activities hook
   const {
@@ -833,55 +834,90 @@ export default function AnimeDetail() {
 
               <div className="grid grid-cols-2 gap-4 text-sm">
                 {anime.status && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '방영 상태:' : language === 'ja' ? '放送状態:' : 'Status:'}</span> {anime.status}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">📺</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '방영 상태' : language === 'ja' ? '放送状態' : 'Status'}</span>
+                      <div className="text-gray-900">{anime.status}</div>
+                    </div>
                   </div>
                 )}
                 {anime.format && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '포맷:' : language === 'ja' ? 'フォーマット:' : 'Format:'}</span> {anime.format}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">🎬</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '포맷' : language === 'ja' ? 'フォーマット' : 'Format'}</span>
+                      <div className="text-gray-900">{anime.format}</div>
+                    </div>
                   </div>
                 )}
                 {anime.episodes && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '에피소드:' : language === 'ja' ? 'エピソード:' : 'Episodes:'}</span> {anime.episodes}{language === 'ko' ? '화' : language === 'ja' ? '話' : ''}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">📹</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '에피소드' : language === 'ja' ? 'エピソード' : 'Episodes'}</span>
+                      <div className="text-gray-900">{anime.episodes}{language === 'ko' ? '화' : language === 'ja' ? '話' : ''}</div>
+                    </div>
                   </div>
                 )}
                 {anime.duration && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '러닝타임:' : language === 'ja' ? '放送時間:' : 'Duration:'}</span> {anime.duration}min
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">⏱️</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '러닝타임' : language === 'ja' ? '放送時間' : 'Duration'}</span>
+                      <div className="text-gray-900">{anime.duration}min</div>
+                    </div>
                   </div>
                 )}
                 {anime.start_date && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '방영 시작:' : language === 'ja' ? '放送開始:' : 'Start Date:'}</span> {anime.start_date}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">📅</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '방영 시작' : language === 'ja' ? '放送開始' : 'Start Date'}</span>
+                      <div className="text-gray-900">{anime.start_date}</div>
+                    </div>
                   </div>
                 )}
                 {anime.season && anime.season_year && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '시즌:' : language === 'ja' ? 'シーズン:' : 'Season:'}</span> {anime.season} {anime.season_year}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">🗓️</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '시즌' : language === 'ja' ? 'シーズン' : 'Season'}</span>
+                      <div className="text-gray-900">{anime.season} {anime.season_year}</div>
+                    </div>
                   </div>
                 )}
                 {anime.source && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '원작:' : language === 'ja' ? '原作:' : 'Source:'}</span> {anime.source}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">📖</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '원작' : language === 'ja' ? '原作' : 'Source'}</span>
+                      <div className="text-gray-900">{anime.source}</div>
+                    </div>
                   </div>
                 )}
                 {anime.country_of_origin && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '국가:' : language === 'ja' ? '国:' : 'Country:'}</span> {anime.country_of_origin}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">🌏</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '국가' : language === 'ja' ? '国' : 'Country'}</span>
+                      <div className="text-gray-900">{anime.country_of_origin}</div>
+                    </div>
                   </div>
                 )}
               </div>
 
               {anime.genres && anime.genres.length > 0 && (
-                <div className="mt-4">
-                  <span className="font-medium text-sm">{language === 'ko' ? '장르:' : language === 'ja' ? 'ジャンル:' : 'Genres:'}</span>
-                  <div className="flex flex-wrap gap-2 mt-2">
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-lg">🎭</span>
+                    <span className="font-semibold text-sm text-gray-700">{language === 'ko' ? '장르' : language === 'ja' ? 'ジャンル' : 'Genres'}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
                     {anime.genres.map((genre) => (
                       <span
                         key={genre}
-                        className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm"
+                        className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors"
                       >
                         {genre}
                       </span>
@@ -891,13 +927,16 @@ export default function AnimeDetail() {
               )}
 
               {anime.studios && anime.studios.length > 0 && (
-                <div className="mt-4">
-                  <span className="font-medium text-sm">{language === 'ko' ? '제작사:' : language === 'ja' ? 'スタジオ:' : 'Studios:'}</span>
-                  <div className="flex flex-wrap gap-2 mt-2">
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-lg">🏢</span>
+                    <span className="font-semibold text-sm text-gray-700">{language === 'ko' ? '제작사' : language === 'ja' ? 'スタジオ' : 'Studios'}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
                     {anime.studios.map((studio, idx) => (
                       <span
                         key={idx}
-                        className="bg-gray-100 text-gray-800 px-3 py-1 rounded text-sm"
+                        className="bg-gray-100 text-gray-800 px-3 py-1 rounded text-sm font-medium hover:bg-gray-200 transition-colors"
                       >
                         {studio.name || studio}
                       </span>
@@ -907,13 +946,16 @@ export default function AnimeDetail() {
               )}
 
               {anime.tags && anime.tags.length > 0 && (
-                <div className="mt-4">
-                  <span className="font-medium text-sm">{language === 'ko' ? '태그:' : language === 'ja' ? 'タグ:' : 'Tags:'}</span>
-                  <div className="flex flex-wrap gap-2 mt-2">
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-lg">🏷️</span>
+                    <span className="font-semibold text-sm text-gray-700">{language === 'ko' ? '태그' : language === 'ja' ? 'タグ' : 'Tags'}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
                     {anime.tags.slice(0, 10).map((tag, idx) => (
                       <span
                         key={idx}
-                        className="bg-purple-50 text-purple-700 px-2 py-1 rounded text-xs"
+                        className="bg-purple-50 text-purple-700 px-2 py-1 rounded text-xs font-medium hover:bg-purple-100 transition-colors cursor-help"
                         title={tag.description}
                       >
                         {tag.name}
@@ -979,55 +1021,90 @@ export default function AnimeDetail() {
 
               <div className="grid grid-cols-2 gap-4 text-sm">
                 {anime.status && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '방영 상태:' : language === 'ja' ? '放送状態:' : 'Status:'}</span> {anime.status}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">📺</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '방영 상태' : language === 'ja' ? '放送状態' : 'Status'}</span>
+                      <div className="text-gray-900">{anime.status}</div>
+                    </div>
                   </div>
                 )}
                 {anime.format && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '포맷:' : language === 'ja' ? 'フォーマット:' : 'Format:'}</span> {anime.format}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">🎬</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '포맷' : language === 'ja' ? 'フォーマット' : 'Format'}</span>
+                      <div className="text-gray-900">{anime.format}</div>
+                    </div>
                   </div>
                 )}
                 {anime.episodes && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '에피소드:' : language === 'ja' ? 'エピソード:' : 'Episodes:'}</span> {anime.episodes}{language === 'ko' ? '화' : language === 'ja' ? '話' : ''}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">📹</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '에피소드' : language === 'ja' ? 'エピソード' : 'Episodes'}</span>
+                      <div className="text-gray-900">{anime.episodes}{language === 'ko' ? '화' : language === 'ja' ? '話' : ''}</div>
+                    </div>
                   </div>
                 )}
                 {anime.duration && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '러닝타임:' : language === 'ja' ? '放送時間:' : 'Duration:'}</span> {anime.duration}min
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">⏱️</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '러닝타임' : language === 'ja' ? '放送時間' : 'Duration'}</span>
+                      <div className="text-gray-900">{anime.duration}min</div>
+                    </div>
                   </div>
                 )}
                 {anime.start_date && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '방영 시작:' : language === 'ja' ? '放送開始:' : 'Start Date:'}</span> {anime.start_date}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">📅</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '방영 시작' : language === 'ja' ? '放送開始' : 'Start Date'}</span>
+                      <div className="text-gray-900">{anime.start_date}</div>
+                    </div>
                   </div>
                 )}
                 {anime.season && anime.season_year && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '시즌:' : language === 'ja' ? 'シーズン:' : 'Season:'}</span> {anime.season} {anime.season_year}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">🗓️</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '시즌' : language === 'ja' ? 'シーズン' : 'Season'}</span>
+                      <div className="text-gray-900">{anime.season} {anime.season_year}</div>
+                    </div>
                   </div>
                 )}
                 {anime.source && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '원작:' : language === 'ja' ? '原作:' : 'Source:'}</span> {anime.source}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">📖</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '원작' : language === 'ja' ? '原作' : 'Source'}</span>
+                      <div className="text-gray-900">{anime.source}</div>
+                    </div>
                   </div>
                 )}
                 {anime.country_of_origin && (
-                  <div>
-                    <span className="font-medium">{language === 'ko' ? '국가:' : language === 'ja' ? '国:' : 'Country:'}</span> {anime.country_of_origin}
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">🌏</span>
+                    <div>
+                      <span className="font-medium text-gray-600">{language === 'ko' ? '국가' : language === 'ja' ? '国' : 'Country'}</span>
+                      <div className="text-gray-900">{anime.country_of_origin}</div>
+                    </div>
                   </div>
                 )}
               </div>
 
               {anime.genres && anime.genres.length > 0 && (
-                <div className="mt-4">
-                  <span className="font-medium text-sm">{language === 'ko' ? '장르:' : language === 'ja' ? 'ジャンル:' : 'Genres:'}</span>
-                  <div className="flex flex-wrap gap-2 mt-2">
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-lg">🎭</span>
+                    <span className="font-semibold text-sm text-gray-700">{language === 'ko' ? '장르' : language === 'ja' ? 'ジャンル' : 'Genres'}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
                     {anime.genres.map((genre) => (
                       <span
                         key={genre}
-                        className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm"
+                        className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors"
                       >
                         {genre}
                       </span>
@@ -1037,13 +1114,16 @@ export default function AnimeDetail() {
               )}
 
               {anime.studios && anime.studios.length > 0 && (
-                <div className="mt-4">
-                  <span className="font-medium text-sm">{language === 'ko' ? '제작사:' : language === 'ja' ? 'スタジオ:' : 'Studios:'}</span>
-                  <div className="flex flex-wrap gap-2 mt-2">
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-lg">🏢</span>
+                    <span className="font-semibold text-sm text-gray-700">{language === 'ko' ? '제작사' : language === 'ja' ? 'スタジオ' : 'Studios'}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
                     {anime.studios.map((studio, idx) => (
                       <span
                         key={idx}
-                        className="bg-gray-100 text-gray-800 px-3 py-1 rounded text-sm"
+                        className="bg-gray-100 text-gray-800 px-3 py-1 rounded text-sm font-medium hover:bg-gray-200 transition-colors"
                       >
                         {studio.name || studio}
                       </span>
@@ -1053,13 +1133,16 @@ export default function AnimeDetail() {
               )}
 
               {anime.tags && anime.tags.length > 0 && (
-                <div className="mt-4">
-                  <span className="font-medium text-sm">{language === 'ko' ? '태그:' : language === 'ja' ? 'タグ:' : 'Tags:'}</span>
-                  <div className="flex flex-wrap gap-2 mt-2">
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-lg">🏷️</span>
+                    <span className="font-semibold text-sm text-gray-700">{language === 'ko' ? '태그' : language === 'ja' ? 'タグ' : 'Tags'}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
                     {anime.tags.slice(0, 10).map((tag, idx) => (
                       <span
                         key={idx}
-                        className="bg-purple-50 text-purple-700 px-2 py-1 rounded text-xs"
+                        className="bg-purple-50 text-purple-700 px-2 py-1 rounded text-xs font-medium hover:bg-purple-100 transition-colors cursor-help"
                         title={tag.description}
                       >
                         {tag.name}
@@ -1073,15 +1156,36 @@ export default function AnimeDetail() {
             {/* Synopsis */}
             {anime.description && (
               <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
-                <h3 className="text-xl font-bold mb-4">{language === 'ko' ? '줄거리' : language === 'ja' ? 'あらすじ' : 'Synopsis'}</h3>
-                <p className="text-gray-700 whitespace-pre-line">{anime.description}</p>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-xl">📝</span>
+                  <h3 className="text-xl font-bold">{language === 'ko' ? '줄거리' : language === 'ja' ? 'あらすじ' : 'Synopsis'}</h3>
+                </div>
+                <div className="relative">
+                  <p className={`text-gray-700 whitespace-pre-line leading-relaxed ${!showFullSynopsis && anime.description.length > 300 ? 'line-clamp-4' : ''}`}>
+                    {anime.description}
+                  </p>
+                  {anime.description.length > 300 && (
+                    <button
+                      onClick={() => setShowFullSynopsis(!showFullSynopsis)}
+                      className="mt-2 text-[#47B5FF] hover:text-[#2DA0ED] font-medium text-sm transition-colors"
+                    >
+                      {showFullSynopsis
+                        ? (language === 'ko' ? '접기' : language === 'ja' ? '折りたたむ' : 'Show less')
+                        : (language === 'ko' ? '더 보기' : language === 'ja' ? 'もっと見る' : 'Read more')
+                      }
+                    </button>
+                  )}
+                </div>
               </div>
             )}
 
             {/* Characters & Voice Actors */}
             {anime.characters && anime.characters.length > 0 && (
               <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
-                <h3 className="text-xl font-bold mb-4">{language === 'ko' ? '캐릭터 & 성우' : language === 'ja' ? 'キャラクター & 声優' : 'Characters & Voice Actors'}</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-xl">👥</span>
+                  <h3 className="text-xl font-bold">{language === 'ko' ? '캐릭터 & 성우' : language === 'ja' ? 'キャラクター & 声優' : 'Characters & Voice Actors'}</h3>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {anime.characters.map((char, idx) => (
                     <div key={idx} className="flex items-center gap-4 p-3 border border-gray-200 rounded-lg hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-shadow">
