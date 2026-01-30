@@ -485,10 +485,10 @@ export default function Feed() {
           {/* Sidebar - Desktop only */}
           <aside
             ref={sidebarRef}
-            className="hidden md:block w-48 flex-shrink-0 self-start"
+            className="hidden md:block w-48 flex-shrink-0"
           >
             <nav
-              className="flex flex-col gap-1 sticky top-14"
+              className="flex flex-col gap-1 fixed top-14 md:top-16 w-48"
               style={{ zIndex: 10 }}
             >
                 <button
