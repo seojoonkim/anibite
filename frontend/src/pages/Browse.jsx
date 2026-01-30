@@ -238,7 +238,7 @@ export default function Browse() {
             <select
               value={sort}
               onChange={(e) => handleSortChange(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm bg-white min-w-[100px]"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-base md:text-sm bg-white min-w-[100px]"
             >
               <option value="popularity_desc">{t('sortPopularity')}</option>
               <option value="rating_desc">{t('sortRatingDesc')}</option>
@@ -256,7 +256,7 @@ export default function Browse() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={language === 'ko' ? '애니메이션, 캐릭터 검색..' : language === 'ja' ? 'アニメ、キャラクターを検索..' : 'Search anime, characters...'}
-                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-base md:text-sm"
               />
               {searchTerm && (
                 <button

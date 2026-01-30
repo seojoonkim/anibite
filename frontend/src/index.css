@@ -164,6 +164,9 @@ body {
   min-height: 100vh;
   position: relative;
   -webkit-overflow-scrolling: touch;
+  /* Mobile touch optimizations */
+  -webkit-tap-highlight-color: rgba(71, 181, 255, 0.2);
+  touch-action: manipulation;
 }
 
 #root {
@@ -397,11 +400,38 @@ img {
   cursor: pointer;
   border: none;
   outline: none;
+  /* Mobile touch target size (min 44x44px) */
+  min-height: 44px;
+  touch-action: manipulation;
 }
 
 .btn:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  /* Prevent iOS text zoom on input focus */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  /* Ensure touch targets are at least 44x44px */
+  button,
+  a,
+  input[type="button"],
+  input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
 
 /* Skeleton Loading with Shimmer - Dark Mode */
