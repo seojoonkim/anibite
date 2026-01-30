@@ -1664,8 +1664,8 @@ export default function MyAniPass() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Left Sidebar - Profile Summary - Show when stats loaded */}
             {stats && (
-              <div className="hidden lg:block lg:col-span-1">
-                <div className="bg-surface rounded-xl shadow-lg border border-border p-6 sticky top-4">
+              <div className="hidden lg:block lg:col-span-1 self-start">
+                <div className="bg-surface rounded-xl shadow-lg border border-border p-6 sticky top-14">
                   {/* Profile Picture */}
                   <div className="flex flex-col items-center mb-4">
                     {displayUser?.avatar_url ? (

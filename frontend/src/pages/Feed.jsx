@@ -485,9 +485,9 @@ export default function Feed() {
           {/* Sidebar - Desktop only */}
           <aside
             ref={sidebarRef}
-            className="hidden md:block w-48 flex-shrink-0"
+            className="hidden md:block w-48 flex-shrink-0 self-start"
           >
-            <nav className="sticky top-20 flex flex-col gap-1">
+            <nav className="sticky top-14 flex flex-col gap-1">
               <button
                 onClick={() => { setSearchParams({ filter: 'all' }); triggerWiggle(); }}
                 className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'all'
