@@ -33,6 +33,7 @@ function CharacterSearchCard({ character, language }) {
           <img
             src={imageUrl}
             alt={character.name_korean || character.name_full}
+            loading="lazy"
             className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
             onLoad={() => setImageLoaded(true)}
             onError={() => {
@@ -166,7 +167,7 @@ export default function Browse() {
       const currentPage = resetList ? 1 : page;
       const params = {
         page: currentPage,
-        limit: 20,
+        limit: resetList ? 12 : 20, // Initial load: 12, subsequent: 20
         sort: sort,
       };
 
@@ -361,6 +362,7 @@ export default function Browse() {
                                 <img
                                   src={getImageUrl(anime.cover_image_url)}
                                   alt={getAnimeTitle(anime)}
+                                  loading="lazy"
                                   className="w-full h-full object-cover hover:scale-110 transition-transform duration-200"
                                   onError={(e) => {
                                     e.target.src = '/placeholder-anime.svg';
