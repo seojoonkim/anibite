@@ -4,8 +4,18 @@ from pathlib import Path
 
 def add_oauth_support():
     db_path = Path(__file__).parent.parent.parent / "data" / "anime.db"
+    print(f"🔍 Database path: {db_path}")
+    print(f"🔍 Database exists: {db_path.exists()}")
+    print(f"🔍 Database size: {db_path.stat().st_size if db_path.exists() else 0} bytes")
+
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
+
+    # Check current schema
+    cursor.execute("PRAGMA table_info(users)")
+    columns = cursor.fetchall()
+    column_names = [col[1] for col in columns]
+    print(f"🔍 Current columns: {', '.join(column_names)}")
 
     try:
         cursor.execute("ALTER TABLE users ADD COLUMN oauth_provider TEXT NULL")
