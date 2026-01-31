@@ -7,6 +7,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Optional
 from database import get_db, Database, dict_from_row
 from utils.security import decode_access_token
+from utils.user_helpers import set_default_avatar
 from models.user import UserResponse
 
 security = HTTPBearer()
@@ -53,6 +54,8 @@ def get_current_user(
         )
 
     user_dict = dict_from_row(user_row)
+    user_dict = set_default_avatar(user_dict, db)
+
     return UserResponse(**user_dict)
 
 
@@ -88,4 +91,6 @@ def get_current_user_optional(
         return None
 
     user_dict = dict_from_row(user_row)
+    user_dict = set_default_avatar(user_dict, db)
+
     return UserResponse(**user_dict)

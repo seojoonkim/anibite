@@ -8,6 +8,7 @@ import secrets
 from fastapi import HTTPException, status
 from database import db, dict_from_row
 from utils.security import hash_password, verify_password, create_access_token
+from utils.user_helpers import set_default_avatar
 from models.user import UserRegister, UserLogin, UserResponse, TokenResponse
 from services.email_service import send_verification_email
 
@@ -87,6 +88,7 @@ def register_user(user_data: UserRegister) -> dict:
     )
 
     user_dict = dict_from_row(user_row)
+    user_dict = set_default_avatar(user_dict, db)
     user_response = UserResponse(**user_dict)
 
     # JWT 토큰 생성
@@ -137,6 +139,7 @@ def login_user(login_data: UserLogin) -> TokenResponse:
     #         detail="Please verify your email before logging in. Check your inbox for the verification link."
     #     )
 
+    user_dict = set_default_avatar(user_dict, db)
     user = UserResponse(**user_dict)
 
     # JWT 토큰 생성
