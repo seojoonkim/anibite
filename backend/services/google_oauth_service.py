@@ -8,6 +8,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 from database import db, dict_from_row
 from utils.security import create_access_token
+from utils.user_helpers import set_default_avatar
 from models.user import UserResponse, TokenResponse
 from config import GOOGLE_CLIENT_ID
 
@@ -105,6 +106,8 @@ async def google_login_or_register(google_user_info: Dict[str, str], preferred_l
         user_id = user_dict['id']
 
         # 프로필 사진 업데이트 안 함 - 사용자가 설정한 캐릭터 이미지 유지
+        # avatar_url이 없으면 5점 캐릭터 이미지 자동 설정
+        user_dict = set_default_avatar(user_dict, db)
 
         user_response = UserResponse(**user_dict)
         access_token = create_access_token(data={"sub": user_response.username})
@@ -158,6 +161,7 @@ async def google_login_or_register(google_user_info: Dict[str, str], preferred_l
         )
 
         user_dict = dict_from_row(updated_user)
+        user_dict = set_default_avatar(user_dict, db)
         user_response = UserResponse(**user_dict)
         access_token = create_access_token(data={"sub": user_dict['username']})
 
@@ -220,6 +224,7 @@ async def google_login_or_register(google_user_info: Dict[str, str], preferred_l
     )
 
     user_dict = dict_from_row(user_row)
+    user_dict = set_default_avatar(user_dict, db)
     user_response = UserResponse(**user_dict)
 
     # JWT 토큰 생성
