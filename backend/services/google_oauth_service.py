@@ -100,17 +100,11 @@ async def google_login_or_register(google_user_info: Dict[str, str], preferred_l
     )
 
     if existing_oauth_user:
-        # 기존 OAuth 사용자 → 로그인 처리 + 아바타 업데이트
+        # 기존 OAuth 사용자 → 로그인 처리 (프로필 사진은 유지)
         user_dict = dict_from_row(existing_oauth_user)
         user_id = user_dict['id']
 
-        # 아바타 URL 업데이트 (Google 프로필 사진이 변경될 수 있음)
-        if picture:
-            db.execute_query(
-                "UPDATE users SET avatar_url = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-                (picture, user_id)
-            )
-            user_dict['avatar_url'] = picture
+        # 프로필 사진 업데이트 안 함 - 사용자가 설정한 캐릭터 이미지 유지
 
         user_response = UserResponse(**user_dict)
         access_token = create_access_token(data={"sub": user_response.username})
@@ -138,18 +132,17 @@ async def google_login_or_register(google_user_info: Dict[str, str], preferred_l
         user_dict = dict_from_row(existing_email_user)
         user_id = user_dict['id']
 
-        # Google OAuth 정보 업데이트
+        # Google OAuth 정보 업데이트 (프로필 사진은 유지)
         db.execute_query(
             """
             UPDATE users
             SET oauth_provider = 'google',
                 oauth_id = ?,
-                avatar_url = ?,
                 is_verified = 1,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             """,
-            (oauth_id, picture, user_id)
+            (oauth_id, user_id)
         )
 
         # 업데이트된 사용자 정보 다시 조회
@@ -192,15 +185,15 @@ async def google_login_or_register(google_user_info: Dict[str, str], preferred_l
         username = f"{base_username}{counter}"
         counter += 1
 
-    # 사용자 생성 (비밀번호 없음, 자동 이메일 인증)
+    # 사용자 생성 (비밀번호 없음, 자동 이메일 인증, 프로필 사진 없음)
     user_id = db.execute_insert(
         """
         INSERT INTO users (username, email, password_hash, display_name, avatar_url,
                           preferred_language, oauth_provider, oauth_id,
                           is_verified, created_at, updated_at)
-        VALUES (?, ?, NULL, ?, ?, ?, 'google', ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        VALUES (?, ?, NULL, ?, NULL, ?, 'google', ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         """,
-        (username, email, name, picture, preferred_language, oauth_id)
+        (username, email, name, preferred_language, oauth_id)
     )
 
     # 사용자 통계 초기화
