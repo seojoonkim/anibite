@@ -113,13 +113,62 @@ async def startup_event():
         print(f"WARNING: Failed to update schema: {e}\n")
 
     # 4.5. Add OAuth support (oauth_provider, oauth_id columns)
-    print("🔐 Adding OAuth support...")
+    print("\n🔐 Adding OAuth support...")
     try:
-        from scripts.add_oauth_support import add_oauth_support
-        add_oauth_support()
+        from scripts.force_add_oauth import force_add_oauth
+        # Run inline to avoid import issues
+        import sqlite3
+        from pathlib import Path
+
+        db_path = Path(__file__).parent.parent / "data" / "anime.db"
+        if not db_path.exists():
+            db_path = Path("/app/data/anime.db")
+
+        print(f"[OAuth] Database path: {db_path}")
+        conn = sqlite3.connect(str(db_path))
+        cursor = conn.cursor()
+
+        # Check and add oauth_provider
+        cursor.execute("PRAGMA table_info(users)")
+        columns = [row[1] for row in cursor.fetchall()]
+
+        if 'oauth_provider' not in columns:
+            cursor.execute("ALTER TABLE users ADD COLUMN oauth_provider TEXT")
+            print("[OAuth] ✅ Added oauth_provider column")
+        else:
+            print("[OAuth] ⚠️  oauth_provider already exists")
+
+        if 'oauth_id' not in columns:
+            cursor.execute("ALTER TABLE users ADD COLUMN oauth_id TEXT")
+            print("[OAuth] ✅ Added oauth_id column")
+        else:
+            print("[OAuth] ⚠️  oauth_id already exists")
+
+        # Create index
+        try:
+            cursor.execute("""
+                CREATE UNIQUE INDEX idx_oauth_user
+                ON users(oauth_provider, oauth_id)
+                WHERE oauth_provider IS NOT NULL AND oauth_provider != 'local'
+            """)
+            print("[OAuth] ✅ Created unique index")
+        except sqlite3.OperationalError as e:
+            if "already exists" in str(e).lower():
+                print("[OAuth] ⚠️  Index already exists")
+
+        # Mark existing users as local
+        cursor.execute("UPDATE users SET oauth_provider = 'local' WHERE oauth_provider IS NULL")
+        updated = cursor.rowcount
+        print(f"[OAuth] ✅ Marked {updated} users as 'local'")
+
+        conn.commit()
+        conn.close()
         print("✅ OAuth support ready!\n")
     except Exception as e:
-        print(f"WARNING: Failed to add OAuth support: {e}\n")
+        print(f"❌ WARNING: Failed to add OAuth support: {e}")
+        import traceback
+        traceback.print_exc()
+        print("⚠️  Server will start but Google OAuth may not work!\n")
 
     # 5. Verify existing users (one-time migration for email verification feature)
     print("👤 Verifying existing users...")
