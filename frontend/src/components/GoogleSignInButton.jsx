@@ -1,8 +1,8 @@
 /**
  * Google Sign-In Button Component
- * Handles Google OAuth login/registration
+ * Handles Google OAuth login/registration with custom styling
  */
-import { GoogleLogin } from '@react-oauth/google';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL } from '../config/api';
@@ -10,34 +10,75 @@ import { API_BASE_URL } from '../config/api';
 const GoogleSignInButton = ({ onError }) => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const buttonRef = useRef(null);
 
-  const handleSuccess = async (credentialResponse) => {
+  useEffect(() => {
+    // Load Google Sign-In script
+    if (window.google) {
+      initializeGoogleSignIn();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = initializeGoogleSignIn;
+    document.body.appendChild(script);
+
+    return () => {
+      const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+      if (existingScript) {
+        document.body.removeChild(existingScript);
+      }
+    };
+  }, []);
+
+  const initializeGoogleSignIn = () => {
+    if (!window.google || !buttonRef.current) return;
+
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+    window.google.accounts.id.initialize({
+      client_id: clientId,
+      callback: handleCredentialResponse,
+    });
+
+    window.google.accounts.id.renderButton(
+      buttonRef.current,
+      {
+        theme: 'outline',
+        size: 'large',
+        width: buttonRef.current.offsetWidth,
+        text: 'continue_with',
+        shape: 'rectangular',
+        logo_alignment: 'left',
+      }
+    );
+  };
+
+  const handleCredentialResponse = async (response) => {
     try {
-      // Get user's preferred language from localStorage
       const preferredLanguage = localStorage.getItem('language') || 'en';
 
-      // Send the credential (ID token) to backend
-      const response = await fetch(`${API_BASE_URL}/api/auth/google`, {
+      const apiResponse = await fetch(`${API_BASE_URL}/api/auth/google`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          credential: credentialResponse.credential,
+          credential: response.credential,
           preferred_language: preferredLanguage,
         }),
       });
 
-      const data = await response.json();
+      const data = await apiResponse.json();
 
-      if (!response.ok) {
+      if (!apiResponse.ok) {
         throw new Error(data.detail || 'Google login failed');
       }
 
-      // Login with token and user data
       await login(null, data.access_token, data.user);
-
-      // Navigate to home
       navigate('/');
     } catch (error) {
       console.error('Google login error:', error);
@@ -47,23 +88,12 @@ const GoogleSignInButton = ({ onError }) => {
     }
   };
 
-  const handleError = () => {
-    console.error('Google OAuth error');
-    if (onError) {
-      onError('Failed to sign in with Google');
-    }
-  };
-
   return (
     <div className="w-full">
-      <GoogleLogin
-        onSuccess={handleSuccess}
-        onError={handleError}
-        theme="outline"
-        size="large"
-        width="100%"
-        text="signin_with"
-        shape="rectangular"
+      <div
+        ref={buttonRef}
+        className="w-full flex items-center justify-center"
+        style={{ minHeight: '44px' }}
       />
     </div>
   );
