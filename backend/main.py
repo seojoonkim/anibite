@@ -112,6 +112,15 @@ async def startup_event():
     except Exception as e:
         print(f"WARNING: Failed to update schema: {e}\n")
 
+    # 4.5. Add OAuth support (oauth_provider, oauth_id columns)
+    print("🔐 Adding OAuth support...")
+    try:
+        from scripts.add_oauth_support import add_oauth_support
+        add_oauth_support()
+        print("✅ OAuth support ready!\n")
+    except Exception as e:
+        print(f"WARNING: Failed to add OAuth support: {e}\n")
+
     # 5. Verify existing users (one-time migration for email verification feature)
     print("👤 Verifying existing users...")
     try:
