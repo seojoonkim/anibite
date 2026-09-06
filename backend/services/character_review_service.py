@@ -13,158 +13,34 @@ from models.character_review import (
 )
 
 
-def create_character_review(user_id: int, review_data: CharacterReviewCreate) -> CharacterReviewResponse:
-    """캐릭터 리뷰 생성"""
-
-    # 캐릭터 존재 확인
-    character_exists = db.execute_query(
-        "SELECT id FROM character WHERE id = ?",
-        (review_data.character_id,),
-        fetch_one=True
-    )
-
-    if not character_exists:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Character not found"
-        )
-
-    # 중복 확인
-    existing = db.execute_query(
-        "SELECT id FROM character_reviews WHERE user_id = ? AND character_id = ?",
-        (user_id, review_data.character_id),
-        fetch_one=True
-    )
-
-    if existing:
-        # 이미 리뷰가 있으면 업데이트
-        return update_character_review(
-            existing['id'],
-            user_id,
-            CharacterReviewUpdate(
-                content=review_data.content,
-                title=review_data.title,
-                is_spoiler=review_data.is_spoiler
-            )
-        )
-
-    # 별점이 함께 제공된 경우 먼저 저장
-    if review_data.rating is not None:
-        try:
-            from services.character_service import rate_character
-            # 별점 저장 (이미 _sync_character_rating_to_activities 호출됨)
-            rate_character(user_id, review_data.character_id, review_data.rating)
-        except Exception as e:
-            # 별점 저장 실패해도 리뷰는 계속 진행
-            print(f"Warning: Failed to save character rating: {e}")
-
-    # 리뷰 생성
-    review_id = db.execute_insert(
-        """
-        INSERT INTO character_reviews (
-            user_id, character_id, title, content, is_spoiler,
-            likes_count, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-        """,
-        (user_id, review_data.character_id, review_data.title,
-         review_data.content, 1 if review_data.is_spoiler else 0)
-    )
-
-    # Sync to activities (리뷰 생성 시 activities 업데이트)
-    from services.character_service import _sync_character_rating_to_activities
-    _sync_character_rating_to_activities(user_id, review_data.character_id)
-
-    # Update activity_time to current time (move to recent feed)
-    db.execute_update("""
-        UPDATE activities
-        SET activity_time = CURRENT_TIMESTAMP,
-            updated_at = CURRENT_TIMESTAMP
-        WHERE activity_type = 'character_rating'
-          AND user_id = ?
-          AND item_id = ?
-    """, (user_id, review_data.character_id))
-
+@db.atomic
+def create_character_review(user_id, review_data):
+    from services.projection_service import save_review
+    review_id=save_review('character',user_id,review_data.character_id,review_data.title,review_data.content,review_data.is_spoiler,review_data.rating)
     return get_character_review_by_id(review_id)
 
 
-def update_character_review(review_id: int, user_id: int, review_data: CharacterReviewUpdate) -> CharacterReviewResponse:
-    """캐릭터 리뷰 수정 (별점도 함께 업데이트 가능)"""
-
-    # 리뷰 존재 및 권한 확인
-    existing = db.execute_query(
-        "SELECT user_id, character_id FROM character_reviews WHERE id = ?",
-        (review_id,),
-        fetch_one=True
-    )
-
+@db.atomic
+def update_character_review(review_id,user_id,review_data):
+    from services.projection_service import save_review
+    existing=db.execute_query('SELECT * FROM character_reviews WHERE id=?',(review_id,),fetch_one=True)
     if not existing:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Review not found"
-        )
-
-    if existing['user_id'] != user_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to update this review"
-        )
-
-    character_id = existing['character_id']
-
-    # 별점이 제공되면 먼저 업데이트
-    if review_data.rating is not None:
-        from services.character_service import create_or_update_character_rating
-        create_or_update_character_rating(user_id, character_id, rating=review_data.rating)
-
-    # 수정할 필드만 업데이트
-    update_fields = []
-    params = []
-
-    if review_data.title is not None:
-        update_fields.append("title = ?")
-        params.append(review_data.title)
-
-    if review_data.content is not None:
-        update_fields.append("content = ?")
-        params.append(review_data.content)
-
-    if review_data.is_spoiler is not None:
-        update_fields.append("is_spoiler = ?")
-        params.append(1 if review_data.is_spoiler else 0)
-
-    if update_fields:
-        update_fields.append("updated_at = CURRENT_TIMESTAMP")
-        params.append(review_id)
-
-        db.execute_update(
-            f"UPDATE character_reviews SET {', '.join(update_fields)} WHERE id = ?",
-            tuple(params)
-        )
-
-    # Sync to activities (리뷰 수정 시 activities도 업데이트)
-    # Note: 별점 업데이트 시 이미 sync가 호출되었지만, 리뷰 내용도 반영하기 위해 다시 호출
-    from services.character_service import _sync_character_rating_to_activities
-    _sync_character_rating_to_activities(user_id, character_id)
-
-    # Update activity_time to current time (move to recent feed)
-    db.execute_update("""
-        UPDATE activities
-        SET activity_time = CURRENT_TIMESTAMP,
-            updated_at = CURRENT_TIMESTAMP
-        WHERE activity_type = 'character_rating'
-          AND user_id = ?
-          AND item_id = ?
-    """, (user_id, character_id))
-
+        raise HTTPException(status_code=404,detail='Review not found')
+    if existing['user_id']!=user_id:
+        raise HTTPException(status_code=403,detail='Not authorized')
+    values=dict(existing)
+    values.update(review_data.model_dump(exclude_none=True))
+    save_review('character',user_id,existing['character_id'],values['title'],values['content'],values['is_spoiler'],review_data.rating)
     return get_character_review_by_id(review_id)
 
 
+@db.atomic
 def delete_character_review(review_id: int, user_id: int) -> bool:
     """캐릭터 리뷰 삭제 (관련 댓글과 좋아요도 함께 삭제)"""
 
     # 권한 확인
     existing = db.execute_query(
-        "SELECT user_id FROM character_reviews WHERE id = ?",
+        "SELECT user_id, character_id FROM character_reviews WHERE id = ?",
         (review_id,),
         fetch_one=True
     )
@@ -195,44 +71,21 @@ def delete_character_review(review_id: int, user_id: int) -> bool:
 
     # 리뷰 삭제
     db.execute_update("DELETE FROM character_reviews WHERE id = ?", (review_id,))
+    from services.projection_service import sync_projection
+    sync_projection('character', user_id, existing['character_id'])
 
     return True
 
 
+@db.atomic
 def delete_character_review_by_character(user_id: int, character_id: int) -> bool:
-    """character_id로 캐릭터 리뷰 삭제 (관련 댓글과 좋아요도 함께 삭제)"""
-
-    # 리뷰 찾기
     existing = db.execute_query(
-        "SELECT id FROM character_reviews WHERE user_id = ? AND character_id = ?",
-        (user_id, character_id),
-        fetch_one=True
+        "SELECT id FROM character_reviews WHERE user_id=? AND character_id=?",
+        (user_id, character_id), fetch_one=True,
     )
-
     if not existing:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Review not found"
-        )
-
-    review_id = existing['id']
-
-    # 관련 댓글 삭제 (review_comments)
-    db.execute_update(
-        "DELETE FROM review_comments WHERE review_id = ? AND review_type = 'character'",
-        (review_id,)
-    )
-
-    # 관련 좋아요 삭제 (character_review_likes)
-    db.execute_update(
-        "DELETE FROM character_review_likes WHERE review_id = ?",
-        (review_id,)
-    )
-
-    # 리뷰 삭제
-    db.execute_update("DELETE FROM character_reviews WHERE id = ?", (review_id,))
-
-    return True
+        raise HTTPException(status_code=404, detail="Review not found")
+    return delete_character_review(existing['id'], user_id)
 
 
 def get_character_review_by_id(review_id: int) -> Optional[CharacterReviewResponse]:
@@ -276,7 +129,9 @@ def get_character_reviews(
 
     # 전체 개수 (평점이 있는 모든 사용자)
     total = db.execute_query(
-        "SELECT COUNT(*) as total FROM character_ratings WHERE character_id = ?",
+        """SELECT COUNT(*) as total FROM (SELECT id,user_id,character_id,rating,created_at FROM character_ratings WHERE status='RATED' AND rating IS NOT NULL
+            UNION ALL SELECT NULL,r0.user_id,r0.character_id,NULL,r0.created_at FROM character_reviews r0
+            WHERE NOT EXISTS (SELECT 1 FROM character_ratings r1 WHERE r1.user_id=r0.user_id AND r1.character_id=r0.character_id AND r1.status='RATED' AND r1.rating IS NOT NULL)) WHERE character_id = ?""",
         (character_id,),
         fetch_one=True
     )['total']
@@ -307,7 +162,9 @@ def get_character_reviews(
             CASE WHEN ? IS NOT NULL AND r.id IS NOT NULL THEN
                 (SELECT COUNT(*) FROM character_review_likes crl WHERE crl.review_id = r.id AND crl.user_id = ?)
             ELSE 0 END as user_liked
-        FROM character_ratings cr
+        FROM (SELECT id,user_id,character_id,rating,created_at FROM character_ratings WHERE status='RATED' AND rating IS NOT NULL
+            UNION ALL SELECT NULL,r0.user_id,r0.character_id,NULL,r0.created_at FROM character_reviews r0
+            WHERE NOT EXISTS (SELECT 1 FROM character_ratings r1 WHERE r1.user_id=r0.user_id AND r1.character_id=r0.character_id AND r1.status='RATED' AND r1.rating IS NOT NULL)) cr
         JOIN users u ON cr.user_id = u.id
         LEFT JOIN user_stats us ON u.id = us.user_id
         JOIN character c ON cr.character_id = c.id
@@ -371,7 +228,9 @@ def get_my_character_review(user_id: int, character_id: int) -> Optional[Charact
             CASE WHEN r.id IS NOT NULL THEN
                 (SELECT COUNT(*) FROM character_review_likes crl WHERE crl.review_id = r.id AND crl.user_id = ?)
             ELSE 0 END as user_liked
-        FROM character_ratings cr
+        FROM (SELECT id,user_id,character_id,rating,created_at FROM character_ratings WHERE status='RATED' AND rating IS NOT NULL
+            UNION ALL SELECT NULL,r0.user_id,r0.character_id,NULL,r0.created_at FROM character_reviews r0
+            WHERE NOT EXISTS (SELECT 1 FROM character_ratings r1 WHERE r1.user_id=r0.user_id AND r1.character_id=r0.character_id AND r1.status='RATED' AND r1.rating IS NOT NULL)) cr
         JOIN users u ON cr.user_id = u.id
         LEFT JOIN user_stats us ON u.id = us.user_id
         JOIN character c ON cr.character_id = c.id

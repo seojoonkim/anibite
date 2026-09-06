@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ['nodejs_20', 'python312']
+nixPkgs = ['nodejs_22', 'python311']
 
 [phases.install]
 cmds = [
@@ -13,4 +13,4 @@ cmds = [
 ]
 
 [start]
-cmd = 'cd backend && python download_db.py && uvicorn main:app --host 0.0.0.0 --port $PORT'
+cmd = 'bash /app/docker-startup.sh'

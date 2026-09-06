@@ -8,8 +8,11 @@ export const animeService = {
   /**
    * Get anime list with filters
    */
-  async getAnimeList(params = {}) {
-    const response = await api.get('/api/anime/', { params });
+  async getAnimeList(params = {}, options = {}) {
+    const { limit, sort, ...rest } = params;
+    const sorts = { popularity_desc: 'popularity', rating_desc: 'score', title_asc: 'title' };
+    const sortBy = rest.sort_by || sorts[sort] || 'popularity';
+    const response = await api.get('/api/anime/', { ...options, params: { ...rest, page_size: rest.page_size || limit || 20, sort_by: ['popularity', 'score', 'trending', 'title', 'recent'].includes(sortBy) ? sortBy : 'popularity' } });
     return response.data;
   },
 

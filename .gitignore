@@ -67,6 +67,9 @@ data/images/covers_large/
 !data/images/covers_large/.gitkeep
 
 # Testing
+.venv/
+frontend/test-results/
+frontend/playwright-report/
 .pytest_cache/
 coverage/
 .coverage
@@ -75,3 +78,5 @@ htmlcov/
 # OS
 Thumbs.db
 Desktop.ini
+.vercel
+.env*.local

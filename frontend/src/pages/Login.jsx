@@ -1,150 +1,37 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import GoogleSignInButton from '../components/GoogleSignInButton';
+import { safeReturnPath } from '../components/common/returnPath';
 
+const copy = {
+ ko: {title:'로그인', intro:'좋아하는 작품을 발견하고, 나만의 취향을 기록하세요.', username:'아이디 또는 이메일', password:'비밀번호', show:'비밀번호 표시', hide:'비밀번호 숨기기', submit:'로그인', pending:'로그인 중…', email:'이메일 계정으로 로그인', oauth:'Google로 가입한 계정은 Google 로그인을 이용하세요. 로그인이 차단되면 일반 Chrome 또는 Safari에서 다시 시도해주세요.', signup:'회원가입', browse:'가입 없이 작품 둘러보기', resend:'인증 이메일 다시 보내기', failed:'로그인에 실패했습니다. 다시 시도해주세요.'},
+ en: {title:'Log in',intro:'Discover anime. Keep a record of your taste.',username:'Username or email',password:'Password',show:'Show password',hide:'Hide password',submit:'Log in',pending:'Logging in…',email:'Sign in with an email account',oauth:'Accounts created with Google should use Google sign-in. If blocked, try a regular Chrome or Safari browser.',signup:'Sign up',browse:'Explore without an account',resend:'Resend verification email',failed:'Login failed. Please try again.'},
+ ja: {title:'ログイン',intro:'好きな作品を見つけて、好みを記録しましょう。',username:'ユーザー名またはメール',password:'パスワード',show:'パスワードを表示',hide:'パスワードを隠す',submit:'ログイン',pending:'ログイン中…',email:'メールアカウントでログイン',oauth:'Googleで登録した場合はGoogleログインをご利用ください。ブロックされた場合は通常のChromeまたはSafariをお試しください。',signup:'新規登録',browse:'登録せず作品を見る',resend:'認証メールを再送',failed:'ログインに失敗しました。もう一度お試しください。'}
+};
 export default function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [emailNotVerified, setEmailNotVerified] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const { login } = useAuth();
-  const { language } = useLanguage();
-  const navigate = useNavigate();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setEmailNotVerified(false);
-    setLoading(true);
-
-    const result = await login({ username, password });
-
-    if (result.success) {
-      navigate('/');
-    } else {
-      // Check if error is due to email not verified
-      if (result.error && result.error.toLowerCase().includes('not verified')) {
-        setEmailNotVerified(true);
-        setUserEmail(username.includes('@') ? username : '');
-        setError('Email verification is not complete.');
-      } else {
-        setError(result.error);
-      }
-    }
-
-    setLoading(false);
-  };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white p-8 rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 w-full max-w-md mx-4">
-        {/* Logo */}
-        <div className="flex flex-col items-center mb-8">
-          <Link to="/feed" className="flex items-center gap-2 mb-3 hover:opacity-80 transition-opacity">
-            <img
-              src="/logo.svg"
-              alt="AniBite Logo"
-              className="w-11 h-11 object-contain"
-            />
-            <h1 className="text-3xl font-bold text-gray-900">AniBite</h1>
-          </Link>
-          <p className="text-gray-600 text-center">Your Anime Journey</p>
-        </div>
-
-        <h2 className="text-xl font-semibold text-center mb-6 text-gray-800">Login</h2>
-
-        {/* Google Sign-In */}
-        <div className="mb-6">
-          <GoogleSignInButton onError={setError} />
-
-          {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with email</span>
-            </div>
-          </div>
-        </div>
-
-        {error && (
-          <div className={`px-4 py-3 rounded mb-4 ${emailNotVerified
-              ? 'bg-yellow-100 border border-yellow-400 text-yellow-800'
-              : 'bg-red-100 border border-red-400 text-red-700'
-            }`}>
-            <p className="mb-2">{error}</p>
-            {emailNotVerified && (
-              <button
-                onClick={() => navigate('/resend-verification', { state: { email: userEmail } })}
-                className="text-sm underline hover:no-underline"
-              >
-                Resend verification email →
-              </button>
-            )}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit}>
-          <div className="mb-5">
-            <label className="block text-gray-700 text-sm font-semibold mb-2">
-              Username or Email
-            </label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username or email"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#47B5FF] focus:border-transparent transition-all text-sm"
-              required
-            />
-            <p className="text-xs text-gray-500 mt-1.5">
-              You can login with your username or email
-            </p>
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-semibold mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#47B5FF] focus:border-transparent transition-all text-sm"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full text-white font-semibold py-3 px-4 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
-            style={{ backgroundColor: '#47B5FF' }}
-            onMouseEnter={(e) => {
-              if (!loading) e.target.style.backgroundColor = '#2378D5';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#47B5FF';
-            }}
-          >
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-
-        <p className="text-center mt-6 text-gray-600 text-sm">
-          Don't have an account?{' '}
-          <Link to="/register" className="font-semibold hover:underline" style={{ color: '#47B5FF' }}>
-            Sign up
-          </Link>
-        </p>
-      </div>
-    </div>
-  );
+ const [username,setUsername] = useState(''); const [password,setPassword] = useState('');
+ const [error,setError] = useState(''); const [loading,setLoading] = useState(false); const [visible,setVisible] = useState(false);
+ const {login} = useAuth(); const {language} = useLanguage(); const navigate = useNavigate(); const location = useLocation();
+ const text = copy[language] || copy.ko;
+ const destination = safeReturnPath(location.state?.from || new URLSearchParams(location.search).get('returnTo'));
+ const submit = async event => {
+  event.preventDefault(); if (loading) return; setLoading(true); setError('');
+  try { const result = await login({username,password}); if (result.success) navigate(destination,{replace:true}); else setError(typeof result.error === 'string' ? result.error : text.failed); }
+  catch { setError(text.failed); } finally { setLoading(false); }
+ };
+ return <main className="auth-page"><section className="auth-card" aria-labelledby="login-title">
+  <Link to="/browse" className="auth-brand"><img src="/logo.svg" alt="" width="40" height="40"/>AniBite</Link>
+  <p className="text-text-secondary">{text.intro}</p><h1 id="login-title">{text.title}</h1>
+  <GoogleSignInButton onError={setError} returnTo={destination}/><p className="auth-help">{text.oauth}</p>
+  <p className="auth-divider">{text.email}</p>
+  {error && <div role="alert" className="form-error">{error}{/not verified/i.test(error) && <Link to="/resend-verification" state={{email:username.includes('@') ? username : ''}}>{text.resend}</Link>}</div>}
+  <form onSubmit={submit} aria-busy={loading}>
+   <label htmlFor="login-username">{text.username}</label><input id="login-username" name="username" autoComplete="username" autoCapitalize="none" required value={username} onChange={event=>setUsername(event.target.value)}/>
+   <label htmlFor="login-password">{text.password}</label><input id="login-password" name="password" type={visible?'text':'password'} autoComplete="current-password" required value={password} onChange={event=>setPassword(event.target.value)}/>
+   <button type="button" className="password-toggle" aria-pressed={visible} onClick={()=>setVisible(!visible)}>{visible?text.hide:text.show}</button>
+   <button type="submit" className="button-primary" disabled={loading}>{loading?text.pending:text.submit}</button>
+  </form><div className="auth-links"><Link to="/register" state={{from:destination}}>{text.signup}</Link><Link to="/browse">{text.browse}</Link></div>
+ </section></main>;
 }

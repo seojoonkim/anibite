@@ -4,10 +4,9 @@ AniPass Backend Configuration
 """
 import os
 from pathlib import Path
-from dotenv import load_dotenv
+import secrets
 
-# Load .env file
-load_dotenv()
+# Configuration comes only from the process environment; never discover .env.
 
 # Base directory
 # In production (Railway), we work from backend/ directory
@@ -23,7 +22,14 @@ else:
 DATABASE_PATH = os.getenv("DATABASE_PATH", str(DATA_DIR / "anime.db"))
 
 # JWT Settings
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-this-in-production")  # 프로덕션에서는 환경변수로 변경 필수
+APP_ENV = os.getenv("APP_ENV", "production").lower()
+SECRET_KEY = os.getenv("SECRET_KEY", "")
+if not SECRET_KEY or SECRET_KEY == "your-secret-key-change-this-in-production" or len(SECRET_KEY) < 32:
+    if APP_ENV not in {"development", "test"}:
+        raise RuntimeError("SECRET_KEY must be explicitly configured with at least 32 characters")
+    # Explicit development only: ephemeral keys invalidate tokens on restart.
+    SECRET_KEY = secrets.token_urlsafe(48)
+ADMIN_USER_IDS = frozenset(int(value.strip()) for value in os.getenv("ADMIN_USER_IDS", "").split(",") if value.strip())
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 

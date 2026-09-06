@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import api from '../../services/api';
 import { notificationService } from '../../services/notificationService';
 import { useLanguage } from '../../context/LanguageContext';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../../config/api';
@@ -7,7 +8,7 @@ import { API_BASE_URL, IMAGE_BASE_URL } from '../../config/api';
 export default function NotificationDropdown({
   isOpen,
   onClose,
-  unreadCount,
+  unreadCount: suppliedUnreadCount,
   onMarkAllRead,
   lastCheckTime
 }) {
@@ -15,6 +16,9 @@ export default function NotificationDropdown({
   const { language } = useLanguage();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [readError, setReadError] = useState(false);
+  const [markingRead, setMarkingRead] = useState(false);
+  const markInFlight = useRef(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const dropdownRef = useRef(null);
   const notificationRefs = useRef([]);
@@ -148,6 +152,7 @@ export default function NotificationDropdown({
 
   // 알림이 읽지 않은 것인지 확인
   const isUnread = (notification) => {
+    if (notification.is_read != null) return Boolean(!notification.is_read);
     if (!lastCheckTime) return true;
     const notificationTime = new Date(notification.time.endsWith('Z') ? notification.time : notification.time + 'Z');
     const checkTime = new Date(lastCheckTime.endsWith('Z') ? lastCheckTime : lastCheckTime + 'Z');
@@ -172,7 +177,7 @@ export default function NotificationDropdown({
   };
 
   // 알림 클릭 (피드 알림 페이지의 해당 활동으로 이동)
-  const handleNotificationClick = (notification) => {
+  const handleNotificationClick = useCallback((notification) => {
     const activityType = notification.activity_type;
     const userId = notification.target_user_id;
     const itemId = notification.item_id;
@@ -184,17 +189,30 @@ export default function NotificationDropdown({
     navigate(`/feed?filter=notifications&highlight=${activityKey}`);
 
     onClose();
-  };
+  }, [navigate, onClose]);
 
   // 모두 읽음 처리
   const handleMarkAllRead = async () => {
-    await onMarkAllRead();
-    // 드롭다운은 열린 상태 유지
+    if (markInFlight.current) return;
+    markInFlight.current = true;
+    setMarkingRead(true);
+    setReadError(false);
+    try {
+      // The legacy service swallows failures; use the rejecting API client here.
+      if (onMarkAllRead) await onMarkAllRead();
+      else await api.post('/api/notifications/mark-read');
+      await loadNotifications();
+    } catch {
+      setReadError(true);
+    } finally {
+      markInFlight.current = false;
+      setMarkingRead(false);
+    }
   };
 
   // 모두 보기
   const handleViewAll = async () => {
-    await onMarkAllRead();
+    await handleMarkAllRead();
     navigate('/feed?filter=notifications');
     onClose();
   };
@@ -226,7 +244,7 @@ export default function NotificationDropdown({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, notifications, selectedIndex]);
+  }, [isOpen, notifications, selectedIndex, onClose, handleNotificationClick]);
 
   // 선택된 알림으로 스크롤
   useEffect(() => {
@@ -238,10 +256,12 @@ export default function NotificationDropdown({
     }
   }, [selectedIndex]);
 
+  const unreadCount = suppliedUnreadCount ?? notifications.filter(isUnread).length;
   if (!isOpen) return null;
 
   return (
     <>
+      {readError && <p role="alert">{language === 'ko' ? '읽음 처리에 실패했습니다. 다시 시도해주세요.' : 'Could not mark notifications read. Please retry.'}</p>}
       {/* Desktop Dropdown */}
       <div
         ref={dropdownRef}
@@ -266,6 +286,7 @@ export default function NotificationDropdown({
           </h3>
           {notifications.length > 0 && (
             <button
+              disabled={markingRead}
               onClick={handleMarkAllRead}
               className="text-white text-xs hover:underline font-medium"
             >
@@ -404,7 +425,8 @@ export default function NotificationDropdown({
             </h3>
             {notifications.length > 0 && (
               <button
-                onClick={handleMarkAllRead}
+                disabled={markingRead}
+              onClick={handleMarkAllRead}
                 className="text-primary text-sm hover:text-primary-light font-medium"
               >
                 {language === 'ko' ? '모두 읽음' : language === 'ja' ? 'すべて既読' : 'Mark all read'}

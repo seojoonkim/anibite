@@ -1,6 +1,28 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useLanguage } from '../../context/LanguageContext';
 
+const CustomTooltip = ({ active, payload, language }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-white border border-gray-200 rounded-lg shadow-lg px-3 py-2">
+        <p className="font-medium">
+          {data.year}{language === 'ko' ? '년' : language === 'ja' ? '年' : ''}
+        </p>
+        <p className="text-sm text-gray-600">
+          {data.count}{language === 'ko' ? '개 작품' : language === 'ja' ? '作品' : ' titles'}
+        </p>
+        {data.average_rating && (
+          <p className="text-sm text-yellow-500">
+            {language === 'ko' ? '평균 ' : language === 'ja' ? '平均 ' : 'Avg '}★ {data.average_rating.toFixed(1)}
+          </p>
+        )}
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function YearDistributionChart({ distribution }) {
   const { language } = useLanguage();
 
@@ -29,27 +51,7 @@ export default function YearDistributionChart({ distribution }) {
     return '#638CCC'; // 중간 파랑
   };
 
-  const CustomTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-lg px-3 py-2">
-          <p className="font-medium">
-            {data.year}{language === 'ko' ? '년' : language === 'ja' ? '年' : ''}
-          </p>
-          <p className="text-sm text-gray-600">
-            {data.count}{language === 'ko' ? '개 작품' : language === 'ja' ? '作品' : ' titles'}
-          </p>
-          {data.average_rating && (
-            <p className="text-sm text-yellow-500">
-              {language === 'ko' ? '평균 ' : language === 'ja' ? '平均 ' : 'Avg '}★ {data.average_rating.toFixed(1)}
-            </p>
-          )}
-        </div>
-      );
-    }
-    return null;
-  };
+
 
   // 데이터를 연도순으로 정렬
   const sortedData = [...distribution].sort((a, b) => a.year - b.year);
@@ -73,7 +75,7 @@ export default function YearDistributionChart({ distribution }) {
             tick={{ fontSize: 12 }}
             allowDecimals={false}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip language={language} />} />
           <Bar dataKey="count" radius={[8, 8, 0, 0]}>
             {sortedData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={getColor(entry.year)} />

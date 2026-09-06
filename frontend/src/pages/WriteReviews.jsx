@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ratingService } from '../services/ratingService';
 import { reviewService } from '../services/reviewService';
@@ -8,7 +8,7 @@ import { ratingPageService } from '../services/ratingPageService';
 import { useLanguage } from '../context/LanguageContext';
 import { useLogoWiggle } from '../context/LogoWiggleContext';
 import StarRating from '../components/common/StarRating';
-import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
+import { IMAGE_BASE_URL } from "../config/api";
 import { getCharacterImageUrl } from '../utils/imageHelpers';
 
 export default function WriteReviews() {
@@ -18,7 +18,7 @@ export default function WriteReviews() {
   const [allItems, setAllItems] = useState([]);
   const [reviews, setReviews] = useState({});
   const [loading, setLoading] = useState(true);
-  const [reviewsLoading, setReviewsLoading] = useState(true); // 리뷰 로딩 상태
+  const [, setReviewsLoading] = useState(true); // 리뷰 로딩 상태 // 리뷰 로딩 상태
   const [editingId, setEditingId] = useState(null);
   const [editContent, setEditContent] = useState('');
   const [editRating, setEditRating] = useState(0);
@@ -28,100 +28,15 @@ export default function WriteReviews() {
     character: { reviewed: 0, pending: 0 },
     total: { reviewed: 0, pending: 0 }
   });
-  const [toast, setToast] = useState(null); // { message, type: 'success'|'error' }
+   // { message, type: 'success'|'error' }
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
-    loadData(true);
-    loadStats();
-  }, []);
-
-  // Infinite scroll handler
-  useEffect(() => {
-    const handleScroll = () => {
-      if (loadingMore || !hasMore) return;
-
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const scrollHeight = document.documentElement.scrollHeight;
-      const clientHeight = document.documentElement.clientHeight;
-
-      // Load more when user is 500px from bottom
-      if (scrollTop + clientHeight >= scrollHeight - 500) {
-        loadMore();
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [loadingMore, hasMore, offset]);
-
-  const loadMore = async () => {
-    if (loadingMore || !hasMore) return;
-
+  const loadData = async () => {
     try {
-      setLoadingMore(true);
-      console.log('[WriteReviews] Loading more items... offset:', offset);
-
-      const data = await ratingPageService.getItemsForReviews(50, offset);
-      console.log('[WriteReviews] Loaded more items:', data?.items?.length || 0);
-
-      const items = (data.items || []).map(item => {
-        const processed = {
-          type: item.type,
-          id: `${item.type}_${item.item_id}`,
-          itemId: item.item_id,
-          rating: item.rating,
-          updated_at: item.updated_at,
-          ...(item.type === 'anime' ? {
-            anime_id: item.item_id,
-            title_romaji: item.item_title,
-            title_english: item.item_title,
-            title_native: item.item_title_native,
-            title_korean: item.item_title_korean,
-            image_url: item.item_image,
-            year: item.item_year
-          } : {}),
-          ...(item.type === 'character' ? {
-            character_id: item.item_id,
-            character_name: item.item_title,
-            character_name_korean: item.item_title_korean,
-            character_name_native: item.item_title_native,
-            character_image: item.item_image,
-            anime_id: item.anime_id,
-            anime_title_korean: item.anime_title_korean,
-            anime_title_native: item.anime_title_native,
-            anime_title: item.anime_title
-          } : {})
-        };
-        return processed;
-      });
-
-      setAllItems(prev => [...prev, ...items]);
-      setOffset(prev => prev + items.length);
-      setHasMore(items.length === 50);
-    } catch (err) {
-      console.error('[WriteReviews] Failed to load more:', err);
-    } finally {
-      setLoadingMore(false);
-    }
-  };
-
-  const loadStats = async () => {
-    try {
-      const data = await ratingPageService.getReviewStats();
-      setStats(data);
-      console.log('[WriteReviews] Stats loaded:', data);
-    } catch (err) {
-      console.error('[WriteReviews] Failed to load stats:', err);
-    }
-  };
-
-  const loadData = async (resetOffset = false) => {
-    try {
-      setLoading(true);
-      const currentOffset = resetOffset ? 0 : offset;
+      const currentOffset = 0;
       console.log('[WriteReviews] Starting to load data... offset:', currentOffset);
 
       // 초고속 API 사용 - 단일 쿼리로 애니+캐릭터 모두 가져오기(0.1초 목표)
@@ -176,13 +91,8 @@ export default function WriteReviews() {
       console.log('[WriteReviews] Processed items:', items.length);
 
       // 이미 백엔드에서 정렬되어 옴 (popularity + 랜덤)
-      if (resetOffset) {
-        setAllItems(items);
-        setOffset(50);
-      } else {
-        setAllItems(prev => [...prev, ...items]);
-        setOffset(prev => prev + items.length);
-      }
+      setAllItems(items);
+      setOffset(50);
 
       // Check if there are more items
       setHasMore(items.length === 50);
@@ -198,6 +108,93 @@ export default function WriteReviews() {
       setReviewsLoading(false);
     }
   };
+
+    loadData();
+    loadStats();
+  }, []);
+
+
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+
+    try {
+      setLoadingMore(true);
+      console.log('[WriteReviews] Loading more items... offset:', offset);
+
+      const data = await ratingPageService.getItemsForReviews(50, offset);
+      console.log('[WriteReviews] Loaded more items:', data?.items?.length || 0);
+
+      const items = (data.items || []).map(item => {
+        const processed = {
+          type: item.type,
+          id: `${item.type}_${item.item_id}`,
+          itemId: item.item_id,
+          rating: item.rating,
+          updated_at: item.updated_at,
+          ...(item.type === 'anime' ? {
+            anime_id: item.item_id,
+            title_romaji: item.item_title,
+            title_english: item.item_title,
+            title_native: item.item_title_native,
+            title_korean: item.item_title_korean,
+            image_url: item.item_image,
+            year: item.item_year
+          } : {}),
+          ...(item.type === 'character' ? {
+            character_id: item.item_id,
+            character_name: item.item_title,
+            character_name_korean: item.item_title_korean,
+            character_name_native: item.item_title_native,
+            character_image: item.item_image,
+            anime_id: item.anime_id,
+            anime_title_korean: item.anime_title_korean,
+            anime_title_native: item.anime_title_native,
+            anime_title: item.anime_title
+          } : {})
+        };
+        return processed;
+      });
+
+      setAllItems(prev => [...prev, ...items]);
+      setOffset(prev => prev + items.length);
+      setHasMore(items.length === 50);
+    } catch (err) {
+      console.error('[WriteReviews] Failed to load more:', err);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [loadingMore, hasMore, offset]);
+
+  // Infinite scroll handler
+  useEffect(() => {
+    const handleScroll = () => {
+      if (loadingMore || !hasMore) return;
+
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = document.documentElement.clientHeight;
+
+      // Load more when user is 500px from bottom
+      if (scrollTop + clientHeight >= scrollHeight - 500) {
+        loadMore();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [loadingMore, hasMore, loadMore]);
+
+  const loadStats = async () => {
+    try {
+      const data = await ratingPageService.getReviewStats();
+      setStats(data);
+      console.log('[WriteReviews] Stats loaded:', data);
+    } catch (err) {
+      console.error('[WriteReviews] Failed to load stats:', err);
+    }
+  };
+
 
   const handleStartEdit = async (item, existingContent = '', currentRating = 0) => {
     setEditingId(item.id);
@@ -222,7 +219,7 @@ export default function WriteReviews() {
         } else {
           setEditContent('');
         }
-      } catch (err) {
+      } catch {
         // No review exists, start with empty content
         setEditContent('');
       }

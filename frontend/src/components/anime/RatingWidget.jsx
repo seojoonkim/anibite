@@ -1,131 +1,101 @@
-import { useState, useEffect } from 'react';
-import StarRating from '../common/StarRating';
+import { useState, useRef } from 'react';
+import RatingEditor from '../common/RatingEditor';
+import Dialog from '../common/Dialog';
 import { seriesService } from '../../services/seriesService';
 import { useLanguage } from '../../context/LanguageContext';
 
 export default function RatingWidget({ animeId, currentRating, onRate, onStatusChange }) {
   const { t } = useLanguage();
-  const [tempRating, setTempRating] = useState(currentRating?.rating || 0);
   const [showSeriesModal, setShowSeriesModal] = useState(false);
   const [seriesInfo, setSeriesInfo] = useState(null);
   const [pendingStatus, setPendingStatus] = useState(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [successText, setSuccessText] = useState('');
 
-  useEffect(() => {
-    setTempRating(currentRating?.rating || 0);
-  }, [currentRating]);
+  const [busy, setBusy] = useState(false);
+  const inFlight = useRef(false);
+  const [failedAction, setFailedAction] = useState(null);
+  const { language } = useLanguage();
 
-  const handleRatingChange = (newRating) => {
-    setTempRating(newRating);
-    // 바로 저장
-    if (newRating > 0) {
-      onRate(newRating, 'RATED');
+  const runStatusAction = async (action) => {
+    if (inFlight.current) return;
+    inFlight.current = true;
+    setBusy(true);
+    setFailedAction(null);
+    try {
+      await action();
+    } catch {
+      setFailedAction(() => action);
+    } finally {
+      inFlight.current = false;
+      setBusy(false);
     }
   };
 
-  const handleStatusClick = async (status) => {
-    console.log('handleStatusClick called:', { status, animeId, currentStatus: currentRating?.status });
-
+  const handleStatusClick = (status) => runStatusAction(async () => {
     if (currentRating?.status === status) {
-      // Remove status if clicking the same one
-      onStatusChange(null);
+      await onStatusChange(null);
       return;
     }
-
-    // WANT_TO_WATCH나 PASS 상태일 때만 시리즈 확인
-    if (status === 'WANT_TO_WATCH' || status === 'PASS') {
-      console.log('Checking for series...');
-      try {
-        const series = await seriesService.getAnimeSequels(animeId);
-        console.log('Series response:', series);
-        if (series && series.sequels && series.sequels.length > 0) {
-          // 시리즈가 있으면 팝업 표시
-          console.log('Series found, showing modal');
-          setSeriesInfo(series);
-          setPendingStatus(status);
-          setShowSeriesModal(true);
-          return;
-        } else {
-          console.log('No sequels found');
-        }
-      } catch (err) {
-        console.error('Failed to check series:', err);
-      }
+    const series = await seriesService.getAnimeSequels(animeId);
+    if (series?.sequels?.length) {
+      setSeriesInfo(series);
+      setPendingStatus(status);
+      setShowSeriesModal(true);
+      return;
     }
+    await onStatusChange(status);
+  });
 
-    // 시리즈가 없거나 에러 발생 시 바로 처리
-    console.log('Directly calling onStatusChange');
-    onStatusChange(status);
-  };
-
-  const handleSeriesConfirm = async (applyToAll) => {
-    setShowSeriesModal(false);
-
+  const handleSeriesConfirm = (applyToAll) => runStatusAction(async () => {
     if (applyToAll && seriesInfo) {
-      // 현재 애니 + 모든 후속작에 상태 적용
-      const animeIds = [animeId, ...seriesInfo.sequels.map(s => s.id)];
-      try {
-        await seriesService.bulkRateSeries(animeIds, pendingStatus);
-        // 현재 애니 상태 업데이트
-        onStatusChange(pendingStatus);
-
-        // 성공 메시지 표시
-        setSuccessText(`${seriesInfo.sequels.length + 1}개 작품에 ${pendingStatus === 'WANT_TO_WATCH' ? t('watchLater') : t('notInterested')}를 적용했습니다.`);
-        setShowSuccessMessage(true);
-        setTimeout(() => setShowSuccessMessage(false), 3000);
-      } catch (err) {
-        console.error('Failed to bulk rate series:', err);
-        setSuccessText('일괄 처리 중 오류가 발생했습니다.');
-        setShowSuccessMessage(true);
-        setTimeout(() => setShowSuccessMessage(false), 3000);
-      }
-    } else {
-      // 현재 애니에만 적용
-      onStatusChange(pendingStatus);
+      await seriesService.bulkRateSeries([animeId, ...seriesInfo.sequels.map(s => s.id)], pendingStatus);
     }
-
+    await onStatusChange(pendingStatus);
+    setShowSeriesModal(false);
     setSeriesInfo(null);
     setPendingStatus(null);
+    if (applyToAll) {
+      setSuccessText(language === 'ko' ? '시리즈 상태를 저장했습니다.' : 'Series status saved.');
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 3000);
+    }
+  });
+
+  const saveRating = async (value) => {
+    if (inFlight.current) throw new Error('A save is already pending');
+    inFlight.current = true;
+    setBusy(true);
+    setFailedAction(null);
+    try {
+      await (value === 0 ? onStatusChange(null) : onRate(value, 'RATED'));
+    } finally {
+      inFlight.current = false;
+      setBusy(false);
+    }
   };
 
   const handleSeriesCancel = () => {
+    if (inFlight.current) return;
+    setFailedAction(null);
     setShowSeriesModal(false);
     setSeriesInfo(null);
     setPendingStatus(null);
   };
+
+  const statusError = failedAction && <div role="alert"><p>{language === 'ko' ? '저장하지 못했습니다. 다시 시도해주세요.' : 'Not saved. Please retry.'}</p><button disabled={busy} onClick={() => runStatusAction(failedAction)}>{language === 'ko' ? '다시 시도' : 'Retry'}</button></div>;
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h3 className="text-lg font-bold mb-4">내 평가</h3>
 
-      {/* Rating Display/Input */}
-      <div className="mb-6 flex flex-col items-center w-full">
-        <div className="flex justify-center">
-          <StarRating
-            rating={tempRating}
-            onRatingChange={handleRatingChange}
-            size="widget"
-            align="center"
-            showNumber={false}
-          />
-        </div>
-        {tempRating > 0 && (
-          <div className="mt-3 text-xl text-gray-700 font-medium">
-            {tempRating.toFixed(1)}
-          </div>
-        )}
-
-        {!currentRating?.rating && (
-          <p className="text-sm text-gray-500 text-center mt-2">
-            별을 클릭하여 평가해보세요
-          </p>
-        )}
-      </div>
+      <RatingEditor rating={currentRating?.rating || 0} disabled={busy || showSeriesModal} onSave={saveRating}/>
+      {!showSeriesModal && statusError}
 
       {/* Status Text Links */}
       <div className="flex items-center justify-center gap-4 text-sm pt-2">
         <button
+          disabled={busy || showSeriesModal}
           onClick={() => handleStatusClick('WANT_TO_WATCH')}
           className={`transition-colors underline-offset-2 hover:underline ${
             currentRating?.status === 'WANT_TO_WATCH'
@@ -137,6 +107,7 @@ export default function RatingWidget({ animeId, currentRating, onRate, onStatusC
         </button>
         <span className="text-gray-400">|</span>
         <button
+          disabled={busy || showSeriesModal}
           onClick={() => handleStatusClick('PASS')}
           className={`transition-colors underline-offset-2 hover:underline ${
             currentRating?.status === 'PASS'
@@ -156,7 +127,7 @@ export default function RatingWidget({ animeId, currentRating, onRate, onStatusC
 
       {/* 시리즈 일괄 처리 모달 */}
       {showSeriesModal && seriesInfo && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={handleSeriesCancel}>
+        <Dialog title="시리즈 일괄 처리" onClose={handleSeriesCancel}>
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold mb-4">시리즈 일괄 처리</h3>
 
@@ -189,20 +160,24 @@ export default function RatingWidget({ animeId, currentRating, onRate, onStatusC
               </p>
             </div>
 
+            {statusError}
             <div className="flex gap-3">
               <button
+                disabled={busy}
                 onClick={() => handleSeriesConfirm(true)}
                 className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded font-medium transition-colors"
               >
                 모두 적용 ({seriesInfo.sequels.length + 1}개)
               </button>
               <button
+                disabled={busy}
                 onClick={() => handleSeriesConfirm(false)}
                 className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded font-medium transition-colors"
               >
                 현재만
               </button>
               <button
+                disabled={busy}
                 onClick={handleSeriesCancel}
                 className="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded font-medium transition-colors"
               >
@@ -210,7 +185,7 @@ export default function RatingWidget({ animeId, currentRating, onRate, onStatusC
               </button>
             </div>
           </div>
-        </div>
+        </Dialog>
       )}
 
       {/* 성공 메시지 토스트 */}

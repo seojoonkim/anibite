@@ -37,7 +37,9 @@ export default function Register() {
 
     setLoading(true);
 
-    const { passwordConfirm, ...registerData } = formData;
+    const {
+  ...registerData
+} = formData;
     const result = await register(registerData);
 
     if (result.success) {

@@ -30,11 +30,10 @@ class CharacterUpdate(BaseModel):
     image_large: Optional[str] = None  # 이미지 URL/경로
 
 
-def require_simon(current_user = Depends(get_current_user)):
-    """Require simon user"""
-    if current_user.username != "simon":
-        raise HTTPException(status_code=403, detail="Admin access only")
-    return current_user
+from api.deps import require_admin
+
+# Compatibility name only; authorization is centralized and ID-based.
+require_simon = require_admin
 
 
 @router.get("/search")

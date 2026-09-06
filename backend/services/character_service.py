@@ -178,212 +178,51 @@ def get_character_rating(user_id: int, character_id: int) -> Optional[Dict]:
     return dict_from_row(row) if row else None
 
 
+@db.atomic
 def create_or_update_character_rating(user_id: int, character_id: int, rating: float = None, status: str = None) -> Dict:
-    """
-    캐릭터 평가 생성 또는 수정 + activities 테이블 동기화
-    """
-    # Delete from activities first (트리거가 동작하지 않을 경우를 대비)
-    db.execute_update(
-        """
-        DELETE FROM activities
-        WHERE activity_type = 'character_rating'
-          AND user_id = ?
-          AND item_id = ?
-        """,
-        (user_id, character_id)
-    )
-
-    # Check if rating exists
-    existing = get_character_rating(user_id, character_id)
-
-    if existing:
-        # Update - only update fields that are provided
-        update_parts = []
-        params = []
-
-        if rating is not None:
-            update_parts.append("rating = ?")
-            params.append(rating)
-
-        if status is not None:
-            update_parts.append("status = ?")
-            params.append(status)
-
-        if update_parts:
-            update_parts.append("updated_at = CURRENT_TIMESTAMP")
-            params.extend([user_id, character_id])
-
-            db.execute_update(
-                f"""
-                UPDATE character_ratings
-                SET {', '.join(update_parts)}
-                WHERE user_id = ? AND character_id = ?
-                """,
-                tuple(params)
-            )
-    else:
-        # Insert
-        if rating is None and status is None:
-            return None
-
-        db.execute_insert(
-            """
-            INSERT INTO character_ratings (user_id, character_id, rating, status)
-            VALUES (?, ?, ?, ?)
-            """,
-            (user_id, character_id, rating, status or 'RATED')
-        )
-
-    # Sync to activities table only if rating exists
-    # (WANT_TO_KNOW, NOT_INTERESTED should not appear in feed)
-    if rating is not None and rating > 0:
-        _sync_character_rating_to_activities(user_id, character_id)
-
-        # Update activity_time to current time (move to recent feed)
-        db.execute_update("""
-            UPDATE activities
-            SET activity_time = CURRENT_TIMESTAMP,
-                updated_at = CURRENT_TIMESTAMP
-            WHERE activity_type = 'character_rating'
-              AND user_id = ?
-              AND item_id = ?
-        """, (user_id, character_id))
-
-    # Update user stats (otaku score)
+    from fastapi import HTTPException
     from services.rating_service import _update_user_stats
+    status = status or 'RATED'
+    if status not in {'RATED','WANT_TO_KNOW','NOT_INTERESTED'}:
+        raise HTTPException(status_code=422, detail="Invalid character rating status")
+    if status == 'RATED' and (rating is None or not 0.5 <= rating <= 5 or rating * 2 != int(rating * 2)):
+        raise HTTPException(status_code=422, detail="RATED requires a 0.5-step rating between 0.5 and 5")
+    if not db.execute_query('SELECT id FROM character WHERE id=?',(character_id,),fetch_one=True):
+        raise HTTPException(status_code=404, detail="Character not found")
+    final_rating = rating if status == 'RATED' else None
+    db.execute_update("""INSERT INTO character_ratings(user_id,character_id,rating,status)
+        VALUES (?,?,?,?) ON CONFLICT(user_id,character_id) DO UPDATE SET
+        rating=excluded.rating,status=excluded.status,updated_at=CURRENT_TIMESTAMP""",
+        (user_id,character_id,final_rating,status))
+    if final_rating is not None:
+        _sync_character_rating_to_activities(user_id,character_id)
+    else:
+        # Keep the ID/social links if the user later rates this item again.
+        db.execute_update("UPDATE activities SET rating=NULL WHERE activity_type='character_rating' AND user_id=? AND item_id=?",(user_id,character_id))
     _update_user_stats(user_id)
-
-    # Get updated rating
-    result = get_character_rating(user_id, character_id)
-
-    # Add updated otaku_score to response
-    updated_stats = db.execute_query(
-        "SELECT otaku_score FROM user_stats WHERE user_id = ?",
-        (user_id,),
-        fetch_one=True
-    )
-    if updated_stats and result:
-        result['otaku_score'] = updated_stats['otaku_score']
-
+    result = get_character_rating(user_id,character_id)
+    stats = db.execute_query('SELECT otaku_score FROM user_stats WHERE user_id=?',(user_id,),fetch_one=True)
+    result['otaku_score'] = stats[0] if stats else 0
     return result
 
 
 def _sync_character_rating_to_activities(user_id: int, character_id: int):
-    """
-    character_ratings 변경사항을 activities 테이블에 동기화
-    트리거 대신 Python에서 처리 - 한 번의 쿼리로 모든 정보 가져오기
-    """
-    # Get all data needed for activity in a single query (efficient!)
-    activity_data = db.execute_query(
-        """
-        SELECT
-            cr.user_id,
-            cr.character_id,
-            cr.rating,
-            cr.created_at,
-            cr.updated_at,
-            u.username,
-            u.display_name,
-            u.avatar_url,
-            COALESCE(us.otaku_score, 0) as otaku_score,
-            c.name_full as item_title,
-            COALESCE(c.name_korean, c.name_native) as item_title_korean,
-            COALESCE('/' || c.image_local, c.image_url) as item_image,
-            r.title as review_title,
-            r.content as review_content,
-            COALESCE(r.is_spoiler, 0) as is_spoiler,
-            COALESCE(r.created_at, cr.updated_at) as activity_time,
-            a.id as anime_id,
-            a.title_romaji as anime_title,
-            a.title_korean as anime_title_korean
-        FROM character_ratings cr
-        JOIN users u ON u.id = cr.user_id
-        JOIN character c ON c.id = cr.character_id
-        LEFT JOIN user_stats us ON u.id = cr.user_id
-        LEFT JOIN character_reviews r ON r.user_id = cr.user_id AND r.character_id = cr.character_id
-        LEFT JOIN (
-            SELECT ac.character_id, a.*
-            FROM anime_character ac
-            JOIN anime a ON a.id = ac.anime_id
-            WHERE ac.character_id = ?
-            ORDER BY CASE WHEN ac.role = 'MAIN' THEN 0 ELSE 1 END
-            LIMIT 1
-        ) a ON a.character_id = cr.character_id
-        WHERE cr.user_id = ? AND cr.character_id = ?
-        """,
-        (character_id, user_id, character_id),
-        fetch_one=True
-    )
-
-    if not activity_data:
-        return
-
-    # Insert or replace activity
-    db.execute_update(
-        """
-        INSERT OR REPLACE INTO activities (
-            activity_type, user_id, item_id, activity_time,
-            username, display_name, avatar_url, otaku_score,
-            item_title, item_title_korean, item_image,
-            rating, review_title, review_content, is_spoiler,
-            anime_id, anime_title, anime_title_korean,
-            created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-        (
-            'character_rating',
-            activity_data['user_id'],
-            activity_data['character_id'],
-            activity_data['activity_time'],
-            activity_data['username'],
-            activity_data['display_name'],
-            activity_data['avatar_url'],
-            activity_data['otaku_score'],
-            activity_data['item_title'],
-            activity_data['item_title_korean'],
-            activity_data['item_image'],
-            activity_data['rating'],
-            activity_data['review_title'],
-            activity_data['review_content'],
-            activity_data['is_spoiler'],
-            activity_data['anime_id'],
-            activity_data['anime_title'],
-            activity_data['anime_title_korean'],
-            activity_data['created_at'],
-            activity_data['updated_at']
-        )
-    )
+    from services.projection_service import sync_projection
+    sync_projection('character',user_id,character_id)
 
 
+@db.atomic
 def delete_character_rating(user_id: int, character_id: int) -> bool:
-    """
-    캐릭터 평가 삭제 (activities 삭제 시 CASCADE로 댓글/좋아요도 자동 삭제)
-    """
-    # activities 테이블에서 삭제 (CASCADE로 comments/likes 자동 삭제)
-    db.execute_update(
-        """
-        DELETE FROM activities
-        WHERE activity_type = 'character_rating'
-        AND user_id = ?
-        AND item_id = ?
-        """,
-        (user_id, character_id)
-    )
-
-    # 평점 삭제
-    db.execute_update(
-        """
-        DELETE FROM character_ratings
-        WHERE user_id = ? AND character_id = ?
-        """,
-        (user_id, character_id)
-    )
-
-    # Update user stats (otaku score)
+    """Retain the shared activity and social references, even while hidden."""
+    from services.projection_service import sync_projection
     from services.rating_service import _update_user_stats
-    _update_user_stats(user_id)
-
-    return True
+    rowcount = db.execute_update(
+        "DELETE FROM character_ratings WHERE user_id=? AND character_id=?", (user_id, character_id)
+    )
+    if rowcount:
+        sync_projection('character', user_id, character_id)
+        _update_user_stats(user_id)
+    return rowcount > 0
 
 
 def get_user_character_ratings(
@@ -748,7 +587,7 @@ def get_user_character_stats(user_id: int) -> Dict:
     }
 
 
-def get_character_detail(character_id: int, user_id: int) -> Optional[Dict]:
+def get_character_detail(character_id: int, user_id: Optional[int] = None) -> Optional[Dict]:
     """
     캐릭터 상세 정보 조회
     """

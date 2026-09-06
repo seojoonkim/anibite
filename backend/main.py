@@ -19,7 +19,7 @@ from config import ALLOWED_ORIGINS, COVER_IMAGES_DIR
 import os
 
 # Import API routers
-from api import auth, anime, ratings, reviews, comments, users, series, characters, character_ratings, feed, follows, activity_comments, comment_likes, user_posts, character_reviews, notifications, activities, rating_pages, admin, admin_fix, admin_editor, debug_promotion, bookmarks, search
+from api import auth, anime, ratings, reviews, comments, users, series, characters, character_ratings, feed, follows, activity_comments, comment_likes, user_posts, character_reviews, notifications, activities, rating_pages, admin_editor, bookmarks, search
 
 # Try to import image_proxy router (may fail if dependencies missing)
 try:
@@ -39,294 +39,11 @@ app = FastAPI(
     redirect_slashes=False,  # Prevent HTTPS->HTTP redirect on Railway
 )
 
-# Startup event to ensure database schema is up to date
+# Startup is deliberately read-only. Release migrations are an explicit CLI job.
 @app.on_event("startup")
 async def startup_event():
-    """Run on application startup - Complete initialization and backfill"""
-    print("\n" + "="*60)
-    print(">>> ANIPASS BACKEND STARTUP")
-    print("="*60 + "\n")
-
-    # 1. Schema updates
-    print("[Startup] Ensuring database schema is up to date...")
-    try:
-        from scripts.ensure_schema import main as ensure_schema
-        ensure_schema()
-        print("[Startup] OK - Schema check complete")
-    except Exception as e:
-        print(f"[Startup] WARNING -Schema check failed: {e}")
-        import traceback
-        traceback.print_exc()
-
-    # 2. Sync Korean character names (DISABLED - overwrites manual edits)
-    # This script overwrites manually edited names from admin panel
-    # Only run this manually if you need to bulk update from korean_names.json
-    # print("[Startup] Syncing Korean character names...")
-    # try:
-    #     from scripts.sync_korean_names import sync_korean_names
-    #     sync_korean_names()
-    #     print("[Startup] OK - Korean names sync complete")
-    # except Exception as e:
-    #     print(f"[Startup] WARNING -Korean names sync failed: {e}")
-    #     import traceback
-    #     traceback.print_exc()
-
-    # 2.5. Ensure UNIQUE constraints to prevent duplicate ratings
-    print("[Startup] Ensuring UNIQUE constraints...")
-    try:
-        from scripts.ensure_unique_constraints import ensure_unique_constraints
-        ensure_unique_constraints()
-        print("[Startup] OK - UNIQUE constraints ensured")
-    except Exception as e:
-        print(f"[Startup] WARNING - UNIQUE constraints check failed: {e}")
-        import traceback
-        traceback.print_exc()
-
-    # 3. Create bookmarks table
-    print("[Startup] Creating bookmarks table...")
-    try:
-        from database import get_db
-        db = get_db()
-        db.execute_update("""
-            CREATE TABLE IF NOT EXISTS activity_bookmarks (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                activity_id INTEGER NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-                UNIQUE(user_id, activity_id)
-            )
-        """)
-        db.execute_update("CREATE INDEX IF NOT EXISTS idx_bookmarks_user_id ON activity_bookmarks(user_id)")
-        db.execute_update("CREATE INDEX IF NOT EXISTS idx_bookmarks_activity_id ON activity_bookmarks(activity_id)")
-        print("[Startup] OK - Bookmarks table ready")
-    except Exception as e:
-        print(f"[Startup] WARNING -Failed to create bookmarks table: {e}")
-
-    # 4. Add preferred_language column if needed
-    print("\n[DB] Checking database schema...")
-    try:
-        from scripts.add_preferred_language import add_preferred_language_column
-        add_preferred_language_column()
-        print("✅ Database schema up to date!\n")
-    except Exception as e:
-        print(f"WARNING: Failed to update schema: {e}\n")
-
-    # 4.5. Add OAuth support (oauth_provider, oauth_id columns)
-    print("\n🔐 Adding OAuth support...")
-    try:
-        from scripts.force_add_oauth import force_add_oauth
-        # Run inline to avoid import issues
-        import sqlite3
-        from pathlib import Path
-
-        db_path = Path(__file__).parent.parent / "data" / "anime.db"
-        if not db_path.exists():
-            db_path = Path("/app/data/anime.db")
-
-        print(f"[OAuth] Database path: {db_path}")
-        conn = sqlite3.connect(str(db_path))
-        cursor = conn.cursor()
-
-        # Check and add oauth_provider
-        cursor.execute("PRAGMA table_info(users)")
-        columns = [row[1] for row in cursor.fetchall()]
-
-        if 'oauth_provider' not in columns:
-            cursor.execute("ALTER TABLE users ADD COLUMN oauth_provider TEXT")
-            print("[OAuth] ✅ Added oauth_provider column")
-        else:
-            print("[OAuth] ⚠️  oauth_provider already exists")
-
-        if 'oauth_id' not in columns:
-            cursor.execute("ALTER TABLE users ADD COLUMN oauth_id TEXT")
-            print("[OAuth] ✅ Added oauth_id column")
-        else:
-            print("[OAuth] ⚠️  oauth_id already exists")
-
-        # Create index
-        try:
-            cursor.execute("""
-                CREATE UNIQUE INDEX idx_oauth_user
-                ON users(oauth_provider, oauth_id)
-                WHERE oauth_provider IS NOT NULL AND oauth_provider != 'local'
-            """)
-            print("[OAuth] ✅ Created unique index")
-        except sqlite3.OperationalError as e:
-            if "already exists" in str(e).lower():
-                print("[OAuth] ⚠️  Index already exists")
-
-        # Mark existing users as local
-        cursor.execute("UPDATE users SET oauth_provider = 'local' WHERE oauth_provider IS NULL")
-        updated = cursor.rowcount
-        print(f"[OAuth] ✅ Marked {updated} users as 'local'")
-
-        conn.commit()
-        conn.close()
-        print("✅ OAuth support ready!\n")
-    except Exception as e:
-        print(f"❌ WARNING: Failed to add OAuth support: {e}")
-        import traceback
-        traceback.print_exc()
-        print("⚠️  Server will start but Google OAuth may not work!\n")
-
-    # 5. Verify existing users (one-time migration for email verification feature)
-    print("👤 Verifying existing users...")
-    try:
-        from scripts.verify_existing_users import verify_existing_users
-        verify_existing_users()
-        print("✅ Existing users verified!\n")
-    except Exception as e:
-        print(f"WARNING: Failed to verify existing users: {e}\n")
-
-    # 6. Fix triggers
-    print("🔧 Checking and fixing database triggers...")
-    try:
-        from scripts.fix_railway_triggers import fix_triggers
-        fix_triggers()
-        print("✅ Triggers fixed successfully!\n")
-    except Exception as e:
-        print(f"WARNING: Failed to fix triggers: {e}")
-        print("Server will continue, but rating save may fail.\n")
-
-    # 7. Add activity indexes for performance
-    print("📊 Adding database indexes for performance...")
-    try:
-        from scripts.add_activity_indexes import add_indexes
-        add_indexes()
-        print("✅ Indexes created successfully!\n")
-    except Exception as e:
-        print(f"WARNING: Failed to add indexes: {e}")
-        print("Server will continue, but queries may be slow.\n")
-
-    # 8. CRITICAL: Backfill anime_title_native and item_title_native for ALL activities
-    print("🌐 Backfilling Japanese titles for ALL activities...")
-    try:
-        from database import get_db
-        db = get_db()
-
-        # Check if columns exist
-        columns = db.execute_query("PRAGMA table_info(activities)")
-        column_names = [col[1] for col in columns]
-
-        if 'anime_title_native' not in column_names:
-            print("  Adding anime_title_native column...")
-            db.execute_update("ALTER TABLE activities ADD COLUMN anime_title_native TEXT")
-
-        if 'item_title_native' not in column_names:
-            print("  Adding item_title_native column...")
-            db.execute_update("ALTER TABLE activities ADD COLUMN item_title_native TEXT")
-
-        # Backfill 1: Anime native titles for character activities
-        db.execute_update("""
-            UPDATE activities
-            SET anime_title_native = (
-                SELECT a.title_native
-                FROM anime a
-                WHERE a.id = activities.anime_id
-            )
-            WHERE activity_type IN ('character_rating', 'character_review')
-            AND anime_id IS NOT NULL
-            AND anime_title_native IS NULL
-        """)
-
-        # Backfill 2: Character native names
-        db.execute_update("""
-            UPDATE activities
-            SET item_title_native = (
-                SELECT c.name_native
-                FROM character c
-                WHERE c.id = activities.item_id
-            )
-            WHERE activity_type IN ('character_rating', 'character_review')
-            AND item_id IS NOT NULL
-            AND item_title_native IS NULL
-        """)
-
-        # Backfill 3: Anime native titles for anime activities (THIS WAS MISSING!)
-        db.execute_update("""
-            UPDATE activities
-            SET item_title_native = (
-                SELECT a.title_native
-                FROM anime a
-                WHERE a.id = activities.item_id
-            )
-            WHERE activity_type IN ('anime_rating', 'anime_review')
-            AND item_id IS NOT NULL
-            AND item_title_native IS NULL
-        """)
-
-        # Count results
-        anime_char_count = db.execute_query("""
-            SELECT COUNT(*) as count
-            FROM activities
-            WHERE activity_type IN ('character_rating', 'character_review')
-            AND anime_title_native IS NOT NULL
-        """, fetch_one=True)
-
-        char_count = db.execute_query("""
-            SELECT COUNT(*) as count
-            FROM activities
-            WHERE activity_type IN ('character_rating', 'character_review')
-            AND item_title_native IS NOT NULL
-        """, fetch_one=True)
-
-        anime_count = db.execute_query("""
-            SELECT COUNT(*) as count
-            FROM activities
-            WHERE activity_type IN ('anime_rating', 'anime_review')
-            AND item_title_native IS NOT NULL
-        """, fetch_one=True)
-
-        print(f"✅ Backfilled:")
-        print(f"   - {anime_char_count['count'] if anime_char_count else 0} character activity anime titles")
-        print(f"   - {char_count['count'] if char_count else 0} character names")
-        print(f"   - {anime_count['count'] if anime_count else 0} anime activity titles\n")
-    except Exception as e:
-        print(f"WARNING: Failed to backfill titles: {e}")
-        print("Server will continue, but Japanese titles may not display.\n")
-        import traceback
-        traceback.print_exc()
-
-    # 9. Debug: Log database info
-    try:
-        from config import DATABASE_PATH
-        from database import get_db
-        import os
-
-        print(f"[Startup DEBUG] DATABASE_PATH: {DATABASE_PATH}")
-        print(f"[Startup DEBUG] Database file exists: {os.path.exists(DATABASE_PATH)}")
-        if os.path.exists(DATABASE_PATH):
-            print(f"[Startup DEBUG] Database file size: {os.path.getsize(DATABASE_PATH)} bytes")
-
-        db = get_db()
-        user_posts = db.execute_query("SELECT COUNT(*) FROM user_posts")
-        activities_posts = db.execute_query("SELECT COUNT(*) FROM activities WHERE activity_type = 'user_post'")
-        print(f"[Startup DEBUG] user_posts count: {user_posts[0][0] if user_posts else 0}")
-        print(f"[Startup DEBUG] activities (user_post) count: {activities_posts[0][0] if activities_posts else 0}")
-
-        # Show recent user_posts
-        recent_posts = db.execute_query("SELECT id, user_id, created_at FROM user_posts ORDER BY created_at DESC LIMIT 3")
-        print(f"[Startup DEBUG] Recent user_posts:")
-        for post in recent_posts:
-            print(f"  - ID: {post[0]}, user_id: {post[1]}, created_at: {post[2]}")
-
-        # Show user 4's activity breakdown
-        user4_anime = db.execute_query("SELECT COUNT(*) FROM activities WHERE user_id = 4 AND activity_type = 'anime_rating'")
-        user4_char = db.execute_query("SELECT COUNT(*) FROM activities WHERE user_id = 4 AND activity_type = 'character_rating'")
-        user4_post = db.execute_query("SELECT COUNT(*) FROM activities WHERE user_id = 4 AND activity_type = 'user_post'")
-        user4_total = db.execute_query("SELECT COUNT(*) FROM activities WHERE user_id = 4")
-        print(f"[Startup DEBUG] User 4 activities:")
-        print(f"  - anime_rating: {user4_anime[0][0] if user4_anime else 0}")
-        print(f"  - character_rating: {user4_char[0][0] if user4_char else 0}")
-        print(f"  - user_post: {user4_post[0][0] if user4_post else 0}")
-        print(f"  - TOTAL: {user4_total[0][0] if user4_total else 0}")
-    except Exception as e:
-        print(f"[Startup DEBUG] Failed to log database info: {e}")
-
-    print("\n" + "="*60)
-    print("✅ STARTUP COMPLETE")
-    print("="*60 + "\n")
+    """Never mutate schema or user records during worker startup."""
+    return None
 
 # Debug: Print allowed origins on startup
 print(f"[CORS] Allowed origins: {ALLOWED_ORIGINS}")
@@ -426,7 +143,16 @@ def root():
 # Health check
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "timestamp": "2026-01-13"}
+    return {"status": "ok"}
+
+
+@app.get("/ready")
+def readiness_check():
+    from database import get_db
+    from migrations import is_ready
+    if not is_ready(get_db().db_path):
+        return JSONResponse(status_code=503, content={"status": "not_ready"})
+    return {"status": "ready"}
 
 
 # Legacy image proxy removed - now using routers/image_proxy.py with auto-download functionality
@@ -458,10 +184,10 @@ if IMAGE_PROXY_AVAILABLE:
     print("[Startup] ✅ Image proxy router registered")
 else:
     print("[Startup] ⚠️ Image proxy router NOT registered (import failed)")
-app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
-app.include_router(admin_fix.router, prefix="/api/admin-fix", tags=["Admin Fix"])
+
+
 app.include_router(admin_editor.router, prefix="/api/admin/editor", tags=["Admin Editor"])
-app.include_router(debug_promotion.router, prefix="/api/debug", tags=["Debug"])
+
 
 
 # Serve React frontend static files

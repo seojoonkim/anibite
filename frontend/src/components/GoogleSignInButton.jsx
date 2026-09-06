@@ -6,34 +6,14 @@ import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL } from '../config/api';
+import { safeReturnPath } from './common/returnPath';
 
-const GoogleSignInButton = ({ onError }) => {
+const GoogleSignInButton = ({ onError, returnTo = '/browse' }) => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const buttonRef = useRef(null);
 
   useEffect(() => {
-    // Load Google Sign-In script
-    if (window.google) {
-      initializeGoogleSignIn();
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    script.onload = initializeGoogleSignIn;
-    document.body.appendChild(script);
-
-    return () => {
-      const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
-      if (existingScript) {
-        document.body.removeChild(existingScript);
-      }
-    };
-  }, []);
-
   const initializeGoogleSignIn = () => {
     if (!window.google || !buttonRef.current) return;
 
@@ -79,7 +59,7 @@ const GoogleSignInButton = ({ onError }) => {
       }
 
       await login(null, data.access_token, data.user);
-      navigate('/');
+      navigate(safeReturnPath(returnTo), { replace: true });
     } catch (error) {
       console.error('Google login error:', error);
       if (onError) {
@@ -87,6 +67,28 @@ const GoogleSignInButton = ({ onError }) => {
       }
     }
   };
+
+
+    // Load Google Sign-In script
+    if (window.google) {
+      initializeGoogleSignIn();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = initializeGoogleSignIn;
+    document.body.appendChild(script);
+
+    return () => {
+      const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+      if (existingScript) {
+        document.body.removeChild(existingScript);
+      }
+    };
+  }, [login, navigate, onError, returnTo]);
 
   return (
     <div className="w-full">

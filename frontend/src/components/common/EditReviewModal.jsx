@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import { useState } from 'react';
+import Dialog from './Dialog';
 import { useLanguage } from '../../context/LanguageContext';
 import StarRating from './StarRating';
 
@@ -76,30 +76,20 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
     return url;
   };
 
-  useEffect(() => {
-    if (isOpen && activity) {
-      setFormData({
-        rating: activity.rating || 0,
-        content: activity.review_content || '',
-        is_spoiler: activity.is_spoiler || false
-      });
-      setError('');
-    }
-  }, [isOpen, activity, mode]);
-
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = 'unset';
-      };
-    }
-  }, [isOpen]);
+  // Keep a draft across close/reopen for this item; never persist private text to storage.
+  const draftKey = `${activity?.id ?? activity?.item_id}:${mode}`;
+  const [loadedKey, setLoadedKey] = useState(null);
+  if (activity && loadedKey !== draftKey) {
+    setLoadedKey(draftKey);
+    setFormData({ rating: activity.rating || 0, content: activity.review_content || '', is_spoiler: activity.is_spoiler || false });
+    setError('');
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    if (saving) return;
+    if (formData.content.length > 5000) { setError(language === 'ko' ? '리뷰는 5000자 이하여야 합니다.' : 'Review must be at most 5000 characters.'); return; }
 
     // 별점 필수
     if (formData.rating === 0) {
@@ -125,7 +115,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
     try {
       await onSave(formData);
       onClose();
-    } catch (err) {
+    } catch {
       setError(language === 'ko' ? '저장에 실패했습니다.' : language === 'ja' ? '保存に失敗しました。' : 'Failed to save.');
     } finally {
       setSaving(false);
@@ -140,23 +130,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
   };
 
   const modalContent = (
-    <div
-      className="fixed z-[9999] flex items-center justify-center p-4"
-      onClick={(e) => {
-        // Close modal when clicking on overlay
-        if (e.target === e.currentTarget) {
-          onClose();
-        }
-      }}
-      style={{
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        position: 'fixed'
-      }}
-    >
+    <Dialog title={getTitle()} onClose={onClose} busy={saving}>
       <div
         className="bg-white rounded-xl shadow-xl max-w-xl w-full max-h-[90vh] overflow-y-auto"
         style={{ position: 'relative', zIndex: 10000 }}
@@ -166,6 +140,8 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
           <h2 className="text-base font-semibold text-gray-900">{getTitle()}</h2>
           <button
             onClick={onClose}
+            disabled={saving}
+            aria-label={language === 'ko' ? '닫기 (초안 유지)' : 'Close (keep draft)'}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -177,7 +153,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
         {/* Body */}
         <form onSubmit={handleSubmit} className="p-4">
           {error && (
-            <div className="mb-3 p-2.5 bg-red-100 border border-red-300 text-red-800 rounded-md text-sm">
+            <div role="alert" className="mb-3 p-2.5 bg-red-100 border border-red-300 text-red-800 rounded-md text-sm">
               {error}
             </div>
           )}
@@ -238,7 +214,7 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
 
           {/* Review Content */}
           <div className="mb-3">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label htmlFor="review-content" className="block text-sm font-medium text-gray-700 mb-1.5">
               {language === 'ko' ? '리뷰 내용' : language === 'ja' ? 'レビュー内容' : 'Review Content'}{' '}
               {mode === 'add_review' ? '*' : (
                 <span className="text-gray-500 font-normal text-xs">
@@ -247,6 +223,9 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
               )}
             </label>
             <textarea
+              id="review-content"
+              maxLength={5000}
+              aria-invalid={!!error}
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md h-28 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -300,9 +279,8 @@ export default function EditReviewModal({ isOpen, onClose, activity, onSave, mod
           </div>
         </form>
       </div>
-    </div>
+    </Dialog>
   );
 
-  // Render modal using React Portal to ensure it's not affected by parent z-index
-  return createPortal(modalContent, document.body);
+  return modalContent;
 }

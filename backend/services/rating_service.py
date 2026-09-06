@@ -9,6 +9,7 @@ from database import db, dict_from_row, dicts_from_rows
 from models.rating import RatingCreate, RatingUpdate, RatingResponse, UserRatingListResponse, RatingStatus
 
 
+@db.atomic
 def create_or_update_rating(user_id: int, rating_data: RatingCreate) -> RatingResponse:
     """평점 생성 또는 수정"""
 
@@ -30,17 +31,6 @@ def create_or_update_rating(user_id: int, rating_data: RatingCreate) -> RatingRe
         "SELECT id FROM user_ratings WHERE user_id = ? AND anime_id = ?",
         (user_id, rating_data.anime_id),
         fetch_one=True
-    )
-
-    # Delete from activities first (트리거가 동작하지 않을 경우를 대비)
-    db.execute_update(
-        """
-        DELETE FROM activities
-        WHERE activity_type = 'anime_rating'
-          AND user_id = ?
-          AND item_id = ?
-        """,
-        (user_id, rating_data.anime_id)
     )
 
     if existing:
@@ -70,26 +60,13 @@ def create_or_update_rating(user_id: int, rating_data: RatingCreate) -> RatingRe
             (user_id, rating_data.anime_id, final_rating, rating_data.status.value)
         )
 
+    # Always project status transitions, retaining stable activity/social IDs.
+    _sync_to_activities(user_id, rating_data.anime_id)
+
     # RATED 상태일 때 activities 동기화 확인
     # 트리거가 동작했는지 확인하고, 동작하지 않았으면 수동 동기화
     rating_activity_time = None
     if rating_data.status == RatingStatus.RATED and rating_data.rating:
-        # Check if trigger worked
-        activity_exists = db.execute_query(
-            """
-            SELECT 1 FROM activities
-            WHERE activity_type = 'anime_rating'
-              AND user_id = ?
-              AND item_id = ?
-            """,
-            (user_id, rating_data.anime_id),
-            fetch_one=True
-        )
-
-        # If trigger didn't work, manually sync
-        if not activity_exists:
-            _sync_to_activities(user_id, rating_data.anime_id)
-
         # Update activity_time to current time (move to recent feed)
         db.execute_update("""
             UPDATE activities
@@ -229,7 +206,7 @@ def get_user_ratings(
         total = db.execute_query(
             """
             SELECT COUNT(*) as total FROM activities
-            WHERE user_id = ? AND activity_type = 'anime_rating'
+            WHERE user_id = ? AND activity_type = 'anime_rating' AND rating IS NOT NULL
             AND (review_content IS NULL OR review_content = '')
             """,
             (user_id,),
@@ -269,7 +246,7 @@ def get_user_ratings(
                 NULL as season_year,
                 NULL as episodes
             FROM activities
-            WHERE user_id = ? AND activity_type = 'anime_rating'
+            WHERE user_id = ? AND activity_type = 'anime_rating' AND rating IS NOT NULL
             AND (review_content IS NULL OR review_content = '')
             ORDER BY activity_time DESC
             {limit_clause}
@@ -280,7 +257,7 @@ def get_user_ratings(
         # 전체 개수
         total = db.execute_query(
             """SELECT COUNT(*) as total FROM activities
-               WHERE user_id = ? AND activity_type = 'anime_rating'""",
+               WHERE user_id = ? AND activity_type = 'anime_rating' AND rating IS NOT NULL""",
             (user_id,),
             fetch_one=True
         )['total']
@@ -317,7 +294,7 @@ def get_user_ratings(
                 NULL as season_year,
                 NULL as episodes
             FROM activities
-            WHERE user_id = ? AND activity_type = 'anime_rating'
+            WHERE user_id = ? AND activity_type = 'anime_rating' AND rating IS NOT NULL
             ORDER BY activity_time DESC
             {limit_clause}
             """,
@@ -364,7 +341,7 @@ def get_all_user_ratings(user_id: int, rating_filter: float = None, status_filte
                 item_title_native as title_native,
                 item_image as image_url
             FROM activities
-            WHERE user_id = ? AND activity_type = 'anime_rating'{rating_condition}
+            WHERE user_id = ? AND activity_type = 'anime_rating' AND rating IS NOT NULL{rating_condition}
             ORDER BY activity_time DESC
             """,
             tuple(params)
@@ -439,99 +416,23 @@ def get_all_user_ratings(user_id: int, rating_filter: float = None, status_filte
     }
 
 
+@db.atomic
 def delete_rating(user_id: int, anime_id: int) -> bool:
-    """평점 삭제 (activities 삭제 시 CASCADE로 댓글/좋아요도 자동 삭제)"""
-
-    # activities 테이블에서 삭제 (CASCADE로 comments/likes 자동 삭제)
-    db.execute_update(
-        """
-        DELETE FROM activities
-        WHERE activity_type = 'anime_rating'
-        AND user_id = ?
-        AND item_id = ?
-        """,
-        (user_id, anime_id)
-    )
-
-    # 평점 삭제
+    """Retain the shared activity and social references, even while hidden."""
+    from services.projection_service import sync_projection
+    from services.rating_service import _update_user_stats
     rowcount = db.execute_update(
-        "DELETE FROM user_ratings WHERE user_id = ? AND anime_id = ?",
-        (user_id, anime_id)
+        "DELETE FROM user_ratings WHERE user_id=? AND anime_id=?", (user_id, anime_id)
     )
-
-    if rowcount > 0:
-        # 사용자 통계 업데이트
+    if rowcount:
+        sync_projection('anime', user_id, anime_id)
         _update_user_stats(user_id)
-        return True
-
-    return False
+    return rowcount > 0
 
 
 def _sync_to_activities(user_id: int, anime_id: int):
-    """user_ratings 데이터를 activities 테이블에 동기화 (트리거 대체)"""
-
-    # 사용자 정보와 평점 정보 조회
-    data = db.execute_query(
-        """
-        SELECT
-            ur.user_id,
-            ur.anime_id,
-            ur.rating,
-            ur.created_at,
-            ur.updated_at,
-            u.username,
-            u.display_name,
-            u.avatar_url,
-            COALESCE(us.otaku_score, 0) as otaku_score,
-            a.title_romaji,
-            a.title_korean,
-            COALESCE('/' || a.cover_image_local, a.cover_image_url) as item_image,
-            r.title as review_title,
-            r.content as review_content,
-            COALESCE(r.is_spoiler, 0) as is_spoiler
-        FROM user_ratings ur
-        JOIN users u ON u.id = ur.user_id
-        JOIN anime a ON a.id = ur.anime_id
-        LEFT JOIN user_stats us ON us.user_id = ur.user_id
-        LEFT JOIN user_reviews r ON r.user_id = ur.user_id AND r.anime_id = ur.anime_id
-        WHERE ur.user_id = ? AND ur.anime_id = ? AND ur.status = 'RATED'
-        """,
-        (user_id, anime_id),
-        fetch_one=True
-    )
-
-    if data:
-        # activities 테이블에 INSERT (OR REPLACE로 중복 방지)
-        db.execute_update(
-            """
-            INSERT OR REPLACE INTO activities (
-                activity_type, user_id, item_id, activity_time,
-                username, display_name, avatar_url, otaku_score,
-                item_title, item_title_korean, item_image,
-                rating, review_title, review_content, is_spoiler,
-                created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                'anime_rating',
-                data['user_id'],
-                data['anime_id'],
-                data['created_at'],
-                data['username'],
-                data['display_name'],
-                data['avatar_url'],
-                data['otaku_score'],
-                data['title_romaji'],
-                data['title_korean'],
-                data['item_image'],
-                data['rating'],
-                data['review_title'],
-                data['review_content'],
-                data['is_spoiler'],
-                data['created_at'],
-                data['updated_at']
-            )
-        )
+    from services.projection_service import sync_projection
+    sync_projection('anime',user_id,anime_id)
 
 
 def _get_rank_info(otaku_score: float) -> tuple[str, int]:

@@ -391,7 +391,7 @@ def get_character_ratings(user_id: int, limit: int = 500) -> List[Dict]:
             anime_title,
             anime_title_korean
         FROM activities
-        WHERE user_id = ? AND activity_type = 'character_rating'
+        WHERE user_id = ? AND activity_type = 'character_rating' AND rating IS NOT NULL
         ORDER BY activity_time DESC
         LIMIT ?
         """,

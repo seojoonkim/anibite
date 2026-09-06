@@ -73,14 +73,18 @@ const ActivityCard = forwardRef(({
   context = 'feed',
   showOptions = {},
   onUpdate = null,
-  notificationData = null,  // Additional data for notification context
-  onEditContent = null,  // Custom edit handler (e.g., for detail pages)
-  onDeleteContent = null  // Custom delete handler (e.g., for detail pages)
+  // Additional data for notification context
+  onEditContent = null,
+  // Custom edit handler (e.g., for detail pages)
+  onDeleteContent = null // Custom delete handler (e.g., for detail pages)
 }, ref) => {
   const { language } = useLanguage();
   const { user } = useAuth();
   const { triggerWiggle } = useLogoWiggle();
   const navigate = useNavigate();
+
+  // Temporary detail placeholders are not persisted activity IDs.
+  const canEngage = /^[1-9]\d*$/.test(String(activity.id));
 
   // Merge context preset with custom showOptions
   const preset = CONTEXT_PRESETS[context] || CONTEXT_PRESETS.feed;
@@ -126,7 +130,7 @@ const ActivityCard = forwardRef(({
   // Initialize bookmark state from server
   useEffect(() => {
     const fetchBookmarkStatus = async () => {
-      if (!user) {
+      if (!user || !canEngage) {
         setBookmarked(false);
         return;
       }
@@ -143,11 +147,11 @@ const ActivityCard = forwardRef(({
     };
 
     fetchBookmarkStatus();
-  }, [activity.id, user]);
+  }, [activity.id, user, canEngage]);
 
   // Hooks
   const { liked, likesCount, toggleLike } = useActivityLike(
-    activity.id,
+    canEngage ? activity.id : null,
     activity.user_liked,
     activity.likes_count
   );
@@ -157,14 +161,10 @@ const ActivityCard = forwardRef(({
     loading: commentsLoading,
     createComment,
     deleteComment
-  } = useActivityComments(activity.id);
+  } = useActivityComments(canEngage ? activity.id : null);
 
   // Helper functions
-  const getImageUrl = (url) => {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    return `${IMAGE_BASE_URL}${url}`;
-  };
+
 
   const getAvatarUrl = (url) => {
     if (!url) return null;
@@ -300,6 +300,7 @@ const ActivityCard = forwardRef(({
 
   // Handlers
   const handleLikeClick = async () => {
+    if (!canEngage) return;
     if (!user) {
       alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
       return;
@@ -310,6 +311,7 @@ const ActivityCard = forwardRef(({
   };
 
   const handleBookmarkClick = async () => {
+    if (!canEngage) return;
     console.log('Bookmark button clicked!', { user, bookmarked, activityId: activity.id });
 
     if (!user) {
@@ -340,6 +342,7 @@ const ActivityCard = forwardRef(({
   };
 
   const handleCommentSubmit = async () => {
+    if (!canEngage) return;
     if (!user) {
       alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
       return;
@@ -359,7 +362,7 @@ const ActivityCard = forwardRef(({
   };
 
   const handleReplySubmit = async (parentCommentId) => {
-    if (!user || !replyText.trim()) return;
+    if (!canEngage || !user || !replyText.trim()) return;
 
     try {
       await createComment(replyText.trim(), parentCommentId);
@@ -770,6 +773,7 @@ const ActivityCard = forwardRef(({
         <div className="flex items-center gap-4 sm:gap-5">
           {/* Like Button */}
           <button
+            disabled={!canEngage}
             onClick={handleLikeClick}
             className="flex items-center gap-1.5 transition-all hover:scale-105"
             style={{
@@ -795,6 +799,7 @@ const ActivityCard = forwardRef(({
 
           {/* Comment Button */}
           <button
+            disabled={!canEngage}
             onClick={() => setShowComments(!showComments)}
             className="flex items-center gap-1.5 transition-all hover:scale-105"
             style={{
@@ -815,6 +820,7 @@ const ActivityCard = forwardRef(({
 
         {/* Bookmark Button */}
         <button
+          disabled={!canEngage}
           onClick={handleBookmarkClick}
           className="flex items-center gap-1.5 transition-all hover:scale-105"
           style={{
@@ -837,7 +843,7 @@ const ActivityCard = forwardRef(({
       </div>
 
       {/* Comments Section */}
-      {showComments && (
+      {canEngage && showComments && (
         <ActivityComments
           comments={comments}
           loading={commentsLoading}

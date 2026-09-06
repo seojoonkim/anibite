@@ -3,7 +3,7 @@ Characters API Router
 캐릭터 조회 및 평가
 """
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, Field
 from models.user import UserResponse
 from services.character_service import (
@@ -14,7 +14,7 @@ from services.character_service import (
     get_user_character_stats,
     get_character_detail
 )
-from api.deps import get_current_user
+from api.deps import get_current_user, get_current_user_optional
 
 router = APIRouter()
 
@@ -146,12 +146,12 @@ def get_my_character_stats(
 @router.get("/{character_id}")
 def get_character_by_id(
     character_id: int,
-    current_user: UserResponse = Depends(get_current_user)
+    current_user: Optional[UserResponse] = Depends(get_current_user_optional)
 ):
     """
     캐릭터 상세 정보 조회
     """
-    character = get_character_detail(character_id, current_user.id)
+    character = get_character_detail(character_id, current_user.id if current_user else None)
     if not character:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -24,7 +24,7 @@ export const activityService = {
     followingOnly = false,
     limit = 50,
     offset = 0
-  } = {}) {
+  } = {}, options = {}) {
     const params = new URLSearchParams();
 
     if (activityType) params.append('activity_type', activityType);
@@ -44,7 +44,7 @@ export const activityService = {
       url: `/api/activities?${params}`
     });
 
-    const response = await api.get(`/api/activities?${params}`);
+    const response = await api.get(`/api/activities?${params}`, options);
 
     console.log('[activityService] Received activities:', {
       count: response.data.items?.length || 0,

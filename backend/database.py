@@ -4,6 +4,8 @@ SQLite3 connection management
 """
 import sqlite3
 from contextlib import contextmanager
+from contextvars import ContextVar
+from functools import wraps
 from typing import Optional, Dict, List, Any
 from config import DATABASE_PATH
 
@@ -13,10 +15,15 @@ class Database:
 
     def __init__(self, db_path: str = None):
         self.db_path = db_path or str(DATABASE_PATH)
+        self._connection = ContextVar("db_connection", default=None)
 
     @contextmanager
     def get_connection(self):
         """데이터베이스 연결 컨텍스트 매니저"""
+        existing = self._connection.get()
+        if existing is not None:
+            yield existing
+            return
         conn = sqlite3.connect(self.db_path, timeout=60.0)
         conn.row_factory = sqlite3.Row  # Row 객체로 결과 반환
         # WAL 모드 활성화 (동시 읽기/쓰기 지원)
@@ -30,6 +37,26 @@ class Database:
             raise e
         finally:
             conn.close()
+
+    @contextmanager
+    def transaction(self):
+        if self._connection.get() is not None:
+            yield self._connection.get()
+            return
+        with self.get_connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            token = self._connection.set(conn)
+            try:
+                yield conn
+            finally:
+                self._connection.reset(token)
+
+    def atomic(self, function):
+        @wraps(function)
+        def wrapped(*args, **kwargs):
+            with self.transaction():
+                return function(*args, **kwargs)
+        return wrapped
 
     def execute_query(
         self, query: str, params: tuple = None, fetch_one: bool = False

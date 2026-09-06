@@ -1,20 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 
 export default function MobileWebBanner() {
   const { language } = useLanguage();
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    // Check if banner was dismissed
-    const dismissed = localStorage.getItem('mobileWebBannerDismissed');
-
-    // Show banner only on mobile screens and if not dismissed
-    const isMobile = window.innerWidth < 768;
-    if (isMobile && !dismissed) {
-      setIsVisible(true);
-    }
-  }, []);
+  const [isVisible, setIsVisible] = useState(() =>
+    window.innerWidth < 768 && !localStorage.getItem('mobileWebBannerDismissed')
+  );
 
   const handleDismiss = () => {
     setIsVisible(false);

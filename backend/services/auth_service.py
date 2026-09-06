@@ -13,6 +13,7 @@ from models.user import UserRegister, UserLogin, UserResponse, TokenResponse
 from services.email_service import send_verification_email
 
 
+@db.atomic
 def register_user(user_data: UserRegister) -> dict:
     """회원가입 - 이메일 인증 필요"""
 
@@ -55,7 +56,7 @@ def register_user(user_data: UserRegister) -> dict:
         INSERT INTO users (username, email, password_hash, display_name,
                           preferred_language, oauth_provider, is_verified, verification_token,
                           verification_token_expires, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, 'local', 1, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        VALUES (?, ?, ?, ?, ?, 'local', 0, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         """,
         (user_data.username, user_data.email, hashed_password, user_data.display_name,
          user_data.preferred_language, verification_token, token_expires.isoformat())
@@ -92,7 +93,7 @@ def register_user(user_data: UserRegister) -> dict:
     user_response = UserResponse(**user_dict)
 
     # JWT 토큰 생성
-    access_token = create_access_token(data={"sub": str(user_id)})
+    access_token = create_access_token(data={"sub": user_data.username})
 
     # 즉시 로그인 처리
     return TokenResponse(

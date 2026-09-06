@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 
 /**
- * Virtual scrolling hook for grid layouts with category sections
- * Only renders sections that are near the viewport
+ * Progressive section mounting, not full virtualization.
+ * Keep mounted sections until callers provide measured placeholder heights.
  */
 export function useVirtualGrid(sections, { rootMargin = '500px' } = {}) {
   const [visibleSections, setVisibleSections] = useState(new Set());
@@ -10,6 +10,7 @@ export function useVirtualGrid(sections, { rootMargin = '500px' } = {}) {
   const sectionRefs = useRef(new Map());
 
   useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') return;
     // Create intersection observer
     observerRef.current = new IntersectionObserver(
       (entries) => {
@@ -52,7 +53,7 @@ export function useVirtualGrid(sections, { rootMargin = '500px' } = {}) {
     }
   };
 
-  const isSectionVisible = (sectionId) => visibleSections.has(sectionId);
+  const isSectionVisible = (sectionId) => typeof IntersectionObserver === 'undefined' || visibleSections.has(sectionId);
 
   return { getSectionRef, isSectionVisible };
 }

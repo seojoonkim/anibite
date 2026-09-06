@@ -1,9 +1,5 @@
-/* 모던?�고 ?�련???�트 */
-@import url('https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css');
+/* One body family with system CJK fallbacks. */
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -154,7 +150,7 @@ html {
 }
 
 body {
-  font-family: 'SUIT Variable', 'Pretendard Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, 'Noto Sans CJK KR', 'Hiragino Kaku Gothic ProN', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.02em;
@@ -174,18 +170,6 @@ body {
   display: flex;
   flex-direction: column;
   /* REMOVED: 90% scale transform - causes mobile usability issues */
-}
-
-/* Language-specific Typography */
-:lang(en) {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  letter-spacing: -0.01em;
-  font-feature-settings: 'cv05' 1, 'cv08' 1, 'cv11' 1;
-}
-
-:lang(ko) {
-  font-family: 'SUIT Variable', 'Pretendard Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  letter-spacing: -0.02em;
 }
 
 /* ============================================
@@ -223,7 +207,8 @@ input:focus,
 textarea:focus,
 select:focus {
   background-color: var(--color-input-focus) !important;
-  outline: none !important;
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
   border-color: var(--color-border-focus) !important;
   box-shadow: 0 0 0 3px rgba(91, 181, 245, 0.15) !important;
 }
@@ -238,14 +223,6 @@ select:focus {
 [style*="background:white"],
 [style*="background-color:white"] {
   background-color: var(--color-surface) !important;
-}
-
-/* Buttons with white backgrounds */
-button[style*="background"],
-.btn-white,
-.button-white {
-  background-color: var(--color-surface-elevated) !important;
-  color: var(--color-text-primary) !important;
 }
 
 /* Cards and containers */
@@ -459,3 +436,63 @@ img {
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+
+/* Accessible application primitives: scoped controls, never global link sizing. */
+:root { color-scheme: dark; --content-width: 1200px; --reading-width: 720px; --control-size: 44px; --color-text-tertiary: #93a2b6; --color-on-primary: #071321; }
+body { font-size: 16px; line-height: 1.6; letter-spacing: 0; }
+:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+button:disabled { cursor: not-allowed; opacity: .55; }
+.button-primary { display: inline-flex; justify-content: center; align-items: center; min-height: 44px; padding: 10px 20px; border-radius: 10px; background: var(--color-primary); color: var(--color-on-primary); font-weight: 700; }
+.button-primary:hover:not(:disabled) { background: var(--color-primary-light); }
+.skip-link { position: fixed; top: -100px; left: 16px; z-index: 20000; padding: 12px; background: var(--color-primary); color: var(--color-on-primary); }
+.skip-link:focus { top: 8px; }
+.app-header { position: fixed; inset: 0 0 auto; min-height: 64px; z-index: 100; background: var(--color-surface); border-bottom: 1px solid var(--color-border); }
+.app-header-inner { max-width: var(--content-width); min-height: 64px; padding: 8px 16px; margin: auto; display:flex; align-items:center; gap:16px; }
+.app-brand,.auth-brand { display:flex; align-items:center; gap:8px; color:var(--color-primary); font-weight:800; font-size:22px; white-space:nowrap; }
+.desktop-search { flex:1; min-width:100px; max-width:240px; }
+.desktop-search input { width:100%; min-height:44px; border-radius:8px; padding:8px 12px; }
+.desktop-navigation,.app-account { display:flex; align-items:center; gap:4px; }
+.app-account { margin-left:auto; }
+.app-account button,.app-account select,.account-menu summary { min-height:44px; padding:8px; border-radius:8px; cursor:pointer; }
+.app-account select { max-width:88px; }
+.nav-destination { display:flex; align-items:center; justify-content:center; min-height:44px; padding:8px 12px; border-radius:8px; white-space:nowrap; font-size:14px; }
+.nav-destination.is-active { color:var(--color-primary); background:var(--color-surface-elevated); font-weight:700; }
+.account-menu { position:relative; font-size:14px; }
+.account-menu summary { max-width:110px; overflow:hidden; }
+.account-menu > div { position:absolute; right:0; width:180px; display:grid; background:var(--color-surface-elevated); padding:8px; border:1px solid var(--color-border); border-radius:10px; }
+.account-menu a { padding:10px; }
+.mobile-navigation { display:none; }
+.app-content { padding-top:64px; }
+.auth-page { min-height:100dvh; display:grid; place-items:center; padding:24px 16px; }
+.auth-card { max-width:440px; width:100%; padding:32px; border:1px solid var(--color-border); border-radius:16px; }
+.auth-card h1 { font-size:26px; font-weight:700; margin:24px 0; }
+.auth-card form { display:grid; gap:10px; }
+.auth-card input { padding:12px; border-radius:8px; width:100%; min-height:48px; }
+.auth-help { font-size:14px; color:var(--color-text-secondary); margin:12px 0; }
+.auth-divider { border-top:1px solid var(--color-border); padding-top:20px; margin:20px 0; font-size:14px; }
+.auth-links { display:grid; gap:12px; margin-top:24px; color:var(--color-primary); }
+.auth-links a,.password-toggle { min-height:44px; display:flex; align-items:center; }
+.form-error { padding:12px; border:1px solid var(--color-error); margin:12px 0; color:#ffb5b5; }
+.recovery-page { max-width:720px; margin:64px auto; padding:24px; display:grid; gap:24px; }
+.recovery-page h1 { font-size:28px; font-weight:700; }
+.rating-input { width:100%; min-width:0; max-width:320px; }
+.rating-adjustments { display:flex; align-items:center; gap:8px; }
+.rating-adjustments button { width:44px; min-height:44px; flex-shrink:0; font-size:22px; border:1px solid var(--color-border); border-radius:8px; }
+.rating-adjustments input { width:100%; min-width:40px; min-height:44px; accent-color:#F5C842; }
+.rating-caption { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; font-size:14px; align-items:center; }
+.rating-caption button { min-height:44px; text-decoration:underline; }
+.rating-caption [role=status] { color:#F5C842; }
+.rating-readonly { display:inline-flex; align-items:center; gap:8px; white-space:nowrap; }
+.rating-stars { position:relative; display:inline-block; line-height:1; color:#68768a; }
+.rating-stars > span:last-child { position:absolute; inset:0 auto 0 0; overflow:hidden; color:#F5C842; }
+.dialog-backdrop { position:fixed; inset:0; z-index:10000; background:rgb(0 0 0 / .7); display:grid; place-items:center; padding:16px; }
+.dialog-panel { width:min(100%,560px); max-height:calc(100dvh - 32px); overflow:auto; border:1px solid var(--color-border); border-radius:16px; background:var(--color-surface); }
+.dialog-panel button { min-height:44px; min-width:44px; }
+.dialog-panel textarea { font-size:16px; }
+.rating-tabs { display:flex; gap:8px; margin-bottom:20px; }
+.rating-tabs a { min-height:44px; padding:8px 20px; border-radius:10px; border:1px solid var(--color-border); }
+.rating-tabs a[aria-current=page] { color:var(--color-primary); background:var(--color-surface-elevated); }
+@media (max-width: 900px) { .desktop-navigation { display:none; } .mobile-navigation { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); position:fixed; inset:auto 0 0; z-index:100; border-top:1px solid var(--color-border); background:var(--color-surface); padding:4px 8px calc(4px + env(safe-area-inset-bottom,0px)); } .app-content { padding-bottom:calc(72px + env(safe-area-inset-bottom,0px)); } }
+@media (max-width: 600px) { .desktop-search { display:none; } .app-header-inner { gap:8px; } .auth-card { padding:24px; } .mobile-navigation .nav-destination { font-size:14px; padding:8px 4px; } }
+@media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation:none !important; transition:none !important; scroll-behavior:auto !important; } }

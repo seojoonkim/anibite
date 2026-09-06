@@ -1,7 +1,8 @@
 /**
  * React hooks for activity management
  */
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { usePagedResource } from './usePagedResource';
 import { activityService } from '../services/activityService';
 
 /**
@@ -14,50 +15,19 @@ import { activityService } from '../services/activityService';
  */
 export function useActivities(filters = {}, options = {}) {
   const { autoFetch = true, refetchInterval = null } = options;
-
-  const [activities, setActivities] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const fetchActivities = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const data = await activityService.getActivities(filters);
-      setActivities(data.items);
-      setTotal(data.total);
-    } catch (err) {
-      console.error('Failed to fetch activities:', err);
-      setError(err.message || 'Failed to load activities');
-    } finally {
-      setLoading(false);
-    }
-  }, [JSON.stringify(filters)]);
-
+  const key = JSON.stringify(filters);
+  const loadPage = useCallback(async (_page, signal) => {
+    const data = await activityService.getActivities(JSON.parse(key), { signal });
+    return { items: data.items || [], total: data.total, hasMore: false };
+  }, [key]);
+  const resource = usePagedResource(loadPage, false, { autoFetch });
+  const refetch = resource.reset;
   useEffect(() => {
-    if (autoFetch) {
-      fetchActivities();
-    }
-  }, [autoFetch, fetchActivities]);
-
-  // Auto-refetch interval
-  useEffect(() => {
-    if (refetchInterval && refetchInterval > 0) {
-      const intervalId = setInterval(fetchActivities, refetchInterval);
-      return () => clearInterval(intervalId);
-    }
-  }, [refetchInterval, fetchActivities]);
-
-  return {
-    activities,
-    total,
-    loading,
-    error,
-    refetch: fetchActivities
-  };
+    if (refetchInterval > 0) { const timer = setInterval(refetch, refetchInterval); return () => clearInterval(timer); }
+  }, [refetchInterval, refetch]);
+  return { activities: resource.items, total: resource.total, loading: resource.loading, error: resource.error, refetch };
 }
+
 
 /**
  * Hook to manage a single activity
@@ -244,132 +214,11 @@ export function useActivityComments(activityId) {
  * Hook for pagination - 단순하고 빠르게
  */
 export function useActivityPagination(filters = {}, pageSize = 50, skip = false) {
-  const [allActivities, setAllActivities] = useState([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(!skip);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [nextPage, setNextPage] = useState(2);
-
-  const isResettingRef = useRef(false);
-  const loadingRef = useRef(false);
-  const filtersStringRef = useRef('');
-  const skipRef = useRef(skip);
-
-  // Update skip ref when it changes
-  useEffect(() => {
-    skipRef.current = skip;
-  }, [skip]);
-
-  // 초기 로드 (한 번에 2페이지 분량)
-  const loadInitial = useCallback(async (currentFilters) => {
-    if (loadingRef.current || skipRef.current) return;
-
-    console.log('[useActivityPagination] Loading initial pages');
-    loadingRef.current = true;
-    isResettingRef.current = true;
-    setLoading(true);
-    setAllActivities([]);
-
-    try {
-      // 한 번의 요청으로 2페이지 분량 로드 (더 빠름)
-      const data = await activityService.getActivities({
-        ...currentFilters,
-        limit: pageSize * 2,
-        offset: 0
-      });
-
-      console.log('[useActivityPagination] Initial load complete:', {
-        count: data.items.length,
-        total: data.total
-      });
-
-      setAllActivities(data.items);
-      setHasMore(data.items.length === pageSize * 2);
-      setNextPage(2);
-      isResettingRef.current = false;
-    } catch (err) {
-      console.error('[useActivityPagination] Initial load failed:', err);
-      setAllActivities([]);
-      setHasMore(false);
-      isResettingRef.current = false;
-    } finally {
-      setLoading(false);
-      loadingRef.current = false;
-    }
-  }, [pageSize]);
-
-  // 추가 페이지 로드
-  const loadMore = useCallback(async () => {
-    if (loadingMore || !hasMore || loading) {
-      console.log('[useActivityPagination] loadMore skipped');
-      return;
-    }
-
-    console.log('[useActivityPagination] Loading more, page:', nextPage);
-    setLoadingMore(true);
-
-    try {
-      const data = await activityService.getActivities({
-        ...filters,
-        limit: pageSize,
-        offset: nextPage * pageSize
-      });
-
-      console.log('[useActivityPagination] Loaded page:', nextPage, 'count:', data.items.length);
-
-      setAllActivities(prev => [...prev, ...data.items]);
-      setHasMore(data.items.length === pageSize);
-      setNextPage(prev => prev + 1);
-    } catch (err) {
-      console.error('[useActivityPagination] loadMore failed:', err);
-    } finally {
-      setLoadingMore(false);
-    }
-  }, [loadingMore, hasMore, loading, nextPage, pageSize, filters]);
-
-  // 필터 변경 감지 및 리로드
-  useEffect(() => {
-    if (skip) return;
-
-    const newFiltersString = JSON.stringify(filters);
-
-    if (newFiltersString !== filtersStringRef.current) {
-      console.log('[useActivityPagination] Filters changed');
-      filtersStringRef.current = newFiltersString;
-      loadInitial(filters);
-    }
-  }, [filters, loadInitial, skip]);
-
-  // 컴포넌트 마운트 시 초기 로드
-  useEffect(() => {
-    if (skip) return;
-
-    if (filtersStringRef.current === '') {
-      console.log('[useActivityPagination] Initial mount');
-      filtersStringRef.current = JSON.stringify(filters);
-      loadInitial(filters);
-    }
-  }, [skip]); // skip이 변경되면 다시 체크
-
-  // Reset function to reload from beginning
-  const reset = useCallback(() => {
-    console.log('[useActivityPagination] Reset called');
-    filtersStringRef.current = ''; // Force reload on next effect
-    loadInitial(filters);
-  }, [filters, loadInitial]);
-
-  // Remove activity from list (optimistic UI)
-  const removeActivity = useCallback((activityId) => {
-    setAllActivities(prev => prev.filter(a => a.id !== activityId));
-  }, []);
-
-  return {
-    activities: isResettingRef.current ? [] : allActivities,
-    loading: loading || isResettingRef.current,
-    loadingMore,
-    hasMore,
-    loadMore,
-    reset,
-    removeActivity
-  };
+  const key = JSON.stringify(filters);
+  const loadPage = useCallback(async (page, signal) => {
+    const data = await activityService.getActivities({ ...JSON.parse(key), limit: pageSize, offset: (page - 1) * pageSize }, { signal });
+    return { items: data.items || [], total: data.total, hasMore: data.has_more ?? (typeof data.total === 'number' ? page * pageSize < data.total : data.items.length === pageSize) };
+  }, [key, pageSize]);
+  const resource = usePagedResource(loadPage, skip);
+  return { ...resource, activities: resource.items, removeActivity: resource.remove };
 }

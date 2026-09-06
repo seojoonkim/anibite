@@ -5,6 +5,7 @@ Feed Service
 import json
 from typing import List, Dict
 from database import db, dict_from_row
+from services.activity_service import VISIBLE_ACTIVITY_SQL
 
 
 def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[Dict]:
@@ -240,6 +241,7 @@ def get_following_feed(user_id: int, limit: int = 50, offset: int = 0) -> List[D
                 a.item_id,
                 a.item_title,
                 a.item_title_korean,
+                a.item_title_native,
                 a.item_image,
                 a.rating,
                 NULL as status,
@@ -291,7 +293,7 @@ def get_global_feed(limit: int = 50, offset: int = 0) -> List[Dict]:
 
     # activities 테이블 + JOIN으로 조회 (정규화)
     rows = db.execute_query(
-        """
+        f"""
         SELECT
             a.id,
             a.activity_type,
@@ -366,6 +368,7 @@ def get_global_feed(limit: int = 50, offset: int = 0) -> List[Dict]:
             )
             WHERE rn = 1
         ) char_anime ON ch.id = char_anime.character_id
+        WHERE {VISIBLE_ACTIVITY_SQL}
         ORDER BY a.activity_time DESC,
                  CASE a.activity_type
                      WHEN 'rank_promotion' THEN 1
@@ -505,7 +508,7 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
 
     # activities 테이블 + JOIN으로 조회 (정규화)
     rows = db.execute_query(
-        """
+        f"""
         SELECT
             a.id,
             a.activity_type,
@@ -581,7 +584,7 @@ def get_user_feed(user_id: int, current_user_id: int = None, limit: int = 50, of
             )
             WHERE rn = 1
         ) char_anime ON ch.id = char_anime.character_id
-        WHERE a.user_id = ?
+        WHERE a.user_id = ? AND {VISIBLE_ACTIVITY_SQL}
         ORDER BY a.activity_time DESC,
                  CASE a.activity_type
                      WHEN 'rank_promotion' THEN 1

@@ -11,21 +11,9 @@ export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadLeaderboard();
-  }, []);
 
-  const loadLeaderboard = async () => {
-    try {
-      setLoading(true);
-      const data = await userService.getLeaderboard(100);
-      setLeaderboard(data || []);
-      setLoading(false);
-    } catch (err) {
-      console.error('Failed to load leaderboard:', err);
-      setLoading(false);
-    }
-  };
+
+
 
   const getAvatarUrl = (avatarUrl) => {
     return getAvatarUrlHelper(avatarUrl) || '/placeholder-avatar.png';
@@ -36,7 +24,21 @@ export default function Leaderboard() {
     return romanNumerals[num - 1] || num;
   };
 
-  if (loading) {
+  useEffect(() => {
+  async function loadLeaderboard() {
+    try {
+      const data = await userService.getLeaderboard(100);
+      setLeaderboard(data || []);
+      setLoading(false);
+    } catch (err) {
+      console.error('Failed to load leaderboard:', err);
+      setLoading(false);
+    }
+  };
+    loadLeaderboard();
+  }, []);
+
+if (loading) {
     return (
       <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
         <div className="flex justify-center items-center h-screen">
