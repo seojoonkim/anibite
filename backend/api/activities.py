@@ -253,6 +253,28 @@ def delete_activity_endpoint(
         )
 
 
+def _set_like(activity_id, user_id, liked):
+    from services.activity_service import set_activity_like
+    from database import db
+    try:
+        with db.transaction():
+            set_activity_like(activity_id,user_id,liked)
+            count=db.execute_query('SELECT COUNT(*) FROM activity_likes WHERE activity_id=?',(activity_id,),fetch_one=True)[0]
+            return {"liked":liked,"likes_count":count}
+    except ValueError:
+        raise HTTPException(status_code=404,detail="Activity not found")
+
+
+@router.put("/{activity_id}/like")
+def put_activity_like(activity_id: int, current_user: UserResponse = Depends(get_current_user)):
+    return _set_like(activity_id,current_user.id,True)
+
+
+@router.delete("/{activity_id}/like")
+def remove_activity_like(activity_id: int, current_user: UserResponse = Depends(get_current_user)):
+    return _set_like(activity_id,current_user.id,False)
+
+
 @router.post("/{activity_id}/like", response_model=dict)
 def like_activity_endpoint(
     activity_id: int,
@@ -285,7 +307,9 @@ def like_activity_endpoint(
 
 @router.get("/{activity_id}/comments", response_model=List[CommentResponse])
 def get_comments_endpoint(
-    activity_id: int
+    activity_id: int,
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0)
 ):
     """Get comments for an activity"""
 
@@ -297,7 +321,7 @@ def get_comments_endpoint(
             detail="Activity not found"
         )
 
-    comments = get_activity_comments(activity_id)
+    comments = get_activity_comments(activity_id,limit=limit,offset=offset)
     return [CommentResponse(**comment) for comment in comments]
 
 

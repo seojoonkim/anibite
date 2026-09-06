@@ -2,7 +2,7 @@
 Rating Pydantic models
 Request/Response schemas
 """
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum
@@ -20,6 +20,12 @@ class RatingCreate(BaseModel):
     anime_id: int
     rating: Optional[float] = Field(None, ge=0.5, le=5.0)
     status: RatingStatus = RatingStatus.RATED
+
+    @model_validator(mode='after')
+    def require_rated_value(self):
+        if self.status == RatingStatus.RATED and self.rating is None:
+            raise ValueError('RATED requires a rating')
+        return self
 
     @field_validator('rating')
     @classmethod

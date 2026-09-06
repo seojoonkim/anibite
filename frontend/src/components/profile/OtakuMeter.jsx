@@ -5,8 +5,7 @@ import { useLanguage } from '../../context/LanguageContext';
 
 export default function OtakuMeter({ score }) {
   const { language } = useLanguage();
-  const maxScore = 2000;
-  const percentage = Math.min((score / maxScore) * 100, 100);
+
   const [showRoadmap, setShowRoadmap] = useState(false);
 
   // Use levels from otakuLevels.js

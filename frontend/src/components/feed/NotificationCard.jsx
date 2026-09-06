@@ -4,10 +4,11 @@ import { useLanguage } from '../../context/LanguageContext';
 import DefaultAvatar from '../common/DefaultAvatar';
 
 export default function NotificationCard({
-  notifications, // Array of notifications for the same content
-  children, // Activity card content
-  getTimeAgo,
-  getAvatarUrl
+  notifications,
+  // Array of notifications for the same content
+  children,
+  // Activity card content
+  getTimeAgo
 }) {
   const { language } = useLanguage();
   const [collapsedComments, setCollapsedComments] = useState({});

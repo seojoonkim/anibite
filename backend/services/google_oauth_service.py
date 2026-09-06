@@ -50,6 +50,9 @@ async def verify_google_token(credential: str) -> Dict[str, str]:
             'email_verified': idinfo.get('email_verified', False)
         }
 
+        if google_user_info['email_verified'] is not True:
+            raise HTTPException(status_code=401, detail="Verified Google email required")
+
         if not google_user_info['email']:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -58,6 +61,8 @@ async def verify_google_token(credential: str) -> Dict[str, str]:
 
         return google_user_info
 
+    except HTTPException:
+        raise
     except ValueError as e:
         # 토큰 검증 실패
         raise HTTPException(
@@ -73,6 +78,13 @@ async def verify_google_token(credential: str) -> Dict[str, str]:
 
 
 async def google_login_or_register(google_user_info: Dict[str, str], preferred_language: str = 'en') -> TokenResponse:
+    if google_user_info.get('email_verified') is not True:
+        raise HTTPException(status_code=401, detail="Verified Google email required")
+    with db.transaction():
+        return await _google_login_or_register(google_user_info, preferred_language)
+
+
+async def _google_login_or_register(google_user_info: Dict[str, str], preferred_language: str = 'en') -> TokenResponse:
     """
     Google OAuth 로그인 또는 회원가입
 
@@ -131,45 +143,9 @@ async def google_login_or_register(google_user_info: Dict[str, str], preferred_l
     )
 
     if existing_email_user:
-        # 기존 계정에 Google OAuth 연동 (계정 통합)
-        user_dict = dict_from_row(existing_email_user)
-        user_id = user_dict['id']
-
-        # Google OAuth 정보 업데이트 (프로필 사진은 유지)
-        db.execute_query(
-            """
-            UPDATE users
-            SET oauth_provider = 'google',
-                oauth_id = ?,
-                is_verified = 1,
-                updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-            """,
-            (oauth_id, user_id)
-        )
-
-        # 업데이트된 사용자 정보 다시 조회
-        updated_user = db.execute_query(
-            """
-            SELECT u.*, COALESCE(us.otaku_score, 0.0) as otaku_score
-            FROM users u
-            LEFT JOIN user_stats us ON u.id = us.user_id
-            WHERE u.id = ?
-            """,
-            (user_id,),
-            fetch_one=True
-        )
-
-        user_dict = dict_from_row(updated_user)
-        user_dict = set_default_avatar(user_dict, db)
-        user_response = UserResponse(**user_dict)
-        access_token = create_access_token(data={"sub": user_dict['username']})
-
-        return TokenResponse(
-            access_token=access_token,
-            token_type="bearer",
-            user=user_response
-        )
+        # Linking requires a separate authenticated reauthorization flow.
+        # Until that exists, deny rather than silently take over a local account.
+        raise HTTPException(status_code=409, detail="Account linking requires authenticated reauthorization")
 
     # 3. 신규 Google 사용자 → 회원가입 처리
     # username 생성 (이메일 기반, 중복 방지)

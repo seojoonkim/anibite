@@ -1,9 +1,11 @@
 [build]
-builder = "nixpacks"
-nixpacksConfigPath = "nixpacks.toml"
-
-[build.nixpacks]
-pythonVersion = "3.11"
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
 
 [deploy]
-volumeMountPath = "/app/data"
+# Schema application is an approved one-off release operation, never startup.
+startCommand = "bash /app/docker-startup.sh"
+healthcheckPath = "/ready"
+healthcheckTimeout = 120
+# Verify the existing persistent volume attachment at /app/data in Railway.
+# Pre-deploy containers do not mount volumes; never migrate there.

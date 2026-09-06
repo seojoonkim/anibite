@@ -1,12 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { lazy, Suspense, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import { LanguageProvider } from './context/LanguageContext';
-import { LogoWiggleProvider } from './context/LogoWiggleContext';
+import { AuthProvider } from './context/AuthProvider';
+import { useAuth } from './context/AuthContext';
+import { LanguageProvider } from './context/LanguageProvider';
+import { LogoWiggleProvider } from './context/LogoWiggleProvider';
 import ScrollToTop from './components/common/ScrollToTop';
 import Navbar from './components/common/Navbar';
-import MobileWebBanner from './components/common/MobileWebBanner';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Lazy load all pages for code splitting (reduces initial bundle size)
 const Login = lazy(() => import('./pages/Login'));
@@ -28,8 +29,9 @@ const AdminEditor = lazy(() => import('./pages/AdminEditor'));
 const BackupLogs = lazy(() => import('./pages/BackupLogs'));
 
 // Protected Route Component
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+const ProtectedRoute = ({ children, admin = false }) => {
+  const { isAuthenticated, loading, user } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">
@@ -37,7 +39,9 @@ const ProtectedRoute = ({ children }) => {
     </div>;
   }
 
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  if (!isAuthenticated) return <Navigate to="/login" replace state={{ from: location.pathname + location.search + location.hash }} />;
+  if (admin && user?.is_admin !== true) return <section className="recovery-page"><h1>403 · 접근 권한이 없습니다</h1><a href="/browse">작품 둘러보기</a></section>;
+  return children;
 };
 
 // Loading component for Suspense fallback - only shows below navbar
@@ -83,9 +87,9 @@ function AppRoutes() {
       {showNavbar && createPortal(<Navbar />, document.body)}
 
       {/* Mobile web version banner - only on authenticated pages */}
-      {showNavbar && createPortal(<MobileWebBanner />, document.body)}
+      <a href="#main-content" className="skip-link">본문으로 건너뛰기</a>
 
-      <Suspense fallback={<PageLoader />}>
+      <main id="main-content" className={showNavbar ? 'app-content' : undefined} tabIndex={-1}><ErrorBoundary key={location.pathname}><Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -94,11 +98,7 @@ function AppRoutes() {
           <Route path="/resend-verification" element={<ResendVerification />} />
         <Route
           path="/"
-          element={
-            <ProtectedRoute>
-              <Rate />
-            </ProtectedRoute>
-          }
+          element={<Navigate to="/browse" replace />}
         />
         <Route
           path="/feed"
@@ -135,9 +135,7 @@ function AppRoutes() {
         <Route
           path="/browse"
           element={
-            <ProtectedRoute>
-              <Browse />
-            </ProtectedRoute>
+            <Browse />
           }
         />
         <Route
@@ -151,17 +149,13 @@ function AppRoutes() {
         <Route
           path="/anime/:id"
           element={
-            <ProtectedRoute>
-              <AnimeDetail />
-            </ProtectedRoute>
+            <AnimeDetail />
           }
         />
         <Route
           path="/character/:id"
           element={
-            <ProtectedRoute>
-              <CharacterDetail />
-            </ProtectedRoute>
+            <CharacterDetail />
           }
         />
         <Route
@@ -183,7 +177,7 @@ function AppRoutes() {
         <Route
           path="/admin"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute admin>
               <AdminEditor />
             </ProtectedRoute>
           }
@@ -191,7 +185,7 @@ function AppRoutes() {
         <Route
           path="/admin/backup"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute admin>
               <BackupLogs />
             </ProtectedRoute>
           }
@@ -204,8 +198,9 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route path="*" element={<section className="recovery-page"><h1>404 · 페이지를 찾을 수 없습니다</h1><p>주소를 확인하거나 다른 작품을 찾아보세요.</p><a href="/browse" className="button-primary">작품 둘러보기</a></section>} />
       </Routes>
-      </Suspense>
+      </Suspense></ErrorBoundary></main>
     </>
   );
 }

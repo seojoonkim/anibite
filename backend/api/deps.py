@@ -10,6 +10,8 @@ from utils.security import decode_access_token
 from utils.user_helpers import set_default_avatar
 from models.user import UserResponse
 
+from config import ADMIN_USER_IDS
+
 security = HTTPBearer()
 security_optional = HTTPBearer(auto_error=False)
 
@@ -57,6 +59,13 @@ def get_current_user(
     user_dict = set_default_avatar(user_dict, db)
 
     return UserResponse(**user_dict)
+
+
+def require_admin(current_user = Depends(get_current_user)):
+    """Deny by default; names never grant authority."""
+    if current_user.id not in ADMIN_USER_IDS:
+        raise HTTPException(status_code=403, detail="Admin access only")
+    return current_user
 
 
 def get_current_user_optional(

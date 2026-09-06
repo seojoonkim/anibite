@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, useEffectEvent, lazy, Suspense } from "react";
 import { createPortal } from 'react-dom';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -8,38 +8,38 @@ import { userService } from '../services/userService';
 import { ratingService } from '../services/ratingService';
 import { followService } from '../services/followService';
 import { feedService } from '../services/feedService';
-import { activityCommentService } from '../services/activityCommentService';
-import { activityService } from '../services/activityService';
-import { commentLikeService } from '../services/commentLikeService';
+
 import { userPostService } from '../services/userPostService';
 import * as ActivityUtils from '../utils/activityUtils';
 import { reviewService } from '../services/reviewService';
 import { characterReviewService } from '../services/characterReviewService';
 import { characterService } from '../services/characterService';
 import OtakuMeter from '../components/profile/OtakuMeter';
-import GenrePreferences from '../components/profile/GenrePreferences';
-import RatingDistributionChart from '../components/profile/RatingDistributionChart';
-import YearDistributionChart from '../components/profile/YearDistributionChart';
-import StarRating from '../components/common/StarRating';
-import FormatDistribution from '../components/profile/FormatDistribution';
-import EpisodeLengthChart from '../components/profile/EpisodeLengthChart';
-import RatingStatsCard from '../components/profile/RatingStatsCard';
-import StudioStats from '../components/profile/StudioStats';
-import SeasonStats from '../components/profile/SeasonStats';
-import GenreCombinationChart from '../components/profile/GenreCombinationChart';
+const GenrePreferences = lazy(() => import('../components/profile/GenrePreferences'));
+const RatingDistributionChart = lazy(() => import('../components/profile/RatingDistributionChart'));
+const YearDistributionChart = lazy(() => import('../components/profile/YearDistributionChart'));
+
+const FormatDistribution = lazy(() => import('../components/profile/FormatDistribution'));
+const EpisodeLengthChart = lazy(() => import('../components/profile/EpisodeLengthChart'));
+const RatingStatsCard = lazy(() => import('../components/profile/RatingStatsCard'));
+const StudioStats = lazy(() => import('../components/profile/StudioStats'));
+const SeasonStats = lazy(() => import('../components/profile/SeasonStats'));
+const GenreCombinationChart = lazy(() => import('../components/profile/GenreCombinationChart'));
 import ActivityCard from '../components/activity/ActivityCard';
 import EditReviewModal from '../components/common/EditReviewModal';
 import MyAnimeCard from '../components/profile/MyAnimeCard';
 import MyCharacterCard from '../components/profile/MyCharacterCard';
-import api from '../services/api';
+
 import { getCurrentLevelInfo } from '../utils/otakuLevels';
-import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
-import { getCharacterImageUrl, getCharacterImageFallback, getCharacterDisplayName, getAvatarUrl as getAvatarUrlHelper, getAvatarFallback } from '../utils/imageHelpers';
-import DefaultAvatar, { getAvatarGradient } from '../components/common/DefaultAvatar';
+import { IMAGE_BASE_URL } from "../config/api";
+import { getAvatarUrl as getAvatarUrlHelper } from "../utils/imageHelpers";
+import { getAvatarGradient } from "../components/common/avatarGradient";
 
 export default function MyAniPass() {
   const { user } = useAuth();
-  const { t, language } = useLanguage();
+  const {
+  language
+} = useLanguage();
   const { userId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const isOwnProfile = !userId || parseInt(userId) === user?.id;
@@ -83,14 +83,18 @@ export default function MyAniPass() {
   const [displayedAnime, setDisplayedAnime] = useState([]); // 현재 표시하는 애니
   const [allCharacters, setAllCharacters] = useState([]); // 모든 캐릭터(평점, 알고싶어요, 관심없어요 포함)
   const [displayedCharacters, setDisplayedCharacters] = useState([]); // 현재 표시하는 캐릭터
-  const [allRatedCharacters, setAllRatedCharacters] = useState([]); // 평점한 캐릭터만
-  const [wantCharacters, setWantCharacters] = useState([]); // 알고싶어요 캐릭터
-  const [passCharacters, setPassCharacters] = useState([]); // 관심없어요 캐릭터
-  const [ratedAnime, setRatedAnime] = useState([]);
-  const [allRatedAnime, setAllRatedAnime] = useState([]); // 전체 평점 애니 캐시
-  const [ratedFilter, setRatedFilter] = useState('all'); // 별점 필터
-  const [watchlistAnime, setWatchlistAnime] = useState([]);
-  const [passAnime, setPassAnime] = useState([]);
+  // 현재 표시하는 캐릭터
+const [, setAllRatedCharacters] = useState([]); // 평점한 캐릭터만 // 평점한 캐릭터만
+  // 평점한 캐릭터만
+const [, setWantCharacters] = useState([]); // 알고싶어요 캐릭터 // 알고싶어요 캐릭터
+  // 알고싶어요 캐릭터
+const [, setPassCharacters] = useState([]); // 관심없어요 캐릭터 // 관심없어요 캐릭터
+
+  const [, setAllRatedAnime] = useState([]); // 전체 평점 애니 캐시 // 전체 평점 애니 캐시
+   // 별점 필터
+  // 별점 필터
+const [, setWatchlistAnime] = useState([]);
+  const [, setPassAnime] = useState([]);
   const [watchTime, setWatchTime] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tabLoading, setTabLoading] = useState(false);
@@ -120,18 +124,17 @@ export default function MyAniPass() {
   const [feedOffset, setFeedOffset] = useState(0);
   const [hasMoreFeed, setHasMoreFeed] = useState(true);
   const [loadingMoreFeed, setLoadingMoreFeed] = useState(false);
-  const [activityLikes, setActivityLikes] = useState({});
-  const [expandedComments, setExpandedComments] = useState(new Set());
-  const [comments, setComments] = useState({});
-  const [newCommentText, setNewCommentText] = useState({});
-  const [commentLikes, setCommentLikes] = useState({});
-  const [replyingTo, setReplyingTo] = useState({});
+  const [, setActivityLikes] = useState({});
+  const [, setExpandedComments] = useState(new Set());
+  const [, setComments] = useState({});
+
+
   const [newPostContent, setNewPostContent] = useState('');
-  const [failedImages, setFailedImages] = useState(new Set());
+
   // 삭제 모달 상태
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [activityToDelete, setActivityToDelete] = useState(null);
-  const [deleteMenuOpen, setDeleteMenuOpen] = useState(null);
+
 
   // Infinite scroll observer ref
   const observer = useRef();
@@ -361,7 +364,7 @@ export default function MyAniPass() {
     }
   };
 
-  const loadData = useCallback(async (forceRefresh = false) => {
+  const loadData = async (forceRefresh = false) => {
     try {
       // 이미 로드했으면 스킵 (anime, character, anipass 캐싱)
       // forceRefresh가 true면 캐시 무시
@@ -756,7 +759,9 @@ export default function MyAniPass() {
       setLoading(false);
       setTabLoading(false);
     }
-  }, [isOwnProfile, activeTab, statsLoaded, profileUser, userId, user, filterAnimeBySubMenu, animeSubMenu, filterCharactersBySubMenu, characterSubMenu]);
+  };
+
+  const loadSelectedTab = useEffectEvent(() => loadData());
 
   // Load data when tab or userId changes
   useEffect(() => {
@@ -772,8 +777,8 @@ export default function MyAniPass() {
         feed: false
       });
     }
-    loadData();
-  }, [activeTab, userId, loadData]);
+    loadSelectedTab();
+  }, [activeTab, userId]);
 
   // 팔로우 카운트는 항상 로드 (페이지 진입 시 userId 변경시)
   useEffect(() => {
@@ -816,74 +821,7 @@ export default function MyAniPass() {
     return `${IMAGE_BASE_URL}${processedUrl}`;
   };
 
-  const getActivityText = (activity) => {
-    const displayName = activity.display_name || activity.username;
 
-    switch (activity.activity_type) {
-      case 'anime_rating':
-        return language === 'ko' ? `${displayName}님이 평가했어요` : language === 'ja' ? `${displayName}さんが評価しました` : `${displayName} rated an anime`;
-      case 'character_rating':
-        return language === 'ko' ? `${displayName}님이 캐릭터를 평가했어요` : language === 'ja' ? `${displayName}さんがキャラクターを評価しました` : `${displayName} rated a character`;
-      case 'review':
-        return language === 'ko' ? `${displayName}님이 리뷰를 남겼어요` : language === 'ja' ? `${displayName}さんがレビューを残しました` : `${displayName} left a review`;
-      default:
-        return language === 'ko' ? `${displayName}님의 활동` : language === 'ja' ? `${displayName}さんのアクティビティ` : `${displayName}'s activity`;
-    }
-  };
-
-  const getActivityIcon = (activityType) => {
-    switch (activityType) {
-      case 'anime_rating':
-        return '⭐';
-      case 'character_rating':
-        return '👤';
-      case 'review':
-        return '📝';
-      default:
-        return '👤';
-    }
-  };
-
-  const getTimeAgo = (timestamp) => {
-    const now = new Date();
-    // SQLite timestamp를 UTC로 파싱
-    const activityTime = new Date(timestamp.endsWith('Z') ? timestamp : timestamp + 'Z');
-    const diff = now - activityTime;
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-
-    if (language === 'ko') {
-      if (minutes < 60) return `${Math.max(1, minutes)}분 전`;
-      if (hours < 24) return `${hours}시간 전`;
-      if (days < 7) return `${days}일 전`;
-      return activityTime.toLocaleDateString('ko-KR');
-    } else {
-      if (minutes < 60) return `${Math.max(1, minutes)}m ago`;
-      if (hours < 24) return `${hours}h ago`;
-      if (days < 7) return `${days}d ago`;
-      return activityTime.toLocaleDateString('en-US');
-    }
-  };
-
-  const getActivityKey = (activity) => {
-    return `${activity.activity_type}_${activity.user_id}_${activity.item_id}`;
-  };
-
-  const toggleComments = async (activity) => {
-    const key = getActivityKey(activity);
-
-    if (expandedComments.has(key)) {
-      setExpandedComments(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(key);
-        return newSet;
-      });
-    } else {
-      setExpandedComments(prev => new Set(prev).add(key));
-      await loadComments(activity);
-    }
-  };
 
   const loadMoreFeed = useCallback(async () => {
     if (loadingMoreFeed || !hasMoreFeed) return;
@@ -942,154 +880,7 @@ export default function MyAniPass() {
     }
   }, [loadingMoreFeed, hasMoreFeed]);
 
-  const loadComments = async (activity) => {
-    try {
-      const key = getActivityKey(activity);
-      const data = await ActivityUtils.loadComments(activity);
-
-      // Initialize comment likes
-      const likes = {};
-      data.items?.forEach(comment => {
-        likes[comment.id] = {
-          count: comment.likes_count || 0,
-          liked: Boolean(comment.user_liked)
-        };
-        // Also for replies
-        comment.replies?.forEach(reply => {
-          likes[reply.id] = {
-            count: reply.likes_count || 0,
-            liked: Boolean(reply.user_liked)
-          };
-        });
-      });
-      setCommentLikes(prev => ({ ...prev, ...likes }));
-      setComments(prev => ({ ...prev, [key]: data.items || [] }));
-    } catch (err) {
-      console.error('Failed to load comments:', err);
-    }
-  };
-
   // 활동의 댓글 수를 업데이트하는 헬퍼 함수
-  const updateActivityCommentsCount = (activity, delta) => {
-    setUserActivities(prev => prev.map(act => {
-      const actKey = getActivityKey(act);
-      const targetKey = getActivityKey(activity);
-      if (actKey === targetKey) {
-        return {
-          ...act,
-          comments_count: Math.max(0, (act.comments_count || 0) + delta)
-        };
-      }
-      return act;
-    }));
-  };
-
-  const handleSubmitComment = async (activity, parentCommentId = null) => {
-    const key = getActivityKey(activity);
-    const text = parentCommentId ? newCommentText[`${key}-${parentCommentId}`] : newCommentText[key];
-
-    console.log('[MyAniPass] handleSubmitComment called', { activity, parentCommentId, text, key });
-
-    if (!text?.trim()) {
-      console.log('[MyAniPass] No text to submit');
-      return;
-    }
-
-    try {
-      if (parentCommentId) {
-        console.log('[MyAniPass] Creating reply...');
-        await ActivityUtils.createReply(activity, parentCommentId, text);
-      } else {
-        console.log('[MyAniPass] Creating comment...');
-        await ActivityUtils.createComment(activity, text);
-      }
-      console.log('[MyAniPass] Comment/reply created successfully');
-
-      // Clear input
-      if (parentCommentId) {
-        setNewCommentText(prev => ({ ...prev, [`${key}-${parentCommentId}`]: '' }));
-        setReplyingTo(prev => ({ ...prev, [parentCommentId]: false }));
-      } else {
-        setNewCommentText(prev => ({ ...prev, [key]: '' }));
-      }
-
-      // Reload comments
-      console.log('[MyAniPass] Reloading comments...');
-      await loadComments(activity);
-      updateActivityCommentsCount(activity, 1);
-      console.log('[MyAniPass] Comments reloaded and count updated');
-    } catch (err) {
-      console.error('[MyAniPass] Failed to submit comment:', err);
-      alert(language === 'ko' ? `댓글 작성에 실패했습니다: ${err.message}` : language === 'ja' ? `コメント投稿に失敗しました: ${err.message}` : `Failed to post comment: ${err.message}`);
-    }
-  };
-
-  const handleToggleActivityLike = async (activity) => {
-    try {
-      const result = await activityService.toggleLike(activity.id);
-      const key = getActivityKey(activity);
-      setActivityLikes(prev => ({
-        ...prev,
-        [key]: { liked: result.liked, count: result.likes_count }
-      }));
-    } catch (err) {
-      console.error('Failed to toggle activity like:', err);
-    }
-  };
-
-  const handleToggleCommentLike = async (commentId) => {
-    try {
-      const result = await commentLikeService.toggleLike(commentId);
-      setCommentLikes(prev => ({
-        ...prev,
-        [commentId]: { liked: result.liked, count: result.like_count }
-      }));
-    } catch (err) {
-      console.error('Failed to toggle comment like:', err);
-    }
-  };
-
-  const handleReplyClick = (commentId) => {
-    setReplyingTo(prev => ({ ...prev, [commentId]: !prev[commentId] }));
-  };
-
-  const handleSubmitReply = async (activity, parentCommentId) => {
-    const key = getActivityKey(activity);
-    const text = replyText[parentCommentId];
-
-    if (!text?.trim()) return;
-
-    try {
-      await ActivityUtils.createReply(activity, parentCommentId, text);
-
-      setReplyText(prev => ({ ...prev, [parentCommentId]: '' }));
-      setReplyingTo(prev => ({ ...prev, [parentCommentId]: false }));
-      await loadComments(activity);
-      updateActivityCommentsCount(activity, 1);
-    } catch (err) {
-      console.error('Failed to submit reply:', err);
-      alert(language === 'ko' ? '답글 작성에 실패했습니다.' : language === 'ja' ? '返信投稿に失敗しました' : 'Failed to post reply.');
-    }
-  };
-
-  const handleDeleteComment = async (activity, commentId) => {
-    if (!confirm(language === 'ko' ? '댓글을 삭제하시겠습니까?' : language === 'ja' ? 'このコメントを削除しますか？' : 'Delete this comment?')) return;
-
-    try {
-      await ActivityUtils.deleteComment(activity, commentId);
-      await loadComments(activity);
-      updateActivityCommentsCount(activity, -1);
-    } catch (err) {
-      console.error('Failed to delete comment:', err);
-      alert(language === 'ko' ? '댓글 삭제에 실패했습니다.' : language === 'ja' ? 'コメント削除に失敗しました' : 'Failed to delete comment.');
-    }
-  };
-
-  const handleOpenDeleteModal = (activity) => {
-    setActivityToDelete(activity);
-    setShowDeleteModal(true);
-    setDeleteMenuOpen(null);
-  };
 
   const handleDeleteActivity = async (deleteType) => {
     if (!activityToDelete) return;
@@ -1139,24 +930,12 @@ export default function MyAniPass() {
 
       // Reload stats
       if (isOwnProfile) {
-        loadStats();
+        setStats(await userService.getStats());
       }
     } catch (err) {
       console.error('Failed to delete activity:', err);
       alert(language === 'ko' ? '삭제에 실패했습니다.' : language === 'ja' ? '削除に失敗しました' : 'Failed to delete.');
     }
-  };
-
-  const handleAvatarError = (e, userId) => {
-    if (failedImages.has(`avatar-${userId}`)) return;
-    setFailedImages(prev => new Set(prev).add(`avatar-${userId}`));
-    e.target.src = '/placeholder-avatar.png';
-  };
-
-  const handleImageError = (e, itemId) => {
-    if (failedImages.has(`image-${itemId}`)) return;
-    setFailedImages(prev => new Set(prev).add(`image-${itemId}`));
-    e.target.src = '/placeholder-anime.svg';
   };
 
   const handleCreatePost = async () => {
@@ -1812,9 +1591,8 @@ export default function MyAniPass() {
                 <div className="space-y-4">
                   {userActivities.map((activity, index) => {
                     // Use displayUser for consistency
-                    const displayAvatar = displayUser?.avatar_url;
-                    const displayName = displayUser?.display_name || displayUser?.username;
-                    const currentOtakuScore = stats?.otaku_score || 0;
+
+
                     const isLastActivity = userActivities.length === index + 1;
 
                     return (
@@ -1848,7 +1626,7 @@ export default function MyAniPass() {
         ) : activeTab !== 'feed' && (
           <div className={tabLoading ? 'opacity-50 pointer-events-none' : ''}>
             {activeTab === 'anipass' && (
-              <div className="space-y-6">
+              <Suspense fallback={<p role="status">통계 불러오는 중…</p>}><div className="space-y-6">
                 {/* 상단 그리드: 오타쿠 미터, 통계, 장르 선호도 */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-stretch">
                   {/* 오타쿠 미터 */}
@@ -1957,7 +1735,7 @@ export default function MyAniPass() {
                     <SeasonStats seasons={seasonStats} />
                   </div>
                 </div>
-              </div>
+              </div></Suspense>
             )}
 
             {activeTab === 'anime' && (

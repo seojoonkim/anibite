@@ -13,12 +13,12 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 @router.get("/images/test")
-async def test_endpoint():
+def test_endpoint():
     """Test endpoint to verify router is working"""
     return {"status": "ok", "message": "Image proxy router is loaded"}
 
 @router.get("/images/characters/{character_id}.{ext}")
-async def get_character_image(character_id: int, ext: str):
+def get_character_image(character_id: int, ext: str):
     """
     Get character image - auto-download from AniList if not in R2
     캐릭터 이미지 가져오기 - R2에 없으면 AniList에서 자동 다운로드
@@ -79,7 +79,7 @@ async def get_character_image(character_id: int, ext: str):
 
 
 @router.get("/images/staff/{staff_id}.{ext}")
-async def get_staff_image(staff_id: int, ext: str):
+def get_staff_image(staff_id: int, ext: str):
     """
     Get staff image - auto-download from AniList if not in R2
     성우/스태프 이미지 가져오기 - R2에 없으면 AniList에서 자동 다운로드
