@@ -1,6 +1,10 @@
 # FastAPI Backend Dependencies
 # AniPass 애니메이션 평가 플랫폼
 
+# Packaging security baseline (also upgrades preinstalled CI/image tooling)
+setuptools==83.0.0
+pip==26.2
+
 # Web Framework
 fastapi==0.141.1
 starlette==1.6.0
