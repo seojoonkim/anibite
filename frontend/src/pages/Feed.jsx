@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useLogoWiggle } from '../context/LogoWiggleContext';
+import { usePagedResource } from '../hooks/usePagedResource';
 import { useActivityPagination } from '../hooks/useActivity';
 import { activityService } from '../services/activityService';
 import { notificationService } from '../services/notificationService';
@@ -17,7 +18,7 @@ import ActivityCard from '../components/activity/ActivityCard';
 import NotificationCard from '../components/feed/NotificationCard';
 import EditReviewModal from '../components/common/EditReviewModal';
 import DefaultAvatar from '../components/common/DefaultAvatar';
-import { getAvatarUrl as getAvatarUrlHelper, getCharacterImageUrl, getCharacterImageFallback } from '../utils/imageHelpers';
+import { getAvatarUrl as getAvatarUrlHelper, getCharacterImageUrl } from '../utils/imageHelpers';
 import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 export default function Feed() {
@@ -26,12 +27,19 @@ export default function Feed() {
   const { triggerWiggle } = useLogoWiggle();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [feedFilter, setFeedFilter] = useState(searchParams.get('filter') || 'all');
-  const [newPostContent, setNewPostContent] = useState('');
-  const [notifications, setNotifications] = useState([]);
-  const [notificationsLoading, setNotificationsLoading] = useState(false);
-  const [savedActivities, setSavedActivities] = useState([]);
-  const [savedLoading, setSavedLoading] = useState(false);
+  const changeFilter = filter => { const next = new URLSearchParams(searchParams); next.set('filter', filter); setSearchParams(next); triggerWiggle(); };
+  const feedFilter = ['all', 'following', 'saved', 'notifications'].includes(searchParams.get('filter')) ? searchParams.get('filter') : 'all';
+  const draftKey = `feed_draft_${user?.id || 'guest'}`;
+  const [drafts, setDrafts] = useState({});
+  const newPostContent = drafts[draftKey] ?? sessionStorage.getItem(draftKey) ?? '';
+  const setNewPostContent = value => {
+    setDrafts(previous => ({ ...previous, [draftKey]: value }));
+    try { if (value) sessionStorage.setItem(draftKey, value); else sessionStorage.removeItem(draftKey); } catch { /* In-memory draft remains usable. */ }
+  };
+  const [notice, setNotice] = useState('');
+  const [posting, setPosting] = useState(false);
+  const postingRef = useRef(false);
+
 
   // Edit modal state
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -65,7 +73,9 @@ export default function Feed() {
     hasMore,
     loadMore,
     reset: resetActivities,
-    removeActivity
+    removeActivity,
+    error: activityError,
+    retry: retryActivities
   } = useActivityPagination(paginationFilters, 8, skipPagination);
 
   // Cache disabled - was causing inconsistent data on tab switching
@@ -74,7 +84,7 @@ export default function Feed() {
     try {
       sessionStorage.removeItem('feed_cache_all');
       sessionStorage.removeItem('feed_cache_following');
-    } catch (err) {
+    } catch {
       // Ignore
     }
   }, []);
@@ -86,7 +96,7 @@ export default function Feed() {
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
-    if (feedFilter === 'notifications' || feedFilter === 'saved') return; // Skip for notifications and saved
+    if (feedFilter === 'notifications' || feedFilter === 'saved' || activityError || typeof IntersectionObserver === 'undefined') return; // Skip for notifications and saved
 
     const options = {
       root: null,
@@ -111,14 +121,10 @@ export default function Feed() {
         observerRef.current.disconnect();
       }
     };
-  }, [hasMore, loading, loadingMore, loadMore, feedFilter]);
+  }, [hasMore, loading, loadingMore, loadMore, feedFilter, activityError]);
 
   // Update feedFilter when URL changes
   useEffect(() => {
-    const filterParam = searchParams.get('filter') || 'all';
-    if (filterParam !== feedFilter) {
-      setFeedFilter(filterParam);
-    }
 
     // Handle highlight parameter
     const highlightKey = searchParams.get('highlight');
@@ -136,97 +142,45 @@ export default function Feed() {
     }
   }, [searchParams]);
 
-  // Load notifications when filter is 'notifications'
-  useEffect(() => {
-    if (feedFilter === 'notifications') {
-      loadNotifications();
-    } else if (feedFilter === 'saved') {
-      loadSavedActivities();
+  const loadSpecial = useCallback(async (_page, signal) => {
+    if (feedFilter === 'saved') {
+      const data = await bookmarkService.getBookmarks(true, { signal });
+      return { items: data.items || [], hasMore: false };
     }
+    const data = await notificationService.getNotifications(50, 0, { signal });
+    const groups = new Map();
+    for (const item of data.items || []) {
+      const key = item.activity_id || `${item.activity_type}_${item.item_id}`;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(item);
+    }
+    const items = [...groups.values()].map(group => {
+      const item = group[0];
+      return {
+        id: item.activity_id || `notification-${item.id}`, activity_type: item.activity_type,
+        user_id: item.target_user_id, item_id: item.item_id,
+        username: item.activity_username, display_name: item.activity_display_name,
+        avatar_url: item.activity_avatar_url, otaku_score: item.activity_otaku_score || 0,
+        item_title: item.item_title, item_title_korean: item.item_title,
+        item_image: item.item_image, anime_id: item.anime_id,
+        anime_title: item.anime_title, anime_title_korean: item.anime_title_korean,
+        rating: item.my_rating, review_content: item.activity_text,
+        is_spoiler: Boolean(item.is_spoiler), activity_time: item.activity_created_at,
+        likes_count: item.activity_likes_count, comments_count: item.activity_comments_count,
+        user_liked: Boolean(item.user_has_liked), _notifications: group
+      };
+    });
+    return { items, hasMore: false };
   }, [feedFilter]);
+  const special = usePagedResource(loadSpecial, !skipPagination);
 
-
-  const loadNotifications = async () => {
-    try {
-      setNotificationsLoading(true);
-      const notificationData = await notificationService.getNotifications(50, 0);
-
-      // Mark as read
-      await notificationService.markAsRead();
-
-      if (!notificationData.items || notificationData.items.length === 0) {
-        setNotifications([]);
-        setNotificationsLoading(false);
-        return;
-      }
-
-      // Group notifications by item_id + activity_type
-      const groupedNotifications = {};
-      notificationData.items.forEach((notification) => {
-        const key = `${notification.activity_type}_${notification.item_id}`;
-        if (!groupedNotifications[key]) {
-          groupedNotifications[key] = [];
-        }
-        groupedNotifications[key].push(notification);
-      });
-
-      // Transform to activities format
-      const transformedActivities = Object.values(groupedNotifications).map(notificationGroup => {
-        const latestNotification = notificationGroup[0];
-
-        return {
-          // Use real activity_id for like/comment functionality
-          id: latestNotification.activity_id,
-          activity_type: latestNotification.activity_type,
-          user_id: latestNotification.target_user_id,
-          item_id: latestNotification.item_id,
-          username: latestNotification.activity_username,
-          display_name: latestNotification.activity_display_name,
-          avatar_url: latestNotification.activity_avatar_url,
-          otaku_score: latestNotification.activity_otaku_score || 0,
-          item_title: latestNotification.item_title,
-          item_title_korean: latestNotification.item_title,
-          item_image: latestNotification.item_image,
-          anime_id: latestNotification.anime_id,
-          anime_title: latestNotification.anime_title,
-          anime_title_korean: latestNotification.anime_title_korean,
-          rating: latestNotification.my_rating,
-          review_content: latestNotification.activity_text,
-          review_title: null,
-          is_spoiler: false,
-          activity_time: latestNotification.activity_created_at,
-          likes_count: latestNotification.activity_likes_count,
-          comments_count: latestNotification.activity_comments_count,
-          user_liked: Boolean(latestNotification.user_has_liked),
-          _notifications: notificationGroup
-        };
-      });
-
-      setNotifications(transformedActivities);
-      setNotificationsLoading(false);
-    } catch (err) {
-      console.error('Failed to load notifications:', err);
-      setNotifications([]);
-      setNotificationsLoading(false);
-    }
-  };
-
-  const loadSavedActivities = async () => {
-    try {
-      setSavedLoading(true);
-      const data = await bookmarkService.getBookmarks(true);
-      setSavedActivities(data.items || []);
-      setSavedLoading(false);
-    } catch (err) {
-      console.error('Failed to load saved activities:', err);
-      setSavedActivities([]);
-      setSavedLoading(false);
-    }
-  };
 
 
   const handleCreatePost = async () => {
-    if (!newPostContent || !newPostContent.trim()) return;
+    if (!newPostContent.trim() || postingRef.current) return;
+    postingRef.current = true;
+    setPosting(true);
+    setNotice('');
 
     try {
       // Use userPostService instead of activityService for proper content handling
@@ -237,8 +191,8 @@ export default function Feed() {
       resetActivities();
     } catch (err) {
       console.error('Failed to create post:', err);
-      alert(language === 'ko' ? '게시 실패' : language === 'ja' ? '投稿失敗' : 'Failed to post');
-    }
+      setNotice(language === 'ko' ? '게시 실패. 초안은 보존되었습니다.' : language === 'ja' ? '投稿失敗。下書きは保持されています。' : 'Failed to post. Draft preserved.');
+    } finally { postingRef.current = false; setPosting(false); }
   };
 
   const getAvatarUrl = (avatarUrl) => {
@@ -309,29 +263,10 @@ export default function Feed() {
     }
   };
 
-  // Get activities based on filter
-  const getFilteredActivities = () => {
-    if (feedFilter === 'notifications') {
-      return notifications;
-    } else if (feedFilter === 'saved') {
-      return savedActivities;
-    }
-
-    // No more cache - just return activities directly
-    console.log(`[Feed] Returning activities for filter=${feedFilter}:`, {
-      count: activities.length,
-      firstActivity: activities[0] ? {
-        id: activities[0].id,
-        username: activities[0].username,
-        type: activities[0].activity_type
-      } : null
-    });
-    return activities;
-  };
-
-  const filteredActivities = getFilteredActivities();
-  const isLoading = feedFilter === 'notifications' ? notificationsLoading :
-    feedFilter === 'saved' ? savedLoading : loading;
+  const filteredActivities = skipPagination ? special.items : activities;
+  const isLoading = skipPagination ? special.loading : loading;
+  const feedError = skipPagination ? special.error : activityError;
+  const retryFeed = skipPagination ? special.retry : retryActivities;
 
   // Edit modal handlers
   const handleEditContent = (activity, mode = 'edit') => {
@@ -492,7 +427,7 @@ export default function Feed() {
               style={{ zIndex: 10 }}
             >
                 <button
-                  onClick={() => { setSearchParams({ filter: 'all' }); triggerWiggle(); }}
+                  onClick={() => { changeFilter('all'); }}
                   className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'all'
                     ? 'bg-[#47B5FF] text-[#1a1a2e] font-semibold'
                     : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
@@ -508,7 +443,7 @@ export default function Feed() {
                 </button>
 
                 <button
-                  onClick={() => { setSearchParams({ filter: 'following' }); triggerWiggle(); }}
+                  onClick={() => { changeFilter('following'); }}
                   className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'following'
                     ? 'bg-[#47B5FF] text-[#1a1a2e] font-semibold'
                     : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
@@ -524,7 +459,7 @@ export default function Feed() {
                 </button>
 
                 <button
-                  onClick={() => { setSearchParams({ filter: 'notifications' }); triggerWiggle(); }}
+                  onClick={() => { changeFilter('notifications'); }}
                   className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'notifications'
                     ? 'bg-[#47B5FF] text-[#1a1a2e] font-semibold'
                     : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
@@ -538,7 +473,7 @@ export default function Feed() {
                 </button>
 
                 <button
-                  onClick={() => { setSearchParams({ filter: 'saved' }); triggerWiggle(); }}
+                  onClick={() => { changeFilter('saved'); }}
                   className={`w-full text-left px-3.5 py-2 rounded-lg text-xs transition-all flex items-center gap-2.5 ${feedFilter === 'saved'
                     ? 'bg-[#47B5FF] text-[#1a1a2e] font-semibold'
                     : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover font-normal'
@@ -554,6 +489,14 @@ export default function Feed() {
 
           {/* Main Content */}
           <div className="flex-1 min-w-0">
+            <label className="block md:hidden mb-4">{language === 'ko' ? '피드 필터' : language === 'ja' ? 'フィルター' : 'Feed filter'}
+              <select className="block w-full min-h-11 border rounded-lg px-3" value={feedFilter} onChange={event => changeFilter(event.target.value)}>
+                <option value="all">{language === 'ko' ? '전체 보기' : language === 'ja' ? '全て表示' : 'View All'}</option>
+                <option value="following">{language === 'ko' ? '팔로잉 보기' : language === 'ja' ? 'フォロー中' : 'Following'}</option>
+                <option value="notifications">{language === 'ko' ? '알림 보기' : language === 'ja' ? '通知' : 'Notifications'}</option>
+                <option value="saved">{language === 'ko' ? '저장한 피드' : language === 'ja' ? '保存済み' : 'Saved'}</option>
+              </select>
+            </label>
             {/* Post Composer */}
             {user && (
               <div className="bg-white rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-200 p-4 mb-6">
@@ -574,6 +517,8 @@ export default function Feed() {
                   )}
                   <div className="flex-1">
                     <textarea
+                      aria-label={language === 'ko' ? '새 게시물' : language === 'ja' ? '新しい投稿' : 'New post'}
+                      disabled={posting}
                       value={newPostContent}
                       onChange={(e) => setNewPostContent(e.target.value)}
                       placeholder={language === 'ko' ? '무슨 생각을 하고 계신가요?' : language === 'ja' ? '今何を考えていますか？' : "What's on your mind?"}
@@ -583,7 +528,7 @@ export default function Feed() {
                     <div className="flex justify-end mt-1.5">
                       <button
                         onClick={handleCreatePost}
-                        disabled={!newPostContent.trim()}
+                        disabled={posting || !newPostContent.trim()}
                         className="px-4 py-1.5 text-[14px] text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                         style={newPostContent.trim() ? { backgroundColor: '#47B5FF' } : {}}
                         onMouseEnter={(e) => newPostContent.trim() && (e.target.style.backgroundColor = '#2DA0ED')}
@@ -597,6 +542,8 @@ export default function Feed() {
               </div>
             )}
 
+            {notice && <p role="alert" className="p-4 border rounded-lg mb-4">{notice}</p>}
+            {feedError && <div role="alert" className="p-4 border rounded-lg mb-4"><p>{language === 'ko' ? '피드를 불러오지 못했습니다.' : language === 'ja' ? 'フィードを読み込めませんでした。' : 'Could not load feed.'}</p><button className="min-h-11 px-3" onClick={retryFeed}>{language === 'ko' ? '다시 시도' : language === 'ja' ? '再試行' : 'Retry'}</button></div>}
             {/* Activity Feed */}
             {isLoading ? (
               <div className="space-y-4">
@@ -621,7 +568,7 @@ export default function Feed() {
                   </div>
                 ))}
               </div>
-            ) : filteredActivities.length === 0 ? (
+            ) : feedError && filteredActivities.length === 0 ? null : filteredActivities.length === 0 ? (
               <div className="text-center py-12">
                 {feedFilter === 'notifications' ? (
                   <>
@@ -703,6 +650,7 @@ export default function Feed() {
                 {/* Infinite scroll trigger */}
                 {feedFilter !== 'notifications' && feedFilter !== 'saved' && (
                   <div ref={loadMoreTriggerRef} className="h-20 flex items-center justify-center">
+                    {hasMore && !loadingMore && !activityError && <button className="min-h-11 px-4" onClick={loadMore}>{language === 'ko' ? '더 보기' : language === 'ja' ? 'もっと見る' : 'Load more'}</button>}
                     {loadingMore && (
                       <div className="text-gray-500 text-sm">
                         {language === 'ko' ? '로딩 중...' : language === 'ja' ? '読込中...' : 'Loading...'}

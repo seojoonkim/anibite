@@ -35,9 +35,32 @@ logs/
 frontend/dist/
 frontend/build/
 
-# Database backups (but keep the main anime.db for initial copy)
-data/anime.db.backup*
-data/*.db.backup*
+# Never ship databases, SQLite sidecars, or backups in the image context.
+*.db
+**/*.db
+*.db-*
+**/*.db-*
+*.db.*
+**/*.db.*
+*.sqlite*
+**/*.sqlite*
+data/backups/
+
+# Local secrets, dependency trees, and deployment/test artifacts at any depth.
+.env.*
+**/.env
+**/.env.*
+**/*.env
+.venv/
+**/.venv/
+venv/
+**/venv/
+.vercel/
+**/.vercel/
+**/node_modules/
+**/__pycache__/
+**/test-results/
+**/playwright-report/
 
 # Images (too large, should be in volume or CDN)
 data/images/

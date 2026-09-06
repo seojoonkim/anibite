@@ -17,24 +17,18 @@ export default function ContentMenu({
   type,
   item,
   onEdit,
-  onDelete,
-  onEditRating,
-  onAddReview
+  onDelete
 }) {
   const { language } = useLanguage();
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
 
-  const hasReview = item.review_content && item.review_content.trim();
+
   const isUserPost = type === 'user_post';
 
   // Only show menu for own content
   const isOwnContent = user && item.user_id && user.id === item.user_id;
-
-  if (!isOwnContent) {
-    return null;
-  }
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -51,6 +45,8 @@ export default function ContentMenu({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
+
+  if (!isOwnContent) return null;
 
   const handleMenuClick = (e) => {
     e.preventDefault();

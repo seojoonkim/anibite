@@ -8,176 +8,34 @@ from database import db, dict_from_row
 from models.review import ReviewCreate, ReviewUpdate, ReviewResponse, ReviewListResponse
 
 
-def create_review(user_id: int, review_data: ReviewCreate) -> ReviewResponse:
-    """리뷰 생성"""
-
-    # 애니메이션 존재 확인
-    anime_exists = db.execute_query(
-        "SELECT id FROM anime WHERE id = ?",
-        (review_data.anime_id,),
-        fetch_one=True
-    )
-
-    if not anime_exists:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Anime not found"
-        )
-
-    # 중복 확인
-    existing = db.execute_query(
-        "SELECT id FROM user_reviews WHERE user_id = ? AND anime_id = ?",
-        (user_id, review_data.anime_id),
-        fetch_one=True
-    )
-
-    if existing:
-        # 이미 리뷰가 있으면 업데이트
-        return update_review(
-            existing['id'],
-            user_id,
-            ReviewUpdate(
-                content=review_data.content,
-                title=review_data.title,
-                is_spoiler=review_data.is_spoiler
-            )
-        )
-
-    # 별점이 함께 제공된 경우 먼저 저장
-    rating_id = None
-    if review_data.rating is not None:
-        try:
-            from services.rating_service import rate_anime
-            from models.rating import RatingCreate, RatingStatus
-
-            # 별점 저장
-            rating_result = rate_anime(
-                user_id,
-                review_data.anime_id,
-                RatingCreate(rating=review_data.rating, status=RatingStatus.RATED)
-            )
-            rating_id = rating_result.id
-        except Exception as e:
-            # 별점 저장 실패해도 리뷰는 계속 진행 (rating_id 없이)
-            print(f"Warning: Failed to save rating: {e}")
-
-    # 기존 평점 ID 가져오기 (rating이 제공되지 않았거나 저장 실패한 경우)
-    if rating_id is None:
-        rating_row = db.execute_query(
-            "SELECT id FROM user_ratings WHERE user_id = ? AND anime_id = ?",
-            (user_id, review_data.anime_id),
-            fetch_one=True
-        )
-        rating_id = rating_row['id'] if rating_row else None
-
-    # 리뷰 생성
-    review_id = db.execute_insert(
-        """
-        INSERT INTO user_reviews (
-            user_id, anime_id, rating_id, title, content, is_spoiler,
-            likes_count, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-        """,
-        (user_id, review_data.anime_id, rating_id, review_data.title,
-         review_data.content, 1 if review_data.is_spoiler else 0)
-    )
-
-    # 사용자 통계 업데이트 (리뷰 수)
-    from services.rating_service import _update_user_stats
-    _update_user_stats(user_id)
-
-    # Update activity_time to current time (move to recent feed)
-    db.execute_update("""
-        UPDATE activities
-        SET activity_time = CURRENT_TIMESTAMP,
-            updated_at = CURRENT_TIMESTAMP
-        WHERE activity_type = 'anime_rating'
-          AND user_id = ?
-          AND item_id = ?
-    """, (user_id, review_data.anime_id))
-
+@db.atomic
+def create_review(user_id, review_data):
+    from services.projection_service import save_review
+    review_id=save_review('anime',user_id,review_data.anime_id,review_data.title,review_data.content,review_data.is_spoiler,review_data.rating)
     return get_review_by_id(review_id)
 
 
-def update_review(review_id: int, user_id: int, review_data: ReviewUpdate) -> ReviewResponse:
-    """리뷰 수정 (별점도 함께 업데이트 가능)"""
-
-    # 리뷰 존재 및 권한 확인
-    existing = db.execute_query(
-        "SELECT user_id, anime_id FROM user_reviews WHERE id = ?",
-        (review_id,),
-        fetch_one=True
-    )
-
+@db.atomic
+def update_review(review_id,user_id,review_data):
+    from services.projection_service import save_review
+    existing=db.execute_query('SELECT * FROM user_reviews WHERE id=?',(review_id,),fetch_one=True)
     if not existing:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Review not found"
-        )
-
-    if existing['user_id'] != user_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to update this review"
-        )
-
-    anime_id = existing['anime_id']
-
-    # 별점이 제공되면 먼저 업데이트 (triggers will sync activities)
-    if review_data.rating is not None:
-        db.execute_update(
-            """
-            UPDATE user_ratings
-            SET rating = ?, updated_at = CURRENT_TIMESTAMP
-            WHERE user_id = ? AND anime_id = ?
-            """,
-            (review_data.rating, user_id, anime_id)
-        )
-
-    # 수정할 필드만 업데이트
-    update_fields = []
-    params = []
-
-    if review_data.title is not None:
-        update_fields.append("title = ?")
-        params.append(review_data.title)
-
-    if review_data.content is not None:
-        update_fields.append("content = ?")
-        params.append(review_data.content)
-
-    if review_data.is_spoiler is not None:
-        update_fields.append("is_spoiler = ?")
-        params.append(1 if review_data.is_spoiler else 0)
-
-    if update_fields:
-        update_fields.append("updated_at = CURRENT_TIMESTAMP")
-        params.append(review_id)
-
-        db.execute_update(
-            f"UPDATE user_reviews SET {', '.join(update_fields)} WHERE id = ?",
-            tuple(params)
-        )
-
-    # Update activity_time to current time (move to recent feed)
-    db.execute_update("""
-        UPDATE activities
-        SET activity_time = CURRENT_TIMESTAMP,
-            updated_at = CURRENT_TIMESTAMP
-        WHERE activity_type = 'anime_rating'
-          AND user_id = ?
-          AND item_id = ?
-    """, (user_id, anime_id))
-
+        raise HTTPException(status_code=404,detail='Review not found')
+    if existing['user_id']!=user_id:
+        raise HTTPException(status_code=403,detail='Not authorized')
+    values=dict(existing)
+    values.update(review_data.model_dump(exclude_none=True))
+    save_review('anime',user_id,existing['anime_id'],values['title'],values['content'],values['is_spoiler'],review_data.rating)
     return get_review_by_id(review_id)
 
 
+@db.atomic
 def delete_review(review_id: int, user_id: int) -> bool:
     """리뷰 삭제 (관련 댓글과 좋아요도 함께 삭제)"""
 
     # 권한 확인
     existing = db.execute_query(
-        "SELECT user_id FROM user_reviews WHERE id = ?",
+        "SELECT user_id, anime_id FROM user_reviews WHERE id = ?",
         (review_id,),
         fetch_one=True
     )
@@ -208,6 +66,8 @@ def delete_review(review_id: int, user_id: int) -> bool:
 
     # 리뷰 삭제
     db.execute_update("DELETE FROM user_reviews WHERE id = ?", (review_id,))
+    from services.projection_service import sync_projection
+    sync_projection('anime', user_id, existing['anime_id'])
 
     # 사용자 통계 업데이트
     from services.rating_service import _update_user_stats
@@ -216,44 +76,15 @@ def delete_review(review_id: int, user_id: int) -> bool:
     return True
 
 
+@db.atomic
 def delete_review_by_anime(user_id: int, anime_id: int) -> bool:
-    """anime_id로 리뷰 삭제 (관련 댓글과 좋아요도 함께 삭제)"""
-
-    # 리뷰 찾기
     existing = db.execute_query(
-        "SELECT id FROM user_reviews WHERE user_id = ? AND anime_id = ?",
-        (user_id, anime_id),
-        fetch_one=True
+        "SELECT id FROM user_reviews WHERE user_id=? AND anime_id=?",
+        (user_id, anime_id), fetch_one=True,
     )
-
     if not existing:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Review not found"
-        )
-
-    review_id = existing['id']
-
-    # 관련 댓글 삭제 (review_comments)
-    db.execute_update(
-        "DELETE FROM review_comments WHERE review_id = ? AND review_type = 'anime'",
-        (review_id,)
-    )
-
-    # 관련 좋아요 삭제 (review_likes)
-    db.execute_update(
-        "DELETE FROM review_likes WHERE review_id = ?",
-        (review_id,)
-    )
-
-    # 리뷰 삭제
-    db.execute_update("DELETE FROM user_reviews WHERE id = ?", (review_id,))
-
-    # 사용자 통계 업데이트
-    from services.rating_service import _update_user_stats
-    _update_user_stats(user_id)
-
-    return True
+        raise HTTPException(status_code=404, detail="Review not found")
+    return delete_review(existing['id'], user_id)
 
 
 def get_review_by_id(review_id: int) -> Optional[ReviewResponse]:
@@ -270,7 +101,7 @@ def get_review_by_id(review_id: int) -> Optional[ReviewResponse]:
         FROM user_reviews r
         JOIN users u ON r.user_id = u.id
         JOIN anime a ON r.anime_id = a.id
-        LEFT JOIN user_ratings ur ON r.rating_id = ur.id
+        LEFT JOIN user_ratings ur ON r.user_id = ur.user_id AND r.anime_id = ur.anime_id AND ur.status = 'RATED'
         WHERE r.id = ?
         """,
         (review_id,),
@@ -295,7 +126,9 @@ def get_anime_reviews(
 
     # 전체 개수 (평점이 있는 모든 사용자)
     total = db.execute_query(
-        "SELECT COUNT(*) as total FROM user_ratings WHERE anime_id = ?",
+        """SELECT COUNT(*) as total FROM (SELECT id,user_id,anime_id,rating,created_at FROM user_ratings WHERE status='RATED' AND rating IS NOT NULL
+            UNION ALL SELECT NULL,r0.user_id,r0.anime_id,NULL,r0.created_at FROM user_reviews r0
+            WHERE NOT EXISTS (SELECT 1 FROM user_ratings r1 WHERE r1.user_id=r0.user_id AND r1.anime_id=r0.anime_id AND r1.status='RATED' AND r1.rating IS NOT NULL)) WHERE anime_id = ?""",
         (anime_id,),
         fetch_one=True
     )['total']
@@ -336,7 +169,9 @@ def get_anime_reviews(
                  AND activity_user_id = ur.user_id
                  AND item_id = ur.anime_id) > 0
             ELSE 0 END as user_liked
-        FROM user_ratings ur
+        FROM (SELECT id,user_id,anime_id,rating,created_at FROM user_ratings WHERE status='RATED' AND rating IS NOT NULL
+            UNION ALL SELECT NULL,r0.user_id,r0.anime_id,NULL,r0.created_at FROM user_reviews r0
+            WHERE NOT EXISTS (SELECT 1 FROM user_ratings r1 WHERE r1.user_id=r0.user_id AND r1.anime_id=r0.anime_id AND r1.status='RATED' AND r1.rating IS NOT NULL)) ur
         JOIN users u ON ur.user_id = u.id
         JOIN anime a ON ur.anime_id = a.id
         LEFT JOIN user_reviews r ON ur.user_id = r.user_id AND ur.anime_id = r.anime_id
@@ -398,7 +233,7 @@ def get_user_reviews(user_id: int, page: int = 1, page_size: int = 20) -> Review
         FROM user_reviews r
         JOIN users u ON r.user_id = u.id
         JOIN anime a ON r.anime_id = a.id
-        LEFT JOIN user_ratings ur ON r.rating_id = ur.id
+        LEFT JOIN user_ratings ur ON r.user_id = ur.user_id AND r.anime_id = ur.anime_id AND ur.status = 'RATED'
         WHERE r.user_id = ?
         ORDER BY r.created_at DESC
         LIMIT ? OFFSET ?
@@ -430,7 +265,7 @@ def get_my_review(user_id: int, anime_id: int) -> Optional[ReviewResponse]:
         FROM user_reviews r
         JOIN users u ON r.user_id = u.id
         JOIN anime a ON r.anime_id = a.id
-        LEFT JOIN user_ratings ur ON r.rating_id = ur.id
+        LEFT JOIN user_ratings ur ON r.user_id = ur.user_id AND r.anime_id = ur.anime_id AND ur.status = 'RATED'
         WHERE r.user_id = ? AND r.anime_id = ?
         """,
         (user_id, anime_id),

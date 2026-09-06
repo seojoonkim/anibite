@@ -1,16 +1,19 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { characterService } from '../services/characterService';
 import { useLanguage } from '../context/LanguageContext';
 import { useLogoWiggle } from '../context/LogoWiggleContext';
-import StarRating from '../components/common/StarRating';
-import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
+
+
 import { getCharacterImageUrl } from '../utils/imageHelpers';
 
 export default function RateCharacters() {
-  const { t, language, getAnimeTitle } = useLanguage();
+  const {
+  t,
+  language
+} = useLanguage();
   const { triggerWiggle } = useLogoWiggle();
-  const navigate = useNavigate();
+
   const [characters, setCharacters] = useState([]);
   const [allCharacters, setAllCharacters] = useState([]); // All loaded items
   const [displayedCount, setDisplayedCount] = useState(0); // How many are displayed
@@ -63,27 +66,9 @@ export default function RateCharacters() {
     return () => window.removeEventListener('resize', calculateStarSizes);
   }, [characters]);
 
-  // Intersection Observer for infinite scroll
-  useEffect(() => {
-    if (!hasMore || loading || loadingMore) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMore();
-        }
-      },
-      { threshold: 0.1 }
-    );
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [hasMore, loading, loadingMore, page]);
-
-  const loadCharacters = async (pageNum) => {
+  const loadCharacters = async () => {
     try {
       setLoading(true);
       // Load 100 items at once, paginate on frontend
@@ -150,6 +135,26 @@ export default function RateCharacters() {
       setLoadingMore(false);
     }
   }, [hasMore, loadingMore, page, displayedCount, allCharacters]);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    if (!hasMore || loading || loadingMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasMore, loading, loadingMore, loadMore]);
 
   const loadStats = async () => {
     try {
@@ -387,7 +392,7 @@ export default function RateCharacters() {
             {filteredCharacters.map((character) => {
               const status = characterStatuses[character.id] || character.my_status;
               const hasRated = (character.my_rating && character.my_rating > 0) || status === 'RATED';
-              const isCompleted = hasRated || status === 'WANT_TO_KNOW' || status === 'NOT_INTERESTED';
+
 
               return (
                 <div

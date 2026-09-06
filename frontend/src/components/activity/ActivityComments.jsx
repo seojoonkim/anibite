@@ -3,7 +3,6 @@
  */
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
-import { useAuth } from '../../context/AuthContext';
 import { getCurrentLevelInfo } from '../../utils/otakuLevels';
 import DefaultAvatar from '../common/DefaultAvatar';
 

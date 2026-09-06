@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect, useMemo, useEffectEvent } from 'react';
+import { useLocation, Link, useParams, useNavigate } from "react-router-dom";
 import { animeService } from '../services/animeService';
 import { ratingService } from '../services/ratingService';
 import { reviewService } from '../services/reviewService';
-import { activityService } from '../services/activityService';
+
 import { useActivities } from '../hooks/useActivity';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -12,10 +12,29 @@ import * as ActivityUtils from '../utils/activityUtils';
 import StarRating from '../components/common/StarRating';
 import RatingWidget from '../components/anime/RatingWidget';
 import ActivityCard from '../components/activity/ActivityCard';
-import { getCurrentLevelInfo } from '../utils/otakuLevels';
-import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
+
+import { IMAGE_BASE_URL } from "../config/api";
+
+const StarIcon = ({ className = "w-6 h-6", filled = true }) => (
+  <svg className={className} viewBox="0 0 20 20" fill={filled ? "url(#star-gradient-detail)" : "currentColor"}>
+    <defs>
+      <linearGradient id="star-gradient-detail" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style={{ stopColor: '#F5C842', stopOpacity: 1 }} />
+        <stop offset="50%" style={{ stopColor: '#E8B835', stopOpacity: 1 }} />
+        <stop offset="100%" style={{ stopColor: '#D9A828', stopOpacity: 1 }} />
+      </linearGradient>
+    </defs>
+    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+  </svg>
+);
 
 export default function AnimeDetail() {
+  const { id } = useParams();
+  const { user } = useAuth();
+  return <AnimeDetailContent key={`${id}:${user?.id ?? 'guest'}`} />;
+}
+
+function AnimeDetailContent() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -25,36 +44,36 @@ export default function AnimeDetail() {
   const [myReview, setMyReview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const location = useLocation();
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [isEditingReview, setIsEditingReview] = useState(false);
   const [reviewData, setReviewData] = useState({ content: '', is_spoiler: false, rating: 0 });
   const [reviewError, setReviewError] = useState('');
   const [reviewSuccess, setReviewSuccess] = useState('');
-  const [failedImages, setFailedImages] = useState(new Set());
+
   const [showEditMenu, setShowEditMenu] = useState(null);
   const [reviews, setReviews] = useState([]);
-  const [reviewLikes, setReviewLikes] = useState({});
-  const [comments, setComments] = useState({});
-  const [expandedComments, setExpandedComments] = useState(new Set());
-  const [savedActivities, setSavedActivities] = useState(new Set());
+  const [, setReviewLikes] = useState({});
+  const [, setComments] = useState({});
+  const [, setExpandedComments] = useState(new Set());
+
   const [showFullSynopsis, setShowFullSynopsis] = useState(false);
 
   // Use unified activities hook
-  const {
-    activities: otherActivities,
-    loading: activitiesLoading,
-    refetch: refetchActivities
-  } = useActivities(
-    {
-      activityType: 'anime_rating',
-      itemId: id,
-      limit: 50,
-      offset: 0
-    },
-    {
-      autoFetch: true
-    }
-  );
+  // Use unified activities hook
+const {
+  activities: otherActivities,
+  refetch: refetchActivities
+} = useActivities({
+  activityType: 'anime_rating',
+  itemId: id,
+  limit: 50,
+  offset: 0
+}, {
+  autoFetch: true
+});
+
+// Combine myRating/myReview with other activities
 
   // Combine myRating/myReview with other activities
   const activities = useMemo(() => {
@@ -97,127 +116,16 @@ export default function AnimeDetail() {
   }, [otherActivities, myRating, myReview, user, id, anime]);
 
   // 로마 숫자 변환 함수
-  const toRoman = (num) => {
-    const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
-    return romanNumerals[num - 1] || num;
-  };
 
-  useEffect(() => {
-    loadAllData();
-  }, [id]);
 
-  const loadAllData = async () => {
-    setLoading(true);
-    setError(null);
 
-    try {
-      // Check for prefetched data first
-      const prefetched = getPrefetchedData('anime', id, user?.id);
 
-      if (prefetched) {
-        // Use prefetched data for instant display
-        if (prefetched.anime) {
-          setAnime(prefetched.anime);
-          setLoading(false);
-        }
-        if (prefetched.myRating) {
-          setMyRating(prefetched.myRating);
-        }
-        if (prefetched.myReview) {
-          processMyReview(prefetched.myReview);
-        }
-        return; // Skip API calls, data is already fresh from prefetch
-      }
 
-      // 1단계: 애니메이션 기본 정보 먼저 로드하고 즉시 표시
-      const animeData = await animeService.getAnimeById(id);
-
-      if (!animeData) {
-        setError('애니메이션을 찾을 수 없습니다.');
-        setLoading(false);
-        return;
-      }
-
-      // 기본 정보 설정하고 즉시 화면 표시
-      setAnime(animeData);
-      setLoading(false); // 여기서 로딩 해제 - 기본 정보 바로 표시
-
-      // 2단계: 내 평점/리뷰를 백그라운드에서 로드 (화면에 이미 표시 됨)
-      if (user) {
-        const [myRatingData, myReviewData] = await Promise.all([
-          ratingService.getUserRating(id).catch(() => null),
-          reviewService.getMyReview(id).catch(() => null)
-        ]);
-
-        // 내 평점
-        if (myRatingData) {
-          setMyRating(myRatingData);
-        }
-
-        // 내 리뷰
-        if (myReviewData) {
-          processMyReview(myReviewData);
-        }
-      }
-
-      // 3단계: 다른 사람들의 활동은 useActivities hook에서 자동으로 로드됨
-    } catch (err) {
-      console.error('Failed to load anime data:', err);
-      setError(`데이터를 불러오는데 실패했습니다: ${err.message || '알 수 없는 오류'}`);
-      setLoading(false);
-    }
-  };
 
   // 컴포넌트 마운트 시 저장된 활동 로드 (하드코딩 임시)
-  useEffect(() => {
-    const saved = localStorage.getItem('savedActivities');
-    if (saved) {
-      setSavedActivities(new Set(JSON.parse(saved)));
-    }
-  }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (showEditMenu && !event.target.closest('.relative')) {
-        setShowEditMenu(null);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showEditMenu]);
 
-  const processReviews = (data) => {
-    setReviews(data.items || []);
 
-    // 좋아요 상태 정보 초기화
-    const newReviewLikes = {};
-    const newComments = {};
-    const newExpandedComments = new Set();
-    const commentsToLoad = [];
-
-    (data.items || []).forEach(review => {
-      newReviewLikes[review.id] = {
-        liked: review.user_liked || false,
-        count: review.likes_count || 0
-      };
-      newComments[review.id] = [];
-
-      // 댓글이 있으면 자동으로 펼치기
-      if (review.comments_count > 0) {
-        newExpandedComments.add(review.id);
-        commentsToLoad.push(review); // review 객체 전체를 전달
-      }
-    });
-
-    setReviewLikes(newReviewLikes);
-    setComments(newComments);
-    setExpandedComments(newExpandedComments);
-
-    // 댓글 병렬 로드
-    if (commentsToLoad.length > 0) {
-      Promise.all(commentsToLoad.map(review => loadReviewComments(review))); // review 객체 전달
-    }
-  };
 
   const processMyReview = (data) => {
     setMyReview(data);
@@ -244,7 +152,7 @@ export default function AnimeDetail() {
   const loadReviewComments = async (reviewOrId) => {
     try {
       // review 객체가 직접 전달되었는지, ID만 전달되었는지 확인
-      const review = typeof reviewOrId === 'object' ? reviewOrId : getReviewById(reviewOrId);
+      const review = typeof reviewOrId === 'object' ? reviewOrId : reviews.find(item => item.id === reviewOrId);
       const reviewId = typeof reviewOrId === 'object' ? reviewOrId.id : reviewOrId;
 
       if (!review) return;
@@ -258,181 +166,6 @@ export default function AnimeDetail() {
     } catch (err) {
       console.error('Failed to load comments:', err);
     }
-  };
-
-  const toggleComments = (reviewId) => {
-    const newExpanded = new Set(expandedComments);
-    if (newExpanded.has(reviewId)) {
-      newExpanded.delete(reviewId);
-    } else {
-      newExpanded.add(reviewId);
-      // 댓글이 아직 로드되지 않았으면 로드
-      if (!comments[reviewId] || comments[reviewId].length === 0) {
-        loadReviewComments(reviewId);
-      }
-    }
-    setExpandedComments(newExpanded);
-  };
-
-  const handleToggleReviewLike = async (reviewId) => {
-    if (!user) {
-      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
-      return;
-    }
-
-    try {
-      const review = getReviewById(reviewId);
-      if (!review) return;
-
-      const currentLike = reviewLikes[reviewId];
-      const newLiked = !currentLike.liked;
-
-      // Use activityService with activity_id
-      await activityService.toggleLike(reviewId);
-
-      setReviewLikes(prev => ({
-        ...prev,
-        [reviewId]: {
-          liked: newLiked,
-          count: currentLike.count + (newLiked ? 1 : -1)
-        }
-      }));
-    } catch (err) {
-      console.error('Failed to toggle review like:', err);
-    }
-  };
-
-  const handleSubmitComment = async (reviewId) => {
-    if (!user) {
-      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
-      return;
-    }
-
-    const commentText = newComment[reviewId];
-    if (!commentText?.trim()) return;
-
-    try {
-      const review = getReviewById(reviewId);
-      if (!review) return;
-
-      await ActivityUtils.createComment(review, commentText);
-
-      setNewComment(prev => ({ ...prev, [reviewId]: '' }));
-      loadReviewComments(reviewId);
-
-      // 리뷰 목록 새로고침 (댓글 수 업데이트)
-      const reviewData = await reviewService.getAnimeReviews(id, { page: 1, page_size: 10 });
-      if (reviewData) processReviews(reviewData);
-    } catch (err) {
-      console.error('[AnimeDetail] Failed to create comment:', err);
-      alert(language === 'ko' ? '댓글 작성에 실패했습니다.' : language === 'ja' ? 'コメント作成に失敗しました。' : 'Failed to create comment.');
-    }
-  };
-
-  const handleDeleteComment = async (reviewId, commentId) => {
-    if (!confirm(language === 'ko' ? '댓글을 삭제하시겠습니까?' : language === 'ja' ? 'このコメントを削除しますか？' : 'Delete this comment?')) return;
-
-    try {
-      const review = getReviewById(reviewId);
-      if (!review) return;
-
-      await ActivityUtils.deleteComment(review, commentId);
-
-      loadReviewComments(review);
-
-      // 댓글 수 업데이트
-      const reviewData = await reviewService.getAnimeReviews(id, { page: 1, page_size: 10 });
-      if (reviewData) processReviews(reviewData);
-    } catch (err) {
-      console.error('Failed to delete comment:', err);
-      alert(language === 'ko' ? '댓글 삭제에 실패했습니다.' : language === 'ja' ? 'コメント削除に失敗しました。' : 'Failed to delete comment.');
-    }
-  };
-
-  const handleToggleCommentLike = async (reviewId, commentId) => {
-    if (!user) {
-      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
-      return;
-    }
-
-    try {
-      await ActivityUtils.toggleCommentLike(commentId);
-      loadReviewComments(reviewId);
-    } catch (err) {
-      console.error('Failed to toggle comment like:', err);
-    }
-  };
-
-  const handleToggleSaveReview = (review) => {
-    const activityKey = getActivityKey(review);
-    setSavedActivities(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(activityKey)) {
-        newSet.delete(activityKey);
-      } else {
-        newSet.add(activityKey);
-      }
-      // 로컬 스토리지에 저장 (하드코딩 임시)
-      localStorage.setItem('savedActivities', JSON.stringify([...newSet]));
-      return newSet;
-    });
-  };
-
-  const handleReplyClick = (reviewId, commentId) => {
-    setReplyingTo(prev => ({
-      ...prev,
-      [reviewId]: prev[reviewId] === commentId ? null : commentId
-    }));
-  };
-
-  const handleSubmitReply = async (reviewId, parentCommentId) => {
-    if (!user) {
-      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
-      return;
-    }
-
-    const replyContent = replyText[`${reviewId}-${parentCommentId}`];
-    if (!replyContent?.trim()) return;
-
-    try {
-      const review = getReviewById(reviewId);
-      if (!review) return;
-
-      await ActivityUtils.createReply(review, parentCommentId, replyContent);
-
-      setReplyText(prev => ({ ...prev, [`${reviewId}-${parentCommentId}`]: '' }));
-      setReplyingTo(prev => ({ ...prev, [reviewId]: null }));
-      loadReviewComments(reviewId);
-
-      // 댓글 수 업데이트
-      const reviewData = await reviewService.getAnimeReviews(id, { page: 1, page_size: 10 });
-      if (reviewData) processReviews(reviewData);
-    } catch (err) {
-      console.error('Failed to create reply:', err);
-      alert(language === 'ko' ? '답글 작성에 실패했습니다.' : language === 'ja' ? '返信作成に失敗しました。' : 'Failed to create reply.');
-    }
-  };
-
-  const getAvatarUrl = (url) => {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    return `${import.meta.env.VITE_API_URL || API_BASE_URL}${url}`;
-  };
-
-  const handleAvatarError = (e, userId) => {
-    setFailedImages(prev => new Set([...prev, userId]));
-  };
-
-  const getTimeAgo = (timestamp) => {
-    const now = new Date();
-    // SQLite timestamp를 UTC로 파싱
-    const past = new Date(timestamp.endsWith('Z') ? timestamp : timestamp + 'Z');
-    const diffInSeconds = Math.floor((now - past) / 1000);
-
-    if (diffInSeconds < 3600) return language === 'ko' ? `${Math.max(1, Math.floor(diffInSeconds / 60))}분 전` : language === 'ja' ? `${Math.max(1, Math.floor(diffInSeconds / 60))}分前` : `${Math.max(1, Math.floor(diffInSeconds / 60))}m ago`;
-    if (diffInSeconds < 86400) return language === 'ko' ? `${Math.floor(diffInSeconds / 3600)}시간 전` : language === 'ja' ? `${Math.floor(diffInSeconds / 3600)}時間前` : `${Math.floor(diffInSeconds / 3600)}h ago`;
-    if (diffInSeconds < 604800) return language === 'ko' ? `${Math.floor(diffInSeconds / 86400)}일 전` : language === 'ja' ? `${Math.floor(diffInSeconds / 86400)}日前` : `${Math.floor(diffInSeconds / 86400)}d ago`;
-    return past.toLocaleDateString(language === 'ko' ? 'ko-KR' : language === 'ja' ? 'ja-JP' : 'en-US');
   };
 
   const handleEditReview = () => {
@@ -576,7 +309,7 @@ export default function AnimeDetail() {
       }
     } catch (err) {
       console.error('Failed to rate:', err);
-      alert(language === 'ko' ? '평점 저장에 실패했습니다.' : language === 'ja' ? '評価の保存に失敗しました。' : 'Failed to save rating.');
+      throw err;
     }
   };
 
@@ -595,23 +328,12 @@ export default function AnimeDetail() {
       if (animeData) setAnime(animeData);
     } catch (err) {
       console.error('Failed to update status:', err);
-      alert('상태 변경에 실패했습니다.');
+      throw err;
     }
   };
 
   // SVG Star icon component
-  const StarIcon = ({ className = "w-6 h-6", filled = true }) => (
-    <svg className={className} viewBox="0 0 20 20" fill={filled ? "url(#star-gradient-detail)" : "currentColor"}>
-      <defs>
-        <linearGradient id="star-gradient-detail" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: '#F5C842', stopOpacity: 1 }} />
-          <stop offset="50%" style={{ stopColor: '#E8B835', stopOpacity: 1 }} />
-          <stop offset="100%" style={{ stopColor: '#D9A828', stopOpacity: 1 }} />
-        </linearGradient>
-      </defs>
-      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-    </svg>
-  );
+
 
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-anime.svg';
@@ -670,7 +392,90 @@ export default function AnimeDetail() {
     return '/placeholder-anime.svg';
   };
 
-  if (loading) {
+  const onMyReviewLoaded = useEffectEvent(data => processMyReview(data));
+
+  useEffect(() => {
+    let active = true;
+  async function loadAllData() {
+
+    try {
+      // Check for prefetched data first
+      const prefetched = await getPrefetchedData('anime', id, user?.id);
+      if (!active) return;
+
+      if (prefetched) {
+        // Use prefetched data for instant display
+        if (prefetched.anime) {
+          setAnime(prefetched.anime);
+          setLoading(false);
+        }
+        if (user && prefetched.myRating) {
+          setMyRating(prefetched.myRating);
+        }
+        if (user && prefetched.myReview) {
+          onMyReviewLoaded(prefetched.myReview);
+        }
+        return; // Skip API calls, data is already fresh from prefetch
+      }
+
+      // 1단계: 애니메이션 기본 정보 먼저 로드하고 즉시 표시
+      const animeData = await animeService.getAnimeById(id);
+      if (!active) return;
+
+      if (!animeData) {
+        setError('애니메이션을 찾을 수 없습니다.');
+        setLoading(false);
+        return;
+      }
+
+      // 기본 정보 설정하고 즉시 화면 표시
+      setAnime(animeData);
+      setLoading(false); // 여기서 로딩 해제 - 기본 정보 바로 표시
+
+      // 2단계: 내 평점/리뷰를 백그라운드에서 로드 (화면에 이미 표시 됨)
+      if (user) {
+        const [myRatingData, myReviewData] = await Promise.all([
+          ratingService.getUserRating(id).catch(() => null),
+          reviewService.getMyReview(id).catch(() => null)
+        ]);
+        if (!active) return;
+
+        // 내 평점
+        if (myRatingData) {
+          setMyRating(myRatingData);
+        }
+
+        // 내 리뷰
+        if (myReviewData) {
+          onMyReviewLoaded(myReviewData);
+        }
+      }
+
+      // 3단계: 다른 사람들의 활동은 useActivities hook에서 자동으로 로드됨
+    } catch (err) {
+      if (!active) return;
+      console.error('Failed to load anime data:', err);
+      setError(`데이터를 불러오는데 실패했습니다: ${err.message || '알 수 없는 오류'}`);
+      setLoading(false);
+    }
+  };
+    loadAllData();
+    return () => { active = false; };
+  }, [id, user]);
+
+
+
+useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showEditMenu && !event.target.closest('.relative')) {
+        setShowEditMenu(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showEditMenu]);
+
+if (loading) {
     return (
       <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
         <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
@@ -761,12 +566,14 @@ export default function AnimeDetail() {
               />
             </div>
 
-            <RatingWidget
+            <section id="my-rating" tabIndex={-1}>
+            {user ? (<RatingWidget
               animeId={id}
               currentRating={myRating}
               onRate={handleRate}
               onStatusChange={handleStatusChange}
-            />
+            />) : <Link className="button-primary" to="/login" state={{from: window.location.pathname + window.location.search + '#my-rating'}}>로그인하고 평가하기</Link>}
+            </section>
           </div>
 
           {/* Right Column: Details */}
@@ -1347,12 +1154,13 @@ export default function AnimeDetail() {
             )}
 
             {/* Reviews */}
-            <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
+            <div id="reviews" tabIndex={-1} className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold">
                   {language === 'ko' ? '리뷰' : language === 'ja' ? 'レビュー' : 'Reviews'} ({activities.length})
                 </h3>
-                {!myReview && (
+                {!user && <Link className="button-primary" to="/login" state={{from: location.pathname + location.search + '#reviews'}}>{language === 'ko' ? '로그인하고 리뷰 작성하기' : language === 'ja' ? 'ログインしてレビューを書く' : 'Log in to write a review'}</Link>}
+                {user && !myReview && (
                   <button
                     onClick={() => {
                       if (!showReviewForm) {
@@ -1379,7 +1187,7 @@ export default function AnimeDetail() {
               </div>
 
               {/* Review Form */}
-              {showReviewForm && (
+              {user && showReviewForm && (
                 <form onSubmit={handleSubmitReview} className="mb-6 p-4 bg-gray-50 rounded-lg">
                   {reviewError && (
                     <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-800 rounded-md text-sm">

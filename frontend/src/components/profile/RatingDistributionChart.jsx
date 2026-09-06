@@ -1,6 +1,20 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useLanguage } from '../../context/LanguageContext';
 
+const CustomTooltip = ({ active, payload, language }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white border border-gray-200 rounded-lg shadow-lg px-3 py-2">
+        <p className="font-medium">★ {payload[0].payload.rating}</p>
+        <p className="text-sm text-gray-600">
+          {payload[0].value}{language === 'ko' ? '개 작품' : language === 'ja' ? '作品' : ' titles'}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function RatingDistributionChart({ distribution }) {
   const { language } = useLanguage();
 
@@ -39,19 +53,7 @@ export default function RatingDistributionChart({ distribution }) {
     return '#638CCC'; // 중간 파랑
   };
 
-  const CustomTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-lg px-3 py-2">
-          <p className="font-medium">★ {payload[0].payload.rating}</p>
-          <p className="text-sm text-gray-600">
-            {payload[0].value}{language === 'ko' ? '개 작품' : language === 'ja' ? '作品' : ' titles'}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
+
 
   return (
     <div className="bg-surface rounded-xl shadow-lg border border-border p-6 w-full h-full flex flex-col">
@@ -72,7 +74,7 @@ export default function RatingDistributionChart({ distribution }) {
             tick={{ fontSize: 12 }}
             allowDecimals={false}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip language={language} />} />
           <Bar dataKey="count" radius={[8, 8, 0, 0]}>
             {allRatings.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={getColor(entry.rating)} />

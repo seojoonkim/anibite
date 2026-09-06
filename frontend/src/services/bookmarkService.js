@@ -6,7 +6,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 // Get all bookmarks for current user
-export const getBookmarks = async (full = false) => {
+export const getBookmarks = async (full = false, options = {}) => {
   const token = localStorage.getItem('token');
   if (!token) {
     throw new Error('Not authenticated');
@@ -14,6 +14,7 @@ export const getBookmarks = async (full = false) => {
 
   const url = `${API_BASE_URL}/api/bookmarks/${full ? '?full=true' : ''}`;
   const response = await fetch(url, {
+    signal: options.signal,
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,

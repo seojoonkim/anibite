@@ -1,0 +1,46 @@
+# CLI upload exclusions; do not rely on git tracking to protect local secrets.
+.git/
+.vercel/
+**/.vercel/
+.env
+**/.env
+.env.*
+**/.env.*
+*.env
+**/*.env
+
+# Production data belongs only on the verified persistent volume.
+*.db
+**/*.db
+*.db-*
+**/*.db-*
+*.db.*
+**/*.db.*
+*.sqlite*
+**/*.sqlite*
+data/backups/
+data/images/
+
+# Dependencies/builds are produced remotely, not uploaded from the workstation.
+node_modules/
+**/node_modules/
+.venv/
+**/.venv/
+venv/
+**/venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+**/*.pyc
+frontend/dist/
+frontend/build/
+.pytest_cache/
+**/.pytest_cache/
+coverage/
+**/coverage/
+test-results/
+**/test-results/
+playwright-report/
+**/playwright-report/
+*.log
+**/*.log

@@ -4,10 +4,10 @@ export const notificationService = {
   /**
    * 알림 목록 가져오기
    */
-  async getNotifications(limit = 50, offset = 0) {
+  async getNotifications(limit = 50, offset = 0, options = {}) {
     try {
       const response = await api.get('/api/notifications/', {
-        params: { limit, offset }
+        ...options, params: { limit, offset }
       });
       return response.data;
     } catch (error) {

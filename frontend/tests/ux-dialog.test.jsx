@@ -1,0 +1,32 @@
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { afterEach, expect, it, vi } from 'vitest';
+import EditReviewModal from '../src/components/common/EditReviewModal';
+import { LanguageProvider } from '../src/context/LanguageProvider';
+afterEach(cleanup);
+it('names dialog, traps focus, restores focus and preserves a dismissed draft', () => {
+ const close = vi.fn(); const activity = {id: 1, rating: 3, review_content: 'original review'};
+ const opener = document.createElement('button'); document.body.append(opener); opener.focus();
+ const view = open => <LanguageProvider><EditReviewModal isOpen={open} onClose={close} activity={activity} onSave={vi.fn()}/></LanguageProvider>;
+ const {rerender} = render(view(true));
+ const dialog = screen.getByRole('dialog', {name: '평가 수정'});
+ expect(dialog.contains(document.activeElement)).toBe(true);
+ const field = screen.getByRole('textbox', {name: /리뷰 내용/});
+ fireEvent.change(field, {target: {value: 'preserved review draft'}});
+ fireEvent.keyDown(dialog, {key: 'Escape'}); expect(close).toHaveBeenCalledOnce();
+ rerender(view(false)); expect(document.activeElement).toBe(opener);
+ rerender(view(true)); expect(screen.getByRole('textbox').value).toBe('preserved review draft');
+ const buttons = dialog.querySelectorAll('button');
+ buttons[buttons.length-1]?.focus(); fireEvent.keyDown(screen.getByRole('dialog'), {key: 'Tab'});
+ expect(screen.getByRole('dialog').contains(document.activeElement)).toBe(true);
+ opener.remove();
+});
+it('rejects oversized reviews and retains failed save content', async () => {
+ const save = vi.fn().mockRejectedValue(new Error('offline'));
+ render(<LanguageProvider><EditReviewModal isOpen activity={{id: 2,rating: 3}} onClose={vi.fn()} onSave={save}/></LanguageProvider>);
+ const field = screen.getByRole('textbox');
+ fireEvent.change(field, {target: {value: 'x'.repeat(5001)}});
+ fireEvent.submit(field.closest('form'));
+ expect(save).not.toHaveBeenCalled(); expect(screen.getByRole('alert').textContent).toContain('5000');
+ fireEvent.change(field, {target: {value: 'my failed review draft'}}); fireEvent.submit(field.closest('form'));
+ expect(await screen.findByRole('alert')).toBeTruthy(); expect(field.value).toBe('my failed review draft');
+});

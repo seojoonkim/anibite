@@ -35,7 +35,7 @@ export default function Settings() {
   const [isChangingAvatar, setIsChangingAvatar] = useState(false);
   const [avatarMode, setAvatarMode] = useState('character'); // only 'character' mode
   const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
+  const [, setPreviewUrl] = useState(null);
   const [fiveStarCharacters, setFiveStarCharacters] = useState([]);
   const [selectedCharacterId, setSelectedCharacterId] = useState(null);
   const [avatarError, setAvatarError] = useState('');
@@ -180,34 +180,6 @@ export default function Settings() {
     setPreviewUrl(null);
     setSelectedCharacterId(null);
     setAvatarError('');
-  };
-
-  const handleFileSelect = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-      if (!allowedTypes.includes(file.type)) {
-        setAvatarError(language === 'ko' ? '지원되지 않는 파일 형식입니다.' : language === 'ja' ? 'サポートされていないファイル形式です。' : 'Unsupported file type.');
-        return;
-      }
-
-      // Validate file size (5MB max)
-      if (file.size > 5 * 1024 * 1024) {
-        setAvatarError(language === 'ko' ? '파일 크기는 5MB 이하여야 합니다.' : language === 'ja' ? 'ファイルサイズは5MB以下である必要があります。' : 'File size must be less than 5MB.');
-        return;
-      }
-
-      setSelectedFile(file);
-      setAvatarError('');
-
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   const handleAvatarSave = async () => {

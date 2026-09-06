@@ -1,21 +1,40 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect, useMemo, useEffectEvent } from 'react';
+import { useLocation, useParams, useNavigate, Link } from 'react-router-dom';
 import { characterService } from '../services/characterService';
 import { characterReviewService } from '../services/characterReviewService';
-import { activityService } from '../services/activityService';
+
 import { useActivities } from '../hooks/useActivity';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { getPrefetchedData } from '../hooks/usePrefetch';
-import { getCurrentLevelInfo } from '../utils/otakuLevels';
+
 import * as ActivityUtils from '../utils/activityUtils';
 import StarRating from '../components/common/StarRating';
 import CharacterRatingWidget from '../components/character/CharacterRatingWidget';
 import ActivityCard from '../components/activity/ActivityCard';
-import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
-import { getCharacterImageUrl, getCharacterImageFallback, getAvatarUrl } from '../utils/imageHelpers';
+import { IMAGE_BASE_URL } from "../config/api";
+import { getCharacterImageUrl, getCharacterImageFallback } from "../utils/imageHelpers";
+
+const StarIcon = ({ className = "w-6 h-6", filled = true }) => (
+  <svg className={className} viewBox="0 0 20 20" fill={filled ? "url(#star-gradient-char)" : "currentColor"}>
+    <defs>
+      <linearGradient id="star-gradient-char" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style={{ stopColor: '#F5C842', stopOpacity: 1 }} />
+        <stop offset="50%" style={{ stopColor: '#E8B835', stopOpacity: 1 }} />
+        <stop offset="100%" style={{ stopColor: '#D9A828', stopOpacity: 1 }} />
+      </linearGradient>
+    </defs>
+    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+  </svg>
+);
 
 export default function CharacterDetail() {
+  const { id } = useParams();
+  const { user } = useAuth();
+  return <CharacterDetailContent key={`${id}:${user?.id ?? 'guest'}`} />;
+}
+
+function CharacterDetailContent() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { language, getAnimeTitle } = useLanguage();
@@ -24,6 +43,7 @@ export default function CharacterDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [myReview, setMyReview] = useState(null);
+  const location = useLocation();
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [isEditingReview, setIsEditingReview] = useState(false);
   const [reviewData, setReviewData] = useState({ content: '', is_spoiler: false, rating: 0 });
@@ -31,33 +51,32 @@ export default function CharacterDetail() {
   const [reviewSuccess, setReviewSuccess] = useState('');
   const [showEditMenu, setShowEditMenu] = useState(null);
   const [reviews, setReviews] = useState([]);
-  const [reviewLikes, setReviewLikes] = useState({});
-  const [comments, setComments] = useState({});
-  const [expandedComments, setExpandedComments] = useState(new Set());
-  const [savedActivities, setSavedActivities] = useState(new Set());
-  const [newComment, setNewComment] = useState({});
-  const [commentLikes, setCommentLikes] = useState({});
-  const [replyingTo, setReplyingTo] = useState({});
-  const [myReviewComments, setMyReviewComments] = useState([]);
+  const [, setReviewLikes] = useState({});
+  const [, setComments] = useState({});
+  const [, setExpandedComments] = useState(new Set());
+
+
+  const [, setCommentLikes] = useState({});
+
+
   const [showFullDescription, setShowFullDescription] = useState(false);
-  const [replyText, setReplyText] = useState({});
+
 
   // Use unified activities hook
-  const {
-    activities: otherActivities,
-    loading: activitiesLoading,
-    refetch: refetchActivities
-  } = useActivities(
-    {
-      activityType: 'character_rating',
-      itemId: id,
-      limit: 50,
-      offset: 0
-    },
-    {
-      autoFetch: true
-    }
-  );
+  // Use unified activities hook
+const {
+  activities: otherActivities,
+  refetch: refetchActivities
+} = useActivities({
+  activityType: 'character_rating',
+  itemId: id,
+  limit: 50,
+  offset: 0
+}, {
+  autoFetch: true
+});
+
+// Combine myReview with other activities
 
   // Combine myReview with other activities
   const activities = useMemo(() => {
@@ -99,91 +118,14 @@ export default function CharacterDetail() {
     return allActivities;
   }, [otherActivities, myReview, user, id, character]);
 
-  useEffect(() => {
-    loadAllData();
-  }, [id, user]);
 
-  const loadAllData = async () => {
-    setLoading(true);
-    try {
-      // Check for prefetched data first
-      const prefetched = getPrefetchedData('character', id, user?.id);
 
-      if (prefetched) {
-        // Use prefetched data for instant display
-        if (prefetched.character) {
-          setCharacter(prefetched.character);
-          setError(null);
-          setLoading(false);
-        }
-        if (prefetched.reviews) {
-          processReviews(prefetched.reviews);
-        }
-        if (prefetched.myReview) {
-          processMyReview(prefetched.myReview);
-        }
-        return; // Skip API calls, data is already fresh from prefetch
-      }
 
-      // 1단계: 캐릭터 기본 정보 먼저 로드하고 즉시 표시
-      const characterData = await characterService.getCharacterDetail(id);
 
-      if (characterData) {
-        setCharacter(characterData);
-        setError(null);
-        setLoading(false); // 여기서 로딩 해제 - 기본 정보 바로 표시
-      } else {
-        setError(language === 'ko' ? '캐릭터 정보를 불러오지 못했습니다.' : 'Failed to load character.');
-        setLoading(false);
-        return;
-      }
 
-      // 2단계: 리뷰와 내 리뷰를 백그라운드에서 로드 (화면에 먼저 표시 후)
-      const reviewPromises = [
-        characterReviewService.getCharacterReviews(id, { page: 1, page_size: 10 }).catch(() => null)
-      ];
-
-      if (user) {
-        reviewPromises.push(characterReviewService.getMyReview(id).catch(() => null));
-      }
-
-      const reviewResults = await Promise.all(reviewPromises);
-
-      // 리뷰 목록
-      if (reviewResults[0]) {
-        processReviews(reviewResults[0]);
-      }
-
-      // 내 리뷰
-      if (user && reviewResults[1]) {
-        processMyReview(reviewResults[1]);
-      }
-
-      // 3단계: 다른 사람들의 활동은 useActivities hook에서 자동으로 로드됨
-    } catch (err) {
-      console.error('Failed to load character data:', err);
-      setError(language === 'ko' ? '데이터를 불러오지 못했습니다.' : 'Failed to load data.');
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (showEditMenu && !event.target.closest('.relative')) {
-        setShowEditMenu(null);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showEditMenu]);
 
   // Load saved activities from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('savedActivities');
-    if (saved) {
-      setSavedActivities(new Set(JSON.parse(saved)));
-    }
-  }, []);
+
 
   const processReviews = (data) => {
     // 내 리뷰는 myReview로 따로 표시하므로 reviews에서는 제외
@@ -280,16 +222,7 @@ export default function CharacterDetail() {
       console.error('Error response:', err.response?.data);
       console.error('Error status:', err.response?.status);
 
-      const errorDetail = err.response?.data?.detail || err.message || 'Unknown error';
-      const errorStatus = err.response?.status ? ` (${err.response.status})` : '';
-
-      alert(
-        language === 'ko'
-          ? `평점을 저장하는데 실패했습니다${errorStatus}\n${errorDetail}`
-          : language === 'ja'
-            ? `評価の保存に失敗しました${errorStatus}\n${errorDetail}`
-            : `Failed to save rating${errorStatus}\n${errorDetail}`
-      );
+      throw err;
     }
   };
 
@@ -520,251 +453,8 @@ export default function CharacterDetail() {
   };
 
   // 리뷰의 댓글 수를 업데이트하는 헬퍼 함수
-  const updateReviewCommentsCount = (reviewId, delta) => {
-    // myReview 업데이트
-    if (myReview && myReview.id === reviewId) {
-      setMyReview(prev => ({
-        ...prev,
-        comments_count: Math.max(0, (prev.comments_count || 0) + delta)
-      }));
-    }
-
-    // reviews 배열 업데이트
-    setReviews(prev => prev.map(review =>
-      review.id === reviewId
-        ? { ...review, comments_count: Math.max(0, (review.comments_count || 0) + delta) }
-        : review
-    ));
-  };
-
-  const handleSubmitComment = async (reviewId) => {
-    const content = newComment[reviewId];
-    if (!content || !content.trim()) return;
-
-    try {
-      const review = getReviewById(reviewId);
-      if (!review) {
-        console.error('[CharacterDetail] Review not found:', reviewId);
-        return;
-      }
-
-      console.log('[CharacterDetail] handleSubmitComment - review object:', review);
-      console.log('[CharacterDetail] handleSubmitComment - content:', content);
-      console.log('[CharacterDetail] handleSubmitComment - isRatingsOnly:', ActivityUtils.isRatingsOnly(review));
-      console.log('[CharacterDetail] handleSubmitComment - activityType:', ActivityUtils.getActivityType(review));
-
-      // 통합 유틸리티 사용
-      await ActivityUtils.createComment(review, content);
-
-      console.log('[CharacterDetail] handleSubmitComment - comment created successfully');
-
-      setNewComment(prev => ({ ...prev, [reviewId]: '' }));
-      await loadComments(reviewId);
-      updateReviewCommentsCount(reviewId, 1);
-    } catch (err) {
-      console.error('[CharacterDetail] Failed to submit comment:', err);
-      console.error('[CharacterDetail] Error details:', err);
-      alert(language === 'ko' ? '댓글 작성에 실패했습니다.' : language === 'ja' ? 'コメント作成に失敗しました。' : 'Failed to submit comment.');
-    }
-  };
-
-  const handleSubmitReply = async (reviewId, parentCommentId) => {
-    const content = replyText[parentCommentId];
-    if (!content || !content.trim()) return;
-
-    try {
-      const review = getReviewById(reviewId);
-      if (!review) {
-        console.error('[CharacterDetail] Review not found:', reviewId);
-        return;
-      }
-
-      // 통합 유틸리티 사용
-      await ActivityUtils.createReply(review, parentCommentId, content);
-
-      setReplyText(prev => ({ ...prev, [parentCommentId]: '' }));
-      setReplyingTo(prev => ({ ...prev, [parentCommentId]: false }));
-      await loadComments(reviewId);
-      updateReviewCommentsCount(reviewId, 1);
-    } catch (err) {
-      console.error('Failed to submit reply:', err);
-      alert(language === 'ko' ? '답글 작성에 실패했습니다.' : language === 'ja' ? '返信作成に失敗しました。' : 'Failed to submit reply.');
-    }
-  };
-
-  const handleDeleteComment = async (reviewId, commentId) => {
-    if (!window.confirm(language === 'ko' ? '댓글을 삭제하시겠습니까?' : language === 'ja' ? 'このコメントを削除しますか？' : 'Are you sure you want to delete this comment?')) {
-      return;
-    }
-
-    try {
-      const review = getReviewById(reviewId);
-      if (!review) {
-        console.error('[CharacterDetail] Review not found:', reviewId);
-        return;
-      }
-
-      console.log('[CharacterDetail] handleDeleteComment - deleting comment:', commentId, 'from review:', review);
-
-      // 통합 유틸리티 사용
-      await ActivityUtils.deleteComment(review, commentId);
-
-      console.log('[CharacterDetail] handleDeleteComment - comment deleted successfully');
-
-      await loadComments(review);  // review 객체 전달
-      updateReviewCommentsCount(reviewId, -1);
-    } catch (err) {
-      console.error('[CharacterDetail] Failed to delete comment:', err);
-      console.error('[CharacterDetail] Error details:', err.response?.data || err.message);
-      alert(language === 'ko' ? '댓글 삭제에 실패했습니다.' : language === 'ja' ? 'コメント削除に失敗しました。' : 'Failed to delete comment.');
-    }
-  };
-
-  const handleToggleCommentLike = async (commentId) => {
-    if (!user) {
-      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
-      return;
-    }
-
-    try {
-      // Find which review this comment belongs to
-      let reviewId = null;
-      let currentComment = null;
-
-      for (const rId of Object.keys(comments)) {
-        const allComments = comments[rId] || [];
-
-        // Check main comments
-        const mainComment = allComments.find(c => c.id === commentId);
-        if (mainComment) {
-          reviewId = rId;
-          currentComment = mainComment;
-          break;
-        }
-
-        // Check replies
-        for (const comment of allComments) {
-          if (comment.replies) {
-            const reply = comment.replies.find(r => r.id === commentId);
-            if (reply) {
-              reviewId = rId;
-              currentComment = reply;
-              break;
-            }
-          }
-        }
-        if (currentComment) break;
-      }
-
-      if (!reviewId || !currentComment) return;
-
-      if (currentComment.user_liked) {
-        await commentLikeService.unlikeComment(commentId);
-      } else {
-        await commentLikeService.likeComment(commentId);
-      }
-
-      loadComments(reviewId);
-    } catch (err) {
-      console.error('Failed to toggle comment like:', err);
-    }
-  };
-
-  const handleReplyClick = (reviewId, commentId) => {
-    setReplyingTo(prev => ({
-      ...prev,
-      [reviewId]: prev[reviewId] === commentId ? null : commentId
-    }));
-  };
-
-  const toggleComments = (reviewId) => {
-    const newExpanded = new Set(expandedComments);
-    if (newExpanded.has(reviewId)) {
-      newExpanded.delete(reviewId);
-    } else {
-      newExpanded.add(reviewId);
-      // 댓글이 아직 로드되지 않았으면 로드
-      if (!comments[reviewId] || comments[reviewId].length === 0) {
-        loadComments(reviewId);
-      }
-    }
-    setExpandedComments(newExpanded);
-  };
-
-  const handleToggleReviewLike = async (reviewId) => {
-    if (!user) {
-      alert(language === 'ko' ? '로그인이 필요합니다.' : language === 'ja' ? 'ログインが必要です。' : 'Please login first.');
-      return;
-    }
-
-    try {
-      const review = getReviewById(reviewId);
-      if (!review) {
-        console.error('[CharacterDetail] Review not found:', reviewId);
-        return;
-      }
-
-      // 현재 좋아요 상태 가져오기 (없으면 기본값)
-      const currentLike = reviewLikes[reviewId] || { liked: false, count: 0 };
-      const newLiked = !currentLike.liked;
-
-      // Use activityService with activity_id
-      const { activityService } = await import('../services/activityService');
-      await activityService.toggleLike(reviewId);
-
-      setReviewLikes(prev => ({
-        ...prev,
-        [reviewId]: {
-          liked: newLiked,
-          count: currentLike.count + (newLiked ? 1 : -1)
-        }
-      }));
-    } catch (err) {
-      console.error('Failed to toggle review like:', err);
-    }
-  };
-
-  const handleToggleSaveReview = (review) => {
-    // Feed와 동일한 형식으로 activity key 생성 (character_rating 사용!)
-    const activityKey = `character_rating_${review.user_id}_${id}`;
-    console.log('[CharacterDetail] Toggling save for key:', activityKey);
-    console.log('[CharacterDetail] Review user_id:', review.user_id, 'Character ID:', id);
-
-    setSavedActivities(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(activityKey)) {
-        newSet.delete(activityKey);
-        console.log('[CharacterDetail] Removed from saved');
-      } else {
-        newSet.add(activityKey);
-        console.log('[CharacterDetail] Added to saved');
-      }
-      // 로컬 스토리지에 저장 (피드와 동기화)
-      const savedArray = [...newSet];
-      localStorage.setItem('savedActivities', JSON.stringify(savedArray));
-      console.log('[CharacterDetail] Saved to localStorage:', savedArray);
-      return newSet;
-    });
-  };
 
   // Using imported getAvatarUrl from imageHelpers
-
-  const toRoman = (num) => {
-    const romanNumerals = ['I', 'II', 'III', 'IV', 'V'];
-    return romanNumerals[num - 1] || num.toString();
-  };
-
-  const getTimeAgo = (dateString) => {
-    // SQLite timestamp를 UTC로 파싱
-    const date = new Date(dateString.endsWith('Z') ? dateString : dateString + 'Z');
-    const now = new Date();
-    const diffInSeconds = Math.floor((now - date) / 1000);
-
-    if (diffInSeconds < 3600) return language === 'ko' ? `${Math.max(1, Math.floor(diffInSeconds / 60))}분 전` : language === 'ja' ? `${Math.max(1, Math.floor(diffInSeconds / 60))}分前` : `${Math.max(1, Math.floor(diffInSeconds / 60))}m ago`;
-    if (diffInSeconds < 86400) return language === 'ko' ? `${Math.floor(diffInSeconds / 3600)}시간 전` : language === 'ja' ? `${Math.floor(diffInSeconds / 3600)}時間前` : `${Math.floor(diffInSeconds / 3600)}h ago`;
-    if (diffInSeconds < 2592000) return language === 'ko' ? `${Math.floor(diffInSeconds / 86400)}일 전` : language === 'ja' ? `${Math.floor(diffInSeconds / 86400)}日前` : `${Math.floor(diffInSeconds / 86400)}d ago`;
-    return date.toLocaleDateString(language === 'ko' ? 'ko-KR' : language === 'ja' ? 'ja-JP' : 'en-US');
-  };
 
   // Use imageHelpers function for consistency with list pages
   // This ensures proper fallback chain: R2 .jpg → R2 .png → external URL
@@ -780,18 +470,7 @@ export default function CharacterDetail() {
   };
 
   // SVG Star icon component
-  const StarIcon = ({ className = "w-6 h-6", filled = true }) => (
-    <svg className={className} viewBox="0 0 20 20" fill={filled ? "url(#star-gradient-char)" : "currentColor"}>
-      <defs>
-        <linearGradient id="star-gradient-char" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: '#F5C842', stopOpacity: 1 }} />
-          <stop offset="50%" style={{ stopColor: '#E8B835', stopOpacity: 1 }} />
-          <stop offset="100%" style={{ stopColor: '#D9A828', stopOpacity: 1 }} />
-        </linearGradient>
-      </defs>
-      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-    </svg>
-  );
+
 
   const getBirthday = () => {
     const { date_of_birth_year, date_of_birth_month, date_of_birth_day } = character;
@@ -805,7 +484,93 @@ export default function CharacterDetail() {
     return parts.join(language === 'ko' ? ' ' : language === 'ja' ? '' : '');
   };
 
-  if (loading) {
+  const onMyReviewLoaded = useEffectEvent(data => processMyReview(data));
+  const onReviewsLoaded = useEffectEvent(data => processReviews(data));
+
+  useEffect(() => {
+    let active = true;
+  async function loadAllData() {
+    try {
+      // Check for prefetched data first
+      const prefetched = await getPrefetchedData('character', id, user?.id);
+      if (!active) return;
+
+      if (prefetched) {
+        // Use prefetched data for instant display
+        if (prefetched.character) {
+          setCharacter(prefetched.character);
+                setLoading(false);
+        }
+        if (prefetched.reviews) {
+          onReviewsLoaded(prefetched.reviews);
+        }
+        if (user && prefetched.myReview) {
+          onMyReviewLoaded(prefetched.myReview);
+        }
+        return; // Skip API calls, data is already fresh from prefetch
+      }
+
+      // 1단계: 캐릭터 기본 정보 먼저 로드하고 즉시 표시
+      const characterData = await characterService.getCharacterDetail(id);
+      if (!active) return;
+
+      if (characterData) {
+        setCharacter(characterData);
+        setError(null);
+        setLoading(false); // 여기서 로딩 해제 - 기본 정보 바로 표시
+      } else {
+        setError(language === 'ko' ? '캐릭터 정보를 불러오지 못했습니다.' : 'Failed to load character.');
+        setLoading(false);
+        return;
+      }
+
+      // 2단계: 리뷰와 내 리뷰를 백그라운드에서 로드 (화면에 먼저 표시 후)
+      const reviewPromises = [
+        characterReviewService.getCharacterReviews(id, { page: 1, page_size: 10 }).catch(() => null)
+      ];
+
+      if (user) {
+        reviewPromises.push(characterReviewService.getMyReview(id).catch(() => null));
+      }
+
+      const reviewResults = await Promise.all(reviewPromises);
+      if (!active) return;
+
+      // 리뷰 목록
+      if (reviewResults[0]) {
+        onReviewsLoaded(reviewResults[0]);
+      }
+
+      // 내 리뷰
+      if (user && reviewResults[1]) {
+        onMyReviewLoaded(reviewResults[1]);
+      }
+
+      // 3단계: 다른 사람들의 활동은 useActivities hook에서 자동으로 로드됨
+    } catch (err) {
+      if (!active) return;
+      console.error('Failed to load character data:', err);
+      setError(language === 'ko' ? '데이터를 불러오지 못했습니다.' : 'Failed to load data.');
+      setLoading(false);
+    }
+  };
+    loadAllData();
+    return () => { active = false; };
+  }, [id, user, language]);
+
+useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showEditMenu && !event.target.closest('.relative')) {
+        setShowEditMenu(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showEditMenu]);
+
+
+
+if (loading) {
     return (
       <div className="min-h-screen pt-10 md:pt-12 bg-transparent">
         <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
@@ -917,7 +682,7 @@ export default function CharacterDetail() {
             </div>
 
             {/* Rating Widget */}
-            <CharacterRatingWidget
+            {user ? (<CharacterRatingWidget
               characterId={id}
               currentRating={{
                 rating: character.my_rating,
@@ -926,7 +691,7 @@ export default function CharacterDetail() {
               }}
               onRate={handleRatingChange}
               onStatusChange={handleStatusChange}
-            />
+            />) : <Link id="my-rating" className="button-primary" to="/login" state={{from: window.location.pathname + window.location.search + '#my-rating'}}>로그인하고 평가하기</Link>}
           </div>
 
           {/* Right Column: Details and Reviews */}
@@ -1237,12 +1002,13 @@ export default function CharacterDetail() {
             </div>
 
             {/* Reviews Section */}
-            <div className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
+            <div id="reviews" tabIndex={-1} className="bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.08)] p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold">
                   {language === 'ko' ? '리뷰' : language === 'ja' ? 'レビュー' : 'Reviews'} ({activities.length})
                 </h3>
-                {!myReview && (
+                {!user && <Link className="button-primary" to="/login" state={{from: location.pathname + location.search + '#reviews'}}>{language === 'ko' ? '로그인하고 리뷰 작성하기' : language === 'ja' ? 'ログインしてレビューを書く' : 'Log in to write a review'}</Link>}
+                {user && !myReview && (
                   <button
                     onClick={() => {
                       if (!showReviewForm) {
@@ -1269,7 +1035,7 @@ export default function CharacterDetail() {
               </div>
 
               {/* Review Form */}
-              {showReviewForm && (
+              {user && showReviewForm && (
                 <form onSubmit={handleSubmitReview} className="mb-6 p-4 bg-gray-50 rounded-lg">
                   {reviewError && (
                     <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-800 rounded-md text-sm">
