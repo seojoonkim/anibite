@@ -9,6 +9,24 @@ from models.anime import AnimeResponse, AnimeDetailResponse, AnimeListResponse
 from config import DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE
 
 
+
+# Season number = length of the TV-only PREQUEL chain + 1.
+# Counting every PREQUEL edge (OVAs, specials, movies) mislabelled first seasons as "2기".
+SEASON_NUMBER_SQL = """(
+    WITH RECURSIVE chain(id, depth) AS (
+        SELECT a.id, 0
+        UNION
+        SELECT ar.related_anime_id, chain.depth + 1
+        FROM anime_relation ar
+        JOIN chain ON ar.anime_id = chain.id
+        JOIN anime pa ON pa.id = ar.related_anime_id
+        WHERE ar.relation_type = 'PREQUEL'
+          AND pa.format IN ('TV', 'TV_SHORT')
+          AND chain.depth < 15
+    )
+    SELECT MAX(depth) + 1 FROM chain
+)"""
+
 def get_anime_list(
     page: int = 1,
     page_size: int = DEFAULT_PAGE_SIZE,
@@ -98,8 +116,7 @@ def get_anime_list(
                COALESCE('/' || a.cover_image_local, a.cover_image_url) as cover_image_url,
                a.cover_image_color, a.banner_image_url,
                a.average_score, a.popularity, a.favourites, a.source, a.is_adult,
-               (SELECT COUNT(*) FROM anime_relation ar
-                WHERE ar.anime_id = a.id AND ar.relation_type = 'PREQUEL') + 1 as season_number,
+               {SEASON_NUMBER_SQL} as season_number,
                (SELECT COUNT(*) FROM user_ratings ur
                 WHERE ur.anime_id = a.id AND ur.status = 'RATED' AND ur.rating IS NOT NULL) as site_rating_count,
                (SELECT AVG(ur.rating) FROM user_ratings ur
@@ -127,8 +144,7 @@ def get_anime_list(
                    COALESCE('/' || a.cover_image_local, a.cover_image_url) as cover_image_url,
                    a.cover_image_color, a.banner_image_url,
                    a.average_score, a.popularity, a.favourites, a.source, a.is_adult,
-                   (SELECT COUNT(*) FROM anime_relation ar
-                    WHERE ar.anime_id = a.id AND ar.relation_type = 'PREQUEL') + 1 as season_number,
+                   {SEASON_NUMBER_SQL} as season_number,
                    (SELECT COUNT(*) FROM user_ratings ur
                     WHERE ur.anime_id = a.id AND ur.status = 'RATED' AND ur.rating IS NOT NULL) as site_rating_count,
                    (SELECT AVG(ur.rating) FROM user_ratings ur
