@@ -12,6 +12,8 @@ if sys.platform == 'win32':
 
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from utils.cache_headers import PublicCacheMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.exceptions import HTTPException
@@ -33,7 +35,7 @@ except Exception as e:
     traceback.print_exc()
 
 app = FastAPI(
-    title="AniPass API",
+    title="AniBite API",
     description="애니메이션 평가 및 추천 플랫폼 API",
     version="1.0.0",
     redirect_slashes=False,  # Prevent HTTPS->HTTP redirect on Railway
@@ -42,8 +44,20 @@ app = FastAPI(
 # Startup is deliberately read-only. Release migrations are an explicit CLI job.
 @app.on_event("startup")
 async def startup_event():
-    """Never mutate schema or user records during worker startup."""
+    """Never mutate schema or user records during worker startup.
+
+    The catalog sync thread starts here but only runs after a delay, only in
+    production, and only writes public catalog tables (never user data).
+    """
+    from services.catalog_sync import start_scheduler
+    start_scheduler()
     return None
+
+
+@app.get("/catalog-sync-status", include_in_schema=False)
+def catalog_sync_status():
+    from services.catalog_sync import last_run
+    return {"last_run": last_run()}
 
 # Debug: Print allowed origins on startup
 print(f"[CORS] Allowed origins: {ALLOWED_ORIGINS}")
@@ -58,6 +72,11 @@ app.add_middleware(
     expose_headers=["*"],
     max_age=3600,  # Cache preflight requests for 1 hour
 )
+
+
+# Compress JSON (catalog payloads are 30-200 kB) and let browsers/CDN cache public reads.
+app.add_middleware(GZipMiddleware, minimum_size=1024, compresslevel=5)
+app.add_middleware(PublicCacheMiddleware)
 
 
 # Exception handler to ensure CORS headers on error responses

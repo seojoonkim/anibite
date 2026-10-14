@@ -143,9 +143,7 @@ async def _google_login_or_register(google_user_info: Dict[str, str], preferred_
     )
 
     if existing_email_user:
-        # Linking requires a separate authenticated reauthorization flow.
-        # Until that exists, deny rather than silently take over a local account.
-        raise HTTPException(status_code=409, detail="Account linking requires authenticated reauthorization")
+        return _link_google_to_existing_account(dict_from_row(existing_email_user), oauth_id)
 
     # 3. 신규 Google 사용자 → 회원가입 처리
     # username 생성 (이메일 기반, 중복 방지)
@@ -210,4 +208,56 @@ async def _google_login_or_register(google_user_info: Dict[str, str], preferred_
         access_token=access_token,
         token_type="bearer",
         user=user_response
+    )
+
+
+def _link_google_to_existing_account(user_dict: Dict, oauth_id: str) -> TokenResponse:
+    """Link a Google identity to an existing account with the same verified email.
+
+    Google has already proven ownership of the email (email_verified is required).
+    Safety rules:
+    - An account already bound to a *different* Google identity is never re-bound.
+    - If the local account never verified its email, someone else may have
+      pre-registered it with the victim's address. The local password is then
+      invalidated so only the real email owner (via Google) keeps access.
+    """
+    user_id = user_dict['id']
+    bound_provider = user_dict.get('oauth_provider')
+    bound_id = user_dict.get('oauth_id')
+    if bound_provider == 'google' and bound_id and bound_id != oauth_id:
+        raise HTTPException(
+            status_code=409,
+            detail="이 이메일은 다른 Google 계정과 이미 연결되어 있어요.",
+        )
+
+    clear_password = not user_dict.get('is_verified')
+    db.execute_query(
+        """
+        UPDATE users
+        SET oauth_provider = 'google',
+            oauth_id = ?,
+            is_verified = 1,
+            password_hash = CASE WHEN ? THEN NULL ELSE password_hash END,
+            verification_token = NULL,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+        """,
+        (oauth_id, 1 if clear_password else 0, user_id),
+    )
+    row = db.execute_query(
+        """
+        SELECT u.*, COALESCE(us.otaku_score, 0.0) as otaku_score
+        FROM users u
+        LEFT JOIN user_stats us ON u.id = us.user_id
+        WHERE u.id = ?
+        """,
+        (user_id,),
+        fetch_one=True,
+    )
+    linked = set_default_avatar(dict_from_row(row), db)
+    user_response = UserResponse(**linked)
+    return TokenResponse(
+        access_token=create_access_token(data={"sub": user_response.username}),
+        token_type="bearer",
+        user=user_response,
     )

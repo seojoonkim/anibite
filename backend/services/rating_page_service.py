@@ -208,7 +208,7 @@ def get_anime_for_rating_stats(user_id: int) -> Dict:
         fetch_one=True
     )
 
-    stats = dict_from_row(row) if row else {}
+    stats = {k: (v or 0) for k, v in (dict_from_row(row) if row else {}).items()}
 
     # Total anime count (cached value)
     total_anime = db.execute_query(
@@ -246,7 +246,7 @@ def get_characters_for_rating_stats(user_id: int) -> Dict:
         fetch_one=True
     )
 
-    stats = dict_from_row(row) if row else {}
+    stats = {k: (v or 0) for k, v in (dict_from_row(row) if row else {}).items()}
 
     # Available characters (from rated anime)
     available = db.execute_query(
@@ -363,7 +363,7 @@ def get_review_writing_stats(user_id: int) -> Dict:
         fetch_one=True
     )
 
-    result = dict_from_row(stats) if stats else {}
+    result = {k: (v or 0) for k, v in (dict_from_row(stats) if stats else {}).items()}
 
     return {
         'anime': {
