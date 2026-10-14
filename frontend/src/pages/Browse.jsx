@@ -9,7 +9,7 @@ import { usePrefetch } from '../hooks/usePrefetch';
 import { usePagedResource } from '../hooks/usePagedResource';
 import { IMAGE_BASE_URL } from '../config/api';
 import { getCharacterImageUrl } from '../utils/imageHelpers';
-import { GENRES, genreLabel } from '../utils/animeLabels';
+import { GENRES, genreLabel, formatLabel } from '../utils/animeLabels';
 
 const PAGE_SIZE = 20;
 const searchSorts = ['popularity_desc', 'rating_desc', 'rating_asc', 'title_asc'];
@@ -54,23 +54,23 @@ export default function Browse() {
 
   return <main className="max-w-[1180px] mx-auto px-4 py-8">
     <h1 className="text-2xl font-bold mb-6">{text('발견', 'Discover', '見つける')}</h1>
-    <div className="flex flex-wrap gap-3 mb-5">
-      <label className="flex-1 min-w-0">{text('작품·캐릭터 검색', 'Search anime and characters', 'アニメ・キャラクター検索')}
-        <input type="search" className="w-full min-h-11 px-3 rounded-lg border" value={query} onChange={event => update('q', event.target.value, true)} />
+    <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3 mb-5 text-sm text-text-secondary">
+      <label className="col-span-2 sm:flex-1 sm:min-w-[260px]">{text('작품·캐릭터 검색', 'Search anime and characters', 'アニメ・キャラクター検索')}
+        <input type="search" className="mt-1 w-full min-h-11 px-3 rounded-lg border text-base text-text-primary" value={query} onChange={event => update('q', event.target.value, true)} />
       </label>
       <label>{text('정렬', 'Sort', '並び順')}
-        <select className="block min-h-11 rounded-lg border px-3" value={sort} onChange={event => update('sort', event.target.value)}>
+        <select className="mt-1 block w-full sm:w-auto min-h-11 rounded-lg border px-3 text-base text-text-primary" value={sort} onChange={event => update('sort', event.target.value)}>
           <option value="popularity_desc">{t('sortPopularity')}</option>
           <option value="rating_desc">{t('sortRatingDesc')}</option>
           {query.trim() && <option value="rating_asc">{t('sortRatingAsc')}</option>}
           <option value="title_asc">{t('sortTitle')}</option>
         </select>
       </label>
-      <button className="min-h-11 px-3 self-end" onClick={() => setParams({}, { preventScrollReset: true })}>{text('검색·필터 초기화', 'Clear search and filters', '検索・絞り込みをリセット')}</button>
+      <button className="min-h-11 px-3 self-end rounded-lg border text-text-primary" onClick={() => setParams({}, { preventScrollReset: true })}>{text('검색·필터 초기화', 'Clear search and filters', '検索・絞り込みをリセット')}</button>
     </div>
-    <div className="flex flex-wrap gap-3 mb-5">
-      <label>{text('연도', 'Year', '年')}<input className="block border rounded-lg min-h-11 px-3 w-28" type="number" min="1960" max="2030" value={year} disabled={Boolean(query.trim())} onChange={e => update('year', e.target.value, true)} /></label>
-      <label>{text('장르', 'Genre', 'ジャンル')}<select className="block border rounded-lg min-h-11 px-3 max-w-full" value={genre} disabled={Boolean(query.trim())} onChange={e => update('genre', e.target.value)}>
+    <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3 mb-5 text-sm text-text-secondary">
+      <label>{text('연도', 'Year', '年')}<input className="mt-1 block border rounded-lg min-h-11 px-3 w-full sm:w-28 text-base text-text-primary" type="number" min="1960" max="2030" value={year} disabled={Boolean(query.trim())} onChange={e => update('year', e.target.value, true)} /></label>
+      <label>{text('장르', 'Genre', 'ジャンル')}<select className="mt-1 block border rounded-lg min-h-11 px-3 w-full sm:w-44 text-base text-text-primary" value={genre} disabled={Boolean(query.trim())} onChange={e => update('genre', e.target.value)}>
         <option value="">{text('전체', 'All', 'すべて')}</option>
         {Object.keys(GENRES).map(name => <option key={name} value={name}>{genreLabel(name, language)}</option>)}
       </select></label>
@@ -92,8 +92,8 @@ export default function Browse() {
         return <Link key={item.id} to={`/${item.type}/${item.originalId}`} className="flex min-w-0 gap-3 border rounded-xl p-3 bg-surface hover:bg-surface-hover" onMouseEnter={() => item.type === 'anime' ? handleAnimeMouseEnter(item.originalId, user) : handleCharacterMouseEnter(item.originalId, user)} onMouseLeave={handleMouseLeave}>
           <img className="w-20 h-28 object-cover rounded shrink-0" src={item.type === 'anime' ? imageUrl(item.cover_image_url) : getCharacterImageUrl(item.originalId, item.image_large)} alt="" loading="lazy" onError={e => { if (!e.currentTarget.src.endsWith('/placeholder-anime.svg')) e.currentTarget.src = '/placeholder-anime.svg'; }} />
           <div className="min-w-0"><h2 className="font-semibold break-words">{title.primary}</h2>{title.secondary && <p className="text-sm text-text-secondary">{title.secondary}</p>}
-            <p className="text-sm">{item.season_year} {item.format}</p>
-            {item.type === 'anime' && <p className="text-sm">{count > 0 && rating != null ? `${Number(rating).toFixed(1)} / 5 · ${count}` : t('noRating')}</p>}
+            <p className="text-sm text-text-secondary">{[item.season_year, formatLabel(item.format, language)].filter(Boolean).join(' · ')}</p>
+            {item.type === 'anime' && <p className="text-sm">{count > 0 && rating != null ? `★ ${Number(rating).toFixed(1)} · ${text(`평가 ${count}개`, `${count} ratings`, `評価${count}件`)}` : t('noRating')}</p>}
           </div>
         </Link>;
       })}
