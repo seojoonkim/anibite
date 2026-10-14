@@ -9,6 +9,7 @@ import { usePrefetch } from '../hooks/usePrefetch';
 import { usePagedResource } from '../hooks/usePagedResource';
 import { IMAGE_BASE_URL } from '../config/api';
 import { getCharacterImageUrl } from '../utils/imageHelpers';
+import { GENRES, genreLabel } from '../utils/animeLabels';
 
 const PAGE_SIZE = 20;
 const searchSorts = ['popularity_desc', 'rating_desc', 'rating_asc', 'title_asc'];
@@ -69,7 +70,10 @@ export default function Browse() {
     </div>
     <div className="flex flex-wrap gap-3 mb-5">
       <label>{text('연도', 'Year', '年')}<input className="block border rounded-lg min-h-11 px-3 w-28" type="number" min="1960" max="2030" value={year} disabled={Boolean(query.trim())} onChange={e => update('year', e.target.value, true)} /></label>
-      <label>{text('장르', 'Genre', 'ジャンル')}<input className="block border rounded-lg min-h-11 px-3 max-w-full" value={genre} disabled={Boolean(query.trim())} onChange={e => update('genre', e.target.value, true)} /></label>
+      <label>{text('장르', 'Genre', 'ジャンル')}<select className="block border rounded-lg min-h-11 px-3 max-w-full" value={genre} disabled={Boolean(query.trim())} onChange={e => update('genre', e.target.value)}>
+        <option value="">{text('전체', 'All', 'すべて')}</option>
+        {Object.keys(GENRES).map(name => <option key={name} value={name}>{genreLabel(name, language)}</option>)}
+      </select></label>
     </div>
     {query.trim() && <>
       <p className="text-sm mb-3">{text('검색은 종류별 최대 30개입니다. 연도·장르 필터는 전체 작품 목록에서 적용됩니다.', 'Search returns up to 30 per type. Year and genre apply to the catalog only.', '検索は種類別に最大30件です。年・ジャンルは作品一覧のみ適用されます。')}</p>

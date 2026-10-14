@@ -109,13 +109,15 @@ git add . && git commit -m "메시지" && git push
 
 ### 백엔드 재시작 (로컬)
 ```bash
-# 기존 프로세스 종료
-taskkill //F //IM python.exe
+# 기존 프로세스 종료 (macOS/Linux)
+pkill -f 'uvicorn main:app' || true
 # 재시작
-cd backend && python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+cd backend && APP_ENV=development python -m uvicorn main:app --port 8000 --reload
 ```
 
 ## 주의사항
+
+0. **DB 파일(`*.db`)은 절대 커밋 금지** — 사용자 이메일·비밀번호 해시가 들어 있어요.
 
 1. **테이블명 복수형**: `user_ratings`, `character_ratings` (단수형 아님)
 2. **이미지 URL**: R2 또는 로컬 경로 모두 지원, `IMAGE_BASE_URL` 사용

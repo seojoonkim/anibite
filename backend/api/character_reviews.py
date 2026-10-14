@@ -21,7 +21,7 @@ from services.character_review_service import (
     like_character_review,
     unlike_character_review
 )
-from api.deps import get_current_user
+from api.deps import get_current_user, get_current_user_optional
 
 router = APIRouter()
 
@@ -114,14 +114,14 @@ def get_character_review_list(
     character_id: int,
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
-    current_user: UserResponse = Depends(get_current_user)
+    current_user: Optional[UserResponse] = Depends(get_current_user_optional)
 ):
     """
-    캐릭터의 리뷰 목록
+    캐릭터의 리뷰 목록 (비로그인 공개)
 
     좋아요 순으로 정렬
     """
-    return get_character_reviews(character_id, page, page_size, current_user.id)
+    return get_character_reviews(character_id, page, page_size, current_user.id if current_user else None)
 
 
 @router.post("/{review_id}/like", response_model=CharacterReviewResponse)

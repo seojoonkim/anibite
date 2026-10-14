@@ -4,6 +4,9 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import './index.css'
 import './styles/customColors.css'
 import App from './App.jsx'
+import { installImageFallback } from './utils/imageFallback'
+
+installImageFallback()
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
 
