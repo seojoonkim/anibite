@@ -7,6 +7,7 @@ import { reviewService } from '../services/reviewService';
 import { useActivities } from '../hooks/useActivity';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { statusLabel, formatLabel, seasonLabel, sourceLabel, genreLabel } from '../utils/animeLabels';
 import { getPrefetchedData } from '../hooks/usePrefetch';
 import * as ActivityUtils from '../utils/activityUtils';
 import StarRating from '../components/common/StarRating';
@@ -351,15 +352,12 @@ const {
     // Handle AniList staff/voice actor images - convert to R2
     if (imageUrl.includes('anilist.co') && imageUrl.includes('/staff/')) {
       // AniList pattern: /staff/large/n{id}- or /staff/large/b{id}-
-      const match = imageUrl.match(/\/[bn](\d+)-/);
-      if (match && match[1]) {
-        const staffId = match[1];
-        return `${IMAGE_BASE_URL}/images/staff/${staffId}.jpg`;
-      }
+      // Staff images are not mirrored to R2 — serve AniList CDN directly.
+      return imageUrl;
     }
 
-    // External URLs (AniList, etc) - use placeholder
-    if (imageUrl.startsWith('http')) return '/placeholder-anime.svg';
+    // External URLs (e.g. AniList covers of newly synced titles) - use as-is
+    if (imageUrl.startsWith('http')) return imageUrl;
 
     // Use covers_large for better quality
     const processedUrl = imageUrl.includes('/covers/')
@@ -645,7 +643,7 @@ if (loading) {
                     <span className="text-base">📺</span>
                     <div>
                       <span className="font-medium text-gray-600">{language === 'ko' ? '방영 상태' : language === 'ja' ? '放送状態' : 'Status'}</span>
-                      <div className="text-gray-900">{anime.status}</div>
+                      <div className="text-gray-900">{statusLabel(anime.status, language)}</div>
                     </div>
                   </div>
                 )}
@@ -654,7 +652,7 @@ if (loading) {
                     <span className="text-base">🎬</span>
                     <div>
                       <span className="font-medium text-gray-600">{language === 'ko' ? '포맷' : language === 'ja' ? 'フォーマット' : 'Format'}</span>
-                      <div className="text-gray-900">{anime.format}</div>
+                      <div className="text-gray-900">{formatLabel(anime.format, language)}</div>
                     </div>
                   </div>
                 )}
@@ -672,7 +670,7 @@ if (loading) {
                     <span className="text-base">⏱️</span>
                     <div>
                       <span className="font-medium text-gray-600">{language === 'ko' ? '러닝타임' : language === 'ja' ? '放送時間' : 'Duration'}</span>
-                      <div className="text-gray-900">{anime.duration}min</div>
+                      <div className="text-gray-900">{anime.duration}{language === 'en' ? ' min' : '분'}</div>
                     </div>
                   </div>
                 )}
@@ -690,7 +688,7 @@ if (loading) {
                     <span className="text-base">🗓️</span>
                     <div>
                       <span className="font-medium text-gray-600">{language === 'ko' ? '시즌' : language === 'ja' ? 'シーズン' : 'Season'}</span>
-                      <div className="text-gray-900">{anime.season} {anime.season_year}</div>
+                      <div className="text-gray-900">{seasonLabel(anime.season, anime.season_year, language)}</div>
                     </div>
                   </div>
                 )}
@@ -699,7 +697,7 @@ if (loading) {
                     <span className="text-base">📖</span>
                     <div>
                       <span className="font-medium text-gray-600">{language === 'ko' ? '원작' : language === 'ja' ? '原作' : 'Source'}</span>
-                      <div className="text-gray-900">{anime.source}</div>
+                      <div className="text-gray-900">{sourceLabel(anime.source, language)}</div>
                     </div>
                   </div>
                 )}
@@ -722,12 +720,13 @@ if (loading) {
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {anime.genres.map((genre) => (
-                      <span
+                      <Link
                         key={genre}
+                        to={`/browse?genre=${encodeURIComponent(genre)}`}
                         className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors"
                       >
-                        {genre}
-                      </span>
+                        {genreLabel(genre, language)}
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -832,7 +831,7 @@ if (loading) {
                     <span className="text-base">📺</span>
                     <div>
                       <span className="font-medium text-gray-600">{language === 'ko' ? '방영 상태' : language === 'ja' ? '放送状態' : 'Status'}</span>
-                      <div className="text-gray-900">{anime.status}</div>
+                      <div className="text-gray-900">{statusLabel(anime.status, language)}</div>
                     </div>
                   </div>
                 )}
@@ -841,7 +840,7 @@ if (loading) {
                     <span className="text-base">🎬</span>
                     <div>
                       <span className="font-medium text-gray-600">{language === 'ko' ? '포맷' : language === 'ja' ? 'フォーマット' : 'Format'}</span>
-                      <div className="text-gray-900">{anime.format}</div>
+                      <div className="text-gray-900">{formatLabel(anime.format, language)}</div>
                     </div>
                   </div>
                 )}
@@ -859,7 +858,7 @@ if (loading) {
                     <span className="text-base">⏱️</span>
                     <div>
                       <span className="font-medium text-gray-600">{language === 'ko' ? '러닝타임' : language === 'ja' ? '放送時間' : 'Duration'}</span>
-                      <div className="text-gray-900">{anime.duration}min</div>
+                      <div className="text-gray-900">{anime.duration}{language === 'en' ? ' min' : '분'}</div>
                     </div>
                   </div>
                 )}
@@ -877,7 +876,7 @@ if (loading) {
                     <span className="text-base">🗓️</span>
                     <div>
                       <span className="font-medium text-gray-600">{language === 'ko' ? '시즌' : language === 'ja' ? 'シーズン' : 'Season'}</span>
-                      <div className="text-gray-900">{anime.season} {anime.season_year}</div>
+                      <div className="text-gray-900">{seasonLabel(anime.season, anime.season_year, language)}</div>
                     </div>
                   </div>
                 )}
@@ -886,7 +885,7 @@ if (loading) {
                     <span className="text-base">📖</span>
                     <div>
                       <span className="font-medium text-gray-600">{language === 'ko' ? '원작' : language === 'ja' ? '原作' : 'Source'}</span>
-                      <div className="text-gray-900">{anime.source}</div>
+                      <div className="text-gray-900">{sourceLabel(anime.source, language)}</div>
                     </div>
                   </div>
                 )}
@@ -909,12 +908,13 @@ if (loading) {
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {anime.genres.map((genre) => (
-                      <span
+                      <Link
                         key={genre}
+                        to={`/browse?genre=${encodeURIComponent(genre)}`}
                         className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors"
                       >
-                        {genre}
-                      </span>
+                        {genreLabel(genre, language)}
+                      </Link>
                     ))}
                   </div>
                 </div>
