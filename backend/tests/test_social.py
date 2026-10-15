@@ -43,3 +43,15 @@ def test_comment_query_is_bounded(activities):
             activities.execute_insert("INSERT INTO activity_comments(activity_id,user_id,content) VALUES (1,2,'root')")
     comments=service.get_activity_comments(1,limit=20,offset=0)
     assert len(comments)==20
+
+
+def test_feed_carries_viewer_bookmark_state(activities):
+    """Feed rows include the viewer's bookmark flag so cards skip per-card /bookmarks/check calls."""
+    activities.execute_insert('INSERT INTO activity_bookmarks(user_id,activity_id) VALUES (2,1)')
+    items = {a['id']: a for a in service.get_activities(current_user_id=2, limit=10, db=activities)['items']}
+    assert items[1]['user_bookmarked'] is True
+    assert items[2]['user_bookmarked'] is False
+    other = {a['id']: a for a in service.get_activities(current_user_id=1, limit=10, db=activities)['items']}
+    assert other[1]['user_bookmarked'] is False
+    guest = service.get_activities(current_user_id=None, limit=10, db=activities)['items']
+    assert all(a['user_bookmarked'] is None for a in guest)

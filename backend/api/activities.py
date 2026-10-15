@@ -60,6 +60,7 @@ class ActivityResponse(BaseModel):
     likes_count: int = 0
     comments_count: int = 0
     user_liked: bool = False
+    user_bookmarked: Optional[bool] = None
     is_my_activity: bool = False
 
     # Timestamps

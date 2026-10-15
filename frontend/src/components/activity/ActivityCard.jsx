@@ -96,7 +96,7 @@ const ActivityCard = forwardRef(({
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState('');
   const [avatarError, setAvatarError] = useState(false);
-  const [bookmarked, setBookmarked] = useState(false);
+  const [bookmarked, setBookmarked] = useState(Boolean(activity.user_bookmarked));
   const [showEditModal, setShowEditModal] = useState(false);
   const [editPostContent, setEditPostContent] = useState('');
   const editModalTextareaRef = useRef(null);
@@ -134,6 +134,11 @@ const ActivityCard = forwardRef(({
         setBookmarked(false);
         return;
       }
+      // Feed payload already carries the viewer's bookmark state: skip the per-card request.
+      if (typeof activity.user_bookmarked === 'boolean') {
+        setBookmarked(activity.user_bookmarked);
+        return;
+      }
 
       try {
         const isBookmarked = await bookmarkService.checkBookmark(activity.id);
@@ -147,7 +152,7 @@ const ActivityCard = forwardRef(({
     };
 
     fetchBookmarkStatus();
-  }, [activity.id, user, canEngage]);
+  }, [activity.id, activity.user_bookmarked, user, canEngage]);
 
   // Hooks
   const { liked, likesCount, toggleLike } = useActivityLike(
@@ -161,7 +166,7 @@ const ActivityCard = forwardRef(({
     loading: commentsLoading,
     createComment,
     deleteComment
-  } = useActivityComments(canEngage ? activity.id : null);
+  } = useActivityComments(canEngage && showComments ? activity.id : null);
 
   // Helper functions
 

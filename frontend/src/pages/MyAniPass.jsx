@@ -689,6 +689,8 @@ const [, setWatchlistAnime] = useState([]);
         try {
           const targetUserId = userId || user?.id;
 
+          // Stats and the first feed page are independent: fetch them in parallel.
+          const feedRequest = feedService.getUserFeed(targetUserId, 10, 0);
           // Load stats if not loaded yet
           if (!statsLoaded) {
             if (isOwnProfile) {
@@ -705,7 +707,7 @@ const [, setWatchlistAnime] = useState([]);
             }
           }
 
-          const feedData = await feedService.getUserFeed(targetUserId, 10, 0);
+          const feedData = await feedRequest;
           setUserActivities(feedData || []);
           setFeedOffset(10);
           setHasMoreFeed(feedData && feedData.length === 10);

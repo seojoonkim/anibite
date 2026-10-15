@@ -15,18 +15,29 @@ const Register = lazy(() => import('./pages/Register'));
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
 const EmailSent = lazy(() => import('./pages/EmailSent'));
 const ResendVerification = lazy(() => import('./pages/ResendVerification'));
-const Feed = lazy(() => import('./pages/Feed'));
-const Rate = lazy(() => import('./pages/Rate'));
+const loadFeed = () => import('./pages/Feed');
+const Feed = lazy(loadFeed);
+const loadRate = () => import('./pages/Rate');
+const Rate = lazy(loadRate);
 const RateCharacters = lazy(() => import('./pages/RateCharacters'));
 const WriteReviews = lazy(() => import('./pages/WriteReviews'));
-const Browse = lazy(() => import('./pages/Browse'));
+const loadBrowse = () => import('./pages/Browse');
+const Browse = lazy(loadBrowse);
 const Leaderboard = lazy(() => import('./pages/Leaderboard'));
 const AnimeDetail = lazy(() => import('./pages/AnimeDetail'));
 const CharacterDetail = lazy(() => import('./pages/CharacterDetail'));
-const MyAniPass = lazy(() => import('./pages/MyAniPass'));
+const loadMyAniPass = () => import('./pages/MyAniPass');
+const MyAniPass = lazy(loadMyAniPass);
 const Settings = lazy(() => import('./pages/Settings'));
 const AdminEditor = lazy(() => import('./pages/AdminEditor'));
 const BackupLogs = lazy(() => import('./pages/BackupLogs'));
+
+// Main menu pages (평가·피드·발견·내 서재): download their code while the browser is idle,
+// so switching menus never waits on a chunk fetch.
+const MENU_PAGE_LOADERS = [loadRate, loadFeed, loadBrowse, loadMyAniPass];
+function preloadMenuPages() {
+  return Promise.allSettled(MENU_PAGE_LOADERS.map(load => load()));
+}
 
 // Protected Route Component
 const ProtectedRoute = ({ children, admin = false }) => {
@@ -57,6 +68,15 @@ function AppRoutes() {
   const noNavbarPaths = ['/admin'];
   const isPublicPage = publicPaths.includes(location.pathname);
   const showNavbar = !isPublicPage && !noNavbarPaths.includes(location.pathname);
+
+  // Warm the other menu pages once the current page has rendered.
+  useEffect(() => {
+    if (!showNavbar) return undefined;
+    const idle = window.requestIdleCallback || (cb => setTimeout(cb, 1200));
+    const cancel = window.cancelIdleCallback || clearTimeout;
+    const handle = idle(() => { preloadMenuPages(); });
+    return () => cancel(handle);
+  }, [showNavbar]);
 
   // 스크롤 성능 최적화 - 스크롤 시 hover 효과 비활성화
   useEffect(() => {

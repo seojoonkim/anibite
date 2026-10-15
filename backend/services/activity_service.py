@@ -75,7 +75,7 @@ def get_activities(
 
     # Get activities with engagement counts
     # NORMALIZED: JOIN anime/character tables to get titles dynamically
-    query_params = [*params, limit, offset, current_user_id, current_user_id]
+    query_params = [*params, limit, offset, current_user_id, current_user_id, current_user_id]
 
     rows = db.execute_query(
         f"""
@@ -127,6 +127,7 @@ def get_activities(
             COALESCE(likes.count, 0) as likes_count,
             COALESCE(comments.count, 0) as comments_count,
             CASE WHEN ? IS NOT NULL AND user_like.activity_id IS NOT NULL THEN 1 ELSE 0 END as user_liked,
+            CASE WHEN user_bm.activity_id IS NOT NULL THEN 1 ELSE 0 END as user_bookmarked,
             a.activity_time,
             a.created_at,
             a.updated_at
@@ -153,6 +154,12 @@ def get_activities(
             FROM activity_likes
             WHERE user_id = ?
         ) user_like ON user_like.activity_id = a.id
+        -- Viewer bookmark state, so feed cards need no per-card /bookmarks/check request
+        LEFT JOIN (
+            SELECT activity_id
+            FROM activity_bookmarks
+            WHERE user_id = ? AND activity_id IN (SELECT id FROM page)
+        ) user_bm ON user_bm.activity_id = a.id
         ORDER BY a.activity_time DESC,a.id DESC
         """,
         tuple(query_params)
@@ -163,6 +170,7 @@ def get_activities(
         activity_dict = dict_from_row(row)
         # Convert user_liked to boolean
         activity_dict['user_liked'] = bool(activity_dict.get('user_liked', 0))
+        activity_dict['user_bookmarked'] = bool(activity_dict.get('user_bookmarked', 0)) if current_user_id else None
         # Add is_my_activity flag
         if current_user_id:
             activity_dict['is_my_activity'] = activity_dict['user_id'] == current_user_id
