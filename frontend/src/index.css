@@ -496,3 +496,13 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 @media (max-width: 900px) { .desktop-navigation { display:none; } .mobile-navigation { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); position:fixed; inset:auto 0 0; z-index:100; border-top:1px solid var(--color-border); background:var(--color-surface); padding:4px 8px calc(4px + env(safe-area-inset-bottom,0px)); } .app-content { padding-bottom:calc(72px + env(safe-area-inset-bottom,0px)); } }
 @media (max-width: 600px) { .desktop-search { display:none; } .app-header-inner { gap:8px; } .auth-card { padding:24px; } .mobile-navigation .nav-destination { font-size:14px; padding:8px 4px; } }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation:none !important; transition:none !important; scroll-behavior:auto !important; } }
+
+/* Anime quick-rate card: hover overlay on pointer devices, inline stars on touch */
+.anime-rate-card .rating-overlay { opacity:0; pointer-events:none; }
+.anime-rate-card .rating-touch { display:block; }
+@media (hover:hover) and (pointer:fine) {
+  .anime-rate-card:hover .rating-overlay, .anime-rate-card:focus-within .rating-overlay { opacity:1; pointer-events:auto; }
+  .anime-rate-card:hover .rating-resting, .anime-rate-card:focus-within .rating-resting { opacity:0; }
+  .anime-rate-card .rating-touch { display:none; }
+}
+.anime-rate-card [data-star] { min-width:0; min-height:0; }

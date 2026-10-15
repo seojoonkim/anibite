@@ -119,7 +119,7 @@ export default function RatingWidget({ animeId, currentRating, onRate, onStatusC
         </button>
       </div>
 
-      {currentRating && (
+      {currentRating?.created_at && !Number.isNaN(new Date(currentRating.created_at).getTime()) && (
         <div className="mt-4 text-sm text-gray-600 text-center">
           평가일: {new Date(currentRating.created_at).toLocaleDateString('ko-KR')}
         </div>
