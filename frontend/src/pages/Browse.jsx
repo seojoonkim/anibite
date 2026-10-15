@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { animeService } from '../services/animeService';
 import api from '../services/api';
@@ -28,6 +28,7 @@ export default function Browse() {
   const year = params.get('year') || '';
   const genre = params.get('genre') || '';
   const { handleAnimeMouseEnter, handleCharacterMouseEnter, handleMouseLeave } = usePrefetch();
+  const typingRef = useRef(false);
   const update = (name, value, replace = false) => {
     const next = new URLSearchParams(params);
     if (value) next.set(name, value); else next.delete(name);
@@ -35,7 +36,8 @@ export default function Browse() {
   };
   const loadPage = useCallback(async (page, signal) => {
     if (query.trim()) {
-      await new Promise((resolve, reject) => {
+      // Debounce keystrokes only; a query arriving via menu/URL searches immediately.
+      if (typingRef.current) await new Promise((resolve, reject) => {
         const abort = () => { clearTimeout(timer); reject(new DOMException('Aborted', 'AbortError')); };
         const timer = setTimeout(() => { signal.removeEventListener('abort', abort); resolve(); }, 300);
         signal.addEventListener('abort', abort, { once: true });
@@ -56,7 +58,7 @@ export default function Browse() {
     <h1 className="text-2xl font-bold mb-6">{text('발견', 'Discover', '見つける')}</h1>
     <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3 mb-5 text-sm text-text-secondary">
       <label className="col-span-2 sm:flex-1 sm:min-w-[260px]">{text('작품·캐릭터 검색', 'Search anime and characters', 'アニメ・キャラクター検索')}
-        <input type="search" className="mt-1 w-full min-h-11 px-3 rounded-lg border text-base text-text-primary" value={query} onChange={event => update('q', event.target.value, true)} />
+        <input type="search" className="mt-1 w-full min-h-11 px-3 rounded-lg border text-base text-text-primary" value={query} onChange={event => { typingRef.current = true; update('q', event.target.value, true); }} />
       </label>
       <label>{text('정렬', 'Sort', '並び順')}
         <select className="mt-1 block w-full sm:w-auto min-h-11 rounded-lg border px-3 text-base text-text-primary" value={sort} onChange={event => update('sort', event.target.value)}>

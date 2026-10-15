@@ -16,27 +16,40 @@ const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
 const EmailSent = lazy(() => import('./pages/EmailSent'));
 const ResendVerification = lazy(() => import('./pages/ResendVerification'));
 const loadFeed = () => import('./pages/Feed');
-const Feed = lazy(loadFeed);
+const Feed = lazyWithPreload(loadFeed);
 const loadRate = () => import('./pages/Rate');
-const Rate = lazy(loadRate);
+const Rate = lazyWithPreload(loadRate);
 const RateCharacters = lazy(() => import('./pages/RateCharacters'));
 const WriteReviews = lazy(() => import('./pages/WriteReviews'));
 const loadBrowse = () => import('./pages/Browse');
-const Browse = lazy(loadBrowse);
+const Browse = lazyWithPreload(loadBrowse);
 const Leaderboard = lazy(() => import('./pages/Leaderboard'));
 const AnimeDetail = lazy(() => import('./pages/AnimeDetail'));
 const CharacterDetail = lazy(() => import('./pages/CharacterDetail'));
 const loadMyAniPass = () => import('./pages/MyAniPass');
-const MyAniPass = lazy(loadMyAniPass);
+const MyAniPass = lazyWithPreload(loadMyAniPass);
 const Settings = lazy(() => import('./pages/Settings'));
 const AdminEditor = lazy(() => import('./pages/AdminEditor'));
 const BackupLogs = lazy(() => import('./pages/BackupLogs'));
 
+// React.lazy suspends on first render even when the chunk is already downloaded, and React
+// then throttles the fallback→content reveal (~300ms). Once preloaded, render the module directly.
+function lazyWithPreload(load) {
+  let Loaded = null;
+  const preload = () => load().then(mod => { Loaded = mod.default; return mod; });
+  const Lazy = lazy(preload);
+  function MenuPage(props) {
+    return Loaded ? <Loaded {...props} /> : <Lazy {...props} />;
+  }
+  MenuPage.preload = preload;
+  return MenuPage;
+}
+
 // Main menu pages (평가·피드·발견·내 서재): download their code while the browser is idle,
 // so switching menus never waits on a chunk fetch.
-const MENU_PAGE_LOADERS = [loadRate, loadFeed, loadBrowse, loadMyAniPass];
+const MENU_PAGES = [Rate, Feed, Browse, MyAniPass];
 function preloadMenuPages() {
-  return Promise.allSettled(MENU_PAGE_LOADERS.map(load => load()));
+  return Promise.allSettled(MENU_PAGES.map(page => page.preload()));
 }
 
 // Protected Route Component

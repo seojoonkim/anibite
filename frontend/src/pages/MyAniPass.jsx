@@ -503,6 +503,13 @@ const [, setWatchlistAnime] = useState([]);
         setTabLoading(true);
       }
 
+      // Start the first feed page now, in parallel with the profile header requests below.
+      const earlyFeedRequest = activeTab === 'feed' && (userId || user?.id)
+        ? feedService.getUserFeed(userId || user?.id, 10, 0)
+        : null;
+      // Track stats locally: the statsLoaded state in this closure is stale after setStatsLoaded.
+      let statsReady = statsLoaded;
+
       // 내 프로필 또는 stats와 follow data를 병렬로 로드
       if (!statsLoaded && isOwnProfile && user?.id) {
         const [statsData, followCounts] = await Promise.all([
@@ -511,6 +518,7 @@ const [, setWatchlistAnime] = useState([]);
         ]);
         setStats(statsData);
         setStatsLoaded(true);
+        statsReady = true;
         setFollowCounts(followCounts);
       }
 
@@ -527,6 +535,7 @@ const [, setWatchlistAnime] = useState([]);
           setProfileUser(profileData.user); // user 객체 설정
           setStats(profileData.stats); // stats 객체 설정
           setStatsLoaded(true);
+          statsReady = true;
         }
         setGenrePreferences(genrePrefs);
         setFollowCounts(followCounts);
@@ -690,9 +699,9 @@ const [, setWatchlistAnime] = useState([]);
           const targetUserId = userId || user?.id;
 
           // Stats and the first feed page are independent: fetch them in parallel.
-          const feedRequest = feedService.getUserFeed(targetUserId, 10, 0);
+          const feedRequest = earlyFeedRequest || feedService.getUserFeed(targetUserId, 10, 0);
           // Load stats if not loaded yet
-          if (!statsLoaded) {
+          if (!statsReady) {
             if (isOwnProfile) {
               const statsData = await userService.getStats();
               setStats(statsData);
