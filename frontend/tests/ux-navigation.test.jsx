@@ -8,11 +8,14 @@ import { LogoWiggleProvider } from '../src/context/LogoWiggleProvider';
 import { userService } from '../src/services/userService';
 import { notificationService } from '../src/services/notificationService';
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
-it('offers four primary mobile destinations and public search without private requests', () => {
+it('offers three primary destinations (발견 hidden) and public search without private requests', () => {
  const stats = vi.spyOn(userService,'getStats'); const notifications = vi.spyOn(notificationService,'getUnreadCount');
  render(<MemoryRouter><AuthProvider><LanguageProvider><LogoWiggleProvider><Navbar/></LogoWiggleProvider></LanguageProvider></AuthProvider></MemoryRouter>);
  const mobile = screen.getByRole('navigation',{name:'모바일 주요 메뉴'});
- expect(within(mobile).getAllByRole('link').map(a=>a.textContent)).toEqual(['발견','평가','피드','내 서재']);
+ expect(within(mobile).getAllByRole('link').map(a=>a.textContent)).toEqual(['평가','피드','내 서재']);
+ const desktop = screen.getByRole('navigation',{name:'주요 메뉴'});
+ expect(within(desktop).queryByRole('link',{name:'발견'})).toBeNull();
+ expect(screen.getByRole('link',{name:/AniBite/}).getAttribute('href')).toBe('/browse');
  expect(screen.getByRole('searchbox',{name:'작품 검색'})).toBeTruthy();
  expect(stats).not.toHaveBeenCalled(); expect(notifications).not.toHaveBeenCalled();
 });

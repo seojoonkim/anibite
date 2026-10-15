@@ -9,8 +9,10 @@ export default function Navbar() {
  const navigate = useNavigate(); const location = useLocation(); const [query,setQuery] = useState('');
  const [notifications,setNotifications] = useState(false);
  const labels = language === 'ja' ? ['発見','評価','フィード','ライブラリ'] : language === 'en' ? ['Discover','Rate','Feed','Library'] : ['발견','평가','피드','내 서재'];
+ // 발견(/browse) is hidden from the menu; the route stays reachable via logo and search.
  const paths = ['/browse','/rate','/feed','/my-anipass'];
- const links = paths.map((path,i) => <NavLink key={path} to={path} className={({isActive}) => `nav-destination ${isActive || (path === '/rate' && location.pathname === '/rate-characters') ? 'is-active' : ''}`}>{labels[i]}</NavLink>);
+ const hiddenFromMenu = new Set(['/browse']);
+ const links = paths.map((path,i) => hiddenFromMenu.has(path) ? null : <NavLink key={path} to={path} className={({isActive}) => `nav-destination ${isActive || (path === '/rate' && location.pathname === '/rate-characters') ? 'is-active' : ''}`}>{labels[i]}</NavLink>);
  return <>
   <header className="app-header"><div className="app-header-inner">
    <Link to="/browse" className="app-brand"><img src="/logo.svg" width="28" height="28" alt=""/>AniBite</Link>
