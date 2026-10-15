@@ -4,15 +4,17 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import NotificationDropdown from './NotificationDropdown';
 
+export const DISCOVER_KEYWORD = '진격';
+
 export default function Navbar() {
  const {user,logout} = useAuth(); const {language,setLanguage} = useLanguage();
  const navigate = useNavigate(); const location = useLocation(); const [query,setQuery] = useState('');
  const [notifications,setNotifications] = useState(false);
- const labels = language === 'ja' ? ['発見','評価','フィード','ライブラリ'] : language === 'en' ? ['Discover','Rate','Feed','Library'] : ['발견','평가','피드','내 서재'];
- // 발견(/browse) is hidden from the menu; the route stays reachable via logo and search.
- const paths = ['/browse','/rate','/feed','/my-anipass'];
- const hiddenFromMenu = new Set(['/browse']);
- const links = paths.map((path,i) => hiddenFromMenu.has(path) ? null : <NavLink key={path} to={path} className={({isActive}) => `nav-destination ${isActive || (path === '/rate' && location.pathname === '/rate-characters') ? 'is-active' : ''}`}>{labels[i]}</NavLink>);
+ const labels = language === 'ja' ? ['評価','フィード','発見','ライブラリ'] : language === 'en' ? ['Rate','Feed','Discover','Library'] : ['평가','피드','발견','내 서재'];
+ const paths = ['/rate','/feed','/browse','/my-anipass'];
+ // 발견 temporarily opens a prefilled keyword search until curated discovery exists.
+ const destination = path => path === '/browse' ? `/browse?q=${encodeURIComponent(DISCOVER_KEYWORD)}` : path;
+ const links = paths.map((path,i) => <NavLink key={path} to={destination(path)} className={({isActive}) => `nav-destination ${isActive || (path === '/rate' && location.pathname === '/rate-characters') ? 'is-active' : ''}`}>{labels[i]}</NavLink>);
  return <>
   <header className="app-header"><div className="app-header-inner">
    <Link to="/browse" className="app-brand"><img src="/logo.svg" width="28" height="28" alt=""/>AniBite</Link>
